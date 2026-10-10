@@ -421,10 +421,37 @@ A.spySug = b => { conv = false; S.handle(b.dataset.q); };
 OS.forms.spyAsk = f => { const q = f.elements.q.value.trim(); conv = false; if (q) setTimeout(() => S.handle(q), 0); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && el && !el.hidden) close(); });
 
+/* ================= estado do Spyke: tudo o que ele usa, verificado num só sítio ================= */
+const SCRV = 10; let chkBusy = false;
+const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url && c.key), ai = !!(OS.AI && OS.AI.key()), aiSt = U.ls.get('os2aiOk', null), mail = OS.Mail && OS.Mail.counts ? OS.Mail.counts() : {};
+  const row = (ok, t, d) => `<div class="spy-chk ${ok === true ? 'ok' : ok === false ? 'bad' : 'wait'}"><i>${ok === true ? '✓' : ok === false ? '✗' : '!'}</i><div><b>${t}</b><small>${d}</small></div></div>`;
+  const oldScr = hasScr && v < SCRV;
+  return `<div class="pn" id="spyState"><div class="pn-h"><h3>Estado do Spyke</h3><button class="btn sm" data-act="spyCheckAll" ${chkBusy ? 'disabled' : ''}>${UI.ic('sync')}${chkBusy ? 'A verificar…' : 'Verificar tudo'}</button></div>
+    <div class="spy-chks">
+    ${row(ai ? (aiSt && aiSt.ok === false ? false : true) : false, 'Cérebro (IA)', ai ? (aiSt && aiSt.ok === false ? esc(aiSt.msg || 'a chave não funciona') : 'ligado: conversa, decisões, resumos, e-mails, fotos') : 'desligado: cola a chave em "Cérebro do Spyke", aqui em baixo')}
+    ${row(SR ? (ear ? true : null) : false, 'Microfone', !SR ? 'este navegador não reconhece voz' : ear ? 'a ouvir agora' : earStopped ? 'desligado por ti: toca no microfone ou diz "volta a ouvir"' : cfg().always ? 'parado: toca no microfone para começar' : '"Ouvir sempre" está desligado')}
+    ${row(hasScr ? (v >= SCRV ? true : false) : false, 'Script Google', !hasScr ? 'não está ligado neste aparelho: Definições → Sincronizar aparelhos → Recuperar os meus dados' : v >= SCRV ? 'versão ' + v + ': notícias, e-mail, Siri e sincronização' : 'versão ' + (v || 'antiga') + ': falta atualizar para a versão ' + SCRV + ' (passo a passo abaixo)')}
+    ${row(hasScr && v >= SCRV ? (OS.News && OS.News.old ? false : true) : false, 'Notícias', hasScr && v >= SCRV ? 'prontas no Jornal e no resumo do dia' : 'precisam do script Google atualizado')}
+    ${row(hasScr && v >= SCRV ? (mail.at ? true : null) : false, 'E-mail', hasScr && v >= SCRV ? (mail.at ? 'ligado' : 'falta ligar o Gmail: página E-mail → Atualizar') : 'precisa do script Google atualizado')}
+    </div>
+    ${oldScr ? `<div class="spy-upd"><b>Atualizar o script do Google · passo a passo (uns 5 minutos)</b>
+      <ol><li>Toca em <b>Copiar código novo</b> (já leva a tua chave).<div class="row gap8" style="margin-top:6px"><button class="btn sm pri" data-act="ibCopy" data-t="code">${UI.ic('link')}Copiar código novo</button></div></li>
+      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> e entra no teu projeto do Oceanum. No iPhone é mais fácil com <b>aA → Pedir site para computador</b> (ou faz num computador).</li>
+      <li>No código: <b>seleciona tudo</b> → apaga → <b>cola</b> o código novo → toca na disquete (<b>Guardar</b>).</li>
+      <li>Na lista de funções ao lado de <b>▶ Executar</b>, escolhe <b>autorizarGmail</b> → <b>▶ Executar</b> → <b>Rever permissões</b> → a tua conta → <b>Avançado</b> → <b>Aceder</b> → <b>Permitir</b>. É o teu próprio script: o aviso do Google é normal.</li>
+      <li><b>Implantar</b> → <b>Gerenciar implantações</b> → lápis (<b>Editar</b>) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>. Se houver mais de uma implantação, edita a que tem o endereço que termina em <code>…${esc(String(c.url || '').slice(-16))}</code>.</li>
+      <li>Volta aqui e toca em <b>Verificar tudo</b>.</li></ol>
+      <small class="mut">O endereço e a chave ficam iguais: os outros aparelhos continuam ligados sem fazer nada.</small></div>` : ''}</div>`; };
+A.spyCheckAll = async () => { if (chkBusy) return; chkBusy = true; OS.request();
+  try { if (OS.AI && OS.AI.key() && OS.AI.test) await OS.AI.test(); if (OS.Inbox && OS.Inbox.check && ib().url) await OS.Inbox.check();
+    if (OS.News && +(ib().ver || 0) >= SCRV) { OS.News.old = false; try { await OS.News.headlines(3); } catch (e) { } } } catch (e) { }
+  chkBusy = false; OS.request(); const c = ib(), v = +(c.ver || 0), aiSt = U.ls.get('os2aiOk', null);
+  UI.toast(!c.url ? 'O script Google não está ligado neste aparelho.' : v < SCRV ? 'Falta atualizar o script Google (versão ' + (v || 'antiga') + ').' : aiSt && aiSt.ok === false ? 'O script está bem, mas a chave da IA não funciona.' : 'Tudo verificado.', v >= SCRV && !(aiSt && aiSt.ok === false) ? 'pos' : 'warn'); };
+
 /* ================= página do Spyke ================= */
 V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key ? ibc.url.trim() + (ibc.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(ibc.key) + '&op=' + op : '';
   if (sub === 'bomdia') { try { history.replaceState(null, '', '#spyke'); } catch (e) { } setTimeout(() => { open(); S.say(S.brief()); }, 300); }
-  return UI.head('Spyke', 'O teu assistente de voz: fala contigo, resume o dia e faz coisas por ti.', `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>`) + `<div class="spy-page">${OS.AI && OS.AI.panel ? OS.AI.panel() : ''}
+  return UI.head('Spyke', 'O teu assistente de voz: fala contigo, resume o dia e faz coisas por ti.', `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>`) + `<div class="spy-page">${statePanel()}${OS.AI && OS.AI.panel ? OS.AI.panel() : ''}
   <div class="pn"><div class="pn-h"><h3>Voz do Spyke</h3><small class="mut">${esc(engine ? 'última: ' + engine : '')}</small></div>
     <div class="spy-eng">${[['auto', 'Automática', 'a mais humana que estiver ligada'], ['eleven', 'ElevenLabs', 'a mais humana (conta grátis)'], ['gemini', 'IA Gemini', 'com a tua chave da IA'], ['device', 'Aparelho', 'sem internet, mais robótica']].map(([v, l, d]) => `<button type="button" class="spy-ec ${(c.eng || 'auto') === v ? 'on' : ''}" data-act="spyEng" data-v="${v}"><b>${l}</b><small>${d}</small></button>`).join('')}</div>
     ${voiceErr ? `<div class="ib-st bad" style="margin-top:8px">Na última vez: ${esc(voiceErr)}</div>` : ''}

@@ -241,6 +241,7 @@ IB.check = async () => { const u = base(), c = cfg();
   try { let j = null; try { j = await getJSON(q('&op=ping&_=' + Date.now())); } catch (e) { }
     if (!j) return IB.st = { ok: false, m: 'O Google respondeu com uma página em vez dos dados. Na implementação, "Quem tem acesso" tem de ser "Qualquer pessoa".' };
     if (j.msg === 'Chave errada') return IB.st = { ok: false, m: 'Chave errada: o código no Apps Script não é o atual. Cola-o outra vez, guarda e faz Implementar → Gerir implementações → ✏️ → Nova versão.' };
+    if (!j.ok && /Valor inv/i.test(j.msg || '')) { cfg().ver = 1; OS.touch('inbox'); return IB.st = { ok: false, m: 'O script Google é uma versão antiga: atualiza-o (página do Spyke → Estado do Spyke → passo a passo).' }; }
     if (!j.ok) return IB.st = { ok: false, m: 'O script respondeu com erro: ' + (j.msg || '?') };
     cfg().ver = j.v || 2; OS.touch('inbox');
     if ((j.v || 2) >= 3) { // testa também a gravação no Google Drive (precisa de autorização dada no editor)
@@ -295,7 +296,7 @@ A.syCopy = async () => { const SY = window.OceanumSync; const code = SY.linkCode
 const copy = t => new Promise(res => { try { navigator.clipboard.writeText(t).then(() => res(true), () => res(false)); } catch (e) { res(false); } });
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   const t = b.dataset.t === 'code' ? IB.script(c.key) : q('');
-  if (await copy(t)) UI.toast(b.dataset.t === 'code' ? 'Código copiado. Agora abre o sheets.new.' : 'Link copiado', 'pos');
+  if (await copy(t)) UI.toast(b.dataset.t === 'code' ? 'Código copiado. Agora cola-o no teu script em script.google.com.' : 'Link copiado', 'pos');
   else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); };
 A.ibSave = async () => { const el = document.getElementById('ibUrl'), c = cfg(); c.url = (el ? el.value : '').trim(); OS.touch('inbox'); IB.st = { ok: false, m: 'A verificar…' }; OS.request(); await IB.check(); OS.request(); };
 A.ibRound = async () => { IB.testMsg = 'A enviar o teste…'; IB.testDone = false; IB.testOk = false; OS.request();

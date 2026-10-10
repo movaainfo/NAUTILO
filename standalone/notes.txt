@@ -1,1 +1,1 @@
-Atualização garantida: se um aparelho ficar para trás atualiza-se sozinho; botão "Procurar atualização" nas Definições; recuperar os dados do Google Drive direto em Sincronizar aparelhos; testado em iPhone, Android, tablet e computador.
+Estado do Spyke: verifica a IA, o microfone, o script Google, as notícias e o e-mail, e mostra o passo a passo para atualizar o script. Jornal explica quando o script é antigo.

@@ -984,6 +984,23 @@ async function newFeatureTests(b) {
     await sleep(2500); const nt = await E(p, () => document.getElementById('view').innerText);
     ok('jornal: sem resposta desiste, explica e oferece "Tentar outra vez" (sem ficar em ciclo)', /não respondeu/.test(nt) && /Tentar outra vez/.test(nt) && !/A buscar as notícias/.test(nt), nt.slice(0, 120));
     ok('sem erros de JavaScript (decisões e jornal)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // script Google antigo: o Spyke diz o que falta e o passo a passo; depois de atualizado fica tudo verde
+  { const { ctx, p, errs } = await newPage(b, PROFILES[0]); let NEWV = false;
+    await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.fromEntries(new URLSearchParams(rt.request().postData() || '')), op = u.searchParams.get('op') || P.op, J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+      if (!NEWV && op !== 'list' && op !== 'get' && op !== 'put' && op !== 'pull') return J({ ok: false, msg: 'Valor inválido' });
+      if (op === 'ping') return J({ ok: true, v: 10 }); if (op === 'put') return J({ ok: true }); if (op === 'nw') return J({ ok: true, nw: { 'PT:WORLD': [{ t: 'Notícia de teste - Público', s: 'Público', l: 'https://x.pt', d: Date.now() }], 'BR:WORLD': [], 'PT:TOP': [], 'W:TOP': [] } }); return J({ ok: true, items: [], docs: {} }); });
+    await ctx.route(/generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [] }) }));
+    await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 1 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
+    ok('script antigo: o Jornal explica que o script é antigo e leva ao passo a passo', await E(p, () => /versão antiga/.test(document.getElementById('view').innerText) && !!document.querySelector('#view a[href="#spyke"]')));
+    await E(p, () => location.hash = 'spyke'); await sleep(400);
+    const st = await E(p, () => ({ bad: document.querySelectorAll('#spyState .spy-chk.bad').length, guide: !!document.querySelector('#spyState .spy-upd [data-act=ibCopy]'), tail: /TESTE123\/exec/.test(document.querySelector('#spyState .spy-upd').innerText) }));
+    ok('estado do Spyke: mostra o que falta (script, notícias, e-mail) com o passo a passo e a implantação certa', st.bad >= 3 && st.guide && st.tail, JSON.stringify(st));
+    NEWV = true; await E(p, () => document.querySelector('#spyState [data-act=spyCheckAll]').click()); await sleep(2500);
+    const st2 = await E(p, () => ({ ok: [...document.querySelectorAll('#spyState .spy-chk.ok b')].map(x => x.textContent), guide: !!document.querySelector('#spyState .spy-upd') }));
+    ok('estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)', ['Cérebro (IA)', 'Script Google', 'Notícias'].every(t => st2.ok.includes(t)) && !st2.guide, JSON.stringify(st2));
+    await E(p, () => { OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
+    ok('script atualizado: o Jornal mostra as notícias', await E(p, () => /Notícia de teste/.test(document.getElementById('view').innerText)));
+    ok('sem erros de JavaScript (estado do Spyke)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
   // nome da app
   { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), m = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
     ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }

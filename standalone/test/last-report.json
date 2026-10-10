@@ -3,13 +3,13 @@
   "p": "iPhone",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "246 ms"
+  "info": "252 ms"
  },
  {
   "p": "iPhone",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v1.99"
+  "info": "MIND CONTROL · v2.0"
  },
  {
   "p": "iPhone",
@@ -69,11 +69,11 @@
   "p": "iPhone",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 85 ms"
+  "info": "máx 77 ms"
  },
  {
   "p": "iPhone",
-  "name": "476 botões carregados sem erro",
+  "name": "477 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -111,13 +111,13 @@
   "p": "Android tel",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "238 ms"
+  "info": "206 ms"
  },
  {
   "p": "Android tel",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v1.99"
+  "info": "MIND CONTROL · v2.0"
  },
  {
   "p": "Android tel",
@@ -177,11 +177,11 @@
   "p": "Android tel",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 108 ms"
+  "info": "máx 86 ms"
  },
  {
   "p": "Android tel",
-  "name": "476 botões carregados sem erro",
+  "name": "477 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -219,13 +219,13 @@
   "p": "Tablet horiz",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "1449 ms"
+  "info": "1280 ms"
  },
  {
   "p": "Tablet horiz",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v1.99"
+  "info": "MIND CONTROL · v2.0"
  },
  {
   "p": "Tablet horiz",
@@ -285,11 +285,11 @@
   "p": "Tablet horiz",
   "name": "páginas rápidas (processador 6× mais lento)",
   "pass": true,
-  "info": "máx 331 ms"
+  "info": "máx 360 ms"
  },
  {
   "p": "Tablet horiz",
-  "name": "485 botões carregados sem erro",
+  "name": "486 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -315,7 +315,7 @@
   "p": "Tablet horiz",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 2037 elementos"
+  "info": "heap +0 MB · 1619 elementos"
  },
  {
   "p": "Tablet horiz",
@@ -327,13 +327,13 @@
   "p": "Tablet vert",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "224 ms"
+  "info": "211 ms"
  },
  {
   "p": "Tablet vert",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v1.99"
+  "info": "MIND CONTROL · v2.0"
  },
  {
   "p": "Tablet vert",
@@ -393,11 +393,11 @@
   "p": "Tablet vert",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 93 ms"
+  "info": "máx 101 ms"
  },
  {
   "p": "Tablet vert",
-  "name": "488 botões carregados sem erro",
+  "name": "489 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -435,13 +435,13 @@
   "p": "Computador",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "240 ms"
+  "info": "270 ms"
  },
  {
   "p": "Computador",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v1.99"
+  "info": "MIND CONTROL · v2.0"
  },
  {
   "p": "Computador",
@@ -501,11 +501,11 @@
   "p": "Computador",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 117 ms"
+  "info": "máx 90 ms"
  },
  {
   "p": "Computador",
-  "name": "486 botões carregados sem erro",
+  "name": "487 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -621,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 10/10/2026 · Atualização garantida: se um aparelho fic"
+  "info": "Atualizado · versão 9.9 · 10/10/2026 · Estado do Spyke: verifica a IA, o microfo"
  },
  {
   "p": "Geral",
@@ -981,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"ie6ok9nr4t6\",\"_c\":1791652691994,\"_u\":1791652691994,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Ceia\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"v87tqj09s2t\",\"_c\":1791673717349,\"_u\":1791673717349,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1131,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"pz20mgnrldb\",\"_c\":1791652713455,\"_u\":1791652713455,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Ceia\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"pylrpk0a8n2\",\"_c\":1791673738814,\"_u\":1791673738814,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -2271,7 +2271,7 @@
   "p": "Novidades",
   "name": "Spyke: logo ao entrar falo sem dizer \"Spyke\"",
   "pass": true,
-  "info": "São 17:21."
+  "info": "São 23:11."
  },
  {
   "p": "Novidades",
@@ -2438,6 +2438,36 @@
  {
   "p": "Novidades",
   "name": "sem erros de JavaScript (decisões e jornal)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script antigo: o Jornal explica que o script é antigo e leva ao passo a passo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: mostra o que falta (script, notícias, e-mail) com o passo a passo e a implantação certa",
+  "pass": true,
+  "info": "{\"bad\":3,\"guide\":true,\"tail\":true}"
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)",
+  "pass": true,
+  "info": "{\"ok\":[\"Cérebro (IA)\",\"Script Google\",\"Notícias\"],\"guide\":false}"
+ },
+ {
+  "p": "Novidades",
+  "name": "script atualizado: o Jornal mostra as notícias",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (estado do Spyke)",
   "pass": true,
   "info": ""
  },
@@ -2877,13 +2907,13 @@
   "p": "Stress",
   "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
   "pass": true,
-  "info": "máx 641 ms"
+  "info": "máx 593 ms"
  },
  {
   "p": "Stress",
   "name": "guardar tudo é rápido",
   "pass": true,
-  "info": "99 ms"
+  "info": "77 ms"
  },
  {
   "p": "Stress",
