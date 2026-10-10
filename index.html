@@ -2115,6 +2115,13 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .dc-sec{margin:8px 0}.dc-sec b{font-size:13px}.dc-sec ul{margin:4px 0;padding-left:18px;font-size:13px;line-height:1.45}
 .dc-qa{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04)}.dc-qa b{font-size:13px}.dc-qa p{margin:4px 0 0;font-size:13px;line-height:1.45}
 .dc-ask{margin-top:10px}.dc-lean{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;color:var(--mut)}
+/* Spyke: estado */
+.spy-chks{display:flex;flex-direction:column;gap:6px}
+.spy-chk{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;border:1px solid var(--line)}
+.spy-chk i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:12px;color:#fff;background:#64748b}
+.spy-chk.ok i{background:#16a34a}.spy-chk.bad i{background:#dc2626}.spy-chk.wait i{background:#d97706}
+.spy-chk b{display:block;font-size:13.5px}.spy-chk small{color:var(--mut);font-size:12.5px;line-height:1.4}
+.spy-upd{margin-top:12px;padding:12px;border-radius:12px;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.06)}.spy-upd ol{margin:8px 0;padding-left:20px;line-height:1.55;font-size:13.5px}.spy-upd li{margin-bottom:6px}
 
 </style>
 <style>
@@ -2346,7 +2353,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "1.99", "date": "10/10/2026", "notes": ["Atualização garantida: se um aparelho ficar para trás atualiza-se sozinho; botão \"Procurar atualização\" nas Definições; recuperar os dados do Google Drive direto em Sincronizar aparelhos; testado em iPhone, Android, tablet e computador."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.0", "date": "10/10/2026", "notes": ["Estado do Spyke: verifica a IA, o microfone, o script Google, as notícias e o e-mail, e mostra o passo a passo para atualizar o script. Jornal explica quando o script é antigo."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -6317,8 +6324,9 @@ NW.fetch = async (sp, force) => { const need = sp.filter(s => force || !NW.cache
   try { r = await fetch(u, { cache: 'no-store', credentials: 'omit', signal: ac ? ac.signal : undefined }); txt = await r.text(); }
   catch (e) { throw new Error(e && e.name === 'AbortError' ? 'o teu script Google não respondeu a tempo (pode estar a acordar: tenta outra vez)' : 'sem ligação ao teu script Google'); } finally { to && clearTimeout(to); }
   let j; try { j = JSON.parse(txt); } catch (e) { throw new Error(/accounts\.google|ServiceLogin|Sign in/i.test(txt) ? 'o script Google pede início de sessão: na implementação escolhe "Quem tem acesso: Qualquer pessoa"' : 'o script Google respondeu com um erro'); }
+  if (j && j.ok === false && /Valor inv/i.test(j.msg || '')) { NW.old = true; throw new Error('script antigo'); }
   if (j && j.ok === false) throw new Error(j.msg || 'o script recusou o pedido'); if (!j.nw) { NW.old = true; throw new Error('script antigo'); } NW.old = false;
-  Object.entries(j.nw).forEach(([id, items]) => { const prev = NW.cache[id]; NW.cache[id] = { at: Date.now(), items: items || [] }; if (prev && prev.items.length) { const old = new Set(prev.items.map(x => norm(x.t))); NW.cache[id].fresh = (items || []).filter(x => !old.has(norm(x.t))).map(x => norm(x.t)); } });
+  NW.okAt = Date.now(); Object.entries(j.nw).forEach(([id, items]) => { const prev = NW.cache[id]; NW.cache[id] = { at: Date.now(), items: items || [] }; if (prev && prev.items.length) { const old = new Set(prev.items.map(x => norm(x.t))); NW.cache[id].fresh = (items || []).filter(x => !old.has(norm(x.t))).map(x => norm(x.t)); } });
   try { U.ls.set('oc_news1', Object.fromEntries(Object.entries(NW.cache).slice(-24))); } catch (e) { } };
 Object.assign(NW.cache, U.ls.get('oc_news1', {}) || {});
 const itemsFor = (tab, topic, theme) => { const all = merge(specs(tab, topic, theme).map(s => NW.cache[s.id] && NW.cache[s.id].items)), cut = Date.now() - 48 * 36e5; return [...all.filter(x => !x.d || x.d >= cut), ...all.filter(x => x.d && x.d < cut)]; };
@@ -6357,16 +6365,16 @@ const load = async (force) => { if (busy) return; const tab = OS.ui.nwTab || 'W'
   clearInterval(tick); tick = setInterval(() => { const e = document.getElementById('nwSec'); if (!busy || !e) return clearInterval(tick); const s2 = Math.round((Date.now() - busyAt) / 1000); e.textContent = s2 + ' s' + (s2 >= 6 ? ' · o script Google demora mais na primeira vez do dia' : ''); }, 1000);
   try { await NW.fetch(specs(tab, topic, theme), force); const it = itemsFor(tab, topic, theme), fr = freshSet(tab, topic, theme); if (fr.size && !force && lastLoad) UI.toast(`${fr.size} notícia(s) nova(s)`, 'pos'); lastLoad = Date.now();
     if (tab !== 'W' && ED[tab][3] !== 'pt') translate(it, ED[tab][3]); if (topic === 'TOP' && !theme) briefing(tab, it, tab === 'W' ? 'todo o mundo' : ED[tab][0]); }
-  catch (e) { errAt = Date.now(); err = NW.old ? 'O teu script Google precisa do código novo (Investimentos → Cotações → Copiar código novo → Nova versão).' : !scr() ? '' : 'Não consegui buscar as notícias: ' + e.message + '.'; }
+  catch (e) { errAt = Date.now(); err = NW.old ? 'O teu script Google é uma versão antiga e ainda não sabe buscar notícias. Atualiza-o (5 minutos, passo a passo na página do Spyke).' : !scr() ? '' : 'Não consegui buscar as notícias: ' + e.message + '.'; }
   busy = false; clearInterval(tick); OS.request(); };
 V.jornal = () => { const tab = OS.ui.nwTab || 'W', topic = OS.ui.nwTopic || 'TOP', theme = OS.ui.nwTheme || '', C2 = cfg(), lang = tab === 'W' ? 'pt' : ED[tab][3];
-  const sp = specs(tab, topic, theme), stale = sp.some(s => !NW.cache[s.id] || Date.now() - NW.cache[s.id].at > 4 * 6e4); if (stale && !busy && scr() && Date.now() - errAt > 90000) setTimeout(() => load(false), 30);
+  const sp = specs(tab, topic, theme), stale = sp.some(s => !NW.cache[s.id] || Date.now() - NW.cache[s.id].at > 4 * 6e4); if (stale && !busy && scr() && (Date.now() - errAt > 90000 || (NW.okAt || 0) > errAt)) setTimeout(() => load(false), 30);
   const items = itemsFor(tab, topic, theme), fr = freshSet(tab, topic, theme), place = tab === 'W' ? 'Mundo' : ED[tab][0], b = !theme && topic === 'TOP' ? BR[tab] : null, last = Math.max(0, ...sp.map(s => (NW.cache[s.id] || {}).at || 0));
   const tabs = `<div class="nw-tabs"><button class="${tab === 'W' ? 'on' : ''}" data-act="nwTab" data-v="W">🌍 Mundo</button>${(C2.tabs || []).filter(k => ED[k]).map(k => `<button class="${tab === k ? 'on' : ''}" data-act="nwTab" data-v="${k}">${ED[k][1]} ${esc(ED[k][0])}<i data-act="nwDelTab" data-v="${k}" title="Remover" aria-label="Remover ${esc(ED[k][0])}">×</i></button>`).join('')}<button class="nw-add" data-act="nwAddTab">+ País</button></div>`;
   const tops = `<div class="nw-topics">${TOPICS.filter(t => !(tab === 'W' && t[0] === 'NATION')).map(([k, l]) => `<button class="chip ${!theme && topic === k ? 'on' : ''}" data-act="nwTopic" data-v="${k}">${l}</button>`).join('')}${(C2.themes || []).map(t => `<button class="chip ${theme === t ? 'on' : ''}" data-act="nwTheme" data-v="${esc(t)}">#${esc(t)}<i data-act="nwDelTheme" data-v="${esc(t)}" aria-label="Remover tema">×</i></button>`).join('')}<form class="row gap6" data-form="nwTheme"><input class="field" name="q" placeholder="+ tema (ex.: Aveiro, IA, Ucrânia)" style="width:220px" aria-label="Novo tema"></form></div>`;
   if (!scr()) return UI.head('Jornal', 'As notícias mais importantes do mundo, em tempo real.', '', 'Visão geral') + tabs + `<div class="pn"><h3>Liga as notícias</h3><p>As notícias chegam através do teu script Google (o mesmo do atalho de gastos, sincronização e cotações). Configura-o em <a class="acc" href="#definicoes">Definições → Atalho de gastos</a> e cola o código novo (Investimentos → Cotações → Copiar código novo).</p>${OS.Move && !OS.Move.isOld ? '<p class="mut" style="margin:0">Já o tinhas no endereço antigo? <a class="acc" href="#definicoes" data-act="mvWelcome">Traz os teus dados</a>: o script vem com eles e as notícias aparecem logo.</p>' : ''}</div>`;
   return UI.head('Jornal', 'As notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do dia.', `<button class="btn sm ghost" data-act="nwRefresh">${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button>`, 'Visão geral') + tabs + tops
-    + `<div class="nw-meta"><span class="inv-live"><i></i>${last ? 'Atualizado ' + ago(last) : 'A carregar…'} · Google Notícias${tab !== 'W' && lang !== 'pt' ? ` · <label><input type="checkbox" data-act="nwTr" ${C2.tr ? 'checked' : ''}> traduzir para português</label>${TRB ? ' (a traduzir…)' : ''}` : ''}</span></div>${err ? `<div class="note nw-err">${esc(err)} <button class="btn xs" data-act="nwRefresh">Tentar outra vez</button></div>` : ''}
+    + `<div class="nw-meta"><span class="inv-live"><i></i>${last ? 'Atualizado ' + ago(last) : 'A carregar…'} · Google Notícias${tab !== 'W' && lang !== 'pt' ? ` · <label><input type="checkbox" data-act="nwTr" ${C2.tr ? 'checked' : ''}> traduzir para português</label>${TRB ? ' (a traduzir…)' : ''}` : ''}</span></div>${err ? `<div class="note nw-err">${esc(err)} ${NW.old ? '<a class="btn xs pri" href="#spyke">Ver o passo a passo</a>' : '<button class="btn xs" data-act="nwRefresh">Tentar outra vez</button>'}</div>` : ''}
     ${!theme && topic === 'TOP' ? brief(b, tab, place) : ''}
     ${items.length ? `<div class="nw-list">${items.slice(0, 60).map((x, i) => card(x, i, lang, fr.has(norm(x.t)))).join('')}</div>` : busy ? `<div class="pn"><div class="sai-busy"><div class="fd-spin"></div><span>A buscar as notícias do momento… <small class="mut" id="nwSec">${Math.round((Date.now() - busyAt) / 1000)} s</small></span></div></div>` : err ? '' : UI.empty('Sem notícias para mostrar.', '<button class="btn sm" data-act="nwRefresh">Atualizar</button>')}
     <p class="mut" style="font-size:11.5px">Fonte: Google Notícias (agregador de jornais). Cada notícia abre no site do jornal que a publicou.</p>`; };
@@ -9058,10 +9066,37 @@ A.spySug = b => { conv = false; S.handle(b.dataset.q); };
 OS.forms.spyAsk = f => { const q = f.elements.q.value.trim(); conv = false; if (q) setTimeout(() => S.handle(q), 0); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && el && !el.hidden) close(); });
 
+/* ================= estado do Spyke: tudo o que ele usa, verificado num só sítio ================= */
+const SCRV = 10; let chkBusy = false;
+const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url && c.key), ai = !!(OS.AI && OS.AI.key()), aiSt = U.ls.get('os2aiOk', null), mail = OS.Mail && OS.Mail.counts ? OS.Mail.counts() : {};
+  const row = (ok, t, d) => `<div class="spy-chk ${ok === true ? 'ok' : ok === false ? 'bad' : 'wait'}"><i>${ok === true ? '✓' : ok === false ? '✗' : '!'}</i><div><b>${t}</b><small>${d}</small></div></div>`;
+  const oldScr = hasScr && v < SCRV;
+  return `<div class="pn" id="spyState"><div class="pn-h"><h3>Estado do Spyke</h3><button class="btn sm" data-act="spyCheckAll" ${chkBusy ? 'disabled' : ''}>${UI.ic('sync')}${chkBusy ? 'A verificar…' : 'Verificar tudo'}</button></div>
+    <div class="spy-chks">
+    ${row(ai ? (aiSt && aiSt.ok === false ? false : true) : false, 'Cérebro (IA)', ai ? (aiSt && aiSt.ok === false ? esc(aiSt.msg || 'a chave não funciona') : 'ligado: conversa, decisões, resumos, e-mails, fotos') : 'desligado: cola a chave em "Cérebro do Spyke", aqui em baixo')}
+    ${row(SR ? (ear ? true : null) : false, 'Microfone', !SR ? 'este navegador não reconhece voz' : ear ? 'a ouvir agora' : earStopped ? 'desligado por ti: toca no microfone ou diz "volta a ouvir"' : cfg().always ? 'parado: toca no microfone para começar' : '"Ouvir sempre" está desligado')}
+    ${row(hasScr ? (v >= SCRV ? true : false) : false, 'Script Google', !hasScr ? 'não está ligado neste aparelho: Definições → Sincronizar aparelhos → Recuperar os meus dados' : v >= SCRV ? 'versão ' + v + ': notícias, e-mail, Siri e sincronização' : 'versão ' + (v || 'antiga') + ': falta atualizar para a versão ' + SCRV + ' (passo a passo abaixo)')}
+    ${row(hasScr && v >= SCRV ? (OS.News && OS.News.old ? false : true) : false, 'Notícias', hasScr && v >= SCRV ? 'prontas no Jornal e no resumo do dia' : 'precisam do script Google atualizado')}
+    ${row(hasScr && v >= SCRV ? (mail.at ? true : null) : false, 'E-mail', hasScr && v >= SCRV ? (mail.at ? 'ligado' : 'falta ligar o Gmail: página E-mail → Atualizar') : 'precisa do script Google atualizado')}
+    </div>
+    ${oldScr ? `<div class="spy-upd"><b>Atualizar o script do Google · passo a passo (uns 5 minutos)</b>
+      <ol><li>Toca em <b>Copiar código novo</b> (já leva a tua chave).<div class="row gap8" style="margin-top:6px"><button class="btn sm pri" data-act="ibCopy" data-t="code">${UI.ic('link')}Copiar código novo</button></div></li>
+      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> e entra no teu projeto do Oceanum. No iPhone é mais fácil com <b>aA → Pedir site para computador</b> (ou faz num computador).</li>
+      <li>No código: <b>seleciona tudo</b> → apaga → <b>cola</b> o código novo → toca na disquete (<b>Guardar</b>).</li>
+      <li>Na lista de funções ao lado de <b>▶ Executar</b>, escolhe <b>autorizarGmail</b> → <b>▶ Executar</b> → <b>Rever permissões</b> → a tua conta → <b>Avançado</b> → <b>Aceder</b> → <b>Permitir</b>. É o teu próprio script: o aviso do Google é normal.</li>
+      <li><b>Implantar</b> → <b>Gerenciar implantações</b> → lápis (<b>Editar</b>) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>. Se houver mais de uma implantação, edita a que tem o endereço que termina em <code>…${esc(String(c.url || '').slice(-16))}</code>.</li>
+      <li>Volta aqui e toca em <b>Verificar tudo</b>.</li></ol>
+      <small class="mut">O endereço e a chave ficam iguais: os outros aparelhos continuam ligados sem fazer nada.</small></div>` : ''}</div>`; };
+A.spyCheckAll = async () => { if (chkBusy) return; chkBusy = true; OS.request();
+  try { if (OS.AI && OS.AI.key() && OS.AI.test) await OS.AI.test(); if (OS.Inbox && OS.Inbox.check && ib().url) await OS.Inbox.check();
+    if (OS.News && +(ib().ver || 0) >= SCRV) { OS.News.old = false; try { await OS.News.headlines(3); } catch (e) { } } } catch (e) { }
+  chkBusy = false; OS.request(); const c = ib(), v = +(c.ver || 0), aiSt = U.ls.get('os2aiOk', null);
+  UI.toast(!c.url ? 'O script Google não está ligado neste aparelho.' : v < SCRV ? 'Falta atualizar o script Google (versão ' + (v || 'antiga') + ').' : aiSt && aiSt.ok === false ? 'O script está bem, mas a chave da IA não funciona.' : 'Tudo verificado.', v >= SCRV && !(aiSt && aiSt.ok === false) ? 'pos' : 'warn'); };
+
 /* ================= página do Spyke ================= */
 V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key ? ibc.url.trim() + (ibc.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(ibc.key) + '&op=' + op : '';
   if (sub === 'bomdia') { try { history.replaceState(null, '', '#spyke'); } catch (e) { } setTimeout(() => { open(); S.say(S.brief()); }, 300); }
-  return UI.head('Spyke', 'O teu assistente de voz: fala contigo, resume o dia e faz coisas por ti.', `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>`) + `<div class="spy-page">${OS.AI && OS.AI.panel ? OS.AI.panel() : ''}
+  return UI.head('Spyke', 'O teu assistente de voz: fala contigo, resume o dia e faz coisas por ti.', `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>`) + `<div class="spy-page">${statePanel()}${OS.AI && OS.AI.panel ? OS.AI.panel() : ''}
   <div class="pn"><div class="pn-h"><h3>Voz do Spyke</h3><small class="mut">${esc(engine ? 'última: ' + engine : '')}</small></div>
     <div class="spy-eng">${[['auto', 'Automática', 'a mais humana que estiver ligada'], ['eleven', 'ElevenLabs', 'a mais humana (conta grátis)'], ['gemini', 'IA Gemini', 'com a tua chave da IA'], ['device', 'Aparelho', 'sem internet, mais robótica']].map(([v, l, d]) => `<button type="button" class="spy-ec ${(c.eng || 'auto') === v ? 'on' : ''}" data-act="spyEng" data-v="${v}"><b>${l}</b><small>${d}</small></button>`).join('')}</div>
     ${voiceErr ? `<div class="ib-st bad" style="margin-top:8px">Na última vez: ${esc(voiceErr)}</div>` : ''}
@@ -12984,6 +13019,7 @@ IB.check = async () => { const u = base(), c = cfg();
   try { let j = null; try { j = await getJSON(q('&op=ping&_=' + Date.now())); } catch (e) { }
     if (!j) return IB.st = { ok: false, m: 'O Google respondeu com uma página em vez dos dados. Na implementação, "Quem tem acesso" tem de ser "Qualquer pessoa".' };
     if (j.msg === 'Chave errada') return IB.st = { ok: false, m: 'Chave errada: o código no Apps Script não é o atual. Cola-o outra vez, guarda e faz Implementar → Gerir implementações → ✏️ → Nova versão.' };
+    if (!j.ok && /Valor inv/i.test(j.msg || '')) { cfg().ver = 1; OS.touch('inbox'); return IB.st = { ok: false, m: 'O script Google é uma versão antiga: atualiza-o (página do Spyke → Estado do Spyke → passo a passo).' }; }
     if (!j.ok) return IB.st = { ok: false, m: 'O script respondeu com erro: ' + (j.msg || '?') };
     cfg().ver = j.v || 2; OS.touch('inbox');
     if ((j.v || 2) >= 3) { // testa também a gravação no Google Drive (precisa de autorização dada no editor)
@@ -13038,7 +13074,7 @@ A.syCopy = async () => { const SY = window.OceanumSync; const code = SY.linkCode
 const copy = t => new Promise(res => { try { navigator.clipboard.writeText(t).then(() => res(true), () => res(false)); } catch (e) { res(false); } });
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   const t = b.dataset.t === 'code' ? IB.script(c.key) : q('');
-  if (await copy(t)) UI.toast(b.dataset.t === 'code' ? 'Código copiado. Agora abre o sheets.new.' : 'Link copiado', 'pos');
+  if (await copy(t)) UI.toast(b.dataset.t === 'code' ? 'Código copiado. Agora cola-o no teu script em script.google.com.' : 'Link copiado', 'pos');
   else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); };
 A.ibSave = async () => { const el = document.getElementById('ibUrl'), c = cfg(); c.url = (el ? el.value : '').trim(); OS.touch('inbox'); IB.st = { ok: false, m: 'A verificar…' }; OS.request(); await IB.check(); OS.request(); };
 A.ibRound = async () => { IB.testMsg = 'A enviar o teste…'; IB.testDone = false; IB.testOk = false; OS.request();
