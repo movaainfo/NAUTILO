@@ -35,6 +35,7 @@ const panel = () => { const U = OS.U, e = U.esc;
   ${!Cloud.enabled ? `<p class="mut" style="margin:0">Os dados estão guardados só neste dispositivo. Para sincronizar entre telemóvel e computador, configura o Firebase (vê o guia LANCAR.md) e volta a publicar.</p>`
     : Cloud.user ? `<p style="margin:0 0 10px">Ligado como <b>${e(Cloud.user.email || '')}</b>. Tudo o que registas sincroniza sozinho.</p><div class="row gap8"><button class="btn" data-act="cloudPush">Enviar tudo agora</button><button class="btn ghost" data-act="cloudOut">Sair</button></div>`
     : `<p style="margin:0 0 10px">Entra com a tua conta Google para guardar na nuvem e ver os mesmos dados em todos os dispositivos.</p><button class="btn pri" data-act="cloudIn">Entrar com Google</button>`}</div>`; };
-const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + panel();
+// só aparece se o Firebase estiver configurado (a sincronização normal é a do Google Drive, em "Sincronizar aparelhos")
+const orig = OS.views.definicoes; if (orig && Cloud.enabled) OS.views.definicoes = sub => orig(sub) + panel();
 if (Cloud.enabled) init().then(u => { Cloud.state = u ? 'ligado' : 'por entrar'; OS.request(); }).catch(() => { Cloud.state = 'sem ligação'; OS.request(); });
 })();

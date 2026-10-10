@@ -2,7 +2,7 @@
    Serve dist-gh/ em /Oceanum/ (igual ao GitHub Pages) e testa em 5 aparelhos simulados.
    Uso: NODE_PATH=$(npm root -g) node standalone/test/suite.js            (todos)
         ... suite.js --quick                                              (sem stress nem crawl completo)
-        ... suite.js --only=areas,novidades                              (só alguns blocos: perfis, geral, areas, novidades, stress) */
+        ... suite.js --only=areas,novidades                              (só alguns blocos: perfis, geral, areas, novidades, aparelhos, stress) */
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto'), url = require('url');
 const ROOT = path.resolve(__dirname, '../../dist-gh');
@@ -236,6 +236,13 @@ async function sharedTests(b) {
     ok('sync: o iPhone liga-se com o código e recebe os dados do tablet', await E(I.p, () => OS.all('transactions').some(t => t.desc === 'Jantar tablet')));
     ok('código de ligação aceite em qualquer formato (link, código, codificado, com espaços)', await E(I.p, c => { const f = [c, encodeURIComponent(c), 'https://x.github.io/Oceanum/#ligar=' + encodeURIComponent(c), 'Abre isto: https://x.github.io/Oceanum/#ligar=' + c + ' ok', c.slice(0, 10) + '\n ' + c.slice(10)]; const r = f.map(x => window.OceanumSync.applyLink(x)); localStorage.setItem('os2syncJoined', '1'); return r.every(Boolean) && !window.OceanumSync.applyLink('lixo'); }, code));
     ok('sync: a configuração do atalho também passa para o iPhone', await E(I.p, () => !!OS.one('inbox').url && OS.one('inbox').key === 'KEY_T'));
+    // computador: liga-se com o mesmo código, recebe tudo e o que faz chega aos outros
+    { const C = await newPage(b, PROFILES[4]); await C.p.goto(BASE + '?r=2#ligar=' + encodeURIComponent(code)); await sleep(500); await unlock(C.p).catch(() => { }); await sleep(4500);
+      ok('sync: o computador liga-se com o código e recebe os dados', await E(C.p, () => OS.all('transactions').some(t => t.desc === 'Jantar tablet') && !!OS.one('inbox').url));
+      await E(C.p, () => OS.add('transactions', { type: 'Despesa', amount: 9, date: OS.U.today(), desc: 'Livro computador', cat: 'Educação', account: (OS.all('accounts')[0] || {}).id })); await sleep(3000);
+      for (const X of [T, I]) await E(X.p, () => document.dispatchEvent(new Event('visibilitychange'))); await sleep(3500);
+      ok('sync: o que registas no computador aparece no tablet e no iPhone', await E(T.p, () => OS.all('transactions').some(t => t.desc === 'Livro computador')) && await E(I.p, () => OS.all('transactions').some(t => t.desc === 'Livro computador')));
+      ok('sem erros de JavaScript (computador)', !C.errs.length, C.errs.slice(0, 3).join(' | ')); await C.ctx.close(); }
     // alteração no iPhone aparece no tablet
     await E(I.p, () => OS.add('transactions', { type: 'Despesa', amount: 7, date: OS.U.today(), desc: 'Café iPhone', cat: 'Alimentação', account: (OS.all('accounts')[0] || {}).id })); await sleep(3000);
     await E(T.p, () => document.dispatchEvent(new Event('visibilitychange'))); await sleep(3000);
@@ -982,6 +989,56 @@ async function newFeatureTests(b) {
     ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }
 }
 
+/* ================= TODOS OS APARELHOS: iPhone, Android, tablets e computador ================= */
+async function deviceMatrix(b) {
+  for (const prof of PROFILES) { cur = 'Aparelhos · ' + prof.id; console.log(`\n=== Em todos os aparelhos: ${prof.id} ===`);
+    const ctx = await b.newContext(prof.o); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push('JS: ' + e.message));
+    if (prof.slow) { const cdp = await ctx.newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 3 }); }
+    await p.addInitScript(H => { window.__spyEar = 1; window.__srN = 0;
+      class FakeSR { start() { window.__srN++; this.live = true; this.res = []; window.__cur = this; } say(t) { if (!this.live) return; this.res.push(Object.assign([{ transcript: t }], { isFinal: true })); this.onresult && this.onresult({ resultIndex: this.res.length - 1, results: this.res }); } abort() { this.live = false; setTimeout(() => this.onend && this.onend(), 5); } stop() { this.abort(); } }
+      window.webkitSpeechRecognition = FakeSR; window.SpeechRecognition = FakeSR;
+      if (!localStorage.getItem('__s')) { localStorage.setItem('os2:one~security', JSON.stringify({ data: { hash: H } })); localStorage.setItem('__s', '1'); } }, HASH);
+    await p.goto(BASE); await unlock(p); await sleep(1500); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); document.querySelectorAll('#modal').forEach(m => { m.hidden = true; m.innerHTML = ''; }); });
+    ok('abre e entra com o código', await E(p, () => !!document.querySelector('.dash')));
+    const ovf = async () => E(p, () => document.documentElement.scrollWidth > innerWidth + 1);
+    // Definições: sincronização, versão, sem Firebase
+    await E(p, () => location.hash = 'definicoes'); await sleep(400);
+    const df = await E(p, () => { const v = document.getElementById('view').innerText; return { fb: /Firebase/.test(v), rec: !!document.querySelector('#syncPn [data-act=mvWelcome]'), ver: !!document.querySelector('#verPn [data-act=updCheck]') && /v\d+\.\d+/.test(document.querySelector('#verPn').innerText), bio: /Face ID/.test(v) }; });
+    ok('Definições: sem o painel antigo do Firebase', !df.fb);
+    ok('Definições: "Sincronizar aparelhos" com "Recuperar os meus dados"', df.rec);
+    ok('Definições: versão visível e botão "Procurar atualização"', df.ver);
+    ok(prof.id === 'iPhone' ? 'Face ID disponível (só no iPhone)' : 'sem Face ID (só existe no iPhone)', prof.id === 'iPhone' ? df.bio : !(await E(p, () => !!localStorage.getItem('os2bio'))));
+    ok('Definições não saem para o lado', !(await ovf()));
+    // recuperar os dados abre o formulário com endereço e chave
+    await E(p, () => document.querySelector('#syncPn [data-act=mvWelcome]').click()); await sleep(300);
+    ok('recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã', await E(p, () => { const f = document.querySelector('#modal form[data-form=mvRec]'), b = f && f.querySelector('button'); if (!b) return false; b.scrollIntoView(); const r = b.getBoundingClientRect(); return r.bottom <= innerHeight && r.top >= 0; }));
+    await E(p, () => OS.UI.closeModal());
+    // Spyke a ouvir
+    await E(p, () => { OS.setOne('spyke', { eng: 'device' }); }); await E(p, () => window.__cur && window.__cur.say('que horas são')); await sleep(900);
+    ok('Spyke: começa a ouvir sozinho e responde sem tocar', await E(p, () => OS.Spyke.earOn() && [...document.querySelectorAll('#spy .spy-m.spyke .spy-bb')].some(x => /^São \d/.test(x.textContent))));
+    ok('Spyke: o painel cabe no ecrã', !(await ovf()) && await E(p, () => { const c = document.querySelector('#spy .spy-card'); if (!c) return false; const r = c.getBoundingClientRect(); return r.left >= -1 && r.right <= innerWidth + 1; }));
+    await E(p, () => OS.Spyke.close());
+    // Floresta 3D
+    await E(p, () => location.hash = 'floresta'); await sleep(2500);
+    ok('Floresta: árvore em 3D', await E(p, () => OS.Forest.gl().ok && !!document.querySelector('#fo3d canvas')), JSON.stringify(await E(p, () => OS.Forest.gl())));
+    // Decision Center
+    const id = await E(p, () => OS.add('decisions', { title: 'Decisão ' + Math.random().toString(36).slice(2, 6), status: 'Em análise', alts: [{ name: 'A' }, { name: 'B' }] }).id);
+    await E(p, id => { location.hash = 'decisoes'; OS.Decide.open(id); }, id); await sleep(400);
+    ok('Decision Center: abre com o Spyke (IA) e a tabela', await E(p, () => !!document.querySelector('#drawer .dc-ai') && !!document.querySelector('#drawer table.matrix')));
+    await E(p, () => OS.UI.closeDrawer());
+    // atualização à força: versão nova no servidor e o service worker preso (o que acontecia no tablet Android)
+    await p.waitForFunction(() => navigator.serviceWorker && navigator.serviceWorker.controller, null, { timeout: 10000 }).catch(() => { });
+    const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').replace(/OCEANUM_VERSION=\{"v": "[^"]+"/, 'OCEANUM_VERSION={"v": "9.9"');
+    fs.writeFileSync('/tmp/oc_idx2.html', html); OVERRIDE = { 'index.html': '/tmp/oc_idx2.html', '': '/tmp/oc_idx2.html' };
+    await E(p, () => window.OceanumCheckUpdate(true)).catch(() => { }); let v = '';
+    for (let i = 0; i < 50 && v !== '9.9'; i++) { await sleep(200); v = await E(p, () => (window.OceanumVersion || {}).v || '').catch(() => ''); }
+    OVERRIDE = {}; ok('atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)', v === '9.9', 'versão ' + v);
+    let kept = false; for (let i = 0; i < 40 && !kept; i++) { await sleep(250); kept = await E(p, id => !!(window.OS && OS.get && OS.get('decisions', id)), id).catch(() => false); }
+    ok('atualização: os dados continuam lá depois de atualizar', kept);
+    ok('sem erros de JavaScript neste aparelho', !errs.length, errs.slice(0, 3).join(' | '));
+    await ctx.close(); }
+}
+
 async function stress(b) {
   cur = 'Stress'; console.log('\n=== Stress: 3 anos de dados num tablet fraco (CPU 6× mais lenta) ===');
   const prof = PROFILES[2]; const { ctx, p, errs } = await newPage(b, prof); await p.goto(BASE); await unlock(p);
@@ -1006,7 +1063,7 @@ async function stress(b) {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

@@ -1,5 +1,539 @@
 [
  {
+  "p": "iPhone",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "246 ms"
+ },
+ {
+  "p": "iPhone",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v1.99"
+ },
+ {
+  "p": "iPhone",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "iPhone",
+  "name": "modo leve conforme o aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "iPhone",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "iPhone",
+  "name": "152 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 85 ms"
+ },
+ {
+  "p": "iPhone",
+  "name": "476 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 2037 elementos"
+ },
+ {
+  "p": "iPhone",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "238 ms"
+ },
+ {
+  "p": "Android tel",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v1.99"
+ },
+ {
+  "p": "Android tel",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Android tel",
+  "name": "modo leve ligado (Android)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Android tel",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Android tel",
+  "name": "152 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 108 ms"
+ },
+ {
+  "p": "Android tel",
+  "name": "476 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 2037 elementos"
+ },
+ {
+  "p": "Android tel",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "1449 ms"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v1.99"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "modo leve ligado (Android)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "152 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "páginas rápidas (processador 6× mais lento)",
+  "pass": true,
+  "info": "máx 331 ms"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "485 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 2037 elementos"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "224 ms"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v1.99"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "modo leve ligado (Android)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "152 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 93 ms"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "488 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 2037 elementos"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "240 ms"
+ },
+ {
+  "p": "Computador",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v1.99"
+ },
+ {
+  "p": "Computador",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Computador",
+  "name": "modo leve conforme o aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Computador",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Computador",
+  "name": "152 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 117 ms"
+ },
+ {
+  "p": "Computador",
+  "name": "486 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 2037 elementos"
+ },
+ {
+  "p": "Computador",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
   "p": "Geral",
   "name": "os 72 formulários gravam",
   "pass": true,
@@ -87,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 10/10/2026 · Face ID abre sozinho ao entrar; o Spyke c"
+  "info": "Atualizado · versão 9.9 · 10/10/2026 · Atualização garantida: se um aparelho fic"
  },
  {
   "p": "Geral",
@@ -212,6 +746,24 @@
  {
   "p": "Geral",
   "name": "sync: a configuração do atalho também passa para o iPhone",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Geral",
+  "name": "sync: o computador liga-se com o código e recebe os dados",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Geral",
+  "name": "sync: o que registas no computador aparece no tablet e no iPhone",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Geral",
+  "name": "sem erros de JavaScript (computador)",
   "pass": true,
   "info": ""
  },
@@ -429,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"oyuiwcmldqc\",\"_c\":1791650744004,\"_u\":1791650744004,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"ie6ok9nr4t6\",\"_c\":1791652691994,\"_u\":1791652691994,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -579,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"kms8uimlu88\",\"_c\":1791650765384,\"_u\":1791650765384,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-10\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"pz20mgnrldb\",\"_c\":1791652713455,\"_u\":1791652713455,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1424,6 +1976,918 @@
  {
   "p": "Geral",
   "name": "todos os ficheiros da cache offline existem",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: saldo da conta = abertura + receitas − despesas − transferências (1279,50 €)",
+  "pass": true,
+  "info": "{\"a\":1279.5,\"c\":100,\"inc\":500,\"exp\":1119.5,\"up\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: transferência entra na conta de destino (100 €)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: mês soma receitas e despesas (despesa futura ainda não conta no saldo)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: despesa agendada aparece nos próximos pagamentos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: compra em 3 parcelas cria 3 movimentos de 100 € em meses seguidos",
+  "pass": true,
+  "info": "[[100,1,3,\"2026-10\"],[100,2,3,\"2026-11\"],[100,3,3,\"2026-12\"]]"
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: recorrente aparece antes de pagar e desaparece depois de pago",
+  "pass": true,
+  "info": "{\"before\":true,\"paid\":true,\"after\":false}"
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: pagar 200 € de uma dívida de 1000 € deixa 800 € (património igual)",
+  "pass": true,
+  "info": "{\"bal\":800,\"nwDelta\":0}"
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: orçamento soma o gasto da categoria no mês",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "tarefas: \"Rever balanço @Universidade !1 amanhã\" → título, prioridade 1, amanhã, área",
+  "pass": true,
+  "info": "[\"Rever balanço\",\"1\",true,\"Universidade\",\"Próxima\"]"
+ },
+ {
+  "p": "Áreas",
+  "name": "tarefas: concluir tarefa diária marca a data e cria a de amanhã",
+  "pass": true,
+  "info": "{\"done\":true,\"next\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "tarefas: prazo passado conta como atrasada",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "próxima ação: prioridade 1 com prazo hoje vem antes da prioridade 4",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "hábitos: 3 dias seguidos = sequência de 3",
+  "pass": true,
+  "info": "{\"streak\":3,\"wkend\":false,\"auto\":true,\"past\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "hábitos: \"dias úteis\" não conta ao sábado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "hábitos: automático (registar um gasto) marca-se sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "hábitos: não deixa marcar dias passados",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "metas: manual 5 de 10 = 50%",
+  "pass": true,
+  "info": "[0.5,0.5,0.25,\"Atrás do ritmo\"]"
+ },
+ {
+  "p": "Áreas",
+  "name": "metas: 2 de 4 passos = 50%",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "metas: meta ligada a uma conta segue o saldo (100 de 400 = 25%)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "metas: atrás do ritmo é detetado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "universidade: média ponderada 40%×12 + 60%×16 = 14,4",
+  "pass": true,
+  "info": "{\"avg\":14.4,\"due1\":true,\"r1\":true,\"next\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "universidade: revisão de ontem está para hoje e a seguinte é a 7 dias",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "calendário: evento semanal repete-se daqui a 7 dias",
+  "pass": true,
+  "info": "{\"ev0\":true,\"ev7\":true,\"shift\":true,\"exam\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "calendário: turnos e avaliações aparecem",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "decisões: filtro Alpha (24 h, 3 dias, passado)",
+  "pass": true,
+  "info": "[\"Responde às 5 perguntas\",\"Esperar 24 h\",\"Filtro passado\",\"Esperar 3 dias\",\"Filtro passado\"]"
+ },
+ {
+  "p": "Áreas",
+  "name": "segurança: mudar o código pede o atual e 6+ caracteres",
+  "pass": true,
+  "info": "[\"O código atual não está certo.\",\"O novo código precisa de pelo menos 6 caracteres.\",null,null,\"Código incorreto.\",null]"
+ },
+ {
+  "p": "Áreas",
+  "name": "segurança: depois de mudar, o novo código entra e o antigo não",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "segurança: o código nunca fica guardado em texto",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "segurança: 5 códigos errados bloqueiam 30 s (mesmo com o certo)",
+  "pass": true,
+  "info": "[\"Código errado 5 vezes. Espera 30 s.\",\"Muitas tentativas. Espera 30 s.\"]"
+ },
+ {
+  "p": "Áreas",
+  "name": "clima: frase com cidade, graus, sensação e chuva",
+  "pass": true,
+  "info": "Em Aveiro estão 18 graus, sensação de 14, chuva fraca. Máxima de 21 e mínima de 13, 70% de probabilidade de chuva: leva guarda-chuva."
+ },
+ {
+  "p": "Áreas",
+  "name": "clima: amanhã e ícone sem emojis",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "mudança: recuperar recusa endereço errado e aceita o do script (tira as aspas da chave)",
+  "pass": true,
+  "info": "{\"bad\":null,\"ok\":true,\"done\":1}"
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as 152 páginas: cada botão tem função",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as páginas: cada formulário tem função",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as páginas: \"editar\" aponta para dados que existem",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as páginas: sem \"undefined\", \"NaN\" ou \"[object Object]\" no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: nenhuma página tem o cartão antigo \"Ligar a IA\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: o cartão do Spyke aparece onde a IA faz falta",
+  "pass": true,
+  "info": "investimentos.ia, eu.bio, universidade.flashcards, universidade.simulados, universidade.questoes, universidade.tutor, trabalho.foto"
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: a página do Spyke tem o cérebro (IA) com os passos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: ligar uma vez liga a app inteira",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "sem erros de JavaScript (áreas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: ao abrir a app o Face ID começa sozinho e entra",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: não pergunta \"Ativar o Face ID?\" outra vez",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: se cancelares fica o botão e uma mensagem calma (sem repetir sozinho)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: não fica a pedir em ciclo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: tocar no botão entra",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Face ID)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: logo ao entrar falo sem dizer \"Spyke\"",
+  "pass": true,
+  "info": "São 17:21."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: conversa seguida no mesmo microfone (não volta a pedir autorização)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: fora da conversa ignora o que não é para ele",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Spyke, …\" funciona sempre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: frase sem \"fim\" é apanhada pela pausa (iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o eco da própria voz não conta como pedido",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o iPhone fecha o microfone e ele reabre sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"para de ouvir\" desliga e não reabre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: tocar no microfone volta a ouvir",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: dizer \"Spyke\" enquanto fala interrompe e ouve",
+  "pass": true,
+  "info": "Sim?"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: duas palmas chamam o Spyke",
+  "pass": true,
+  "info": "{\"two\":1,\"one\":0,\"voice\":0,\"far\":0,\"soft9\":1,\"soft1\":0}"
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: uma palma sozinha não chama",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: voz ou música contínua não chamam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: palmas muito afastadas não contam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Spyke a ouvir)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: quando o iPhone apaga o 3D, ele refaz-se sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: se o 3D falhar mostra \"A abrir o 3D…\" (não fica preso no erro)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: tenta outra vez sozinha e volta a mostrar a árvore 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Floresta)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: o Spyke analisa (prós, contras, riscos, perguntas, para onde apontam os dados)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: \"Preencher a matriz\" estima só o que está vazio",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: perguntas ao Spyke ficam guardadas na decisão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: próximo passo vira tarefa",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: mostra os segundos enquanto espera",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: sem resposta desiste, explica e oferece \"Tentar outra vez\" (sem ficar em ciclo)",
+  "pass": true,
+  "info": "VISÃO GERAL\nJornal\n\nAs notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do di"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (decisões e jornal)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "nome da app: OCEANUM no ecrã principal, no título e no manifesto",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "abre e entra com o código",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Definições: sem o painel antigo do Firebase",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Face ID disponível (só no iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Definições não saem para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Spyke: o painel cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "abre e entra com o código",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Definições: sem o painel antigo do Firebase",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "sem Face ID (só existe no iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Definições não saem para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Spyke: o painel cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "abre e entra com o código",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições: sem o painel antigo do Firebase",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "sem Face ID (só existe no iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições não saem para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Spyke: o painel cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "abre e entra com o código",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições: sem o painel antigo do Firebase",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "sem Face ID (só existe no iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições não saem para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Spyke: o painel cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "abre e entra com o código",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições: sem o painel antigo do Firebase",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "sem Face ID (só existe no iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições não saem para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Spyke: o painel cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Stress",
+  "name": "dados de teste criados",
+  "pass": true,
+  "info": "7665 registos"
+ },
+ {
+  "p": "Stress",
+  "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
+  "pass": true,
+  "info": "máx 641 ms"
+ },
+ {
+  "p": "Stress",
+  "name": "guardar tudo é rápido",
+  "pass": true,
+  "info": "99 ms"
+ },
+ {
+  "p": "Stress",
+  "name": "sem erros de JavaScript",
   "pass": true,
   "info": ""
  }

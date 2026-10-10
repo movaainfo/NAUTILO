@@ -1,1 +1,1 @@
-Atualização de teste: confirma que a nova versão chega a todos os aparelhos.
+Atualização garantida: se um aparelho ficar para trás atualiza-se sozinho; botão "Procurar atualização" nas Definições; recuperar os dados do Google Drive direto em Sincronizar aparelhos; testado em iPhone, Android, tablet e computador.

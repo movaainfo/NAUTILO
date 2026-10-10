@@ -29,6 +29,23 @@ if (VER.v && prev !== VER.v) { ls.set(KEY, VER.v);
   if (prev) { const go = () => { const el = show(`<div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>Atualizado</b><small>versão ${VER.v} · ${VER.date || ''}</small>${(VER.notes || []).length ? `<ul>${VER.notes.slice(0, 4).map(n => `<li>${String(n).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;')}</li>`).join('')}</ul>` : ''}<div class="bar"><i></i></div>`);
       const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }; el.addEventListener('click', close); setTimeout(close, 2600); };
     if (document.readyState === 'loading') addEventListener('DOMContentLoaded', go); else go(); } }
+// 3) garantia extra: compara a versão desta página com a do servidor. Se o servidor tiver uma mais nova e o service worker
+//    não a trouxer em 15 s (acontecia em alguns Android), apaga a cache da app (os teus dados ficam) e recarrega já com a nova.
+const num = v => { const m = String(v || '').match(/^(\d+)\.(\d+)/); return m ? +m[1] * 1000 + +m[2] : 0; };
+const note = (t, k) => { try { if (window.OS && OS.UI && OS.UI.toast) OS.UI.toast(t, k); } catch (e) { } };
+let checking = false, lastCheck = 0, forcing = false;
+const serverVer = async () => { const r = await fetch(location.pathname + '?vchk=' + Date.now(), { cache: 'no-store', credentials: 'omit' }); if (!r.ok) return ''; const m = (await r.text()).match(/OCEANUM_VERSION=\{"v": *"([^"]+)"/); return m ? m[1] : ''; };
+const hard = async () => { if (forcing) return; const last = +(ls.get('os2hardAt') || 0); if (Date.now() - last < 10 * 60000) return; ls.set('os2hardAt', String(Date.now())); forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão nova encontrada</small>');
+  try { if (navigator.serviceWorker) { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r => r.unregister())); } if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.filter(k => k !== 'oceanum-img').map(k => caches.delete(k))); } } catch (e) { }
+  setTimeout(() => location.reload(), 300); };
+window.OceanumCheckUpdate = async manual => { if (checking || forcing) return ''; if (!manual && Date.now() - lastCheck < 60000) return ''; lastCheck = Date.now(); checking = true;
+  try { const sv = await serverVer(); if (!sv || num(sv) <= num(VER.v)) { if (manual) note('Já tens a versão mais recente (' + (VER.v || '') + ').', 'pos'); return 'ok'; }
+    if (manual) note('Versão ' + sv + ' encontrada. A atualizar…');
+    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) reg.update(); } catch (e) { }
+    setTimeout(() => { if (manual || !document.hidden) hard(); }, manual ? 3000 : 15000); return 'new'; }
+  catch (e) { if (manual) note('Sem internet para procurar a atualização agora.', 'warn'); return 'off'; } finally { checking = false; } };
+addEventListener('load', () => setTimeout(() => window.OceanumCheckUpdate(false), 4000));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => window.OceanumCheckUpdate(false), 2500); });
 // versão visível no ecrã de abertura
 addEventListener('DOMContentLoaded', () => { const f = document.querySelector('.sp-foot'); if (f && VER.v) f.textContent = 'MIND CONTROL · v' + VER.v; });
 window.OceanumVersion = VER;
