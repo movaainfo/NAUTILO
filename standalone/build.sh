@@ -20,14 +20,14 @@ cat > "$OUT/index.html" <<HTML
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Oceanum</title>
+<title>OCEANUM</title>
 <meta name="description" content="Oceanum — o sistema operativo da tua vida: finanças, estudos, treino, dieta, metas e o jogo Dominus.">
 <meta name="theme-color" content="#04101F">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Oceanum">
+<meta name="apple-mobile-web-app-title" content="OCEANUM">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -47,8 +47,8 @@ $BODY
 HTML
 cat > "$OUT/manifest.webmanifest" <<'JSON'
 {
-  "name": "Oceanum",
-  "short_name": "Oceanum",
+  "name": "OCEANUM",
+  "short_name": "OCEANUM",
   "description": "O sistema operativo da tua vida.",
   "lang": "pt",
   "start_url": "./#visao",

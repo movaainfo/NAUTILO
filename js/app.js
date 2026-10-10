@@ -29,7 +29,7 @@ function renderSide(cur) {
 V.explorar = () => { const un = unlocked(); return `<div class="exp"><div class="exp-h"><h1>Explorar</h1><p>Tudo o que o Oceanum faz. Abre um lugar e ele passa a aparecer no teu menu.</p></div>
   ${NAV.map(([g, items]) => `<section class="exp-g"><h6>${g}</h6><div class="exp-grid">${items.map(([k, l, ic]) => `<a class="exp-t ${un.has(k) ? 'in' : ''}" href="#${k}">${UI.ic(ic)}<b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${DESC[k] || ''}</small>${un.has(k) ? '<em>no menu</em>' : '<em class="new">novo</em>'}</a>`).join('')}</div></section>`).join('')}
   <section class="exp-g"><h6>Jogo</h6><div class="exp-grid"><a class="exp-t in" href="#dominus">${UI.ic('crown')}<b>Dominus</b><small>O teu personagem: nível, classe e título, só com conquistas reais.</small><em>no menu</em></a></div></section></div>`; };
-TITLES.explorar = ['Explorar', 'Oceanum'];
+TITLES.explorar = ['Explorar', 'OCEANUM'];
 TITLES.visao = ['Visão Geral', 'Visão geral'];
 function renderTop(cur) {
   const grp = (NAV.find(([, items]) => items.some(([k]) => k === cur)) || [''])[0];
@@ -85,7 +85,7 @@ function render() {
   try { progressive(cur, r.raw); } catch (e) { console.error(e); }
   if (fsel) { const el = U.$('#view').querySelector(fsel); if (el) { el.focus({ preventScroll: true }); try { if (caret != null && el.setSelectionRange) el.setSelectionRange(caret, caret); } catch (e) { } } }
   if (r.raw !== lastRoute) { window.scrollTo(0, 0); lastRoute = r.raw; }
-  document.title = OS.focusState && OS.focusState() ? document.title : 'Oceanum';
+  document.title = OS.focusState && OS.focusState() ? document.title : 'OCEANUM';
 }
 OS.on('render', render);
 OS.on('sync', s => { const d = U.$('#syncDot'), d2 = U.$('#syncDot2'), m = U.$('#syncMsg'); if (d) d.className = 'sync-dot ' + s.status; if (d2) { d2.className = 'sync-dot ' + s.status; d2.title = s.msg; } if (m) m.textContent = s.msg; });

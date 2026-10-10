@@ -8,9 +8,31 @@ const n = v => U.num(v) || 0;
 /* ================= IA (Google Gemini, chave grátis do utilizador) ================= */
 const AI = OS.AI = {};
 AI.key = () => OS.one('diet').aiKey || '';
-AI.setup = (act) => `<div class="fd-ai"><div class="fd-aic">${UI.ic('zap')}</div><h3>Ligar a IA (grátis, 2 minutos)</h3><p>A mesma chave serve para ler exames e para reconhecer comida por foto.</p><ol><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em Guardar.</li></ol>
-  <div class="row gap8"><input class="field grow" id="aiKeyIn" placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Guardar</button></div><small class="mut">A chave fica só na tua conta Oceanum. Não a partilhes.</small></div>`;
-A.aiKeySave = b => { const v = (document.getElementById('aiKeyIn') || {}).value || ''; if (v.trim().length < 20) { UI.toast('Esta chave parece incompleta', 'warn'); return; } OS.setOne('diet', { aiKey: v.trim() }); UI.toast('IA ligada', 'pos'); if (b.dataset.next && A[b.dataset.next]) A[b.dataset.next](b); else UI.closeModal(); };
+/* A IA do OCEANUM é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
+   universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio (página do Spyke) ou em qualquer cartão abaixo. */
+AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Decision Center)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
+const STEPS = `<ol class="ai-steps"><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em <b>Ligar</b>.</li></ol>`;
+const FORM = act => `<div class="row gap8 ai-row"><input class="field grow" data-aikey placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Ligar</button></div>`;
+const moved = () => OS.Move && !OS.Move.isOld && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
+// cartão pequeno onde uma função precisa da IA: o mesmo em toda a app
+AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" aria-hidden="true"></span><div><b>Esta função usa o Spyke, a IA do OCEANUM</b><small>Liga o Spyke uma vez e tudo o que usa IA passa a funcionar na app inteira.</small></div></div>
+  <details class="ai-d"><summary class="btn pri sm">Ligar o Spyke (grátis, 2 minutos)</summary>${STEPS}${FORM(act)}<small class="mut">A chave fica só na tua conta OCEANUM e no teu Google Drive pela sincronização. Não a partilhes.</small></details>${moved()}<a class="acc ai-more" href="#spyke">Ver tudo o que o Spyke faz</a></div>`;
+// secção central (página do Spyke)
+AI.panel = () => { const k = AI.key(), st = U.ls.get('os2aiOk', null);
+  return `<div class="pn" id="spyBrain"><div class="pn-h"><h3>Cérebro do Spyke (IA)</h3><span class="bdg ${k ? (st && st.ok === false ? 'neg' : 'pos') : ''}">${k ? (st && st.ok === false ? 'chave com problema' : 'ligado') : 'desligado'}</span></div>
+    <p class="mut" style="margin:0 0 8px;font-size:13px">Uma só ligação para a app inteira: ${AI.uses.join(', ')}.</p>
+    ${k ? `<div class="row gap8" style="flex-wrap:wrap"><code class="ai-k">${'•'.repeat(8) + esc(k.slice(-4))}</code><button class="btn sm" data-act="aiTest">${UI.ic('zap')}Testar</button><button class="btn sm ghost" data-act="aiChange">Mudar a chave</button><button class="btn sm ghost" data-act="dietAiOff">Desligar</button></div>${st && st.ok === false ? `<p class="neg" style="font-size:12.5px;margin:8px 0 0">${esc(st.msg || '')}</p>` : ''}${OS.ui.aiChg ? FORM('') : ''}`
+      : `${STEPS}${FORM('')}${moved()}`}</div>`; };
+A.aiChange = () => { OS.ui.aiChg = !OS.ui.aiChg; OS.request(); };
+AI.test = async () => { const k = AI.key(); if (!k) return { ok: false, msg: 'Sem chave.' };
+  try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=5&key=${encodeURIComponent(k)}`), j = await r.json().catch(() => ({}));
+    const o = r.ok ? { ok: true } : { ok: false, msg: /API key not valid|API_KEY_INVALID/i.test((j.error && j.error.message) || '') || r.status === 400 ? 'A chave não é válida: volta a copiá-la em aistudio.google.com/apikey.' : 'O Google respondeu com erro ' + r.status + '.' };
+    U.ls.set('os2aiOk', Object.assign({ at: Date.now() }, o)); return o; } catch (e) { return { ok: null, msg: 'Sem internet para testar agora.' }; } };
+A.aiTest = async () => { UI.toast('A testar…'); const o = await AI.test(); UI.toast(o.ok ? 'O Spyke está ligado e a funcionar' : o.msg, o.ok ? 'pos' : 'warn'); OS.request(); };
+A.aiKeySave = b => { const box = b.closest('.ai-row') || document, inp = box.querySelector('[data-aikey]') || document.getElementById('aiKeyIn'), v = ((inp || {}).value || '').trim().replace(/^['"]|['"]$/g, '');
+  if (v.length < 20) { UI.toast('Esta chave parece incompleta', 'warn'); return; } OS.setOne('diet', { aiKey: v }); OS.ui.aiChg = false; U.ls.del('os2aiOk'); UI.toast('Spyke ligado: a IA já funciona em toda a app', 'pos'); OS.emit('ai:on');
+  AI.test().then(o => { if (o.ok === false) UI.toast(o.msg, 'warn'); OS.request(); });
+  if (b.dataset.next && A[b.dataset.next]) A[b.dataset.next](b); else OS.request(); };
 const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '';
   for (const m of MODELS) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseMimeType: 'application/json', temperature: temp } }) });

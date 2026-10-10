@@ -10,7 +10,7 @@ const subjN = id => (OS.get('subjects', id) || {}).name || '—';
 const cur = () => St.current();
 const subjOpts = (v, all) => `${all ? `<option value="">${all}</option>` : ''}${cur().map(s => `<option value="${s.id}"${v === s.id ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}`;
 const hasAI = () => OS.AI && OS.AI.key && OS.AI.key();
-const noAI = () => `<div class="pn">${OS.AI && OS.AI.setup ? OS.AI.setup('') : '<p class="mut">Liga a IA nas Definições.</p>'}</div>`;
+const noAI = () => `<div class="pn">${OS.AI && OS.AI.setup ? OS.AI.setup('') : '<p class="mut">Liga o Spyke (IA) na página do Spyke.</p>'}</div>`;
 const md = t => esc(String(t || '')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|\n)#{1,3} ?(.+)/g, '$1<b class="un-h">$2</b>').replace(/(^|\n)\s*[-•*] (.+)/g, '$1<span class="un-li">• $2</span>').replace(/\n/g, '<br>');
 
 /* ---------- coleções e campos ---------- */

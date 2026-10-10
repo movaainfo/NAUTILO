@@ -1,7 +1,8 @@
 /* Oceanum — bateria de testes rigorosa.
    Serve dist-gh/ em /Oceanum/ (igual ao GitHub Pages) e testa em 5 aparelhos simulados.
    Uso: NODE_PATH=$(npm root -g) node standalone/test/suite.js            (todos)
-        ... suite.js --quick                                              (sem stress nem crawl completo) */
+        ... suite.js --quick                                              (sem stress nem crawl completo)
+        ... suite.js --only=areas,novidades                              (só alguns blocos: perfis, geral, areas, novidades, stress) */
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto'), url = require('url');
 const ROOT = path.resolve(__dirname, '../../dist-gh');
@@ -72,7 +73,7 @@ async function profileTests(b, prof) {
   const t0 = Date.now(); await p.goto(BASE); await p.waitForSelector('#lkCode'); const tl = Date.now() - t0;
   ok('abre o ecrã do código', true, tl + ' ms');
   ok('versão visível no ecrã do código', await E(p, () => /v\d+\.\d+/.test(document.querySelector('.sp-foot').textContent)), await E(p, () => document.querySelector('.sp-foot').textContent));
-  await sleep(1500); ok('não abre o pedido biométrico sozinho', (await E(p, () => window.__cred)) === 0);
+  await sleep(1500); ok('sem pedido biométrico em modo de teste', (await E(p, () => window.__cred)) === 0);
   const inp = await E(p, () => { const i = document.getElementById('lkCode'), cs = getComputedStyle(i); return { t: i.type, sec: cs.webkitTextSecurity, bg: cs.backgroundColor, ac: i.autocomplete }; });
   ok('campo do código sem gestor de palavras-passe', inp.t === 'text' && inp.sec === 'disc' && inp.ac === 'off', JSON.stringify(inp));
   const android = /Android/.test(prof.o.userAgent || '');
@@ -210,7 +211,7 @@ async function sharedTests(b) {
     await p.tap('#modal [data-act=bioRegister]'); await sleep(500);
     ok('iPhone: "Ativar Face ID" regista o rosto', (await E(p, () => window.__c)) === 1 && !!(await E(p, () => localStorage.getItem('os2bio'))));
     await E(p, () => OS.act.lockNow()); await sleep(500); ok('iPhone: ao bloquear aparece "Desbloquear com Face ID"', await p.isVisible('#lkBio'));
-    ok('iPhone: não pede o Face ID sozinho', (await E(p, () => window.__g)) === 0);
+    ok('iPhone: em modo de teste o Face ID só abre pelo botão (o automático é testado à parte)', (await E(p, () => window.__g)) === 0);
     await p.tap('#lkBio'); await sleep(900); ok('iPhone: entrar com o Face ID abre a app', (await E(p, () => window.__g)) === 1 && !(await p.isVisible('#lkCode').catch(() => false)));
     ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
   // tablet e computador: sem Face ID
@@ -345,7 +346,7 @@ async function sharedTests(b) {
       return rt.fulfill(GEM({ itens: [{ nome: 'Arroz branco cozido', gramas: 150, kcal: 195, proteina: 4, hidratos: 42, gordura: .5, fibra: 1 }, { nome: 'Bife grelhado', gramas: 120, kcal: 260, proteina: 34, hidratos: 0, gordura: 13 }], nota: 'Prato de almoço' })); });
     await E(p, () => location.hash = 'dieta'); await sleep(300); await E(p, () => OS.act.dietAdd({ dataset: { tab: 'foto' } })); await sleep(300);
     ok('foto: explica como ligar a IA (grátis)', await E(p, () => /aistudio\.google\.com/.test(document.querySelector('#fdAdd').innerHTML)));
-    await p.fill('#fdAdd [data-phkey]', 'AIzaTESTE_chave_de_teste_1234567890'); await p.click('#fdAdd [data-fa=phkey]'); await sleep(300);
+    await E(p, () => { const d = document.querySelector('#fdAdd .ai-d'); if (d) d.open = true; }); await p.fill('#fdAdd [data-aikey]', 'AIzaTESTE_chave_de_teste_1234567890'); await p.click('#fdAdd [data-act=aiKeySave]'); await sleep(300);
     const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
     await p.setInputFiles('#fdCam', { name: 'prato.png', mimeType: 'image/png', buffer: png }); await sleep(1500);
     ok('foto: a IA identifica os alimentos', await E(p, () => document.querySelectorAll('#fdAdd .fd-phl>div').length === 2));
@@ -464,7 +465,7 @@ async function sharedTests(b) {
     await E(p, () => { OS.setOne('diet', { aiKey: '' }); location.hash = 'simuladores.emprestimo'; }); await sleep(400);
     ok('IA nos simuladores: painel do assistente com sugestões', await E(p, () => /Assistente de decisão/.test(document.querySelector('#view .sim-ai').textContent) && document.querySelectorAll('#view .sai-chips .chip').length >= 2));
     await p.click('#view .sai-chips .chip'); await sleep(300);
-    ok('IA nos simuladores: sem chave pede para ligar a IA', await E(p, () => /Ligar a IA/.test(document.querySelector('#view .sim-ai').textContent)));
+    ok('IA nos simuladores: sem chave mostra o cartão único do Spyke (IA)', await E(p, () => /Ligar o Spyke/.test(document.querySelector('#view .sim-ai').textContent) && !!document.querySelector('#view .sim-ai .ai-off')));
     await E(p, () => OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' })); await sleep(200);
     await p.click('#view .sai-chips .chip'); await sleep(900);
     ok('IA nos simuladores: responde com veredicto, riscos e passos', await E(p, () => { const t = document.querySelector('#view .sim-ai').textContent; return /Completa primeiro a reserva/.test(t) && /Riscos/.test(t) && /Comparar 3 bancos/.test(t) && /Prazo \(meses\): 36/.test(t); }));
@@ -780,6 +781,207 @@ async function sharedTests(b) {
     ok('todos os ficheiros da cache offline existem', !miss.length, miss.join(', ')); }
 }
 
+/* ================= COBERTURA POR ÁREA: a lógica de cada parte da app, com valores exatos ================= */
+async function areaTests(b) {
+  cur = 'Áreas'; console.log('\n=== Cobertura por área (lógica com valores exatos) ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]);
+  await ctx.route(/open-meteo\.com/, rt => { const u = rt.request().url(); if (/geocoding/.test(u)) return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ results: [{ name: 'Aveiro', latitude: 40.64, longitude: -8.65 }] }) });
+    const days = [0, 1, 2, 3].map(i => { const d = new Date(Date.now() + i * 864e5); return d.toISOString().slice(0, 10); });
+    rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ current: { temperature_2m: 18.4, apparent_temperature: 14, weather_code: 61, wind_speed_10m: 12, precipitation: 0, relative_humidity_2m: 80 }, hourly: { precipitation_probability: Array(48).fill(40) }, daily: { time: days, weather_code: [61, 2, 0, 3], temperature_2m_max: [21, 22, 23, 20], temperature_2m_min: [13, 12, 14, 13], precipitation_probability_max: [70, 20, 5, 10], sunrise: days.map(d => d + 'T07:40'), sunset: days.map(d => d + 'T19:10') } }) }); });
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); document.querySelectorAll('#modal').forEach(m => { m.hidden = true; m.innerHTML = ''; }); });
+  // ---------- FINANÇAS ----------
+  const fin = await E(p, () => { const U = OS.U, F = OS.Fin, t = U.today(), ym = U.ym(t), m0 = F.month(ym);
+    const a = OS.add('accounts', { name: 'Conta T', type: 'Conta à ordem', opening: 1000 }), c = OS.add('accounts', { name: 'Poupança T', type: 'Reserva', opening: 0 });
+    OS.add('transactions', { type: 'Receita', amount: 500, date: t, account: a.id, desc: 'Salário T', cat: 'Salário' });
+    OS.add('transactions', { type: 'Despesa', amount: 120.5, date: t, account: a.id, desc: 'Mercado T', cat: 'Alimentação' });
+    OS.add('transactions', { type: 'Transferência', amount: 100, date: t, account: a.id, toAccount: c.id, desc: 'Poupar' });
+    OS.add('transactions', { type: 'Despesa', amount: 999, date: U.addDays(t, 5), account: a.id, desc: 'Futuro T', cat: 'Lazer' });
+    const m1 = F.month(ym);
+    return { a: F.accBal(OS.get('accounts', a.id)), c: F.accBal(OS.get('accounts', c.id)), inc: m1.inc - m0.inc, exp: m1.exp - m0.exp, up: F.upcoming(10).some(x => x.title === 'Futuro T' && x.amount === -999) }; });
+  ok('finanças: saldo da conta = abertura + receitas − despesas − transferências (1279,50 €)', fin.a === 1279.5, JSON.stringify(fin));
+  ok('finanças: transferência entra na conta de destino (100 €)', fin.c === 100);
+  ok('finanças: mês soma receitas e despesas (despesa futura ainda não conta no saldo)', fin.inc === 500 && Math.abs(fin.exp - (120.5 + 999)) < .001 && fin.a === 1279.5);
+  ok('finanças: despesa agendada aparece nos próximos pagamentos', fin.up);
+  const inst = await E(p, () => { const U = OS.U, a = OS.all('accounts').find(x => x.name === 'Conta T'), r = OS.add('transactions', { type: 'Despesa', amount: 300, inst: 3, date: U.today(), account: a.id, desc: 'Telemóvel T', cat: 'Pessoal' }); OS.Fin.afterTx(OS.get('transactions', r.id), true);
+    const L = OS.U.sortBy(OS.all('transactions').filter(t => /Telemóvel T/.test(t.desc)), t => t.date); return L.map(t => [t.amount, t.instI, t.instN, t.date.slice(0, 7)]); });
+  ok('finanças: compra em 3 parcelas cria 3 movimentos de 100 € em meses seguidos', inst.length === 3 && inst.every(x => x[0] === 100 && x[2] === 3) && new Set(inst.map(x => x[3])).size === 3, JSON.stringify(inst));
+  const rec = await E(p, () => { const U = OS.U, F = OS.Fin, t = U.today(), a = OS.all('accounts').find(x => x.name === 'Conta T'), day = +U.addDays(t, 2).slice(8, 10);
+    const r = OS.add('recurring', { name: 'Ginásio T', type: 'Despesa', amount: 30, freq: 'Mensal', day, active: true, account: a.id, cat: 'Saúde' }); const ym = U.ym(U.addDays(t, 2));
+    const before = F.upcoming(10).some(x => x.title === 'Ginásio T'); F.payRecurring(OS.get('recurring', r.id), ym); return { before, paid: F.recurPaid(OS.get('recurring', r.id), ym), after: F.upcoming(10).some(x => x.title === 'Ginásio T') }; });
+  ok('finanças: recorrente aparece antes de pagar e desaparece depois de pago', rec.before && rec.paid && !rec.after, JSON.stringify(rec));
+  const debt = await E(p, () => { const U = OS.U, F = OS.Fin, a = OS.all('accounts').find(x => x.name === 'Conta T'), d = OS.add('debts', { name: 'Empréstimo T', principal: 1000, installment: 200, dueDay: 28 }); const nw0 = F.netWorth();
+    OS.add('transactions', { type: 'Despesa', amount: 200, date: U.today(), account: a.id, desc: 'Prestação', debt: d.id }); return { bal: F.debtBal(OS.get('debts', d.id)), nwDelta: Math.round((F.netWorth() - nw0) * 100) / 100 }; });
+  ok('finanças: pagar 200 € de uma dívida de 1000 € deixa 800 € (património igual)', debt.bal === 800 && debt.nwDelta === 0, JSON.stringify(debt));
+  const bud = await E(p, () => { const U = OS.U; OS.add('budgets', { cat: 'Alimentação', limit: 50 }); return OS.Fin.spentCat('Alimentação', U.ym(U.today())) >= 120.5; });
+  ok('finanças: orçamento soma o gasto da categoria no mês', bud);
+  // ---------- TAREFAS ----------
+  const qp = await E(p, () => { const o = OS.Tasks.quickParse('Rever balanço @Universidade !1 amanhã'); return [o.title, o.prio, o.sched === OS.U.addDays(OS.U.today(), 1), o.area, o.status]; });
+  ok('tarefas: "Rever balanço @Universidade !1 amanhã" → título, prioridade 1, amanhã, área', qp[0] === 'Rever balanço' && qp[1] === '1' && qp[2] && qp[3] === 'Universidade' && qp[4] === 'Próxima', JSON.stringify(qp));
+  const rt = await E(p, () => { const U = OS.U, t = OS.add('tasks', { title: 'Regar T', status: 'Próxima', due: U.today(), recur: 'Diária' }); OS.Tasks.complete(t.id); const nx = OS.all('tasks').find(x => x.title === 'Regar T' && x.status === 'Próxima'); return { done: OS.get('tasks', t.id).doneAt === U.today(), next: nx && nx.due === U.addDays(U.today(), 1) }; });
+  ok('tarefas: concluir tarefa diária marca a data e cria a de amanhã', rt.done && rt.next, JSON.stringify(rt));
+  const late = await E(p, () => { const U = OS.U; OS.add('tasks', { title: 'Atrasada T', status: 'Próxima', due: U.addDays(U.today(), -3), prio: '1' }); return OS.Tasks.late(OS.all('tasks').find(x => x.title === 'Atrasada T')); });
+  ok('tarefas: prazo passado conta como atrasada', late);
+  const nx = await E(p, () => { OS.add('tasks', { title: 'Urgente T', status: 'Próxima', prio: '1', impact: 5, due: OS.U.today() }); OS.add('tasks', { title: 'Calma T', status: 'Próxima', prio: '4', impact: 1 }); const L = OS.Intel.next().map(x => x.title); return L.indexOf('Urgente T') > -1 && (L.indexOf('Calma T') === -1 || L.indexOf('Urgente T') < L.indexOf('Calma T')); });
+  ok('próxima ação: prioridade 1 com prazo hoje vem antes da prioridade 4', nx);
+  // ---------- HÁBITOS ----------
+  const hb = await E(p, () => { const U = OS.U, H = OS.Hab, log = {}; [0, 1, 2].forEach(i => log[U.addDays(U.today(), -i)] = 1); const h = OS.add('habits', { name: 'Ler T', active: true, freq: 'Diário', log });
+    const sat = (() => { let d = U.today(); while (U.parse(d).getDay() !== 6) d = U.addDays(d, 1); return d; })(), wk = OS.add('habits', { name: 'Úteis T', active: true, freq: 'Dias úteis' });
+    const c = OS.add('habits', { name: 'Caixa T', active: true, freq: 'Diário', auto: 'cash' }); H.toggle(h.id, U.addDays(U.today(), -5));
+    return { streak: H.streak(OS.get('habits', h.id)), wkend: H.due(OS.get('habits', wk.id), sat), auto: H.done(OS.get('habits', c.id), U.today()), past: !(OS.get('habits', h.id).log || {})[U.addDays(U.today(), -5)] }; });
+  ok('hábitos: 3 dias seguidos = sequência de 3', hb.streak === 3, JSON.stringify(hb));
+  ok('hábitos: "dias úteis" não conta ao sábado', hb.wkend === false);
+  ok('hábitos: automático (registar um gasto) marca-se sozinho', hb.auto);
+  ok('hábitos: não deixa marcar dias passados', hb.past);
+  // ---------- METAS ----------
+  const gl = await E(p, () => { const U = OS.U, G = OS.Goal, a = OS.all('accounts').find(x => x.name === 'Poupança T');
+    const g1 = OS.add('goals', { title: 'Manual T', metric: 'manual', base: 0, target: 10, cur: 5, status: 'Ativa' }), g2 = OS.add('goals', { title: 'Passos T', metric: 'steps', steps: [{ t: 'a', done: true }, { t: 'b', done: true }, { t: 'c' }, { t: 'd' }], status: 'Ativa' }), g3 = OS.add('goals', { title: 'Conta T', metric: 'account', account: a.id, target: 400, status: 'Ativa' });
+    const g4 = OS.add('goals', { title: 'Atraso T', metric: 'manual', base: 0, target: 100, cur: 10, status: 'Ativa', start: U.addDays(U.today(), -90), due: U.addDays(U.today(), 10) });
+    return [G.info(OS.get('goals', g1.id)).p, G.info(OS.get('goals', g2.id)).p, G.info(OS.get('goals', g3.id)).p, G.info(OS.get('goals', g4.id)).st[0]]; });
+  ok('metas: manual 5 de 10 = 50%', gl[0] === .5, JSON.stringify(gl)); ok('metas: 2 de 4 passos = 50%', gl[1] === .5); ok('metas: meta ligada a uma conta segue o saldo (100 de 400 = 25%)', gl[2] === .25); ok('metas: atrás do ritmo é detetado', gl[3] === 'Atrás do ritmo');
+  // ---------- UNIVERSIDADE ----------
+  const un = await E(p, () => { const U = OS.U, St = OS.St, s = OS.add('subjects', { name: 'Contabilidade T', status: 'Em curso', target: 15, ects: 6 });
+    OS.add('assessments', { subject: s.id, title: 'Teste 1', type: 'Teste', weight: 40, grade: 12, date: U.addDays(U.today(), -20) }); OS.add('assessments', { subject: s.id, title: 'Exame', type: 'Exame', weight: 60, grade: 16, date: U.addDays(U.today(), -2) });
+    const r = OS.add('reviews', { title: 'Tema T', studied: U.addDays(U.today(), -1) }); const due1 = St.revDue().some(x => x.id === r.id); St.revDone(r.id);
+    return { avg: St.stats(OS.get('subjects', s.id)).avg, due1, r1: !!OS.get('reviews', r.id).r1, next: St.revNext(OS.get('reviews', r.id)) === U.addDays(U.addDays(U.today(), -1), 7) }; });
+  ok('universidade: média ponderada 40%×12 + 60%×16 = 14,4', un.avg === 14.4, JSON.stringify(un));
+  ok('universidade: revisão de ontem está para hoje e a seguinte é a 7 dias', un.due1 && un.r1 && un.next);
+  // ---------- CALENDÁRIO ----------
+  const cal = await E(p, () => { const U = OS.U, t = U.today(), d7 = U.addDays(t, 7), d3 = U.addDays(t, 3);
+    OS.add('events', { title: 'Reunião T', date: t, start: '10:00', recur: 'Semanal' }); OS.add('shifts', { date: d3, start: '14:00', end: '22:00' }); OS.add('assessments', { title: 'Teste Cal', type: 'Teste', date: d3 });
+    const it = OS.Cal.items(t, d7); return { ev0: it.some(x => x.title === 'Reunião T' && x.date === t), ev7: it.some(x => x.title === 'Reunião T' && x.date === d7), shift: it.some(x => x.src === 'shift' && x.date === d3), exam: it.some(x => x.src === 'exam' && /Teste Cal/.test(x.title)) }; });
+  ok('calendário: evento semanal repete-se daqui a 7 dias', cal.ev0 && cal.ev7, JSON.stringify(cal)); ok('calendário: turnos e avaliações aparecem', cal.shift && cal.exam);
+  // ---------- DECISION CENTER ----------
+  const al = await E(p, () => { const A = OS.Decide.alpha, all = v => ({ q0: v[0], q1: v[1], q2: v[2], q3: v[3], q4: v[4] }); return [A({}, 0)[0], A(all(['Sim', 'Sim', 'Sim', 'Sim', 'Sim']), 10)[0], A(all(['Não', 'Sim', 'Sim', 'Sim', 'Sim']), 200)[0], A(all(['Não', 'Sim', 'Não', 'Sim', 'Sim']), 200)[0], A(all(['Não', 'Sim', 'Sim', 'Sim', 'Sim']), 10)[0]]; });
+  ok('decisões: filtro Alpha (24 h, 3 dias, passado)', al[0] === 'Responde às 5 perguntas' && al[1] === 'Esperar 24 h' && al[2] === 'Filtro passado' && al[3] === 'Esperar 3 dias' && al[4] === 'Filtro passado', JSON.stringify(al));
+  // ---------- SEGURANÇA ----------
+  const sec = await E(p, async () => { const L = OS.Lock; const r = []; r.push(await L.setCode('errado', 'novo123456')); r.push(await L.setCode('teste1234', '123')); r.push(await L.setCode('teste1234', 'novo123456'));
+    r.push(await L.verifyCode('novo123456')); r.push(await L.verifyCode('teste1234')); r.push(await L.setCode('novo123456', 'teste1234')); return r; });
+  ok('segurança: mudar o código pede o atual e 6+ caracteres', /atual/.test(sec[0]) && /6 caracteres/.test(sec[1]) && sec[2] === null, JSON.stringify(sec));
+  ok('segurança: depois de mudar, o novo código entra e o antigo não', sec[3] === null && /incorreto/i.test(sec[4]) && sec[5] === null);
+  ok('segurança: o código nunca fica guardado em texto', await E(p, () => !JSON.stringify(localStorage).includes('teste1234') && !JSON.stringify(localStorage).includes('novo123456')));
+  const lk = await E(p, async () => { const L = OS.Lock; OS.U.ls.del('os2lkfails'); OS.U.ls.del('os2lkwait'); let m = ''; for (let i = 0; i < 5; i++) m = await L.verifyCode('x' + i); const w = await L.verifyCode('teste1234'); localStorage.removeItem('os2lkwait'); OS.U.ls.del('os2lkwait'); return [m, w]; });
+  ok('segurança: 5 códigos errados bloqueiam 30 s (mesmo com o certo)', /5 vezes/.test(lk[0]) && /Espera/.test(lk[1]), JSON.stringify(lk));
+  // ---------- CLIMA ----------
+  const wx = await E(p, async () => { const d = await OS.Weather.get(true); return { say: OS.Weather.say(d, 0), tom: OS.Weather.say(d, 1), ic: OS.Weather.icon(61) }; });
+  ok('clima: frase com cidade, graus, sensação e chuva', /Aveiro/.test(wx.say) && /18 graus/.test(wx.say) && /sensação de 14/.test(wx.say) && /70% de probabilidade de chuva/.test(wx.say) && /guarda-chuva/.test(wx.say), wx.say);
+  ok('clima: amanhã e ícone sem emojis', /^Amanhã em Aveiro/.test(wx.tom) && /^<svg/.test(wx.ic));
+  // ---------- MUDANÇA DE ENDEREÇO ----------
+  const mv = await E(p, () => { window.__noReload = 1; let called = null; const S0 = window.OceanumSync; window.OceanumSync = Object.assign({}, S0 || {}, { applyLink: c => { called = JSON.parse(decodeURIComponent(escape(atob(c)))); return true; } });
+    const reload = location.reload; const f = n => { const el = document.createElement('form'); el.innerHTML = '<input name="u"><input name="k">'; el.elements.u.value = n[0]; el.elements.k.value = n[1]; return el; };
+    OS.forms.mvRec(f(['https://exemplo.com/exec', 'abcdefghij'])); const bad = called; OS.forms.mvRec(f(['https://script.google.com/macros/s/AKfy_123-x/exec', "'abcdefghij'"])); window.OceanumSync = S0; return { bad, ok: called && called.u.endsWith('/exec') && called.k === 'abcdefghij', done: OS.U.ls.get('os2mvDone', 0) }; });
+  ok('mudança: recuperar recusa endereço errado e aceita o do script (tira as aspas da chave)', mv.bad === null && mv.ok && mv.done === 1, JSON.stringify(mv));
+  // ---------- TODAS AS PÁGINAS: botões com função, sem "undefined" nem "NaN" ----------
+  const base = await E(p, () => Object.keys(OS.views)); let routes = [];
+  for (const r of base) { await E(p, r => location.hash = r, r); await sleep(120); routes.push(r, ...(await E(p, () => [...document.querySelectorAll('#view nav.tabs a, #view .dtabs a[href^="#"]')].map(a => a.getAttribute('href').slice(1))))); }
+  routes = [...new Set(routes)]; const noFn = new Set(), noForm = new Set(), badTxt = [], badEdit = new Set();
+  for (const r of routes) { await E(p, r => location.hash = r, r); await sleep(140);
+    const o = await E(p, () => { const v = document.getElementById('view'), acts = [...v.querySelectorAll('[data-act]')].map(x => x.dataset.act).filter(a => typeof OS.act[a] !== 'function'), forms = [...v.querySelectorAll('[data-form]')].map(x => x.dataset.form).filter(f => f !== 'quickTask' && typeof OS.forms[f] !== 'function'), edits = [...v.querySelectorAll('[data-edit]')].map(x => x.dataset.edit.split(':')[0]).filter(c => !OS.S[c]);
+      const tx = v.innerText, m = tx.match(/.{0,30}(\bundefined\b|\bNaN\b|\[object Object\]|Invalid Date).{0,30}/); return { acts, forms, edits, m: m ? m[0] : '' }; });
+    o.acts.forEach(a => noFn.add(a)); o.forms.forEach(f => noForm.add(f)); o.edits.forEach(c => badEdit.add(c)); if (o.m) badTxt.push(r + ': ' + o.m.replace(/\s+/g, ' ')); }
+  ok(`todas as ${routes.length} páginas: cada botão tem função`, !noFn.size, [...noFn].join(', '));
+  ok('todas as páginas: cada formulário tem função', !noForm.size, [...noForm].join(', '));
+  ok('todas as páginas: "editar" aponta para dados que existem', !badEdit.size, [...badEdit].join(', '));
+  ok('todas as páginas: sem "undefined", "NaN" ou "[object Object]" no ecrã', !badTxt.length, badTxt.slice(0, 4).join(' | '));
+  // ---------- IA UNIFICADA (Spyke) ----------
+  await E(p, () => OS.setOne('diet', { aiKey: '' })); const oldCard = [], cards = new Set();
+  for (const r of routes) { await E(p, r => location.hash = r, r); await sleep(90); const o = await E(p, () => ({ old: /Ligar a IA \(grátis/.test(document.getElementById('view').innerText), n: document.querySelectorAll('#view .ai-off').length })); if (o.old) oldCard.push(r); if (o.n) cards.add(r); }
+  ok('IA unificada: nenhuma página tem o cartão antigo "Ligar a IA"', !oldCard.length, oldCard.join(', '));
+  ok('IA unificada: o cartão do Spyke aparece onde a IA faz falta', cards.size >= 3, [...cards].join(', '));
+  await E(p, () => location.hash = 'spyke'); await sleep(300);
+  ok('IA unificada: a página do Spyke tem o cérebro (IA) com os passos', await E(p, () => !!document.querySelector('#spyBrain') && /aistudio\.google\.com/.test(document.querySelector('#spyBrain').innerHTML)));
+  await E(p, () => { document.querySelector('#spyBrain [data-aikey]').value = 'AIzaChave_de_teste_1234567890'; document.querySelector('#spyBrain [data-act=aiKeySave]').click(); }); await sleep(400);
+  ok('IA unificada: ligar uma vez liga a app inteira', await E(p, () => OS.AI.key() === 'AIzaChave_de_teste_1234567890' && !document.querySelector('#view .ai-off')) && (await E(p, () => { location.hash = 'trabalho.foto'; }), await sleep(300), await E(p, () => !document.querySelector('#view .ai-off'))));
+  ok('sem erros de JavaScript (áreas)', !errs.length, errs.slice(0, 3).join(' | '));
+  await ctx.close();
+}
+
+/* ================= SPYKE SEMPRE A OUVIR, PALMAS, FACE ID AUTOMÁTICO, FLORESTA 3D, DECISÕES COM IA, JORNAL ================= */
+async function newFeatureTests(b) {
+  cur = 'Novidades'; console.log('\n=== Spyke a ouvir, palmas, Face ID automático, Floresta 3D, decisões com IA, jornal ===');
+  const IPH = PROFILES[0].o;
+  // Face ID automático
+  { const ctx = await b.newContext(IPH); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+    await p.addInitScript(H => { window.__bioAuto = 1; window.__g = 0; window.__deny = 0; localStorage.setItem('os2:one~security', JSON.stringify({ data: { hash: H } })); localStorage.setItem('os2bio', JSON.stringify({ id: 'AAAA', at: '2026-10-01' })); localStorage.setItem('os2bioAsk', 'true');
+      Object.defineProperty(navigator, 'credentials', { value: { get: async () => { window.__g++; if (window.__deny) throw Object.assign(new Error('cancelado'), { name: 'NotAllowedError' }); return {}; }, create: async () => ({ rawId: new Uint8Array([1]).buffer }) } }); window.PublicKeyCredential = { isUserVerifyingPlatformAuthenticatorAvailable: async () => true }; }, HASH);
+    await p.goto(BASE); await sleep(2200);
+    ok('Face ID: ao abrir a app o Face ID começa sozinho e entra', await E(p, () => window.__g) === 1 && await E(p, () => document.getElementById('splash').hidden && !!document.querySelector('.dash')));
+    ok('Face ID: não pergunta "Ativar o Face ID?" outra vez', !/Ativar o Face ID/.test(await E(p, () => document.getElementById('modal').innerText)));
+    await E(p, () => { window.__deny = 1; OS.act.lockNow(); }); await sleep(900);
+    ok('Face ID: se cancelares fica o botão e uma mensagem calma (sem repetir sozinho)', await E(p, () => window.__g) === 2 && await p.isVisible('#lkBio') && /Toca em/.test(await E(p, () => document.getElementById('lkMsg').textContent)));
+    await sleep(1500); ok('Face ID: não fica a pedir em ciclo', await E(p, () => window.__g) === 2);
+    await E(p, () => { window.__deny = 0; }); await p.tap('#lkBio'); await sleep(900); ok('Face ID: tocar no botão entra', await E(p, () => document.getElementById('splash').hidden));
+    ok('sem erros de JavaScript (Face ID)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // Spyke: escuta contínua (reconhecimento de voz simulado)
+  { const ctx = await b.newContext(IPH); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+    await p.addInitScript(H => { window.__spyTest = 1; window.__spyEar = 1; window.__srN = 0;
+      class FakeSR { start() { window.__srN++; this.live = true; this.res = []; window.__cur = this; } say(t, fin = true) { if (!this.live) return; this.res.push(Object.assign([{ transcript: t }], { isFinal: fin })); this.onresult && this.onresult({ resultIndex: this.res.length - 1, results: this.res }); }
+        interim(t) { if (!this.live) return; const L = this.res.concat([Object.assign([{ transcript: t }], { isFinal: false })]); this.onresult && this.onresult({ resultIndex: L.length - 1, results: L }); } abort() { this.live = false; setTimeout(() => this.onend && this.onend(), 5); } stop() { this.abort(); } end() { this.live = false; this.onend && this.onend(); } }
+      window.webkitSpeechRecognition = FakeSR; window.SpeechRecognition = FakeSR; localStorage.setItem('os2:one~security', JSON.stringify({ data: { hash: H } })); }, HASH);
+    await p.goto(BASE); await unlock(p); await sleep(1500); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('spyke', { eng: 'device' }); window.speechSynthesis.speak = u => { window.__utt = u; setTimeout(() => { u.onstart && u.onstart(); setTimeout(() => window.__utt === u && u.onend && u.onend(), 300); }, 20); }; window.speechSynthesis.cancel = () => { const u = window.__utt; window.__utt = null; u && u.onend && u.onend(); }; });
+    const last = () => E(p, () => { const L = [...document.querySelectorAll('#spy .spy-m.spyke .spy-bb')]; return L.length ? L[L.length - 1].textContent : ''; });
+    const users = () => E(p, () => document.querySelectorAll('#spy .spy-m.user:not(.live)').length);
+    ok('Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)', await E(p, () => OS.Spyke.earOn() && document.documentElement.classList.contains('spy-ear')));
+    await E(p, () => window.__cur.say('que horas são')); await sleep(900); ok('Spyke: logo ao entrar falo sem dizer "Spyke"', /^São \d/.test(await last()), await last());
+    const n1 = await E(p, () => window.__srN); await E(p, () => window.__cur.say('que dia é hoje')); await sleep(900);
+    ok('Spyke: conversa seguida no mesmo microfone (não volta a pedir autorização)', /Hoje é/.test(await last()) && await E(p, () => window.__srN) === n1);
+    await E(p, () => OS.Spyke._endConv()); const u0 = await users(); await E(p, () => window.__cur.say('isto é a televisão a falar')); await sleep(800);
+    ok('Spyke: fora da conversa ignora o que não é para ele', await users() === u0);
+    await E(p, () => window.__cur.say('Spyke que horas são')); await sleep(900); ok('Spyke: "Spyke, …" funciona sempre', /^São \d/.test(await last()));
+    await E(p, () => OS.Spyke._endConv()); await E(p, () => window.__cur.interim('Spyke que dia')); await sleep(250); await E(p, () => window.__cur.interim('Spyke que dia é hoje')); await sleep(1700);
+    ok('Spyke: frase sem "fim" é apanhada pela pausa (iPhone)', /Hoje é/.test(await last()));
+    const u1 = await users(); await E(p, () => window.__cur.say((document.querySelector('#spy .spy-m.spyke:last-child .spy-bb') || {}).textContent || 'Hoje é dia')); await sleep(800);
+    ok('Spyke: o eco da própria voz não conta como pedido', await users() === u1);
+    const n2 = await E(p, () => window.__srN); await E(p, () => window.__cur.end()); await sleep(900); ok('Spyke: o iPhone fecha o microfone e ele reabre sozinho', await E(p, () => window.__srN) === n2 + 1 && await E(p, () => OS.Spyke.earOn()));
+    await E(p, () => window.__cur.say('Spyke para de ouvir')); await sleep(1500); ok('Spyke: "para de ouvir" desliga e não reabre', !(await E(p, () => OS.Spyke.earOn())));
+    await E(p, () => OS.Spyke.listen()); await sleep(400); ok('Spyke: tocar no microfone volta a ouvir', await E(p, () => OS.Spyke.earOn()));
+    E(p, () => OS.Spyke.say('Esta é uma frase comprida que estou a dizer agora mesmo, sem parar, para testar a interrupção.')); await sleep(250);
+    await E(p, () => window.__cur.interim('Spyke')); await sleep(400); ok('Spyke: dizer "Spyke" enquanto fala interrompe e ouve', await last() === 'Sim?', await last());
+    await E(p, () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(300); const off = !(await E(p, () => OS.Spyke.earOn()));
+    await E(p, () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => false }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(1200);
+    ok('Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho', off && await E(p, () => OS.Spyke.earOn()));
+    const det = await E(p, () => { const run = (sens, seq) => { const d = OS.Spyke._clapDetector(() => sens); let t = 0, n = 0; seq.forEach(([pk, k]) => { for (let i = 0; i < k; i++) { t += 16; if (d(pk, t)) n++; } }); return n; };
+      return { two: run(5, [[.01, 120], [.6, 1], [.08, 20], [.55, 1], [.05, 40]]), one: run(5, [[.01, 120], [.6, 1], [.02, 80]]), voice: run(5, [[.01, 120], [.5, 1], [.4, 30], [.5, 1], [.4, 30]]), far: run(5, [[.01, 120], [.5, 1], [.02, 120], [.5, 1], [.02, 10]]), soft9: run(9, [[.005, 120], [.12, 1], [.01, 15], [.12, 1], [.01, 20]]), soft1: run(1, [[.005, 120], [.12, 1], [.01, 15], [.12, 1], [.01, 20]]) }; });
+    ok('palmas: duas palmas chamam o Spyke', det.two === 1, JSON.stringify(det)); ok('palmas: uma palma sozinha não chama', det.one === 0); ok('palmas: voz ou música contínua não chamam', det.voice === 0); ok('palmas: palmas muito afastadas não contam', det.far === 0);
+    ok('palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)', det.soft9 === 1 && det.soft1 === 0);
+    await E(p, () => { OS.Spyke.close(); location.hash = 'spyke'; }); await sleep(400);
+    ok('Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone', await E(p, () => /segundo plano/.test(document.getElementById('view').innerText) && /Safari → Microfone → Permitir/.test(document.getElementById('view').innerText)));
+    ok('sem erros de JavaScript (Spyke a ouvir)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // Floresta: o 3D recupera sozinho
+  { const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); location.hash = 'floresta'; }); await sleep(2500);
+    const gl0 = await E(p, () => OS.Forest.gl());
+    if (gl0.ok) { await E(p, () => { const c = document.querySelector('#fo3d canvas'); c.dispatchEvent(new Event('webglcontextlost', { cancelable: true })); }); await sleep(1500);
+      ok('floresta: quando o iPhone apaga o 3D, ele refaz-se sozinho', await E(p, () => OS.Forest.gl().ok && !!document.querySelector('#fo3d canvas'))); }
+    else ok('floresta: o 3D abre neste navegador de teste', false, JSON.stringify(gl0));
+    await E(p, () => { OS.Forest._fail('falha simulada'); location.hash = 'visao'; }); await sleep(200); await E(p, () => location.hash = 'floresta'); await sleep(500);
+    ok('floresta: se o 3D falhar mostra "A abrir o 3D…" (não fica preso no erro)', await E(p, () => /A abrir o 3D/.test(document.getElementById('fo3d').innerText)));
+    await sleep(7000); ok('floresta: tenta outra vez sozinha e volta a mostrar a árvore 3D', await E(p, () => OS.Forest.gl().ok && !!document.querySelector('#fo3d canvas')), JSON.stringify(await E(p, () => OS.Forest.gl())));
+    ok('sem erros de JavaScript (Floresta)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // Decision Center com o Spyke e jornal que não fica a rodar
+  { const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.addInitScript(() => { window.__nwTO = 1500; });
+    await ctx.route(/generativelanguage/, rt => { const R = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) }); if (rt.request().method() === 'GET') return R({ models: [] }); const txt = JSON.parse(rt.request().postData()).contents[0].parts[0].text; let o;
+      if (/Estima os valores/.test(txt)) o = { alts: [{ i: 0, cost: 900, benefit: 4, risk: 2, time: 3, fin: -50, goals: 5, routine: 3 }, { i: 1, cost: 0, benefit: 2, risk: 1, time: 0, fin: 0, goals: 2, routine: 5 }], nota: 'assumi 900 €' };
+      else if (/Pergunta dele/.test(txt)) o = { resposta: 'Se esperares até janeiro, juntas o dinheiro.' };
+      else o = { resumo: 'Curso ou poupar.', alternativas: [{ nome: 'Fazer o curso', pros: ['carreira'], contras: ['900 €'], encaixe: 'meta de emprego' }], riscos: ['época de exames'], perguntas: ['Tem certificado?'], nova: 'Curso online mais barato', inclinacao: { nome: 'Fazer o curso', porque: 'alinha com a meta', confianca: 'média' }, emocao: '', passo: 'Pedir o programa do curso' };
+      R({ candidates: [{ content: { parts: [{ text: JSON.stringify(o) }] } }] }); });
+    await ctx.route(/script\.google\.com/, async rt => { await sleep(4000); rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }).catch(() => { }); });
+    await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); });
+    const id = await E(p, () => OS.add('decisions', { title: 'Curso de Excel', status: 'Em análise', alts: [{ name: 'Fazer o curso' }, { name: 'Não fazer nada' }] }).id);
+    await E(p, id => { location.hash = 'decisoes'; OS.Decide.open(id); }, id); await sleep(400); await p.click('#drawer [data-act=decAI]'); await sleep(1200);
+    const dt = await E(p, () => document.querySelector('#drawer .dc-ai').innerText);
+    ok('decisões: o Spyke analisa (prós, contras, riscos, perguntas, para onde apontam os dados)', /Os dados apontam para: Fazer o curso/.test(dt) && /Riscos/.test(dt) && /Responde a isto/.test(dt) && /A decisão continua a ser tua/.test(dt));
+    await p.click('#drawer [data-act=decFill]'); await sleep(900); ok('decisões: "Preencher a matriz" estima só o que está vazio', await E(p, id => { const a = OS.get('decisions', id).alts; return a[0].cost === 900 && a[1].routine === 5; }, id));
+    await p.fill('#drawer .dc-ask input', 'E se eu esperar?'); await p.click('#drawer .dc-ask button'); await sleep(900); ok('decisões: perguntas ao Spyke ficam guardadas na decisão', await E(p, id => (OS.get('decisions', id).aiQ || []).length === 1, id));
+    await p.click('#drawer [data-act=decTask]'); await sleep(300); ok('decisões: próximo passo vira tarefa', await E(p, () => OS.all('tasks').some(t => /programa do curso/.test(t.title))));
+    await E(p, () => { OS.UI.closeDrawer(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/X/exec', key: 'k', ver: 10 }); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(600);
+    ok('jornal: mostra os segundos enquanto espera', await E(p, () => !!document.getElementById('nwSec')));
+    await sleep(2500); const nt = await E(p, () => document.getElementById('view').innerText);
+    ok('jornal: sem resposta desiste, explica e oferece "Tentar outra vez" (sem ficar em ciclo)', /não respondeu/.test(nt) && /Tentar outra vez/.test(nt) && !/A buscar as notícias/.test(nt), nt.slice(0, 120));
+    ok('sem erros de JavaScript (decisões e jornal)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // nome da app
+  { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), m = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
+    ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }
+}
+
 async function stress(b) {
   cur = 'Stress'; console.log('\n=== Stress: 3 anos de dados num tablet fraco (CPU 6× mais lenta) ===');
   const prof = PROFILES[2]; const { ctx, p, errs } = await newPage(b, prof); await p.goto(BASE); await unlock(p);
@@ -803,7 +1005,8 @@ async function stress(b) {
 (async () => {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
-  try { for (const prof of PROFILES) await profileTests(b, prof); await sharedTests(b); if (!QUICK) await stress(b); }
+  const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

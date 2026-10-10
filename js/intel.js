@@ -36,7 +36,7 @@ I.alerts = () => {
   OS.Tasks.open().filter(x => x.due === t).forEach(x => A('attention', 'Tarefas', x.title, 'Prazo hoje', '', { l: 'Concluir', a: `data-act="taskDone" data-id="${x.id}"` }));
   // Universidade
   OS.all('assessments').filter(a => a.date >= t && !['Feito', 'Pronto'].includes(a.prep)).forEach(a => { const d = U.diff(a.date, t), s = OS.get('subjects', a.subject);
-    if (d <= 7) A('urgent', 'Universidade', `${a.type}: ${a.title}`, `${s ? s.name + ' · ' : ''}${U.rel(a.date)} · preparação: ${a.prep}`, '#universidade.avaliacoes');
+    if (d <= 7) A('urgent', 'Universidade', `${a.type}: ${a.title}`, `${s ? s.name + ' · ' : ''}${U.rel(a.date)} · preparação: ${a.prep || 'por começar'}`, '#universidade.avaliacoes');
     else if (d <= 14) A('attention', 'Universidade', `${a.type}: ${a.title}`, `${U.rel(a.date)} · entra em modo exame (só exercícios e exames antigos)`, '#universidade.avaliacoes'); });
   const rev = St.revDue(), revLate = rev.filter(r => St.revNext(r) < t);
   if (revLate.length) A(revLate.length > 3 ? 'urgent' : 'attention', 'Universidade', `${revLate.length} revisão(ões) espaçada(s) atrasada(s)`, 'Revisões atrasadas antes de matéria nova', '#universidade.revisoes');

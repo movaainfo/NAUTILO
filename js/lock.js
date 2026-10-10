@@ -40,15 +40,18 @@ const bioErr = e => { const n = e && e.name;
   return 'Face ID indisponível: ' + ((e && (e.message || e.name)) || 'erro desconhecido'); };
 L.register = async () => { if (ANDROID) { OS.UI.toast('No Android a biometria está desligada. Usa "Entrar direto" em Definições.', 'warn'); return false; }
   try {
-    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'Oceanum' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || 'Ryan' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
+    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'OCEANUM' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || 'Ryan' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
     U.ls.set('os2bio', { id: b64u(cred.rawId), at: U.today() }); U.ls.set('os2bioAsk', true); try { OS.UI.closeModal(); } catch (e) { } OS.UI.toast('Face ID ativado. Da próxima vez entras com a cara.', 'pos'); OS.request(); return true;
-  } catch (e) { OS.UI.toast(bioErr(e), 'warn'); return false; }
+  } catch (e) { U.ls.set('os2bioAsk', true); OS.UI.toast(bioErr(e), 'warn'); return false; }
 };
 L.forget = () => { U.ls.del('os2bio'); OS.UI.toast('Face ID removido deste dispositivo'); OS.request(); };
-const bioUnlock = async () => {
-  const b = L.bioId(); if (!b) return false;
+let bioBusy = false;
+const bioUnlock = async auto => {
+  const b = L.bioId(); if (!b || bioBusy) return false; bioBusy = true;
   try { await navigator.credentials.get({ publicKey: { challenge: rand(32), allowCredentials: [{ type: 'public-key', id: unb64u(b.id) }], userVerification: 'preferred', timeout: 45000 } }); return true; }
-  catch (e) { msg(bioErr(e)); return false; }
+  // ao abrir sozinho, um cancelamento não é erro: fica o botão para tentar outra vez
+  catch (e) { msg(auto && e && (e.name === 'NotAllowedError' || e.name === 'AbortError') ? 'Toca em "Desbloquear com Face ID" ou escreve o código.' : bioErr(e)); return false; }
+  finally { bioBusy = false; }
 };
 // verificação para sair do Bloco de foco (e outros ecrãs protegidos): Face ID no iPhone ou o código, com o mesmo limite de tentativas
 L.verifyBio = async () => { const b = L.bioId(); if (!b) return false; try { await navigator.credentials.get({ publicKey: { challenge: rand(32), allowCredentials: [{ type: 'public-key', id: unb64u(b.id) }], userVerification: 'required', timeout: 45000 } }); return true; } catch (e) { OS.UI.toast(bioErr(e), 'warn'); return false; } };
@@ -73,7 +76,7 @@ const offerBio = async () => { if (!IPHONE || L.bioId() || U.ls.get('os2bioAsk',
   setTimeout(() => { OS.UI.modal(`<div style="padding:20px;text-align:center"><div style="display:grid;place-items:center;color:#9be7ff">${OS.UI.ic('lock')}</div><h3 style="margin:8px 0 6px">Ativar o Face ID?</h3><p class="mut" style="margin:0 0 16px">Da próxima vez entras só com a cara, sem escrever o código.</p><div class="col gap8"><button class="btn pri" data-act="bioRegister">Ativar Face ID</button><button class="btn ghost" data-act="bioLater">Agora não</button></div></div>`); }, 700); };
 OS.act = OS.act || {};
 OS.act.bioLater = () => { U.ls.set('os2bioAsk', true); OS.UI.closeModal(); };
-function open() { const viaCode = !L.unlocked(); setUnlocked(true); if (viaCode) offerBio(); const s = el(); s.classList.add('out'); setTimeout(() => { s.hidden = true; s.classList.remove('out'); }, 520); const d = done; done = null; d && d(); }
+function open() { const viaCode = !L.unlocked(); setUnlocked(true); if (viaCode) offerBio(); const s = el(); s.classList.add('out'); setTimeout(() => { s.hidden = true; s.classList.remove('out'); }, 520); const d = done; done = null; d && d(); setTimeout(() => OS.emit('unlock'), 600); }
 // campo do código: sem o gestor de palavras-passe do iOS (que desenhava bordas brancas e o ícone escuro ao lado)
 const codeInput = () => { const sec = (() => { try { return CSS.supports('-webkit-text-security', 'disc'); } catch (e) { return false; } })();
   return `<input id="lkCode" class="${sec ? 'lk-sec' : ''}" type="${sec ? 'text' : 'password'}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Código de acesso" aria-label="Código de acesso">`; };
@@ -87,11 +90,16 @@ async function showLock() {
       <button class="lk-go" type="submit" aria-label="Entrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div></div><div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div>`;
   document.getElementById('lkForm').onsubmit = e => { e.preventDefault(); tryCode(document.getElementById('lkCode').value); };
-  // o pedido biométrico só abre quando tocas no botão: aberto sozinho ao arrancar, no Android mostrava um ecrã preto do sistema
-  const bb = document.getElementById('lkBio'); if (bb) { let going = false; bb.onclick = async () => { if (going) return; going = true; bb.disabled = true; try { if (await bioUnlock()) open(); } finally { going = false; bb.disabled = false; } }; }
+  const bb = document.getElementById('lkBio');
+  if (bb) { const go = async auto => { if (bb.disabled || !bb.isConnected || L.unlocked()) return; bb.disabled = true; try { if (await bioUnlock(auto)) open(); } finally { bb.disabled = false; } };
+    bb.onclick = () => go(false);
+    // iPhone: o Face ID abre sozinho ao entrar (no Android a biometria está desligada: lá mostrava um ecrã preto do sistema)
+    if (IPHONE && (!navigator.webdriver || window.__bioAuto)) { const auto = () => { if (document.hidden) return; document.removeEventListener('visibilitychange', auto); setTimeout(() => go(true), 250); };
+      document.hidden ? document.addEventListener('visibilitychange', auto) : auto(); } }
   else if (matchMedia('(pointer:fine)').matches) setTimeout(() => { const i = document.getElementById('lkCode'); i && i.focus(); }, 300);
 }
-L.gate = fn => { done = fn; if (L.unlocked()) { const s = el(); s.classList.add('out'); setTimeout(() => { s.hidden = true; s.classList.remove('out'); }, 520); done = null; fn(); } else showLock(); };
+L._autoBio = IPHONE;
+L.gate = fn => { done = fn; if (L.unlocked()) { const s = el(); s.classList.add('out'); setTimeout(() => { s.hidden = true; s.classList.remove('out'); }, 520); done = null; fn(); setTimeout(() => OS.emit('unlock'), 600); } else showLock(); };
 L.lock = () => { L.setTrusted(false); setUnlocked(false); done = () => OS.request(); showLock(); };
 let hiddenAt = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden) hiddenAt = Date.now(); else if (hiddenAt && Date.now() - hiddenAt > 5 * 60 * 1000 && L.unlocked()) L.lock(); });

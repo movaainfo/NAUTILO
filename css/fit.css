@@ -771,3 +771,31 @@ html.jv-open,html.jv-open body{overflow:hidden}
 /* janelas altas: deslizam em vez de sair do ecrã */
 .modal{max-height:calc(82% - 16px - env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .modal.tall{top:calc(12px + env(safe-area-inset-top,0px));max-height:calc(100% - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+/* Spyke: escuta contínua */
+button.spy-on{flex:1;text-align:left;background:none;border:0;padding:4px 0;font:inherit;font-size:11px;color:#7dd3fc;cursor:pointer}
+html.spy-ear .spy-tb{color:#38bdf8;position:relative}
+html.spy-ear .spy-tb::after{content:'';position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:#22d3ee;box-shadow:0 0 0 3px rgba(34,211,238,.22)}
+html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3,105,161,.45)}
+.spy-note{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(56,189,248,.05)}
+.spy-note b{display:block;font-size:13px;margin-bottom:2px}.spy-note small{color:var(--mut);font-size:12.5px;line-height:1.45}
+.spy-meter{height:12px;border-radius:8px;background:rgba(255,255,255,.07);overflow:hidden}
+.spy-meter i{display:block;height:100%;width:2%;background:linear-gradient(90deg,#22d3ee,#38bdf8,#f59e0b);transition:width .1s linear}
+/* Floresta: quando o 3D não abre */
+.fo-nogl .fo-fb{gap:8px;padding:14px}.fo-why{display:block;font-size:11px;opacity:.7;margin-top:4px;word-break:normal}
+/* Spyke (IA) — cartão único para ligar a IA */
+.ai-off{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;border:1px solid rgba(56,189,248,.28);background:linear-gradient(135deg,rgba(14,165,233,.09),rgba(14,165,233,.02))}
+.ai-h{display:flex;gap:10px;align-items:center}.ai-h b{display:block;font-size:14px}.ai-h small{color:var(--mut);font-size:12.5px}
+.ai-orb{flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,#e6fbff 0 18%,#38bdf8 19% 30%,#0b2433 31% 100%);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+.ai-d>summary{list-style:none;display:inline-flex;cursor:pointer}.ai-d>summary::-webkit-details-marker{display:none}.ai-d[open]>summary{margin-bottom:8px}
+.ai-steps{margin:0 0 8px;padding-left:20px;line-height:1.5;font-size:13px}.ai-steps a,.ai-off a{color:var(--accent)}
+.ai-row{margin-bottom:6px}.ai-more{font-size:12.5px}.ai-k{font:12px var(--mono);padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.05)}
+/* Decision Center · Spyke */
+.dc-ai{border:1px solid rgba(56,189,248,.25);border-radius:14px;padding:12px;background:linear-gradient(135deg,rgba(14,165,233,.07),rgba(14,165,233,.015))}
+.ai-orb.sm{width:18px;height:18px}
+.dc-inc{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);margin:8px 0}.dc-inc small{color:var(--mut)}
+.dc-emo{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:rgba(245,158,11,.1);color:#fbbf24;font-size:13px;margin:6px 0}.dc-emo .ic{flex:none;width:16px;height:16px;margin-top:2px}
+.dc-alts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:8px 0}.dc-alts>div{padding:10px;border-radius:12px;border:1px solid var(--line)}.dc-alts small{display:block;color:var(--mut);font-size:12px;margin-top:4px}
+.dc-alts ul{margin:4px 0;padding-left:16px;font-size:13px;line-height:1.45}.dc-p li::marker{content:'+ ';color:#4ade80}.dc-c li::marker{content:'− ';color:#f87171}
+.dc-sec{margin:8px 0}.dc-sec b{font-size:13px}.dc-sec ul{margin:4px 0;padding-left:18px;font-size:13px;line-height:1.45}
+.dc-qa{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04)}.dc-qa b{font-size:13px}.dc-qa p{margin:4px 0 0;font-size:13px;line-height:1.45}
+.dc-ask{margin-top:10px}.dc-lean{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;color:var(--mut)}

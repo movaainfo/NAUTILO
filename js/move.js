@@ -39,7 +39,7 @@ OS.forms.mvRec = f => { const u = f.elements.u.value.trim(), k = f.elements.k.va
   if (!/^https:\/\/script\.google\.com\/(a\/[^/]+\/)?macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(u)) return UI.toast('O endereço tem de começar por https://script.google.com/macros/s/ e terminar em /exec', 'neg');
   if (k.length < 8) return UI.toast('A chave parece incompleta', 'neg'); const SYc = window.OceanumSync;
   if (!SYc || !SYc.applyLink || !SYc.applyLink(btoa(unescape(encodeURIComponent(JSON.stringify({ u, k })))))) return UI.toast('Não consegui guardar a ligação', 'neg');
-  U.ls.set('os2mvDone', 1); UI.toast('Ligado. A trazer os teus dados do Google Drive…', 'pos'); setTimeout(() => location.reload(), 900); };
+  U.ls.set('os2mvDone', 1); UI.toast('Ligado. A trazer os teus dados do Google Drive…', 'pos'); setTimeout(() => window.__noReload || location.reload(), 900); };
 A.mvDone = () => { U.ls.set('os2mvDone', 1); UI.closeModal(); };
 if (!isOld) {
   OS.on('ready', () => { if (navigator.webdriver && !window.__mvTest) return; const want = /mudanca/.test(location.hash); if (want) history.replaceState(null, '', location.pathname + '#visao'); if (want || fresh()) setTimeout(welcome, 900); });

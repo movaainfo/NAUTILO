@@ -392,9 +392,9 @@ function tickFocus() {
   const t = U.$('[data-ftime]'); if (t) t.textContent = tx; const b = U.$('[data-fbar]'); if (b) b.style.width = Math.min(100, (1 - ms / tot) * 100) + '%';
   const dock = U.$('#dock'); if (FS.min) dock.innerHTML = `<div><b>${tx}</b><small>${FS.phase === 'focus' ? esc(FS.label) : 'Pausa'}</small></div><button class="icon-btn" data-act="focusMax" aria-label="Abrir foco">${UI.ic('focus')}</button>`;
   document.title = tx + ' · ' + (FS.phase === 'focus' ? 'Foco' : 'Pausa');
-  if (ms <= 0) { if (FS.phase === 'focus') { A.focusEnd(null); } else { beep(); FS = null; U.ls.del(FK); renderFocus(); UI.toast('Pausa acabou. Volta ao trabalho.'); document.title = 'Oceanum'; } }
+  if (ms <= 0) { if (FS.phase === 'focus') { A.focusEnd(null); } else { beep(); FS = null; U.ls.del(FK); renderFocus(); UI.toast('Pausa acabou. Volta ao trabalho.'); document.title = 'OCEANUM'; } }
 }
-setInterval(() => { if (FS) tickFocus(); else if (document.title !== 'Oceanum' && !/Oceanum/.test(document.title)) document.title = 'Oceanum'; document.querySelectorAll('[data-clock]').forEach(e => e.textContent = U.hm()); }, 1000);
+setInterval(() => { if (FS) tickFocus(); else if (document.title !== 'OCEANUM' && !/OCEANUM/i.test(document.title)) document.title = 'OCEANUM'; document.querySelectorAll('[data-clock]').forEach(e => e.textContent = U.hm()); }, 1000);
 document.addEventListener('click', e => { if (e.target.closest('#dock') && !e.target.closest('[data-act]')) A.focusMax(); });
 OS.on('ready', renderFocus);
 })();

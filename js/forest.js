@@ -54,8 +54,12 @@ const SEASON = () => { const d = new Date(), m = d.getMonth() + 1, day = d.getDa
 const coinsFor = m => Math.round(m * 1.2);
 
 /* ================= 3D: carregamento e construção ================= */
-let T = null, loadP = null, FAIL = false;
-const load3 = () => loadP || (loadP = import(new URL('vendor/three.module.min.js', document.baseURI).href).then(m => { T = m; }).catch(e => { FAIL = true; console.error(e); }));
+// No iPhone o 3D pode falhar por instantes (app em segundo plano, pouca memória, contexto perdido): não fica preso no erro,
+// tenta outra vez sozinho e, enquanto não dá, mostra a árvore em 2D.
+let T = null, loadP = null, FAIL = false, failAt = 0, failWhy = '', failN = 0;
+const fail = (why, e) => { FAIL = true; failAt = Date.now(); failN++; failWhy = why + (e && (e.message || e.name) ? ' (' + String(e.message || e.name).slice(0, 80) + ')' : ''); console.warn('3D:', failWhy); };
+const load3 = () => loadP || (loadP = import(new URL('vendor/three.module.min.js', document.baseURI).href).then(m => { T = m; }).catch(e => { loadP = null; fail('o motor 3D não carregou', e); }));
+const retry3 = () => { FAIL = false; failWhy = ''; };
 const rngOf = seed => { let a = (seed >>> 0) || 1; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
 const M4 = (x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, sx = 1, sy = sx, sz = sx) => new T.Matrix4().compose(new T.Vector3(x, y, z), new T.Quaternion().setFromEuler(new T.Euler(rx, ry, rz)), new T.Vector3(sx, sy, sz));
 const nz = (x, y, z) => Math.sin(x * 1.9 + y * 1.3) * Math.cos(z * 1.7 - x * .9) * .6 + Math.sin(y * 3.1 + z * 2.3) * .4;
@@ -260,10 +264,17 @@ function plot(b, N) { const off = -(N - 1) / 2, P = SC(); for (let x = 0; x < N;
 const G = { r: null, scene: null, cam: null, world: null, key: '', mode: '', raf: 0, last: 0, drag: null, zoom: 1, dirty: true, ro: null, host: null, objs: [] };
 const SKY = () => { const h = new Date().getHours(); return h < 6 || h >= 21 ? 'night' : h < 9 ? 'dawn' : h < 17 ? 'day' : 'dusk'; };
 const LIGHT = { day: ['#fff3dc', 2.3, '#d6ecff', '#7a9a5a', 1.25], dawn: ['#ffd2a8', 2.0, '#ffe2cf', '#7a8a5a', 1.15], dusk: ['#ffbf8a', 1.9, '#f9cdb3', '#6d7a50', 1.1], night: ['#d4ddff', 1.7, '#a3b3ec', '#4a5c48', 1.3] };
-function ensure() { if (G.r || FAIL) return !FAIL; try { const r = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.shadowMap.enabled = true; r.shadowMap.type = T.PCFSoftShadowMap; r.toneMapping = T.ACESFilmicToneMapping; r.toneMappingExposure = SKY() === 'night' ? 1.25 : 1.05; r.domElement.className = 'fo-cv';
-    G.r = r; bindDrag(r.domElement); return true; } catch (e) { FAIL = true; console.warn('WebGL indisponível', e); return false; } }
+const MOB = matchMedia('(pointer:coarse)').matches;
+function ensure() { if (G.r) return true; if (FAIL || document.hidden) return false; let r = null, err = null;
+  for (const o of [{ antialias: true, alpha: true, powerPreference: 'low-power' }, { antialias: false, alpha: true }, { antialias: false, alpha: true, precision: 'mediump', powerPreference: 'default' }]) { try { r = new T.WebGLRenderer(o); break; } catch (e) { err = e; } }
+  if (!r) { fail('o aparelho não abriu o 3D', err); return false; }
+  try { r.setPixelRatio(Math.min(MOB ? 1.75 : 2, window.devicePixelRatio || 1)); r.shadowMap.enabled = true; r.shadowMap.type = T.PCFSoftShadowMap; r.toneMapping = T.ACESFilmicToneMapping; r.toneMappingExposure = SKY() === 'night' ? 1.25 : 1.05; r.domElement.className = 'fo-cv';
+    r.domElement.addEventListener('webglcontextlost', ev => { ev.preventDefault(); lost(); }, false);
+    G.r = r; failN = 0; bindDrag(r.domElement); return true; } catch (e) { try { r.dispose(); } catch (er) { } fail('o 3D falhou ao arrancar', e); return false; } }
+// o iPhone apaga o 3D quando a app vai para segundo plano: refaz-se ao voltar
+function lost() { const r = G.r; G.r = null; G.key = ''; try { clear(); } catch (e) { } if (G.raf) cancelAnimationFrame(G.raf); G.raf = 0; try { r && r.domElement.remove(); r && r.dispose(); } catch (e) { } setTimeout(() => { if (!document.hidden) mount(); }, 400); }
 function clear() { if (G.scene) G.scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) [].concat(o.material).forEach(m => m.dispose()); }); G.scene = null; }
-function baseScene(span) { const s = new T.Scene(), L = LIGHT[SKY()], hemi = new T.HemisphereLight(L[2], L[3], L[4]), sun = new T.DirectionalLight(L[0], L[1]); s.add(hemi); sun.position.set(span * .9, span * 1.6, span * .7); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+function baseScene(span) { const s = new T.Scene(), L = LIGHT[SKY()], hemi = new T.HemisphereLight(L[2], L[3], L[4]), sun = new T.DirectionalLight(L[0], L[1]); s.add(hemi); sun.position.set(span * .9, span * 1.6, span * .7); sun.castShadow = true; sun.shadow.mapSize.set(MOB ? 1024 : 2048, MOB ? 1024 : 2048);
   const c = sun.shadow.camera; c.left = c.bottom = -span * 1.2; c.right = c.top = span * 1.2; c.near = .1; c.far = span * 6; sun.shadow.bias = -.0006; sun.shadow.normalBias = .02; s.add(sun); s.add(sun.target); const w = new T.Group(); s.add(w); G.scene = s; G.world = w; return w; }
 const MAT = () => new T.MeshStandardMaterial({ vertexColors: true, roughness: .9, metalness: 0 });
 function mesh(geo, cast = true, recv = true) { const m = new T.Mesh(geo, MAT()); m.castShadow = cast; m.receiveShadow = recv; return m; }
@@ -287,7 +298,9 @@ function bindDrag(el) { let px = 0, pts = new Map(), pd = 0; el.style.touchActio
   el.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, e); if (pts.size === 2) { const [a, b2] = [...pts.values()], d = Math.hypot(a.clientX - b2.clientX, a.clientY - b2.clientY); if (pd) { G.zoom = Math.max(.6, Math.min(3, G.zoom * d / pd)); size(); } pd = d; return; } if (G.world) { G.world.rotation.y += (e.clientX - px) * .01; px = e.clientX; G.dirty = true; } });
   const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pd = 0; if (!pts.size) G.drag = false; }; el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
   el.addEventListener('wheel', e => { e.preventDefault(); G.zoom = Math.max(.6, Math.min(3, G.zoom * (e.deltaY < 0 ? 1.1 : .9))); size(); }, { passive: false }); }
-function mount() { const h = document.getElementById('fo3d'); if (!h) { G.host = null; return; } if (!T && !FAIL) { load3().then(() => OS.request()); return; } if (FAIL || !ensure()) { h.classList.add('fo-nogl'); return; }
+function mount() { const h = document.getElementById('fo3d'); if (!h) { G.host = null; return; } if (FAIL && failN < 4 && Date.now() - failAt > 6000 && !document.hidden) retry3();
+  if (!T && !FAIL) { load3().then(() => FAIL ? mount() : OS.request()); return; } if (!FAIL && document.hidden && !G.r) return; if (FAIL || !ensure()) { flat(h); return; }
+  h.classList.remove('fo-nogl');
   G.host = h; const key = h.dataset.k; if (key !== G.key) { G.key = key; const mode = h.dataset.mode, list = FLIST || []; clearTimeout(G.bt); G.bt = setTimeout(() => { if (G.key !== key || !G.host) return; G.mode = mode; try { mode === 'pot' ? potFromKey(key) : buildForest(list, key); } catch (e) { console.error(e); } mount(); }, G.scene ? 0 : 30); if (!G.scene) return; }
   if (G.r.domElement.parentNode !== h) h.appendChild(G.r.domElement);
   if (G.ro) G.ro.disconnect(); G.ro = new ResizeObserver(size); G.ro.observe(h); size(); if (!G.raf) G.raf = requestAnimationFrame(frame); }
@@ -295,7 +308,7 @@ const potFromKey = k => { const [, sp, st, dead, seed] = k.split('|'); buildPot(
 OS.on('render', () => queueMicrotask(mount));
 const obsView = () => { const v = document.getElementById('view'); if (v && !v._foObs) { v._foObs = new MutationObserver(() => queueMicrotask(mount)); v._foObs.observe(v, { childList: true }); } };
 obsView(); OS.on('ready', obsView); addEventListener('hashchange', () => setTimeout(mount, 0));
-document.addEventListener('visibilitychange', () => { if (!document.hidden && G.host && !G.raf) { G.dirty = true; G.raf = requestAnimationFrame(frame); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden) return; if (!G.r || FAIL) { setTimeout(mount, 300); return; } if (G.host && !G.raf) { G.dirty = true; G.raf = requestAnimationFrame(frame); } });
 let FLIST = null;
 
 /* miniaturas das espécies (renderizadas uma vez) */
@@ -349,7 +362,7 @@ function startBreak() { RUN = { phase: 'break', t0: Date.now(), mins: Math.max(1
 function loop() { clearInterval(tick); if (!RUN) return; tick = setInterval(step, 1000); step(); }
 function step() { if (!RUN) { clearInterval(tick); pill(); return; } if (left() <= 0) { if (RUN.phase === 'grow') return finish(true); RUN = null; save(); chime(); UI.toast('A pausa acabou. Bora plantar outra?', 'pos'); clearInterval(tick); pill(); OS.request(); return; } paint(); }
 function paint() { const L = left(), el = document.getElementById('foTime'); if (el) el.textContent = mmss(L); const ring = document.getElementById('foRing'); if (ring) ring.style.strokeDashoffset = String(100 - prog() * 100);
-  if (RUN && RUN.phase === 'grow') { const k = `pot|${RUN.sp}|${stageOf(prog())}|0|${RUN.seed}|${cfg().scene || ''}`, h = document.getElementById('fo3d'); if (h && h.dataset.k !== k) { h.dataset.k = k; mount(); } document.title = 'Floresta · ' + mmss(L) + ' · Oceanum'; } pill(); }
+  if (RUN && RUN.phase === 'grow') { const k = `pot|${RUN.sp}|${stageOf(prog())}|0|${RUN.seed}|${cfg().scene || ''}`, h = document.getElementById('fo3d'); if (h && h.dataset.k !== k) { h.dataset.k = k; mount(); } document.title = 'Floresta · ' + mmss(L) + ' · OCEANUM'; } pill(); }
 /* ---- janela flutuante (dentro do app) + Picture-in-Picture (fora do app) ---- */
 const GI = {}, MSPH = {}; let FL = null, FC = null, VID = null, giBusy = '';
 function growImg(sp, st) { const k = sp + '|' + st; if (GI[k] || giBusy === k) return GI[k]; if (!T || FAIL) { if (!FAIL) load3(); return null; }
@@ -429,7 +442,7 @@ VW[''] = () => { const c = cfg(), sp = SP[c.sp] ? c.sp : 'carvalho', t = today()
     <button class="btn pri fo-go" data-act="foPlant">Plantar</button>
     <div class="fo-today">${Td.length ? `Hoje: <b>${Td.filter(x => x.alive !== false).length}</b> árvore(s) · <b>${U.hours(U.sum(Td.filter(x => x.alive !== false), x => +x.mins || 0))}</b> de foco${Td.some(x => x.alive === false) ? ` · ${Td.filter(x => x.alive === false).length} morta(s)` : ''}` : 'Ainda não plantaste hoje.'}</div>`;
   if (T && !FAIL) thumbs([sp].concat(list)); else if (!T && !FAIL) load3().then(() => thumbs([sp].concat(list))); return stage(k, ring(0, 'idle'), body); };
-const stage = (k, ring, body) => `<div class="fo-wrap"><div class="${sky()} fo-stage"><div id="fo3d" class="fo-3d" data-mode="pot" data-k="${k}"><div class="fo-fb"><span class="fd-spin"></span><small>${FAIL ? 'Este navegador não consegue mostrar 3D.' : 'A preparar a tua árvore…'}</small></div></div>${ring}</div><div class="fo-panel">${body}</div></div>`;
+const stage = (k, ring, body) => `<div class="fo-wrap"><div class="${sky()} fo-stage"><div id="fo3d" class="fo-3d" data-mode="pot" data-k="${k}"><div class="fo-fb"><span class="fd-spin"></span><small>A preparar a tua árvore…</small></div></div>${ring}</div><div class="fo-panel">${body}</div></div>`;
 
 const PER = [['d', 'Dia'], ['w', 'Semana'], ['m', 'Mês'], ['y', 'Ano'], ['a', 'Tudo']];
 const range = (p, ref) => { if (p === 'd') return [ref, ref, U.longDate(ref)]; if (p === 'w') { const a = U.monday(ref), b = U.addDays(a, 6); return [a, b, U.fmtDS(a) + ' – ' + U.fmtDS(b)]; } if (p === 'm') { const a = ref.slice(0, 7) + '-01', d = new Date(+ref.slice(0, 4), +ref.slice(5, 7), 0).getDate(); return [a, ref.slice(0, 7) + '-' + d, (U.MESL || U.MES)[+ref.slice(5, 7) - 1] + ' ' + ref.slice(0, 4)]; } if (p === 'y') return [ref.slice(0, 4) + '-01-01', ref.slice(0, 4) + '-12-31', ref.slice(0, 4)]; return ['0000', '9999', 'Desde sempre']; };
@@ -438,7 +451,7 @@ VW.floresta = () => { if (T && !FAIL) setTimeout(() => thumbs(), 400); const p =
   FLIST = shown; const key = `forest|${cfg().scene || ''}|${p}|${a}|${L.length}|${L.map(t => t.id.slice(-3)).join('').slice(-60)}`;
   const byTag = {}; alive.forEach(t => byTag[t.tag || 'Sem etiqueta'] = (byTag[t.tag || 'Sem etiqueta'] || 0) + (+t.mins || 0));
   return `<div class="row gap8 fo-pernav" style="flex-wrap:wrap;align-items:center"><div class="seg">${PER.map(([k, l]) => `<button class="${p === k ? 'on' : ''}" data-act="foPer" data-v="${k}">${l}</button>`).join('')}</div>${p !== 'a' ? `<span class="row gap4"><button class="icon-btn" data-act="foShift" data-d="-1" aria-label="Anterior">${UI.ic('left')}</button><b>${esc(lab)}</b><button class="icon-btn" data-act="foShift" data-d="1" aria-label="Seguinte" ${b >= today() ? 'disabled' : ''}>${UI.ic('right')}</button></span>` : ''}</div>
-    <div class="${sky()} fo-stage fo-big"><div id="fo3d" class="fo-3d" data-mode="forest" data-k="${esc(key)}"><div class="fo-fb"><span class="fd-spin"></span><small>${FAIL ? 'Este navegador não consegue mostrar 3D.' : 'A plantar a tua floresta…'}</small></div></div>
+    <div class="${sky()} fo-stage fo-big"><div id="fo3d" class="fo-3d" data-mode="forest" data-k="${esc(key)}"><div class="fo-fb"><span class="fd-spin"></span><small>A plantar a tua floresta…</small></div></div>
       <div class="fo-ov"><b>${alive.length}</b> ${alive.length === 1 ? 'árvore' : 'árvores'}${dead ? ` · <span>${dead} ${dead === 1 ? "seca" : "secas"}</span>` : ''}<small>${U.hours(U.sum(alive, t => +t.mins || 0))} de foco</small></div>${!L.length ? `<div class="fo-empty">Ainda não há árvores aqui.<br><a class="btn sm pri" href="#floresta">Plantar a primeira</a></div>` : ''}<small class="fo-hint">arrasta para rodar · pinça/roda para zoom</small></div>
     ${L.length > shown.length ? `<p class="mut" style="font-size:12px">A mostrar as ${shown.length} árvores mais recentes.</p>` : ''}
     ${L.length ? `<div class="g g2"><div class="pn"><div class="pn-h"><h3>Por etiqueta</h3></div>${C.mount({ type: 'donut', data: Object.entries(byTag).sort((x, y) => y[1] - x[1]).map(([l, v]) => ({ l, v })), fmt: v => U.hours(v), max: 7, centerSub: 'foco' }, 200)}</div>
@@ -468,5 +481,12 @@ VW.stats = () => { if (T && !FAIL) setTimeout(() => thumbs(), 300); else if (!FA
       <div class="pn"><div class="pn-h"><h3>A que horas te concentras</h3></div>${C.mount({ type: 'bar', labels: hrs.map((_, h) => h + 'h'), series: [{ name: 'Minutos', data: hrs, color: 'var(--accent)' }] }, 200)}</div></div>
     <div class="pn"><div class="pn-h"><h3>Espécies plantadas</h3></div><div class="fo-spst">${Object.entries(U.groupBy(al, x => x.sp)).sort((a, b) => b[1].length - a[1].length).map(([k, a]) => `<span>${mini(k)} ${esc((SP[k] || {}).n || k)} <b>${a.length}</b></span>`).join('')}</div></div>`; };
 
-OS.Forest = { SP, check: () => Object.keys(SP).map(k => { const out = [k]; [1, .5, .05].forEach(g => [false, true].forEach(d => { try { const b = new Bld(rngOf(5), 1); tree(b, k, g, d); } catch (e) { out.push(g + (d ? 'd' : '') + ': ' + e.message); } })); return out; }).filter(x => x.length > 1), run: () => RUN, last: () => LAST, finish, plant, coinsFor, _t: () => ({ T: !!T, FAIL, G }) };
+/* ---- quando o 3D não abre: tenta outra vez sozinho e mostra o motivo (sem trocar a árvore 3D por outra coisa) ---- */
+let flatT = 0;
+function flat(h) { h.classList.add('fo-nogl'); const fb = h.querySelector('.fo-fb'); if (!fb) return; const again = failN < 4;
+  if (again) { clearTimeout(flatT); flatT = setTimeout(() => { if (document.getElementById('fo3d')) mount(); }, 6500); }
+  const k = again + '|' + failWhy; if (fb.dataset.k === k) return; fb.dataset.k = k;
+  fb.innerHTML = again ? `<span class="fd-spin"></span><small>A abrir o 3D…</small>` : `<small>O 3D não abriu agora neste aparelho.${failWhy ? `<span class="fo-why">${esc(failWhy)}</span>` : ''}</small><button type="button" class="btn xs" data-act="fo3dRetry">Tentar outra vez</button>`; }
+A.fo3dRetry = () => { failN = 0; retry3(); const h = document.getElementById('fo3d'); if (h) { const fb = h.querySelector('.fo-fb'); if (fb) { fb.dataset.k = ''; fb.innerHTML = '<span class="fd-spin"></span><small>A abrir o 3D…</small>'; } } setTimeout(mount, 60); };
+OS.Forest = { SP, gl: () => ({ ok: !!G.r, fail: FAIL, why: failWhy }), _fail: (w) => { fail(w || 'teste'); }, _retry: () => { failN = 0; retry3(); }, check: () => Object.keys(SP).map(k => { const out = [k]; [1, .5, .05].forEach(g => [false, true].forEach(d => { try { const b = new Bld(rngOf(5), 1); tree(b, k, g, d); } catch (e) { out.push(g + (d ? 'd' : '') + ': ' + e.message); } })); return out; }).filter(x => x.length > 1), run: () => RUN, last: () => LAST, finish, plant, coinsFor, _t: () => ({ T: !!T, FAIL, G }) };
 })();

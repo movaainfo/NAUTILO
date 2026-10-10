@@ -26,7 +26,12 @@ const merge = lists => { const seen = new Set(), out = []; const L = lists.filte
 /* busca no script (em lotes) */
 NW.fetch = async (sp, force) => { const need = sp.filter(s => force || !NW.cache[s.id] || Date.now() - NW.cache[s.id].at > 4 * 6e4); if (!need.length) return; const c = scr(); if (!c) throw new Error('sem script');
   const u = c.url + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=nw&f=' + encodeURIComponent(JSON.stringify(need)) + '&_=' + Date.now();
-  const r = await fetch(u, { cache: 'no-store', credentials: 'omit' }); const j = JSON.parse(await r.text()); if (!j.nw) { NW.old = true; throw new Error('script antigo'); } NW.old = false;
+  // sem resposta em 25 s (script a acordar ou sem rede) desiste e mostra o motivo, em vez de ficar a rodar para sempre
+  const ac = window.AbortController ? new AbortController() : null, to = ac && setTimeout(() => ac.abort(), window.__nwTO || 25000); let r, txt;
+  try { r = await fetch(u, { cache: 'no-store', credentials: 'omit', signal: ac ? ac.signal : undefined }); txt = await r.text(); }
+  catch (e) { throw new Error(e && e.name === 'AbortError' ? 'o teu script Google não respondeu a tempo (pode estar a acordar: tenta outra vez)' : 'sem ligação ao teu script Google'); } finally { to && clearTimeout(to); }
+  let j; try { j = JSON.parse(txt); } catch (e) { throw new Error(/accounts\.google|ServiceLogin|Sign in/i.test(txt) ? 'o script Google pede início de sessão: na implementação escolhe "Quem tem acesso: Qualquer pessoa"' : 'o script Google respondeu com um erro'); }
+  if (j && j.ok === false) throw new Error(j.msg || 'o script recusou o pedido'); if (!j.nw) { NW.old = true; throw new Error('script antigo'); } NW.old = false;
   Object.entries(j.nw).forEach(([id, items]) => { const prev = NW.cache[id]; NW.cache[id] = { at: Date.now(), items: items || [] }; if (prev && prev.items.length) { const old = new Set(prev.items.map(x => norm(x.t))); NW.cache[id].fresh = (items || []).filter(x => !old.has(norm(x.t))).map(x => norm(x.t)); } });
   try { U.ls.set('oc_news1', Object.fromEntries(Object.entries(NW.cache).slice(-24))); } catch (e) { } };
 Object.assign(NW.cache, U.ls.get('oc_news1', {}) || {});
@@ -61,28 +66,29 @@ Responde APENAS JSON: {"titulo":"a frase que resume o dia (máx 14 palavras)","p
   BRB = ''; OS.request(); };
 
 /* ---------- ecrã ---------- */
-let busy = false, err = '', lastLoad = 0;
-const load = async (force) => { if (busy) return; const tab = OS.ui.nwTab || 'W', topic = OS.ui.nwTopic || 'TOP', theme = OS.ui.nwTheme || ''; busy = true; err = ''; OS.request();
+let busy = false, err = '', lastLoad = 0, busyAt = 0, tick = 0, errAt = 0;
+const load = async (force) => { if (busy) return; const tab = OS.ui.nwTab || 'W', topic = OS.ui.nwTopic || 'TOP', theme = OS.ui.nwTheme || ''; busy = true; busyAt = Date.now(); err = ''; OS.request();
+  clearInterval(tick); tick = setInterval(() => { const e = document.getElementById('nwSec'); if (!busy || !e) return clearInterval(tick); const s2 = Math.round((Date.now() - busyAt) / 1000); e.textContent = s2 + ' s' + (s2 >= 6 ? ' · o script Google demora mais na primeira vez do dia' : ''); }, 1000);
   try { await NW.fetch(specs(tab, topic, theme), force); const it = itemsFor(tab, topic, theme), fr = freshSet(tab, topic, theme); if (fr.size && !force && lastLoad) UI.toast(`${fr.size} notícia(s) nova(s)`, 'pos'); lastLoad = Date.now();
     if (tab !== 'W' && ED[tab][3] !== 'pt') translate(it, ED[tab][3]); if (topic === 'TOP' && !theme) briefing(tab, it, tab === 'W' ? 'todo o mundo' : ED[tab][0]); }
-  catch (e) { err = NW.old ? 'O teu script Google precisa do código novo (Investimentos → Cotações → Copiar código novo → Nova versão).' : !scr() ? '' : 'Não consegui buscar as notícias agora: ' + e.message; }
-  busy = false; OS.request(); };
+  catch (e) { errAt = Date.now(); err = NW.old ? 'O teu script Google precisa do código novo (Investimentos → Cotações → Copiar código novo → Nova versão).' : !scr() ? '' : 'Não consegui buscar as notícias: ' + e.message + '.'; }
+  busy = false; clearInterval(tick); OS.request(); };
 V.jornal = () => { const tab = OS.ui.nwTab || 'W', topic = OS.ui.nwTopic || 'TOP', theme = OS.ui.nwTheme || '', C2 = cfg(), lang = tab === 'W' ? 'pt' : ED[tab][3];
-  const sp = specs(tab, topic, theme), stale = sp.some(s => !NW.cache[s.id] || Date.now() - NW.cache[s.id].at > 4 * 6e4); if (stale && !busy && scr()) setTimeout(() => load(false), 30);
+  const sp = specs(tab, topic, theme), stale = sp.some(s => !NW.cache[s.id] || Date.now() - NW.cache[s.id].at > 4 * 6e4); if (stale && !busy && scr() && Date.now() - errAt > 90000) setTimeout(() => load(false), 30);
   const items = itemsFor(tab, topic, theme), fr = freshSet(tab, topic, theme), place = tab === 'W' ? 'Mundo' : ED[tab][0], b = !theme && topic === 'TOP' ? BR[tab] : null, last = Math.max(0, ...sp.map(s => (NW.cache[s.id] || {}).at || 0));
   const tabs = `<div class="nw-tabs"><button class="${tab === 'W' ? 'on' : ''}" data-act="nwTab" data-v="W">🌍 Mundo</button>${(C2.tabs || []).filter(k => ED[k]).map(k => `<button class="${tab === k ? 'on' : ''}" data-act="nwTab" data-v="${k}">${ED[k][1]} ${esc(ED[k][0])}<i data-act="nwDelTab" data-v="${k}" title="Remover" aria-label="Remover ${esc(ED[k][0])}">×</i></button>`).join('')}<button class="nw-add" data-act="nwAddTab">+ País</button></div>`;
   const tops = `<div class="nw-topics">${TOPICS.filter(t => !(tab === 'W' && t[0] === 'NATION')).map(([k, l]) => `<button class="chip ${!theme && topic === k ? 'on' : ''}" data-act="nwTopic" data-v="${k}">${l}</button>`).join('')}${(C2.themes || []).map(t => `<button class="chip ${theme === t ? 'on' : ''}" data-act="nwTheme" data-v="${esc(t)}">#${esc(t)}<i data-act="nwDelTheme" data-v="${esc(t)}" aria-label="Remover tema">×</i></button>`).join('')}<form class="row gap6" data-form="nwTheme"><input class="field" name="q" placeholder="+ tema (ex.: Aveiro, IA, Ucrânia)" style="width:220px" aria-label="Novo tema"></form></div>`;
-  if (!scr()) return UI.head('Jornal', 'As notícias mais importantes do mundo, em tempo real.', '', 'Visão geral') + tabs + `<div class="pn"><h3>Liga as notícias</h3><p>As notícias chegam através do teu script Google (o mesmo do atalho de gastos, sincronização e cotações). Configura-o em <a class="acc" href="#definicoes">Definições → Atalho de gastos</a> e cola o código novo (Investimentos → Cotações → Copiar código novo).</p></div>`;
+  if (!scr()) return UI.head('Jornal', 'As notícias mais importantes do mundo, em tempo real.', '', 'Visão geral') + tabs + `<div class="pn"><h3>Liga as notícias</h3><p>As notícias chegam através do teu script Google (o mesmo do atalho de gastos, sincronização e cotações). Configura-o em <a class="acc" href="#definicoes">Definições → Atalho de gastos</a> e cola o código novo (Investimentos → Cotações → Copiar código novo).</p>${OS.Move && !OS.Move.isOld ? '<p class="mut" style="margin:0">Já o tinhas no endereço antigo? <a class="acc" href="#definicoes" data-act="mvWelcome">Traz os teus dados</a>: o script vem com eles e as notícias aparecem logo.</p>' : ''}</div>`;
   return UI.head('Jornal', 'As notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do dia.', `<button class="btn sm ghost" data-act="nwRefresh">${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button>`, 'Visão geral') + tabs + tops
-    + `<div class="nw-meta"><span class="inv-live"><i></i>${last ? 'Atualizado ' + ago(last) : 'A carregar…'} · Google Notícias${tab !== 'W' && lang !== 'pt' ? ` · <label><input type="checkbox" data-act="nwTr" ${C2.tr ? 'checked' : ''}> traduzir para português</label>${TRB ? ' (a traduzir…)' : ''}` : ''}</span></div>${err ? `<div class="note">${esc(err)}</div>` : ''}
+    + `<div class="nw-meta"><span class="inv-live"><i></i>${last ? 'Atualizado ' + ago(last) : 'A carregar…'} · Google Notícias${tab !== 'W' && lang !== 'pt' ? ` · <label><input type="checkbox" data-act="nwTr" ${C2.tr ? 'checked' : ''}> traduzir para português</label>${TRB ? ' (a traduzir…)' : ''}` : ''}</span></div>${err ? `<div class="note nw-err">${esc(err)} <button class="btn xs" data-act="nwRefresh">Tentar outra vez</button></div>` : ''}
     ${!theme && topic === 'TOP' ? brief(b, tab, place) : ''}
-    ${items.length ? `<div class="nw-list">${items.slice(0, 60).map((x, i) => card(x, i, lang, fr.has(norm(x.t)))).join('')}</div>` : busy ? '<div class="pn"><div class="sai-busy"><div class="fd-spin"></div><span>A buscar as notícias do momento…</span></div></div>' : UI.empty('Sem notícias para mostrar.')}
+    ${items.length ? `<div class="nw-list">${items.slice(0, 60).map((x, i) => card(x, i, lang, fr.has(norm(x.t)))).join('')}</div>` : busy ? `<div class="pn"><div class="sai-busy"><div class="fd-spin"></div><span>A buscar as notícias do momento… <small class="mut" id="nwSec">${Math.round((Date.now() - busyAt) / 1000)} s</small></span></div></div>` : err ? '' : UI.empty('Sem notícias para mostrar.', '<button class="btn sm" data-act="nwRefresh">Atualizar</button>')}
     <p class="mut" style="font-size:11.5px">Fonte: Google Notícias (agregador de jornais). Cada notícia abre no site do jornal que a publicou.</p>`; };
 const card = (x, i, lang, isNew) => { const t = ttl(x, lang), orig = t !== x.t ? x.t : '';
   return `<article class="nw-c ${i === 0 ? 'lead' : ''}"><a href="${esc(x.l)}" target="_blank" rel="noopener"><div class="nw-src">${fav(x.su)}<span>${esc(x.s || host(x.su))}</span><span class="mut">· ${ago(x.d)}</span>${isNew ? '<span class="bdg pos">novo</span>' : ''}</div><h3>${esc(t)}</h3>${orig ? `<small class="mut">${esc(orig)}</small>` : ''}</a>
     ${(x.rel || []).length ? `<details class="nw-rel"><summary>+${x.rel.length} fonte(s)</summary>${x.rel.map(r => `<a href="${esc(r.l)}" target="_blank" rel="noopener"><b>${esc(r.s)}</b> ${esc(ttl(r, lang))}</a>`).join('')}</details>` : ''}</article>`; };
 const brief = (b, tab, place) => { const has = OS.AI && OS.AI.key();
-  if (!has) return `<div class="pn nw-brief"><div class="eyebrow">O essencial agora</div><p class="mut" style="margin:0">Com a IA ligada (chave Gemini), aqui aparece um resumo das notícias mais importantes do momento, feito só com as manchetes reais abaixo.</p></div>`;
+  if (!has) return `<div class="pn nw-brief"><div class="eyebrow">O essencial agora</div><p class="mut" style="margin:0 0 8px">Com o Spyke (IA) ligado, aqui aparece um resumo das notícias mais importantes do momento, feito só com as manchetes reais abaixo.</p>${OS.AI && OS.AI.setup ? OS.AI.setup('') : ''}</div>`;
   if (!b || (!b.titulo && !(b.pontos || []).length)) return BRB ? `<div class="pn nw-brief"><div class="sai-busy"><div class="fd-spin"></div><span>A ler as manchetes de ${esc(place)} e a preparar o resumo…</span></div></div>` : '';
   return `<div class="pn nw-brief"><div class="row between gap8"><div class="eyebrow">O essencial agora · ${esc(place)} · ${ago(b.at)}</div><button class="btn xs ghost" data-act="nwBrief">${BRB ? 'A atualizar…' : 'Atualizar resumo'}</button></div><h2>${esc(b.titulo)}</h2>
     <ol>${b.pontos.map(p => `<li><b>${esc(p.titulo)}</b><p>${esc(p.resumo)}</p>${p.porque ? `<small class="mut">Porque importa: ${esc(p.porque)}</small>` : ''}${p.idx.length ? `<div class="nw-bs">${p.idx.map(x => `<a href="${esc(x.l)}" target="_blank" rel="noopener">${esc(x.s)}</a>`).join('')}</div>` : ''}</li>`).join('')}</ol>
@@ -90,7 +96,7 @@ const brief = (b, tab, place) => { const has = OS.AI && OS.AI.key();
 A.nwTab = b => { if (b.target && b.target.closest && b.target.closest('[data-act=nwDelTab]')) return; OS.setUI('nwTab', b.dataset.v); OS.setUI('nwTheme', ''); OS.setUI('nwTopic', 'TOP'); };
 A.nwTopic = b => { OS.setUI('nwTopic', b.dataset.v); OS.setUI('nwTheme', ''); };
 A.nwTheme = b => OS.setUI('nwTheme', b.dataset.v);
-A.nwRefresh = () => load(true);
+A.nwRefresh = () => { errAt = 0; load(true); };
 A.nwBrief = () => { const tab = OS.ui.nwTab || 'W'; briefing(tab, itemsFor(tab, 'TOP', ''), tab === 'W' ? 'todo o mundo' : ED[tab][0], true); };
 A.nwTr = () => { cfg().tr = !cfg().tr; OS.touch('news'); };
 A.nwDelTab = b => { const c = cfg(); c.tabs = (c.tabs || []).filter(x => x !== b.dataset.v); OS.touch('news'); if (OS.ui.nwTab === b.dataset.v) OS.setUI('nwTab', 'W'); };
@@ -101,6 +107,8 @@ OS.forms = OS.forms || {}; OS.forms.nwTheme = (f, v) => { const q = String(v('q'
 /* atualização ao longo do dia: com o Jornal aberto a cada 5 min; noutras páginas, os destaques do mundo a cada 20 min (para o contador no menu) */
 let seenTop = U.ls.get('oc_newsseen', 0) || 0;
 NW.unread = () => { const it = itemsFor('W', 'TOP', ''); return it.filter(x => x.d > seenTop && x.d > Date.now() - 6 * 36e5).length; };
+// ao abrir a app já vai buscando os destaques: quando abrires o Jornal estão prontos
+OS.on('ready', () => setTimeout(() => { if (document.hidden || !scr() || navigator.webdriver) return; if (Date.now() - ((NW.cache['PT:WORLD'] || {}).at || 0) > 10 * 6e4) NW.fetch(specs('W', 'TOP', '')).then(() => OS.request()).catch(() => { }); }, 2500));
 OS.on('ready', () => { setInterval(() => { if (document.hidden || !scr()) return; const on = /^#jornal/.test(location.hash); if (on) load(false); else if (Date.now() - ((NW.cache['PT:WORLD'] || {}).at || 0) > 20 * 6e4) NW.fetch(specs('W', 'TOP', '')).then(() => OS.request()).catch(() => { }); }, 5 * 6e4);
   addEventListener('hashchange', () => { if (/^#jornal/.test(location.hash)) { seenTop = Date.now(); U.ls.set('oc_newsseen', seenTop); } }); });
 })();

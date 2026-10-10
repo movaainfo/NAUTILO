@@ -75,7 +75,7 @@ const alphaRes = (a, cost) => { const v = [0, 1, 2, 3, 4].map(i => (a || {})['q'
 V.decisoes = () => {
   const D = U.sortBy(OS.all('decisions'), d => (d.status === 'Em análise' ? '0' : '1') + (d.deadline || '9'));
   return UI.head('Decision Center', 'Organiza decisões importantes: alternativas, custos, riscos e impacto nos teus objetivos, lado a lado. A decisão continua a ser tua.', UI.addBtn('decisions', 'Nova decisão'), 'Direção') +
-  (D.length ? `<div class="g g2">${D.map(d => { const ar = alphaRes(d.alpha, Math.max(0, ...(d.alts || []).map(a => U.num(a.cost)))); return `<div class="pn click" data-act="decOpen" data-id="${d.id}" style="cursor:pointer"><div class="row between gap8"><span class="eyebrow">${esc(d.status)}${d.deadline ? ' · decidir até ' + U.fmtDS(d.deadline) : ''}</span>${UI.badge(ar[0], ar[1])}</div><div style="font-size:16px;font-weight:600;margin:4px 0 6px">${esc(d.title)}</div>${d.context ? `<div class="tx2" style="font-size:13px">${esc(d.context)}</div>` : ''}<div class="row gap4" style="margin-top:10px">${(d.alts || []).map(a => UI.badge(a.name || 'Alternativa', d.chosen === a.name ? 'pos' : 'out')).join('')}</div></div>`; }).join('')}</div>` : UI.empty('Quando tiveres uma decisão importante (curso, emprego, compra grande, investimento, mudança), estrutura-a aqui.', UI.addBtn('decisions', 'Criar decisão', null, '')));
+  (D.length ? `<div class="g g2">${D.map(d => { const ar = alphaRes(d.alpha, Math.max(0, ...(d.alts || []).map(a => U.num(a.cost)))); return `<div class="pn click" data-act="decOpen" data-id="${d.id}" style="cursor:pointer"><div class="row between gap8"><span class="eyebrow">${esc(d.status)}${d.deadline ? ' · decidir até ' + U.fmtDS(d.deadline) : ''}</span>${UI.badge(ar[0], ar[1])}</div><div style="font-size:16px;font-weight:600;margin:4px 0 6px">${esc(d.title)}</div>${d.context ? `<div class="tx2" style="font-size:13px">${esc(d.context)}</div>` : ''}<div class="row gap4" style="margin-top:10px">${(d.alts || []).map(a => UI.badge(a.name || 'Alternativa', d.chosen === a.name ? 'pos' : 'out')).join('')}</div>${d.ai && d.ai.r && d.ai.r.inclinacao && d.ai.r.inclinacao.nome ? `<div class="dc-lean"><span class="ai-orb sm" aria-hidden="true"></span>Spyke: os dados apontam para <b>${esc(d.ai.r.inclinacao.nome)}</b></div>` : ''}</div>`; }).join('')}</div>` : UI.empty('Quando tiveres uma decisão importante (curso, emprego, compra grande, investimento, mudança), estrutura-a aqui.', UI.addBtn('decisions', 'Criar decisão', null, '')));
 };
 A.decOpen = b => decDrawer(b.dataset.id);
 function decDrawer(id) {
@@ -94,6 +94,7 @@ function decDrawer(id) {
       <tr><td><b>Índice ponderado</b><div class="mut" style="font-size:11px">com os teus pesos, 0–100</div></td><td></td>${alts.map(a => `<td class="mono">${Math.round(score(a) * 100)}</td>`).join('')}</tr>
       <tr><td></td><td></td>${alts.map((a, i) => `<td><button class="btn xs ghost" data-act="altDel" data-id="${d.id}" data-i="${i}">Remover</button></td>`).join('')}</tr></tbody></table></div>
       <div class="note" style="margin-top:8px">O contorno verde marca a melhor alternativa em cada critério. O índice resume os critérios com os pesos que escolheste; não é uma recomendação.</div>` : UI.empty('Adiciona pelo menos duas alternativas (inclui "não fazer nada").')}</div>
+    ${decAIBox(d)}
     <div class="row gap8"><select class="field" style="width:auto" data-decset="${d.id}" data-k="status" aria-label="Estado">${['Em análise', 'Decidida', 'Adiada'].map(s => `<option${d.status === s ? ' selected' : ''}>${s}</option>`).join('')}</select>${alts.length ? `<select class="field" style="width:auto" data-decset="${d.id}" data-k="chosen" aria-label="Opção escolhida"><option value="">Opção escolhida…</option>${alts.map(a => `<option${d.chosen === a.name ? ' selected' : ''}>${esc(a.name || '')}</option>`).join('')}</select>` : ''}</div>
   </div>`, 'wide');
 }
@@ -107,6 +108,59 @@ document.addEventListener('change', e => {
   else if (el.dataset.decset) { OS.upd('decisions', el.dataset.decset, { [el.dataset.k]: el.value }); setTimeout(() => decDrawer(el.dataset.decset), 0); }
 });
 document.addEventListener('click', e => { const b = e.target.closest('[data-alpha]'); if (!b) return; decUpd(b.dataset.alpha, c => { c.alpha[b.dataset.q] = b.dataset.v; }); });
+
+/* ---- Spyke (IA) no Decision Center: lê a decisão e a tua vida e ajuda-te a pensar. A decisão continua a ser tua. ---- */
+const DECB = {};
+const W0 = { cost: 3, benefit: 4, risk: 3, time: 2, fin: 3, goals: 5, routine: 2 };
+const decCtx = d => { const L = [], add = (k, v) => { if (v) L.push(k + ': ' + v); };
+  add('Decisão', d.title); add('Contexto', d.context); add('Decidir até', d.deadline); add('Estado', d.status);
+  (d.alts || []).forEach((a, i) => add('Alternativa ' + (i + 1), [a.name || 'sem nome'].concat(CRIT.filter(([k]) => a[k] !== '' && a[k] != null).map(([k, l]) => l + ' = ' + a[k]), a.notes ? ['notas: ' + a.notes] : []).join('; ')));
+  add('Pesos que ele deu (0–5)', CRIT.map(([k, l]) => l + ' ' + Object.assign({}, W0, d.weights || {})[k]).join(', '));
+  add('Filtro Alpha', ALPHA.map((q, i) => q + ' ' + ((d.alpha || {})['q' + i] || 'sem resposta')).join(' | '));
+  return L.join('\n'); };
+const who = () => OS.one('profile').short || 'Ryan';
+const decPrompt = (d, task) => [{ text: `És o Spyke, o assistente pessoal do ${who()}. Ajudas a pensar uma decisão importante: és honesto, concreto e usas os dados dele; não decides por ele. Escreve em português claro (de Portugal), sem emojis, frases curtas.
+DECISÃO:
+${decCtx(d)}
+VIDA DELE (dados do OCEANUM):
+${OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx() : ''}
+${task}` }];
+const AN = `Responde só JSON: {"resumo":"2 a 3 frases sobre o que está em jogo","alternativas":[{"nome":"nome exato da alternativa","pros":["até 3"],"contras":["até 3"],"encaixe":"como encaixa nas metas, finanças, estudos, trabalho e rotina dele"}],"riscos":["riscos ou custos escondidos que ele não escreveu (até 4)"],"perguntas":["perguntas que ele devia responder antes de decidir (até 4)"],"nova":"uma alternativa que ele não considerou, ou vazio","inclinacao":{"nome":"alternativa para onde os dados apontam, ou vazio se não dá para saber","porque":"uma frase","confianca":"baixa|média|alta"},"emocao":"se parece uma decisão emocional ou impulsiva diz porquê numa frase, senão vazio","passo":"o próximo passo concreto (ex.: pedir orçamento, falar com alguém, esperar 24 h)"}`;
+const FILL = `Estima os valores dos critérios que estão VAZIOS em cada alternativa (não mudes os que ele já pôs), com base no contexto e nos dados dele. Critérios: cost = custo total em euros; benefit, risk, goals, routine = 1 a 5; time = horas por semana; fin = impacto financeiro em euros por mês (negativo se custa). Responde só JSON: {"alts":[{"i":0,"cost":null,"benefit":null,"risk":null,"time":null,"fin":null,"goals":null,"routine":null}],"nota":"o que assumiste, numa frase"}`;
+const decRun = async (id, kind, q) => { const d = OS.get('decisions', id); if (!d || DECB[id]) return; if (!(OS.AI && OS.AI.key())) return UI.toast('Liga o Spyke (IA) primeiro', 'warn');
+  DECB[id] = kind; decDrawer(id);
+  try { if (kind === 'an') { const r = await OS.AI.json(decPrompt(d, AN), .35); OS.upd('decisions', id, { ai: { at: Date.now(), r } }); }
+    else if (kind === 'fill') { const r = await OS.AI.json(decPrompt(d, FILL), .2), alts = U.clone(d.alts || []); let n = 0;
+      (r.alts || []).forEach(x => { const a = alts[+x.i]; if (!a) return; CRIT.forEach(([k, , t]) => { const v = x[k]; if ((a[k] === '' || a[k] == null) && v != null && v !== '' && isFinite(+v)) { a[k] = t === 'r' ? Math.max(1, Math.min(5, Math.round(+v))) : Math.round(+v * 100) / 100; n++; } }); });
+      OS.upd('decisions', id, { alts }); UI.toast(n ? `O Spyke preencheu ${n} valores${r.nota ? ': ' + String(r.nota).slice(0, 120) : ''}` : 'Não havia nada por preencher', n ? 'pos' : ''); }
+    else { const r = await OS.AI.json(decPrompt(d, `Pergunta dele sobre esta decisão: "${q}". Responde só JSON: {"resposta":"até 5 frases, direto ao ponto"}`), .4); OS.upd('decisions', id, { aiQ: (d.aiQ || []).concat([{ q, a: String(r.resposta || '').slice(0, 900), at: Date.now() }]).slice(-6) }); } }
+  catch (e) { UI.toast(e.message || 'O Spyke não respondeu', 'neg'); } finally { delete DECB[id]; if (document.querySelector('#drawer:not([hidden]) [data-dcai="' + id + '"]')) decDrawer(id); } };
+const li = a => (a || []).filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
+function decAIBox(d) { const has = OS.AI && OS.AI.key(), r = d.ai && d.ai.r, busy = DECB[d.id], inc = r && r.inclinacao || {};
+  return `<div class="dc-ai" data-dcai="${d.id}"><div class="row between gap8" style="flex-wrap:wrap"><div class="row gap8" style="align-items:center"><span class="ai-orb sm" aria-hidden="true"></span><div class="eyebrow">Spyke · ajuda a decidir</div></div>
+    ${has ? `<div class="row gap4"><button class="btn sm pri" data-act="decAI" data-id="${d.id}" ${busy ? 'disabled' : ''}>${UI.ic('zap')}${r ? 'Analisar de novo' : 'Analisar'}</button><button class="btn sm" data-act="decFill" data-id="${d.id}" ${(d.alts || []).length && !busy ? '' : 'disabled'}>Preencher a matriz</button>${r ? `<button class="btn sm ghost" data-act="decSay" data-id="${d.id}" aria-label="Ouvir">${UI.ic('play')}</button>` : ''}</div>` : ''}</div>
+    ${has ? '' : OS.AI && OS.AI.setup ? OS.AI.setup('') : ''}
+    ${busy ? `<div class="row gap8 mut" style="margin-top:10px"><span class="fd-spin" style="width:18px;height:18px"></span>${busy === 'fill' ? 'A estimar os valores…' : busy === 'q' ? 'A pensar na tua pergunta…' : 'O Spyke está a analisar a decisão e a tua vida…'}</div>` : ''}
+    ${r ? `<p style="margin:10px 0 6px">${esc(r.resumo || '')}</p>
+      ${inc.nome ? `<div class="dc-inc"><b>Os dados apontam para: ${esc(inc.nome)}</b>${inc.confianca ? ` <span class="bdg ${inc.confianca === 'alta' ? 'pos' : inc.confianca === 'baixa' ? 'warn' : ''}">confiança ${esc(inc.confianca)}</span>` : ''}<small>${esc(inc.porque || '')} A decisão continua a ser tua.</small></div>` : ''}
+      ${r.emocao ? `<div class="dc-emo">${UI.ic('info')}<span>${esc(r.emocao)}</span></div>` : ''}
+      ${(r.alternativas || []).length ? `<div class="dc-alts">${r.alternativas.map(a => `<div><b>${esc(a.nome || '')}</b>${(a.pros || []).length ? `<ul class="dc-p">${li(a.pros)}</ul>` : ''}${(a.contras || []).length ? `<ul class="dc-c">${li(a.contras)}</ul>` : ''}${a.encaixe ? `<small>${esc(a.encaixe)}</small>` : ''}</div>`).join('')}</div>` : ''}
+      ${(r.riscos || []).length ? `<div class="dc-sec"><b>Riscos que podes não estar a ver</b><ul>${li(r.riscos)}</ul></div>` : ''}
+      ${(r.perguntas || []).length ? `<div class="dc-sec"><b>Responde a isto antes de decidir</b><ul>${li(r.perguntas)}</ul></div>` : ''}
+      ${r.nova ? `<div class="dc-sec"><b>E se…</b><p style="margin:2px 0 6px">${esc(r.nova)}</p><button class="btn xs" data-act="decNewAlt" data-id="${d.id}">${UI.ic('plus')}Juntar como alternativa</button></div>` : ''}
+      ${r.passo ? `<div class="dc-sec"><b>Próximo passo</b><p style="margin:2px 0 6px">${esc(r.passo)}</p><button class="btn xs" data-act="decTask" data-id="${d.id}">${UI.ic('plus')}Criar tarefa</button></div>` : ''}
+      <small class="mut">Análise de ${new Date(d.ai.at).toLocaleString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Se mudares as alternativas, analisa de novo.</small>`
+    : has && !busy ? `<p class="mut" style="margin:8px 0 0;font-size:13px">O Spyke lê esta decisão e a tua vida (metas, dinheiro, agenda, estudos, trabalho, o que lhe contaste) e dá-te prós e contras, riscos escondidos, perguntas a fazer e para onde os dados apontam. "Preencher a matriz" estima os valores que deixaste em branco.</p>` : ''}
+    ${(d.aiQ || []).map(x => `<div class="dc-qa"><b>${esc(x.q)}</b><p>${esc(x.a)}</p></div>`).join('')}
+    ${has ? `<form class="row gap8 dc-ask" data-form="decAsk" data-id="${d.id}" autocomplete="off"><input class="field grow" name="q" placeholder="Pergunta ao Spyke sobre esta decisão…" aria-label="Pergunta ao Spyke"><button class="btn sm" ${busy ? 'disabled' : ''}>Perguntar</button></form>` : ''}</div>`; }
+A.decAI = b => decRun(b.dataset.id, 'an');
+A.decFill = b => decRun(b.dataset.id, 'fill');
+OS.forms.decAsk = f => { const q = f.elements.q.value.trim(); if (q.length > 2) decRun(f.dataset.id, 'q', q); };
+A.decSay = b => { const d = OS.get('decisions', b.dataset.id), r = d && d.ai && d.ai.r; if (!r || !OS.Spyke) return; const inc = r.inclinacao || {};
+  OS.Spyke.say([r.resumo, inc.nome ? `Os dados apontam para ${inc.nome}: ${inc.porque || ''}` : '', r.emocao, r.passo ? 'Próximo passo: ' + r.passo : ''].filter(Boolean).join(' ')); };
+A.decNewAlt = b => { const d = OS.get('decisions', b.dataset.id), r = d && d.ai && d.ai.r; if (!r || !r.nova) return; decUpd(d.id, c => c.alts.push({ name: String(r.nova).split(/[.:;,(]/)[0].slice(0, 60), notes: String(r.nova).slice(0, 200) })); };
+A.decTask = b => { const d = OS.get('decisions', b.dataset.id), r = d && d.ai && d.ai.r; if (!r || !r.passo) return; OS.add('tasks', { title: String(r.passo).slice(0, 140), status: 'Próxima', prio: 2, due: d.deadline || '', notes: 'Decisão: ' + d.title }); UI.toast('Tarefa criada', 'pos'); };
+OS.Decide = { run: decRun, ctx: decCtx, open: id => decDrawer(id), alpha: alphaRes };
 
 /* ================= REVISÕES ================= */
 const upsertRev = (coll, key, patch) => { const r = OS.all(coll).find(x => x.key === key); if (r) OS.upd(coll, r.id, patch); else OS.add(coll, Object.assign({ key }, patch)); };
