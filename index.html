@@ -2346,7 +2346,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "1.98", "date": "10/10/2026", "notes": ["Atualização de teste: confirma que a nova versão chega a todos os aparelhos."]};</script>
+<script>window.OCEANUM_VERSION={"v": "1.99", "date": "10/10/2026", "notes": ["Atualização garantida: se um aparelho ficar para trás atualiza-se sozinho; botão \"Procurar atualização\" nas Definições; recuperar os dados do Google Drive direto em Sincronizar aparelhos; testado em iPhone, Android, tablet e computador."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -2381,6 +2381,23 @@ if (VER.v && prev !== VER.v) { ls.set(KEY, VER.v);
   if (prev) { const go = () => { const el = show(`<div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>Atualizado</b><small>versão ${VER.v} · ${VER.date || ''}</small>${(VER.notes || []).length ? `<ul>${VER.notes.slice(0, 4).map(n => `<li>${String(n).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;')}</li>`).join('')}</ul>` : ''}<div class="bar"><i></i></div>`);
       const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }; el.addEventListener('click', close); setTimeout(close, 2600); };
     if (document.readyState === 'loading') addEventListener('DOMContentLoaded', go); else go(); } }
+// 3) garantia extra: compara a versão desta página com a do servidor. Se o servidor tiver uma mais nova e o service worker
+//    não a trouxer em 15 s (acontecia em alguns Android), apaga a cache da app (os teus dados ficam) e recarrega já com a nova.
+const num = v => { const m = String(v || '').match(/^(\d+)\.(\d+)/); return m ? +m[1] * 1000 + +m[2] : 0; };
+const note = (t, k) => { try { if (window.OS && OS.UI && OS.UI.toast) OS.UI.toast(t, k); } catch (e) { } };
+let checking = false, lastCheck = 0, forcing = false;
+const serverVer = async () => { const r = await fetch(location.pathname + '?vchk=' + Date.now(), { cache: 'no-store', credentials: 'omit' }); if (!r.ok) return ''; const m = (await r.text()).match(/OCEANUM_VERSION=\{"v": *"([^"]+)"/); return m ? m[1] : ''; };
+const hard = async () => { if (forcing) return; const last = +(ls.get('os2hardAt') || 0); if (Date.now() - last < 10 * 60000) return; ls.set('os2hardAt', String(Date.now())); forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão nova encontrada</small>');
+  try { if (navigator.serviceWorker) { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r => r.unregister())); } if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.filter(k => k !== 'oceanum-img').map(k => caches.delete(k))); } } catch (e) { }
+  setTimeout(() => location.reload(), 300); };
+window.OceanumCheckUpdate = async manual => { if (checking || forcing) return ''; if (!manual && Date.now() - lastCheck < 60000) return ''; lastCheck = Date.now(); checking = true;
+  try { const sv = await serverVer(); if (!sv || num(sv) <= num(VER.v)) { if (manual) note('Já tens a versão mais recente (' + (VER.v || '') + ').', 'pos'); return 'ok'; }
+    if (manual) note('Versão ' + sv + ' encontrada. A atualizar…');
+    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) reg.update(); } catch (e) { }
+    setTimeout(() => { if (manual || !document.hidden) hard(); }, manual ? 3000 : 15000); return 'new'; }
+  catch (e) { if (manual) note('Sem internet para procurar a atualização agora.', 'warn'); return 'off'; } finally { checking = false; } };
+addEventListener('load', () => setTimeout(() => window.OceanumCheckUpdate(false), 4000));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => window.OceanumCheckUpdate(false), 2500); });
 // versão visível no ecrã de abertura
 addEventListener('DOMContentLoaded', () => { const f = document.querySelector('.sp-foot'); if (f && VER.v) f.textContent = 'MIND CONTROL · v' + VER.v; });
 window.OceanumVersion = VER;
@@ -13005,6 +13022,7 @@ const syncPanel = () => { const c = cfg(), SY = window.OceanumSync || {}, on = !
     <div class="ib-s"><i>+</i><div><b>Ligar outro aparelho</b><p>Copia o código e abre-o no outro aparelho (manda para ti por WhatsApp ou email). No outro aparelho: Oceanum → Definições → Sincronizar aparelhos → cola o código → <b>Ligar</b>. É como uma palavra-passe: não o partilhes.</p><button class="btn sm pri" data-act="syCopy">${UI.ic('link')}Copiar código de ligação</button></div></div>
     <p style="margin:10px 0 0"><button class="btn sm ghost" data-act="syOff">Desligar a sincronização neste aparelho</button></p>`
   : `<div class="ib-w">
+    <div class="ib-s sy-rec"><i>↺</i><div><b>Já tinhas a sincronização ligada (ou mudaste de endereço)?</b><p>Os teus dados estão no teu Google Drive. Recupera-os neste aparelho com o endereço e a chave do teu script Google (os passos aparecem ao tocar).</p><button class="btn sm pri" data-act="mvWelcome">Recuperar os meus dados</button></div></div>
     <div class="ib-s"><i>A</i><div><b>Este aparelho já tem o atalho ligado?</b><p>Se sim (passo 2 do atalho com ✓), segue para B. Se este é o <b>segundo aparelho</b>, cola aqui o código de ligação que copiaste no primeiro:</p>
       <div class="ib-url"><input class="field" id="syCode" placeholder="Código de ligação" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Código de ligação"><button class="btn sm pri" data-act="syLink">Ligar</button></div></div></div>
     ${ready ? `<div class="ib-s ${v3 ? 'done' : ''}"><i>B</i><div><b>Atualizar o script do Google (uma vez)</b>${v3 ? '<p class="pos">✓ O script já está atualizado e pode gravar no teu Google Drive.</p>' : `${(c.ver || 0) >= 3 && st.m && !st.ok ? `<div class="ib-st bad">✗ ${esc(st.m)}</div>` : ''}<p>A sincronização precisa da versão nova do script:</p><p>1. Toca em <b>Copiar código</b> (passo 1 do atalho, mais abaixo).<br>2. No Apps Script: apaga tudo → cola → <b>💾 Guardar</b>.<br>3. <b>Implantar → Gerenciar implantações</b> → ✏️ (lápis) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>.<br>4. Se pedir, <b>autoriza o acesso ao Google Drive</b> (Avançado → Acessar → Permitir).<br>5. Volta aqui e toca em <b>Verificar</b>.</p><button class="btn sm" data-act="syVer">Verificar</button>`}</div></div>
@@ -13285,7 +13303,8 @@ const panel = () => { const U = OS.U, e = U.esc;
   ${!Cloud.enabled ? `<p class="mut" style="margin:0">Os dados estão guardados só neste dispositivo. Para sincronizar entre telemóvel e computador, configura o Firebase (vê o guia LANCAR.md) e volta a publicar.</p>`
     : Cloud.user ? `<p style="margin:0 0 10px">Ligado como <b>${e(Cloud.user.email || '')}</b>. Tudo o que registas sincroniza sozinho.</p><div class="row gap8"><button class="btn" data-act="cloudPush">Enviar tudo agora</button><button class="btn ghost" data-act="cloudOut">Sair</button></div>`
     : `<p style="margin:0 0 10px">Entra com a tua conta Google para guardar na nuvem e ver os mesmos dados em todos os dispositivos.</p><button class="btn pri" data-act="cloudIn">Entrar com Google</button>`}</div>`; };
-const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + panel();
+// só aparece se o Firebase estiver configurado (a sincronização normal é a do Google Drive, em "Sincronizar aparelhos")
+const orig = OS.views.definicoes; if (orig && Cloud.enabled) OS.views.definicoes = sub => orig(sub) + panel();
 if (Cloud.enabled) init().then(u => { Cloud.state = u ? 'ligado' : 'por entrar'; OS.request(); }).catch(() => { Cloud.state = 'sem ligação'; OS.request(); });
 })();
 
@@ -13453,9 +13472,12 @@ document.addEventListener('submit', e => {
 (() => { const orig = V.definicoes; if (!orig) return;
   V.definicoes = sub => { const f = U.ls.get('os2lite', null), on = document.documentElement.classList.contains('lite');
     return orig(sub) + `<div class="pn"><div class="pn-h"><h3>Desempenho</h3><span class="mut" style="font-size:12px">${on ? 'modo leve ligado' : 'efeitos completos'}</span></div><p class="mut" style="margin:0 0 10px">O modo leve tira sombras, desfoques e animações. Liga-o se a app estiver lenta ou travar (fica ligado sozinho em Android e aparelhos com pouca memória).</p><div class="seg" role="group">${[['auto', 'Automático'], ['1', 'Leve'], ['0', 'Completo']].map(([v, l]) => `<button class="${(f == null ? 'auto' : String(f)) === v ? 'on' : ''}" data-act="liteSet" data-v="${v}">${l}</button>`).join('')}</div></div>`; };
+  const origV = V.definicoes; V.definicoes = sub => { const vv = window.OceanumVersion || {};
+    return origV(sub) + `<div class="pn" id="verPn"><div class="pn-h"><h3>Versão do OCEANUM</h3><span class="mut" style="font-size:12px">v${esc(vv.v || '')}${vv.date ? ' · ' + esc(vv.date) : ''}</span></div><p class="mut" style="margin:0 0 10px">As atualizações chegam sozinhas quando abres a app. Se um aparelho ficar para trás, toca aqui: ele compara com a versão publicada e atualiza já (os teus dados ficam).</p><button class="btn sm" data-act="updCheck">${UI.ic('sync')}Procurar atualização</button></div>`; };
   const orig2 = V.definicoes; V.definicoes = sub => { const t = OS.Lock.trusted();
     return orig2(sub) + `<div class="pn"><div class="pn-h"><h3>Código neste aparelho</h3><span class="mut" style="font-size:12px">${t ? 'não pede código' : 'pede código ao abrir'}</span></div><p class="mut" style="margin:0 0 10px">Num aparelho só teu (como o teu tablet), podes entrar direto sem escrever o código. Os outros aparelhos continuam a pedir. O botão do cadeado volta a ligar o código.${OS.Lock.android ? ' Neste aparelho Android a biometria está desligada para não abrir o ecrã de senha do sistema.' : ''}</p><div class="seg" role="group"><button class="${t ? '' : 'on'}" data-act="trustSet" data-v="0">Pedir código</button><button class="${t ? 'on' : ''}" data-act="trustSet" data-v="1">Entrar direto</button></div></div>`; };
   A.trustSet = b => { OS.Lock.setTrusted(b.dataset.v === '1'); UI.toast(b.dataset.v === '1' ? 'Este aparelho entra direto' : 'O código volta a ser pedido', 'pos'); OS.request(); };
+  A.updCheck = () => { if (window.OceanumCheckUpdate) window.OceanumCheckUpdate(true); else location.reload(); };
   A.liteSet = b => { const v = b.dataset.v; try { if (v === 'auto') localStorage.removeItem('os2lite'); else localStorage.setItem('os2lite', v); } catch (e) { } location.reload(); };
 })();
 /* ---------- com um painel aberto, só o painel rola (no iPhone o overflow:hidden não chega) ---------- */
