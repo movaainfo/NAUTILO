@@ -2164,6 +2164,26 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .fo-sky.fo-bg-espaco{background:radial-gradient(1.5px 1.5px at 10% 12%,#fff 60%,transparent),radial-gradient(1px 1px at 26% 40%,#fff 60%,transparent),radial-gradient(1.5px 1.5px at 52% 8%,#fff 60%,transparent),radial-gradient(1px 1px at 66% 30%,#cfe3ff 60%,transparent),radial-gradient(1.5px 1.5px at 90% 20%,#fff 60%,transparent),radial-gradient(260px 160px at 30% 30%,rgba(90,70,170,.35),transparent 70%),linear-gradient(180deg,#02030a 0%,#0a0f26 60%,#151b3a 100%)}
 .fo-sky.fo-bg-mar{background:radial-gradient(240px 140px at 50% -10%,rgba(190,240,255,.55),transparent 70%),repeating-linear-gradient(100deg,rgba(255,255,255,.05) 0 18px,transparent 18px 60px),linear-gradient(180deg,#1f8fc4 0%,#0d5f93 55%,#073c63 100%)}
 .fo-stage.fo-bg-noite::before,.fo-stage.fo-bg-magica::before,.fo-stage.fo-bg-vulcao::before,.fo-stage.fo-bg-espaco::before,.fo-stage.fo-bg-mar::before{display:none}
+.ai-eng{font-size:13px;line-height:1.5;border:1px solid var(--line2);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--pn2)}
+.ai-free{display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:13px}.ai-free input{margin-top:3px}
+/* Próximos passos: plano da vida */
+.lp-star{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;align-items:start;border-left:3px solid var(--accent)}
+.lp-star .eyebrow,.lp-star>.more{grid-column:1/-1}.lp-sv small{display:block;color:var(--mut);font-size:11.5px}.lp-sv b{font-weight:520;font-size:14px;line-height:1.4}
+.lp-ai{border-color:var(--line3)}.lp-foco{margin:10px 0 0;font-size:15px;font-weight:520;color:var(--tx)}
+.lp-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+@media (max-width:720px){.lp-g{grid-template-columns:1fr}}
+.lp-lv{margin-top:8px}.lp-lh{display:flex;align-items:baseline;gap:8px;margin:6px 0 2px}.lp-lh span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono);background:var(--pn2);color:var(--accent)}.lp-lh b{font-size:13px}.lp-lh small{color:var(--mut);font-size:11.5px}
+.lp-st{display:flex;gap:10px;align-items:flex-start;padding:7px 0 7px 6px;border-top:1px dashed var(--line)}
+.lp-dot{flex:none;border-radius:50%;background:var(--accent);margin-top:6px}.lv1 .lp-dot{width:6px;height:6px}.lv2 .lp-dot{width:8px;height:8px}.lv3 .lp-dot{width:10px;height:10px}.lv4 .lp-dot{width:12px;height:12px;background:var(--c8)}.lv5 .lp-dot{width:14px;height:14px;background:var(--vio)}
+.lp-st.neg .lp-dot{background:var(--neg)}.lp-st.ai b{color:var(--accent)}
+.lp-tx{flex:1;min-width:0}.lp-tx b{display:block;font-weight:500;font-size:13.5px}.lp-tx small{display:block;color:var(--mut);font-size:12px}.lp-a{flex:none;display:flex;gap:4px}
+/* E-mail da faculdade (Outlook) por matéria */
+.ol-it{position:relative;padding-left:14px}.ol-bar{position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:4px}
+.ol-sel{font:inherit;font-size:12px;padding:3px 6px;border-radius:8px;border:1px solid var(--line2);background:var(--pn2);color:var(--tx2);max-width:150px}
+.ol-copy{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}.ol-copy code{font-size:11.5px;word-break:break-all;background:var(--pn2);padding:4px 6px;border-radius:6px}
+.ol-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:10px}
+.ol-rp{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.ol-dom summary{cursor:pointer;font-size:13.5px}
+.ml-sn{font-size:12.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 </style>
 <style>
@@ -2395,7 +2415,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.3", "date": "11/10/2026", "notes": ["Atualização automática a sério: ao abrir, a app vem sempre da internet primeiro (a cópia guardada só é usada sem rede), por isso abre logo na versão mais recente.", "Com a app aberta em segundo plano, ao voltar a ela atualiza-se sozinha em segundos, sem esperar e sem teres de a desinstalar.", "Nunca atualiza a meio de um formulário: espera que acabes. Se algo correr mal, limpa a cópia guardada sozinha (os teus dados ficam)."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.4", "date": "11/10/2026", "notes": ["IA sem parar: a app descobre sozinha os modelos novos do Google (os antigos foram desligados) e, se a cota grátis acabar, responde uma IA grátis de reserva. Notícias, Spyke, e-mails e investimentos nunca mais ficam sem resposta.", "Painel: a Visão Geral e o Painel são agora uma só página, com tudo junto e sem repetições.", "Próximos passos (na Direção): o plano da tua vida por áreas, do passo pequeno (hoje) ao grande (longo prazo), ligado às metas; o Spyke sugere os que faltam.", "E-mail → Faculdade: o Outlook da universidade dentro da app, separado por matéria (aprende com as tuas escolhas). Liga-se pela Parte 4 do script.", "Nomes todos em português: Estrela-guia, Roteiro da vida, Longo prazo, Centro de decisões, Base de conhecimento, Carreira e contactos."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -3285,7 +3305,7 @@ S.subjects = { label: 'Disciplina', title: r => r.name, fields: [
   F('name', 'Disciplina', 'text', { req: 1, wide: 1 }), F('sem', 'Semestre', 'sel', { o: L.SEM }), F('status', 'Estado', 'sel', { o: ['Em curso', 'Plano', 'Aprovada', 'Reprovada', 'Em atraso'] }),
   F('ects', 'ECTS', 'num'), F('target', 'Nota alvo', 'num', { h: '0–20' }), F('final', 'Nota final', 'num'),
   F('hoursWeek', 'Horas de estudo alvo / semana', 'num'), F('diff', 'Dificuldade', 'sel', { o: ['Baixa', 'Média', 'Alta'] }),
-  F('prof', 'Professor(a)'), F('room', 'Sala'), F('notes', 'Notas', 'area', { rows: 2 })
+  F('prof', 'Professor(a)'), F('mail', 'Palavras dos e-mails', 'text', { h: 'Sigla, código da cadeira ou e-mail do professor, separados por vírgula: servem para separar os e-mails da faculdade por matéria' }), F('room', 'Sala'), F('notes', 'Notas', 'area', { rows: 2 })
 ], defaults: () => ({ sem: '1.º Semestre 26/27', status: 'Em curso', target: 15, ects: 6, hoursWeek: 4, diff: 'Média' }) };
 S.classes = { label: 'Aula', title: r => (OS.get('subjects', r.subject) || {}).name || 'Aula', fields: [
   rel('subject', 'Disciplina', 'subjects', { req: 1, filter: s => s.status === 'Em curso' }), F('wday', 'Dia', 'sel', { o: L.WEEK, req: 1 }),
@@ -3923,7 +3943,7 @@ I.next = (o = {}) => {
   }
   OS.all('habits').filter(h => h.active && h.core && Hab.due(h, t) && !Hab.done(h, t) && !h.auto).forEach(h => { if (effOk(10)) out.push({ kind: 'Hábito', title: h.name, score: 30 + (new Date().getHours() >= 18 ? 15 : 0), why: ['inegociável', 'sequência ' + Hab.streak(h) + 'd'], eff: 10, area: 'Hábitos', act: `data-act="habit" data-id="${h.id}" data-d="${t}"`, actL: 'Feito' }); });
   if (ctxOk(['@Computador'])) OS.all('opps').filter(o2 => o2.deadline && o2.next && U.diff(o2.deadline, t) >= 0 && U.diff(o2.deadline, t) <= 14 && !['Aceite', 'Recusada', 'Perdida', 'Submetida', 'Em avaliação'].includes(o2.status)).forEach(o2 => { if (effOk(30)) out.push({ kind: 'Oportunidade', title: o2.next + ' · ' + o2.name, score: 55 - U.diff(o2.deadline, t) * 2, why: ['prazo ' + U.rel(o2.deadline)], eff: 30, area: 'Carreira', edit: 'opps:' + o2.id }); });
-  OS.all('contacts').filter(c => c.next && c.next <= t).forEach(c => { if (effOk(10)) out.push({ kind: 'Networking', title: 'Follow-up com ' + c.name, score: 28, why: [c.org || c.role || 'rede'].filter(Boolean), eff: 10, area: 'Carreira', act: `data-act="contactDone" data-id="${c.id}"`, actL: 'Contactado' }); });
+  OS.all('contacts').filter(c => c.next && c.next <= t).forEach(c => { if (effOk(10)) out.push({ kind: 'Contactos', title: 'Retomar contacto com ' + c.name, score: 28, why: [c.org || c.role || 'rede'].filter(Boolean), eff: 10, area: 'Carreira', act: `data-act="contactDone" data-id="${c.id}"`, actL: 'Contactado' }); });
   OS.all('wishlist').filter(w => w.status === 'Em espera' && Date.now() >= I.wishUntil(w)).forEach(w => { if (effOk(5)) out.push({ kind: 'Decisão', title: 'Decidir compra: ' + w.product, score: 22, why: ['espera cumprida', U.eur(w.price)], eff: 5, area: 'Finanças', href: '#compras' }); });
   if (new Date().getDay() === 0 && !OS.all('reviews_w').some(r => r.key === U.monday(t)) && effOk(20)) out.push({ kind: 'Revisão', title: 'Revisão semanal', score: 50, why: ['domingo', '20 minutos'], eff: 20, area: 'Direção', href: '#revisao' });
   return out.sort((a, b) => b.score - a.score);
@@ -4096,10 +4116,10 @@ V.hoje = () => {
     <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || 'Ryan')}.</h1>
     <p class="tx2" style="margin:4px 0 0">${nextIt ? `A seguir: <b style="color:var(--tx)">${esc(nextIt.title)}</b> às ${nextIt.start}` : 'Sem mais compromissos com hora hoje.'}</p></div><div class="today-clock" data-clock>${U.hm()}</div></div>
     <p class="today-q" style="margin-top:14px">${esc(dayQuote())}</p></div>
-  ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#painel">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
+  ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#visao">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
   <section><div class="sech"><div><h2>Prioridades</h2><p>${doneToday.length} concluída(s) hoje · ordenadas por prazo, importância e impacto</p></div><a class="btn ghost sm" href="#next">${UI.ic('zap')}Next Action</a></div>
     <form class="row gap8" data-form="quickTask" data-today="1" style="margin-bottom:8px"><input class="field grow" name="t" placeholder="Nova tarefa para hoje… (@Casa, !1)" aria-label="Nova tarefa para hoje"><button class="btn">${UI.ic('plus')}</button></form>
-    <div class="list">${tasks.slice(0, 7).map(x => taskRow(x)).join('') || UI.empty('Nada planeado para hoje. Puxa algo em Next Action.')}${doneToday.slice(0, 3).map(x => taskRow(x, { focus: false })).join('')}</div></section>
+    <div class="list">${tasks.slice(0, 7).map(x => taskRow(x)).join('') || UI.empty('Nada planeado para hoje. Puxa algo em Próximos passos.')}${doneToday.slice(0, 3).map(x => taskRow(x, { focus: false })).join('')}</div></section>
   <section><div class="sech"><div><h2>Agenda</h2><p>${timed.length} com hora${allDay.length ? ' · ' + allDay.length + ' sem hora' : ''}</p></div>${UI.addBtn('events', 'Compromisso', { date: t }, 'ghost sm')}</div>
     ${allDay.length ? `<div class="row gap8" style="margin-bottom:10px">${allDay.map(x => `<span class="bdg out" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><i class="dot" style="background:${OS.srcColor(x.src)}"></i>${esc(x.title)}</span>`).join('')}</div>` : ''}
     ${tl ? `<div class="tl">${tl}</div>` : UI.empty('Sem compromissos com hora. Aulas, turnos e rotina aparecem aqui sozinhos.')}</section>
@@ -4120,7 +4140,8 @@ V.hoje = () => {
 };
 
 /* ================= PAINEL ================= */
-V.painel = () => {
+/* ================= PAINEL (partes): a Visão Geral e o antigo Painel são agora uma só página, "Painel" ================= */
+OS.PainelParts = () => {
   const t = U.today(), ym = U.ym(t), p = OS.one('profile');
   const alerts = I.alerts(), urg = alerts.filter(a => a.lvl === 'urgent'), att = alerts.filter(a => a.lvl === 'attention');
   const areaTone = area => alerts.some(a => a.area === area && a.lvl === 'urgent') ? 'neg' : alerts.some(a => a.area === area) ? 'warn' : 'pos';
@@ -4152,27 +4173,26 @@ V.painel = () => {
   const opps = U.sortBy(OS.all('opps').filter(o => o.deadline && o.deadline >= t && !['Aceite', 'Recusada', 'Perdida'].includes(o.status)), o => o.deadline).slice(0, 3);
   const projs = OS.all('projects').filter(x => x.status === 'Em andamento').map(x => Object.assign({ p: x }, Proj.info(x))).slice(0, 4);
   const ins = I.insights().slice(0, 4);
-  return `<div class="phead greet"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}.</h1>
-    <p>${urg.length ? `<b class="neg">${urg.length} urgente${urg.length > 1 ? 's' : ''}</b> · ` : ''}${att.length} para atenção${na[0] ? ` · Próxima ação: <b style="color:var(--tx)">${esc(na[0].title)}</b>` : ''}</p></div>
-    <div class="phead-a"><a class="btn" href="#next">${UI.ic('zap')}Next Action</a><button class="btn pri" data-act="quickAdd">${UI.ic('plus')}Registar</button></div></div>
-  <div class="life">${life.map(([h, l, k, v, s]) => `<a href="#${h}"><span class="lh">${UI.dot(lifeTone(k))}${l}</span><span class="lv">${v}</span><span class="ls">${esc(s)}</span></a>`).join('')}</div>
-  ${controlRoom(alerts)}
-  <div class="g g-main">
+  return {
+    summary: `<p>${urg.length ? `<b class="neg">${urg.length} urgente${urg.length > 1 ? 's' : ''}</b> · ` : ''}${att.length} para atenção${na[0] ? ` · Próxima ação: <b style="color:var(--tx)">${esc(na[0].title)}</b>` : ''}</p>`,
+    life: `<div class="life">${life.map(([h, l, k, v, s]) => `<a href="#${h}"><span class="lh">${UI.dot(lifeTone(k))}${l}</span><span class="lv">${v}</span><span class="ls">${esc(s)}</span></a>`).join('')}</div>`,
+    control: controlRoom(alerts),
+    next: `<div class="g g-main">
     <div class="col gap16">
-      <div class="pn"><div class="pn-h"><h3>${UI.ic('zap')}Next Action</h3><a class="more" href="#next">Mais ${UI.ic('right')}</a></div>
+      <div class="pn"><div class="pn-h"><h3>${UI.ic('zap')}Próxima ação</h3><a class="more" href="#next.agora">Mais ${UI.ic('right')}</a></div>
         ${na.map((n, i) => `<div class="na ${i ? '' : 'top'}"><span class="na-score">${Math.round(n.score)}</span><div><b>${esc(n.title)}</b><div class="na-why">${n.why.slice(0, 3).map(w => UI.badge(w, 'out')).join('')}${UI.badge(U.hours(n.eff), '')}</div></div><div class="row gap4">${n.focus ? `<button class="icon-btn" ${n.focus} aria-label="Modo foco">${UI.ic('focus')}</button>` : ''}${n.act ? `<button class="btn sm" ${n.act}>${n.actL}</button>` : ''}</div></div>`).join('') || UI.empty('Sem ações pendentes. Adiciona tarefas ao Inbox.')}</div>
     </div>
     <div class="pn"><div class="pn-h"><h3>${UI.ic('cal')}Próximos 7 dias</h3><a class="more" href="#calendario.semana">Calendário ${UI.ic('right')}</a></div>${agendaList(t, U.addDays(t, 6), 12)}</div>
-  </div>
-  <section><div class="sech"><div><h2>Dinheiro</h2><p>${U.fmtYML(ym)}</p></div><a class="btn ghost sm" href="#financas">Finanças ${UI.ic('right')}</a></div>
-    <div class="kpis">${UI.kpi('Saldo disponível', U.eur(liq), 'contas à ordem, poupança e dinheiro', { href: 'financas.contas' })}${UI.kpi('Receitas do mês', U.eur(m.inc), UI.trend(m.inc, Fin.month(U.addMonths(ym, -1)).inc) + ' vs mês anterior')}${UI.kpi('Despesas do mês', U.eur(m.exp), UI.trend(m.exp, Fin.month(U.addMonths(ym, -1)).exp, false) + ' vs mês anterior')}${UI.kpi('Taxa de poupança', m.inc ? U.pct(m.rate) : '—', 'alvo ' + (p.savingsTarget || 20) + '%', { tone: m.inc ? (m.rate * 100 >= (p.savingsTarget || 20) ? 'pos' : m.rate < 0 ? 'neg' : 'warn') : '' })}${UI.kpi('Patrimônio líquido', U.eur(nw, { dec: 0 }), 'investido ' + U.eur(inv, { dec: 0 }), { href: 'evolucao' })}</div>
+  </div>`,
+    money: `<section><div class="sech"><div><h2>Dinheiro</h2><p>${U.fmtYML(ym)}</p></div><a class="btn ghost sm" href="#financas">Finanças ${UI.ic('right')}</a></div>
+    <div class="kpis">${UI.kpi('Taxa de poupança', m.inc ? U.pct(m.rate) : '—', 'este mês · alvo ' + (p.savingsTarget || 20) + '%', { tone: m.inc ? (m.rate * 100 >= (p.savingsTarget || 20) ? 'pos' : m.rate < 0 ? 'neg' : 'warn') : '' })}${UI.kpi('Investido', U.eur(inv, { dec: 0 }), 'carteira de investimentos', { href: 'investimentos' })}</div>
     <div class="g g-main" style="margin-top:16px">
       <div class="pn"><div class="pn-h"><h3>Receitas × despesas</h3><span class="mut" style="font-size:12px">6 meses</span></div>${C.mount({ type: 'bar', labels: months.map(U.fmtYM), series: [{ name: 'Receitas', data: months.map(x => Fin.month(x).inc), color: 'var(--pos)' }, { name: 'Despesas', data: months.map(x => Fin.month(x).exp), color: 'var(--c2)' }], fmt: U.eurK, empty: 'Regista movimentos em Finanças para ver este gráfico.' }, 200)}</div>
       <div class="pn"><div class="pn-h"><h3>Compromissos (30 dias)</h3><a class="more" href="#financas.recorrentes">${UI.ic('right')}</a></div>
         ${upc.length ? `<div class="list">${upc.map(x => `<div class="li"><span class="when">${U.fmtDS(x.date)}</span><div class="li-t"><b>${esc(x.title)}</b><small>${x.kind}</small></div><span class="mono ${x.late ? 'neg' : ''}">${U.eur(x.amount)}</span></div>`).join('')}</div>` : UI.empty('Sem contas previstas. Regista assinaturas e contas fixas em Recorrentes.')}
         ${fgoals.length ? `<div class="divider"></div>${fgoals.map(x => `<div style="margin-bottom:10px"><div class="row between" style="font-size:13px;margin-bottom:5px"><span>${esc(x.g.title)}</span><span class="mono mut">${Goal.fmt(x.g, x.cur)} / ${Goal.fmt(x.g, x.tgt)}</span></div>${UI.bar(x.p, x.p >= 1 ? 'pos' : '', x.exp)}</div>`).join('')}` : ''}</div>
-    </div></section>
-  <div class="g g2">
+    </div></section>`,
+    study: `<div class="g g2">
     <div class="pn"><div class="pn-h"><h3>${UI.ic('school')}Universidade</h3><a class="more" href="#universidade">${UI.ic('right')}</a></div>
       <div class="row gap16" style="margin-bottom:12px"><div><div class="big-num">${U.nf(studyWk, 1)}<span class="mut" style="font-size:16px"> / ${studyTgt || '—'} h</span></div><div class="mut" style="font-size:12px">estudo esta semana</div></div>${nextExam ? `<div class="grow" style="text-align:right"><div style="font-size:13px"><b>${esc(nextExam.title)}</b></div><div class="mut" style="font-size:12px">${esc(subjN(nextExam.subject))} · ${U.rel(nextExam.date)}</div>${UI.badge(nextExam.prep, nextExam.prep === 'Não comecei' ? 'neg' : nextExam.prep === 'Pronto' ? 'pos' : 'warn')}</div>` : ''}</div>
       ${subs.map(x => `<div class="bar-row"><span class="l">${esc(x.s.name)}</span>${UI.bar(x.targetWk ? x.hWk / x.targetWk : 0, x.targetWk && x.hWk >= x.targetWk ? 'pos' : '', ((new Date().getDay() + 6) % 7 + 1) / 7)}<span class="v">${x.hWk}/${x.targetWk || '—'} h${x.avg ? ' · ' + x.avg : ''}</span></div>`).join('') || UI.empty('Sem disciplinas em curso.')}</div>
@@ -4180,18 +4200,19 @@ V.painel = () => {
       <div class="row gap8" style="margin-bottom:14px">${wdays.map(d => { const w = OS.all('workouts').some(x => x.date === d), r = OS.all('runs').some(x => x.date === d); return `<div style="flex:1;text-align:center"><div class="mut" style="font-size:11px">${U.WDS[U.parse(d).getDay()]}</div><div style="height:30px;margin-top:4px;border-radius:7px;background:${w && r ? 'linear-gradient(135deg,var(--c5) 50%,var(--c6) 50%)' : w ? 'var(--c5)' : r ? 'var(--c6)' : d === t ? 'var(--pn3)' : 'rgba(255,255,255,.04)'};${d === t ? 'box-shadow:inset 0 0 0 1px var(--accent)' : ''}"></div></div>`; }).join('')}</div>
       <div class="legend" style="margin:-4px 0 10px"><span><i style="background:var(--c5)"></i>Musculação</span><span><i style="background:var(--c6)"></i>Corrida</span></div>
       ${C.mount({ type: 'bar', labels: runWeeks.map(w => U.fmtDS(w)), series: [{ name: 'km', data: runWeeks.map(w => Run.kmIn(w, U.addDays(w, 6))), color: 'var(--c6)' }], fmt: v => U.nf(v, 0), target: U.num(p.runKmTarget) || null, targetLabel: 'alvo', empty: 'Regista corridas para ver os km semanais.' }, 130)}</div>
-  </div>
-  <div class="g g2">
+  </div>`,
+    goals: `<div class="g g2">
     <div class="pn"><div class="pn-h"><h3>${UI.ic('target')}Metas e projetos</h3><a class="more" href="#metas">${UI.ic('right')}</a></div>
       ${goals.slice(0, 5).map(x => `<div style="margin-bottom:12px" data-edit="goals:${x.g.id}" class="click"><div class="row between gap8" style="font-size:13px;margin-bottom:5px"><span>${esc(x.g.title)}</span>${UI.badge(x.st[0], x.st[1])}</div>${UI.bar(x.p, x.p >= 1 ? 'pos' : x.late ? 'neg' : x.behind ? 'warn' : '', x.exp)}</div>`).join('') || UI.empty('Sem metas ativas.', UI.addBtn('goals', 'Nova meta', null, ''))}
       ${projs.length ? `<div class="divider"></div>${projs.map(x => `<div class="li"><div class="li-t click" data-edit="projects:${x.p.id}"><b>${esc(x.p.name)}</b><small>${x.done.length}/${x.tasks.length} tarefas${x.stalled ? ' · <span class="warn">parado há ' + x.idle + ' dias</span>' : ''}</small></div><span class="mono" style="font-size:12px">${Math.round(x.prog * 100)}%</span></div>`).join('')}` : ''}</div>
     <div class="pn"><div class="pn-h"><h3>${UI.ic('briefcase')}Carreira e Mova</h3><a class="more" href="#capital">${UI.ic('right')}</a></div>
       <div class="kpis" style="margin-bottom:14px">${UI.kpi('Capital profissional', U.nf(cap.score), UI.trend(cap.score, capPrev.score) + ' em 30 dias', { href: 'capital' })}</div>
       ${opps.length ? opps.map(o => `<div class="li"><span class="when">${U.fmtDS(o.deadline)}</span><div class="li-t click" data-edit="opps:${o.id}"><b>${esc(o.name)}</b><small>${esc([o.kind, o.next].filter(Boolean).join(' · '))}</small></div>${UI.badge(U.rel(o.deadline), U.diff(o.deadline, t) <= 7 ? 'neg' : '')}</div>`).join('') : UI.empty('Sem oportunidades com prazo. Regista-as no Opportunity Center.')}</div>
-  </div>
-  ${ins.length ? `<div class="pn"><div class="pn-h"><h3>${UI.ic('chart')}Tendências</h3><a class="more" href="#evolucao">Minha evolução ${UI.ic('right')}</a></div>${ins.map(x => `<div class="ins">${UI.ic(x.tone === 'pos' ? 'arrowUp' : 'arrowDown', x.tone)}<div><span class="eyebrow">${esc(x.area)}</span><div>${esc(x.text)}</div></div></div>`).join('')}</div>` : ''}`;
+  </div>`,
+    trends: `${ins.length ? `<div class="pn"><div class="pn-h"><h3>${UI.ic('chart')}Tendências</h3><a class="more" href="#evolucao">Minha evolução ${UI.ic('right')}</a></div>${ins.map(x => `<div class="ins">${UI.ic(x.tone === 'pos' ? 'arrowUp' : 'arrowDown', x.tone)}<div><span class="eyebrow">${esc(x.area)}</span><div>${esc(x.text)}</div></div></div>`).join('')}</div>` : ''}` };
 };
-
+// os endereços antigos (#painel e #control) abrem a página única
+V.painel = sub => { setTimeout(() => { try { history.replaceState(null, '', '#visao'); } catch (e) { } }, 0); return V.visao(sub); };
 /* ================= CENTRO DE CONTROLO (era o Control Room; agora vive dentro do Painel) ================= */
 const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a => a.area === f) : al;
   const urg = fl.filter(a => a.lvl === 'urgent'), att = fl.filter(a => a.lvl === 'attention'), ok = I.controlled(al).filter(x => !f || x.area === f);
@@ -4199,7 +4220,7 @@ const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a =
   const card = a => `<div class="cr-card ${a.lvl}"><div class="row between gap8"><span class="eyebrow">${esc(a.area)}</span>${a.href ? `<a class="icon-btn" href="${a.href}" aria-label="Abrir">${UI.ic('right')}</a>` : ''}</div><div class="t">${esc(a.title)}</div>${a.detail ? `<small>${esc(a.detail)}</small>` : ''}${a.act ? `<div><button class="btn sm" ${a.act.a}>${a.act.l}</button></div>` : ''}</div>`;
   const cut = (L, n) => more ? L : L.slice(0, n);
   return `<section id="control"><div class="sech"><div><h2>${UI.ic('radar')} Centro de controlo</h2><p>O que precisa da tua atenção agora, calculado a partir de todas as áreas: prazos, orçamentos, metas, projetos parados, provas, oportunidades e hábitos.</p></div></div>
-  <div class="kpis">${UI.kpi('Urgente', urg.length, 'resolve hoje', { tone: urg.length ? 'neg' : '' })}${UI.kpi('Atenção', att.length, 'resolve esta semana', { tone: att.length ? 'warn' : '' })}${UI.kpi('Sob controlo', ok.length, 'áreas sem problemas', { tone: 'pos' })}${UI.kpi('Próxima ação', '', (I.next()[0] || {}).title ? esc(I.next()[0].title) : '—', { href: 'next' })}</div>
+  <div class="kpis">${UI.kpi('Urgente', urg.length, 'resolve hoje', { tone: urg.length ? 'neg' : '' })}${UI.kpi('Atenção', att.length, 'resolve esta semana', { tone: att.length ? 'warn' : '' })}${UI.kpi('Sob controlo', ok.length, 'áreas sem problemas', { tone: 'pos' })}${UI.kpi('Próxima ação', '', (I.next()[0] || {}).title ? esc(I.next()[0].title) : '—', { href: 'next.agora' })}</div>
   ${areas.length > 1 ? `<div class="row gap8" style="flex-wrap:wrap;margin-top:10px">${UI.chip('Todas', 'crArea', !f, 'data-v=""')}${areas.map(a => UI.chip(esc(a) + ' · ' + al.filter(x => x.area === a).length, 'crArea', f === a, `data-v="${esc(a)}"`)).join('')}</div>` : ''}
   <div class="g g3" style="margin-top:12px">
     <div class="cr-col"><h3>${UI.dot('neg')}Urgente</h3>${cut(urg, 6).map(card).join('') || UI.empty('Nada urgente.')}</div>
@@ -4207,7 +4228,7 @@ const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a =
     <div class="cr-col"><h3>${UI.dot('pos')}Sob controlo</h3>${cut(ok, 5).map(o => `<div class="cr-card"><span class="eyebrow">${esc(o.area)}</span><small>${esc(o.text)}</small></div>`).join('') || UI.empty('Regista dados nas áreas para o sistema as poder avaliar.')}</div>
   </div>${urg.length > 6 || att.length > 6 || ok.length > 5 ? `<button class="btn sm ghost" data-act="crMore" style="margin-top:8px">${more ? 'Mostrar menos' : 'Ver tudo'}</button>` : ''}</section>`; };
 // o antigo endereço #control abre o Painel, já na secção do centro de controlo
-V.control = sub => { setTimeout(() => { try { history.replaceState(null, '', '#painel'); } catch (e) { } const el = document.getElementById('control'); el && el.scrollIntoView({ block: 'start' }); }, 60); return V.painel(sub); };
+V.control = sub => { setTimeout(() => { try { history.replaceState(null, '', '#visao'); } catch (e) { } const el = document.getElementById('control'); el && el.scrollIntoView({ block: 'start' }); }, 60); return V.visao(sub); };
 A.crMore = () => OS.setUI('crMore', !OS.ui.crMore);
 A.crArea = b => OS.setUI('crArea', b.dataset.v);
 
@@ -4215,7 +4236,7 @@ A.crArea = b => OS.setUI('crArea', b.dataset.v);
 V.next = () => {
   const o = { ctx: OS.ui.naCtx || '', mins: OS.ui.naMins || '', energy: OS.ui.naEnergy || '' };
   const list = I.next(o);
-  return UI.head('Next Action', 'O que merece ser feito primeiro. Pontuação = urgência do prazo + prioridade + impacto + ligação a metas + vitórias rápidas − esforço acima do tempo disponível. Não é só ordenar por data.', '', 'Visão geral') +
+  return UI.head('Próxima ação', 'O que merece ser feito primeiro. Pontuação = urgência do prazo + prioridade + impacto + ligação a metas + vitórias rápidas − esforço acima do tempo disponível. Não é só ordenar por data.', '', 'Visão geral') +
   `<div class="pn"><div class="col gap12">
     <div class="row gap8"><span class="mut" style="font-size:12.5px;width:110px">Onde estou</span>${UI.chip('Qualquer', 'naCtx', !o.ctx, 'data-v=""')}${L.CTX.map(c => UI.chip(c, 'naCtx', o.ctx === c, `data-v="${c}"`)).join('')}</div>
     <div class="row gap8"><span class="mut" style="font-size:12.5px;width:110px">Tempo disponível</span>${UI.seg('naMins', [['', 'Qualquer'], ['15', '15 min'], ['30', '30 min'], ['60', '1 h'], ['120', '2 h']], o.mins)}</div>
@@ -4357,21 +4378,21 @@ V.habitos = sub => {
   const t = U.today();
   if (sub === 'rotina') {
     const R = OS.all('routine'), days = L.WEEK;
-    return UI.head('Hábitos & Rotina', 'Blocos recorrentes da tua semana. Aparecem em Hoje e no Calendário.', UI.addBtn('routine', 'Novo bloco'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
+    return UI.head('Hábitos e rotina', 'Blocos recorrentes da tua semana. Aparecem em Hoje e no Calendário.', UI.addBtn('routine', 'Novo bloco'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
     (R.length ? `<div class="pn flush" style="overflow-x:auto"><div style="display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));min-width:840px">${days.map(([d, l]) => `<div style="border-right:1px solid var(--line);padding:10px"><div class="eyebrow" style="margin-bottom:8px">${l}</div>${U.sortBy(R.filter(r => (r.days || []).includes(d)), r => r.start).map(r => `<div class="kcard" data-edit="routine:${r.id}" style="margin-bottom:6px"><span class="mono mut" style="font-size:11.5px">${r.start}–${r.end}</span><b>${esc(r.title)}</b></div>`).join('')}</div>`).join('')}</div></div>` : UI.empty('Define os blocos fixos da semana: aulas de estudo, ginásio, igreja, trabalho, revisão de domingo.', UI.addBtn('routine', 'Criar primeiro bloco', null, '')));
   }
   if (sub === 'plano') {
     const pl = OS.one('plan'), wk = U.monday(t), ym = U.ym(t), wp = (pl.week || {})[wk] || {}, mp = (pl.month || {})[ym] || '';
     const days = U.range(wk, U.addDays(wk, 6));
     const goalsM = OS.all('goals').filter(g => g.status === 'Ativa' && g.due && U.ym(g.due) === ym);
-    return UI.head('Hábitos & Rotina', 'Planeamento diário, semanal e mensal.', '', 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
+    return UI.head('Hábitos e rotina', 'Planeamento diário, semanal e mensal.', '', 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
     `<div class="g g2"><div class="pn"><div class="pn-h"><h3>Mês · ${U.fmtYML(ym)}</h3></div><div class="qa"><label for="pm">Foco do mês</label><textarea id="pm" data-bind="plan.month.${ym}" data-fk="pm" placeholder="O que tem de acontecer este mês?">${esc(mp)}</textarea></div>
       <div class="divider"></div><div class="eyebrow" style="margin-bottom:6px">Metas com prazo este mês</div>${goalsM.map(g => { const i = Goal.info(g); return `<div class="bar-row"><span class="l">${esc(g.title)}</span>${UI.bar(i.p, '', i.exp)}<span class="v">${U.fmtDS(g.due)}</span></div>`; }).join('') || '<div class="mut" style="font-size:13px">Nenhuma.</div>'}</div>
      <div class="pn"><div class="pn-h"><h3>Semana de ${U.fmtDS(wk)}</h3></div>${[1, 2, 3].map(i => `<div class="row gap8" style="margin-bottom:8px"><span class="mono mut">${i}</span><input class="field grow" data-bind="plan.week.${wk}.p${i}" data-fk="pw${i}" value="${esc(wp['p' + i] || '')}" placeholder="Prioridade ${i} da semana" aria-label="Prioridade ${i}"></div>`).join('')}<div class="mut" style="font-size:12px">A revisão semanal pode preencher estas prioridades.</div></div></div>
     <section><div class="sech"><h2>Semana dia a dia</h2><span class="mut" style="font-size:12.5px">Arrasta mentalmente; muda o "Fazer em" na tarefa</span></div><div class="kan" style="grid-auto-columns:minmax(170px,1fr)">${days.map(d => { const it = OS.all('tasks').filter(x => x.sched === d || (!x.sched && x.due === d)); return `<div class="kcol"><h4>${U.WDS[U.parse(d).getDay()]} ${+d.slice(8)}<span>${it.filter(x => x.status === 'Feita').length}/${it.length}</span></h4>${it.map(x => `<div class="kcard" data-edit="tasks:${x.id}" style="${x.status === 'Feita' ? 'opacity:.5' : ''}"><b>${esc(x.title)}</b></div>`).join('')}<button class="btn xs ghost" data-new="tasks" data-defs='${JSON.stringify({ sched: d, status: 'Próxima' })}'>${UI.ic('plus')}</button></div>`; }).join('')}</div></section>`;
   }
   const H = OS.all('habits'), days = U.lastN(14), score90 = U.lastN(91);
-  return UI.head('Hábitos & Rotina', 'Hábitos marcados como inegociáveis formam a sequência de dias perfeitos. Alguns marcam-se sozinhos a partir dos teus registos reais.', UI.addBtn('habits', 'Novo hábito'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
+  return UI.head('Hábitos e rotina', 'Hábitos marcados como inegociáveis formam a sequência de dias perfeitos. Alguns marcam-se sozinhos a partir dos teus registos reais.', UI.addBtn('habits', 'Novo hábito'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
   `<div class="kpis">${UI.kpi('Dias perfeitos seguidos', Hab.perfectStreak(), 'todos os inegociáveis cumpridos')}${UI.kpi('Consistência (30 dias)', (() => { const v = U.lastN(30).map(Hab.dayScore).filter(x => x != null); return v.length ? U.pct(U.avg(v)) : '—'; })())}${UI.kpi('Consistência (7 dias)', (() => { const v = U.lastN(7).map(Hab.dayScore).filter(x => x != null); return v.length ? U.pct(U.avg(v)) : '—'; })())}${UI.kpi('Hoje', (() => { const v = Hab.dayScore(t); return v == null ? '—' : U.pct(v); })())}</div>
   <div class="tblw hab-wrap"><table class="tbl hab-tbl"><colgroup><col>${days.map(() => '<col class="c">').join('')}<col style="width:58px"><col style="width:58px"></colgroup><thead><tr><th class="hab-n">Hábito</th>${days.map(d => `<th class="hab-c ${d === t ? 'is-today' : ''}">${U.WDS[U.parse(d).getDay()].slice(0, 1)}<span class="mono">${+d.slice(8)}</span></th>`).join('')}<th class="hab-s">Seq.</th><th class="hab-s">30 d</th></tr></thead><tbody>
   ${H.map(h => `<tr class="${h.active ? '' : 'muted'}"><td class="hab-n"><a href="javascript:void 0" data-edit="habits:${h.id}"><b style="font-weight:520">${esc(h.name)}</b></a> ${h.core ? UI.badge('inegociável', 'acc') : ''}${h.auto ? ' ' + UI.badge('auto', 'out') : ''}</td>${days.map(d => { const due = Hab.due(h, d), dn = Hab.done(h, d), au = h.auto && Hab.autoDone(h, d), isT = d === t;
@@ -5836,11 +5857,16 @@ IA.facts = (extra = {}) => { const S = IX.summary(), val = S.val || 0, H = IX.he
   }, extra); };
 
 /* ================= chamadas à IA ================= */
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
-const raw = async (body) => { const key = OS.AI && OS.AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '';
-  for (const m of MODELS) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({}));
-      if (r.status === 404) { last = 'modelo indisponível'; continue; } if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida.'), { fatal: 1 }); if (r.status === 429) throw Object.assign(new Error('Limite gratuito da IA atingido por agora. Tenta daqui a um minuto.'), { fatal: 1 }); last = msg || 'erro ' + r.status; continue; }
-      return j; } catch (e) { if (e.fatal) throw e; last = e.message; } }
+// modelos descobertos com a tua chave; se o Google não der, a IA grátis de reserva responde (sem pesquisa na web)
+const raw = async (body) => { const key = OS.AI && OS.AI.key(); let last = '';
+  if (key) { await OS.AI.discover(); for (const m of OS.AI.gemini()) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({}));
+      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida.'), { fatal: 1 }); if (r.status === 429) { OS.AI.markLimit(m, msg); last = 'limite'; continue; } if (OS.AI.isDead(r.status, msg)) { OS.AI.markDead(m); last = 'modelo desligado'; continue; } last = msg || 'erro ' + r.status; continue; }
+      return j; } catch (e) { if (e.fatal) throw e; last = e.message; } } }
+  // reserva grátis: converte o pedido (texto) para a IA aberta e devolve no mesmo formato do Google
+  if (OS.AI.freeOn() && !(body.contents || []).some(c => (c.parts || []).some(p => p.inline_data))) { try { const txt = (body.contents || []).map(c => (c.parts || []).map(p => p.text || '').join('\n')).join('\n'), sys = body.systemInstruction ? (body.systemInstruction.parts || []).map(p => p.text || '').join('\n') : '';
+      const m = await OS.AI.free([sys ? { role: 'system', content: sys } : null, { role: 'user', content: txt }].filter(Boolean), { temp: (body.generationConfig || {}).temperature, json: (body.generationConfig || {}).responseMimeType === 'application/json' });
+      return { candidates: [{ content: { parts: [{ text: String(m.content || '') }] } }] }; } catch (e) { last = e.message; } }
+  if (!key && !OS.AI.freeOn()) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 });
   throw new Error('A IA não respondeu (' + last + ').'); };
 const textOf = j => ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('');
 const parseJ = t => { t = String(t || '').replace(/^```(json)?/m, '').replace(/```\s*$/m, '').trim(); const i = t.indexOf('{'), k = t.lastIndexOf('}'); return JSON.parse(i >= 0 ? t.slice(i, k + 1) : t); };
@@ -6535,12 +6561,16 @@ const readAI = async (x, lang) => { const t = ttl(x, lang), when = x.d ? new Dat
 Escreve 6 a 10 parágrafos curtos: o que aconteceu, quem está envolvido, onde e quando, os números e as citações importantes, o contexto (porque é que isto acontece) e o que vem a seguir.
 Usa só factos que as fontes confirmam; se alguma coisa não estiver clara, diz isso. Não escrevas título, nem markdown, nem listas. Separa os parágrafos com uma linha em branco.`);
   return { at: Date.now(), via: 'ia', p: r.text.replace(/\*\*/g, '').split(/\n\s*\n/).map(y => y.trim()).filter(Boolean).slice(0, 14), fontes: r.src }; };
+const readFree = async (x, lang, descs) => { const heads = [x].concat(x.rel || []).map(y => `- ${y.s || 'jornal'}: ${ttl(y, lang)}`).join('\n'), extra = (descs || []).map(d => `- ${d.s}: ${d.d}`).join('\n');
+  const t = await OS.AI.text(`Notícia: "${ttl(x, lang)}" (${x.s || 'jornal'}, ${x.d ? new Date(x.d).toLocaleDateString('pt-PT') : 'hoje'}).\nComo vários jornais a contaram (títulos):\n${heads}${extra ? '\nO que os jornais mostram da notícia:\n' + extra : ''}\n\nEscreve em português de Portugal um resumo claro desta notícia em 3 a 6 parágrafos curtos: o que aconteceu, quem está envolvido, as versões diferentes entre jornais (se houver) e porque importa. Usa SÓ o que está acima; não inventes nomes, números nem datas. Sem título, sem markdown. Separa os parágrafos com uma linha em branco.`, { temp: .3 });
+  const p = t.replace(/\*\*/g, '').split(/\n\s*\n/).map(y => y.trim()).filter(Boolean).slice(0, 8); if (!p.length) throw new Error('a IA não respondeu');
+  return { at: Date.now(), via: 'ia2', p, fontes: [x].concat(x.rel || []).map(y => ({ t: y.s })).filter(f => f.t).slice(0, 8) }; };
 const rdHTML = (x, lang, r) => { const t = ttl(x, lang), others = (x.rel || []).filter(y => y.l !== x.l).slice(0, 5);
   return `<div class="nw-rd"><div class="pn-h"><div class="nw-src">${fav(x.su)}<span>${esc((r && r.s) || x.s || host(x.su))}</span><span class="mut">· ${ago(x.d)}</span></div><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
   <h2>${esc(t)}</h2>${t !== x.t ? `<small class="mut">${esc(x.t)}</small>` : ''}
   ${!r || r.busy ? `<div class="sai-busy"><div class="fd-spin"></div><span>${esc((r && r.step) || 'A abrir a notícia…')}</span></div>`
     : `${r.img && r.via === 'jornal' ? `<img class="nw-img" src="${esc(r.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}
-    <div class="nw-tag">${r.via === 'jornal' ? `Texto de ${esc(r.s || x.s || 'jornal')}` : r.via === 'ia' ? 'Notícia completa escrita pelo Spyke a partir de pesquisa na internet' : 'Resumo'}</div>
+    <div class="nw-tag">${r.via === 'jornal' ? `Texto de ${esc(r.s || x.s || 'jornal')}` : r.via === 'ia' ? 'Notícia completa escrita pelo Spyke a partir de pesquisa na internet' : r.via === 'ia2' ? 'Resumo feito pelo Spyke com o que ' + ((r.fontes || []).length || 1) + ' jornais publicaram' : 'Resumo'}</div>
     <div class="nw-body">${(r.p || []).map(y => y.startsWith('## ') ? `<h4>${esc(y.slice(3))}</h4>` : `<p>${esc(y)}</p>`).join('') || `<p class="mut">${esc(r.msg || 'Não consegui abrir o texto desta notícia.')}</p>`}</div>
     ${(r.fontes || []).length ? `<div class="nw-fon"><b>Fontes consultadas:</b> ${r.fontes.map(f => esc(f.t)).join(' · ')}</div>` : ''}`}
   <div class="row gap8 nw-rda">${r && !r.busy && (r.p || []).length && OS.Spyke && OS.Spyke.say ? `<button class="btn sm pri" data-act="nwSay" data-l="${esc(x.l)}">${UI.ic('mic')}Spyke, lê-me</button>` : ''}${r && !r.busy && r.via === 'jornal' && OS.Brain && OS.Brain.which && OS.Brain.which() ? `<button class="btn sm ghost" data-act="nwRead" data-l="${esc(x.l)}" data-lang="${lang}" data-ai="1">Resumo do Spyke</button>` : ''}</div>
@@ -6551,9 +6581,12 @@ const drawRd = (x, lang, r) => { const m = document.querySelector('#modal .nw-rd
 NW.read = async (x, lang = 'pt', ai = false) => { if (!x || !x.l) return; const k = x.l; let r = !ai && RDN[k];
   if (r && r.p && r.p.length) return drawRd(x, lang, r);
   drawRd(x, lang, { busy: true, step: ai ? 'O Spyke está a pesquisar a notícia…' : 'A abrir a notícia…' }); if (rdBusy === k) return; rdBusy = k;
-  try { if (!ai && location.protocol.startsWith('http')) { for (const y of [x].concat(x.rel || []).slice(0, 3)) { const j = await apiRead(y.l); if (goodTxt(j)) { r = { at: Date.now(), via: 'jornal', s: j.s || y.s, u: j.u, img: j.img, p: j.p }; break; } if (j && j.ok && j.desc && !r) r = { desc: j.desc, u: j.u }; } }
-    if (!(r && r.via) && OS.Brain && OS.Brain.search && OS.AI && OS.AI.key()) { drawRd(x, lang, { busy: true, step: 'Este jornal não deixa abrir o texto. O Spyke está a pesquisar a notícia completa…' }); try { r = await readAI(x, lang); } catch (e) { r = Object.assign(r || {}, { err: e.message }); } }
-    if (!(r && r.via)) r = { at: Date.now(), via: 'resumo', p: r && r.desc ? [r.desc] : [], u: r && r.u, msg: (r && r.err ? 'A IA não conseguiu: ' + r.err + '. ' : '') + (OS.AI && OS.AI.key() ? 'Não consegui abrir o texto desta notícia.' : 'Este jornal não deixa abrir o texto. Liga o Spyke (IA) na página do Spyke para ele escrever a notícia completa aqui.') };
+  const descs = [];
+  try { if (!ai && location.protocol.startsWith('http')) { const srcs = [x].concat(x.rel || []).slice(0, 6); for (let i = 0; i < srcs.length; i++) { const y = srcs[i]; if (i) drawRd(x, lang, { busy: true, step: `Este jornal não deixa abrir o texto. A tentar ${y.s || 'outro jornal'}…` }); const j = await apiRead(y.l); if (goodTxt(j)) { r = { at: Date.now(), via: 'jornal', s: j.s || y.s, u: j.u, img: j.img, p: j.p }; break; } if (j && j.ok && (j.desc || (j.p || []).length)) descs.push({ s: y.s || j.s, d: [j.desc].concat(j.p || []).filter(Boolean).join(' ').slice(0, 900) }); if (j && j.ok && j.desc && !r) r = { desc: j.desc, u: j.u }; } }
+    if (!(r && r.via) && OS.Brain && OS.Brain.search && OS.AI && OS.AI.key()) { drawRd(x, lang, { busy: true, step: 'Os jornais não deixam abrir o texto. O Spyke está a pesquisar a notícia completa…' }); try { r = await readAI(x, lang); } catch (e) { r = Object.assign(r || {}, { err: e.message }); } }
+    // sem pesquisa do Google (cota esgotada ou sem chave): a IA grátis escreve o resumo com o que os jornais mostram
+    if (!(r && r.via) && OS.AI && OS.AI.text && (!OS.AI.freeOn || OS.AI.freeOn())) { drawRd(x, lang, { busy: true, step: 'A escrever o resumo com o que os jornais publicaram…' }); try { r = await readFree(x, lang, descs); } catch (e) { r = Object.assign(r || {}, { err: e.message }); } }
+    if (!(r && r.via)) r = { at: Date.now(), via: 'resumo', p: r && r.desc ? [r.desc] : [], u: r && r.u, msg: 'Não consegui abrir o texto desta notícia agora (sem internet ou os jornais bloquearam). Toca outra vez daqui a pouco.' };
     else { RDN[k] = r; saveRd(); } } catch (e) { r = { via: 'resumo', p: [], msg: 'Não consegui abrir a notícia: ' + (e.message || 'erro') }; }
   rdBusy = ''; drawRd(x, lang, r); };
 A.nwRead = b => { const x = LK.get(b.dataset.l); if (x) NW.read(x, b.dataset.lang || 'pt', !!b.dataset.ai); };
@@ -7797,7 +7830,7 @@ OS.S.subjects.detail = s => { const x = St.stats(s); const ses = U.sortBy(OS.all
 
 /* ================= APRENDIZAGEM ================= */
 V.aprendizagem = sub => {
-  const head = UI.head('Trilhas & competências', 'As competências que queres dominar (Excel, Inglês, Python…), do nível atual ao nível alvo, etapa a etapa: conteúdos → estudo → exercícios → projeto → avaliação → domínio. Cursos, livros e certificações ligados a cada competência aparecem aqui.', UI.addBtn('skills', 'Nova competência'), 'Estudos');
+  const head = UI.head('Trilhas e competências', 'As competências que queres dominar (Excel, Inglês, Python…), do nível atual ao nível alvo, etapa a etapa: conteúdos → estudo → exercícios → projeto → avaliação → domínio. Cursos, livros e certificações ligados a cada competência aparecem aqui.', UI.addBtn('skills', 'Nova competência'), 'Estudos');
   if (sub === 'itens') {
     const Lr = OS.all('learn'), yr = U.today().slice(0, 4);
     return head + `<div class="kpis">${UI.kpi('Livros concluídos ' + yr, Lr.filter(l => l.kind === 'Livro' && l.status === 'Concluído' && (l.end || '').startsWith(yr)).length, 'meta: 12 por ano')}${UI.kpi('Cursos concluídos', Lr.filter(l => l.kind === 'Curso' && l.status === 'Concluído').length)}${UI.kpi('Certificações', Lr.filter(l => l.kind === 'Certificação' && l.status === 'Concluído').length)}${UI.kpi('Em curso', Lr.filter(l => l.status === 'Em curso').length)}</div>
@@ -7817,7 +7850,7 @@ V.conhecimento = () => {
   const N = U.sortBy(OS.all('notes').filter(n => (!f.type || n.type === f.type) && (!f.rel || n.subject === f.rel || n.project === f.rel || n.goal === f.rel || n.skill === f.rel) && (!q || (n.title + ' ' + (n.body || '') + ' ' + (n.tags || []).join(' ')).toLowerCase().includes(q))), n => n._u, -1);
   const rels = [...OS.all('subjects').filter(s => s.status === 'Em curso').map(s => [s.id, 'Disciplina · ' + s.name]), ...OS.all('projects').map(p => [p.id, 'Projeto · ' + p.name]), ...OS.all('goals').filter(g => g.status === 'Ativa').map(g => [g.id, 'Meta · ' + g.title]), ...OS.all('skills').map(s => [s.id, 'Competência · ' + s.name])];
   const relTxt = n => [n.subject && subjN(n.subject), (OS.get('projects', n.project) || {}).name, (OS.get('goals', n.goal) || {}).title, (OS.get('skills', n.skill) || {}).name].filter(Boolean);
-  return UI.head('Knowledge Base', 'Conceitos, fórmulas, insights, resumos e links, ligados à disciplina, projeto, meta ou competência a que pertencem.', UI.addBtn('notes', 'Nova nota'), 'Estudos') +
+  return UI.head('Base de conhecimento', 'Conceitos, fórmulas, insights, resumos e links, ligados à disciplina, projeto, meta ou competência a que pertencem.', UI.addBtn('notes', 'Nova nota'), 'Estudos') +
   `<form class="pn col gap8" data-form="noteQuick"><input class="field" name="t" placeholder="Título (ex.: Equação fundamental da contabilidade)" aria-label="Título"><textarea class="field" name="b" rows="2" placeholder="Ativo = Passivo + Capital Próprio" aria-label="Conteúdo"></textarea><div class="row between gap8"><select class="field" style="width:auto" name="type" aria-label="Tipo">${['Conceito', 'Fórmula', 'Ideia', 'Insight', 'Resumo', 'Anotação', 'Referência', 'Link'].map(x => `<option>${x}</option>`).join('')}</select><button class="btn pri sm">${UI.ic('plus')}Guardar nota</button></div></form>
   <div class="filters"><input type="search" placeholder="Procurar no conhecimento…" value="${esc(f.q || '')}" data-uif="kf.q" aria-label="Procurar"><select data-uif="kf.type" aria-label="Tipo"><option value="">Todos os tipos</option>${['Conceito', 'Fórmula', 'Ideia', 'Insight', 'Resumo', 'Anotação', 'Referência', 'Link'].map(x => `<option${f.type === x ? ' selected' : ''}>${x}</option>`).join('')}</select><select data-uif="kf.rel" aria-label="Relação"><option value="">Qualquer ligação</option>${rels.map(([id, l]) => `<option value="${id}"${f.rel === id ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></div>
   ${N.length ? `<div class="g g3">${N.map(n => `<div class="pn click" data-edit="notes:${n.id}" style="cursor:pointer;display:flex;flex-direction:column;gap:8px"><div class="row between gap8"><span class="eyebrow">${esc(n.type || 'Nota')}</span><span class="mut" style="font-size:11.5px">${U.fmtDS(U.iso(new Date(n._u)))}</span></div><b style="font-weight:560">${esc(n.title)}</b>${n.body ? `<div class="tx2" style="font-size:13px;${n.type === 'Fórmula' ? 'font-family:var(--mono)' : ''};display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap">${esc(n.body)}</div>` : ''}${n.url ? `<a class="acc" style="font-size:12.5px" href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.url.replace(/^https?:\/\//, '').slice(0, 40))}</a>` : ''}<div class="row gap4">${relTxt(n).map(r => UI.badge(r, 'acc')).join('')}${(n.tags || []).map(t => UI.badge('#' + t, 'out')).join('')}</div></div>`).join('')}</div>` : UI.empty('Sem notas com estes filtros.')}`;
@@ -8607,7 +8640,7 @@ P[''] = () => { if (B) return `<div class="pn"><b>Tens um bloco em curso.</b><p 
   const th = themes(), L = list(), sel = picked(), tot = U.sum(sel, x => x.mins), c = cfg(), opt = (v, l) => `<option value="${esc(v)}"${DR.th === v ? ' selected' : ''}>${esc(l)}</option>`;
   return `<div class="pn"><div class="pn-h"><h3>1 · Tema</h3></div>
     <select class="field" id="fbTheme" aria-label="Tema do bloco">${opt('auto', 'Automático — o Oceanum escolhe pela prioridade da app toda')}${th.areas.length ? `<optgroup label="Área">${th.areas.map(a => opt('area:' + a, a)).join('')}</optgroup>` : ''}${th.projs.length ? `<optgroup label="Projeto">${th.projs.map(p => opt('proj:' + p.id, p.name)).join('')}</optgroup>` : ''}${th.subs.length ? `<optgroup label="Disciplina">${th.subs.map(s => opt('subj:' + s.id, s.name)).join('')}</optgroup>` : ''}</select>
-    <small class="mut">Sem tema, a ordem vem do Next Action: atrasos, prazos, prioridade, impacto e metas.</small></div>
+    <small class="mut">Sem tema, a ordem vem da Próxima ação: atrasos, prazos, prioridade, impacto e metas.</small></div>
   <div class="pn"><div class="pn-h"><h3>2 · Pendências e tempo de cada uma</h3><span class="mut">${sel.length} escolhidas · ${U.hours(tot)}</span></div>
     <div class="fb-list">${L.map((x, i) => `<label class="fb-it ${isSel(x, i) ? 'on' : ''}"><input type="checkbox" data-fbk="${esc(x.k)}" ${isSel(x, i) ? 'checked' : ''}><span class="fb-n">${i + 1}</span><span class="fb-t"><b>${esc(x.title)}</b><small>${esc([x.kind, x.area, x.why].filter(Boolean).join(' · '))}</small></span><span class="fb-m"><input type="number" min="5" max="120" step="5" inputmode="numeric" data-fbm="${esc(x.k)}" value="${clamp(DR.mins[x.k] || x.mins)}" aria-label="Minutos"><small>min</small></span></label>`).join('') || UI.empty('Sem pendências neste tema. Escolhe outro ou acrescenta uma abaixo.')}</div>
     <form class="fb-add" data-form="fbAdd"><input class="field" name="t" placeholder="Acrescentar pendência (ex.: responder ao e-mail da Joana)" required><input class="field" name="m" type="number" min="5" max="120" step="5" value="15" aria-label="Minutos"><button class="btn">${UI.ic('plus')}Juntar</button></form></div>
@@ -8831,10 +8864,10 @@ if (I && I.alerts) { const _a = I.alerts; I.alerts = () => { const out = _a(); t
 if (I && I.next) { const _n = I.next; I.next = (o = {}) => { const out = _n(o); try { if (!o.ctx || o.ctx === '@Computador') Mail.items().filter(x => x.c === 'urgente' || x.c === 'responder').slice(0, 5).forEach(x => out.push({ kind: 'E-mail', title: 'Responder: ' + (x.s || nameOf(x.f)), score: x.c === 'urgente' ? 62 : 36, why: [nameOf(x.f), x.a || x.why].filter(Boolean), eff: 10, area: 'E-mail', act: `data-act="mlDone" data-id="${esc(x.id)}"`, actL: 'Feito', href: '#email' })); } catch (e) { } return out.sort((a, b) => b.score - a.score); }; }
 
 /* ---------- página ---------- */
-const TB = [['', 'Resumo'], ['caixa', 'Caixa'], ['linkedin', 'LinkedIn'], ['contas', 'Ligar contas']];
+const TB = [['', 'Resumo'], ['caixa', 'Caixa'], ['faculdade', 'Faculdade'], ['linkedin', 'LinkedIn'], ['contas', 'Ligar contas']];
 V.email = sub => { const k = TB.some(t => t[0] === (sub || '')) ? (sub || '') : '';
   const when = M.at ? 'atualizado ' + U.rel(U.iso(new Date(M.at))) + ' às ' + new Date(M.at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não atualizado';
-  return UI.head('E-mail & LinkedIn', 'O que precisa da tua atenção, separado do lixo.', `<button class="btn sm" data-act="mlRefresh" ${busy ? 'disabled' : ''}>${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button>`) + UI.tabs('email', TB, k) + `<div class="ml-page">${err ? `<div class="ib-st bad" style="margin-bottom:10px">${esc(err)}</div>` : ''}${!ready() || ver() < 9 ? (k === 'contas' ? '' : setupCard()) : ''}${P[k](when)}</div>`; };
+  return UI.head('E-mail e LinkedIn', 'O que precisa da tua atenção, separado do lixo.', `<button class="btn sm" data-act="mlRefresh" ${busy ? 'disabled' : ''}>${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button>`) + UI.tabs('email', TB, k) + `<div class="ml-page">${err ? `<div class="ib-st bad" style="margin-bottom:10px">${esc(err)}</div>` : ''}${!ready() || ver() < 9 ? (k === 'contas' ? '' : setupCard()) : ''}${P[k](when)}</div>`; };
 const setupCard = () => `<div class="pn ml-setup"><b>${ready() ? 'Falta atualizar o script Google' : 'Liga o teu Gmail ao Oceanum'}</b><p class="mut">${ready() ? 'O teu script ainda não tem a parte do e-mail.' : 'Usa o mesmo script Google do atalho de gastos e da sincronização.'} Demora 3 minutos, uma vez só.</p><a class="btn sm pri" href="#email.contas">Ver os passos</a></div>`;
 const row = (x, o = {}) => { const [c, ic, l] = catL(x.c); return `<div class="ml-it ${x.u ? 'unread' : ''} c-${c}"><div class="ml-ic" title="${l}"></div><div class="ml-t click" data-act="mlRead" data-id="${esc(x.id)}" role="button" tabindex="0"><div class="ml-h"><b>${esc(nameOf(x.f))}</b><small>${U.fmtDS(x.d.slice(0, 10))} ${x.d.slice(11, 16) ? new Date(x.d).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : ''}</small></div><div class="ml-s">${esc(x.s || '(sem assunto)')}</div><small class="ml-w">${esc([x.why, x.a ? '→ ' + x.a : '', x.due ? 'prazo ' + U.fmtDS(x.due) : ''].filter(Boolean).join(' · ') || x.sn.slice(0, 110))}</small>
   <div class="ml-a"><button class="btn xs" data-act="mlRead" data-id="${esc(x.id)}">${UI.ic('mail')}Ler</button>${c === 'urgente' || c === 'responder' || c === 'atencao' ? `<button class="btn xs pri" data-act="mlReply" data-id="${esc(x.id)}">Responder</button><button class="btn xs ghost" data-act="mlTask" data-id="${esc(x.id)}">${UI.ic('plus')}Tarefa</button><button class="btn xs ghost" data-act="mlDone" data-id="${esc(x.id)}">${UI.ic('check')}Feito</button>` : ''}<button class="btn xs ghost" data-act="mlDo" data-a="arquivar" data-id="${esc(x.id)}">Arquivar</button>${c === 'spam' || c === 'promo' ? `<button class="btn xs ghost" data-act="mlDo" data-a="spam" data-id="${esc(x.id)}">Spam</button>` : ''}${o.move === false ? '' : `<select class="ml-mv" data-mlmv="${esc(x.id)}" aria-label="Mudar categoria">${CATS.map(k => `<option value="${k[0]}"${k[0] === c ? ' selected' : ''}>${k[2]}</option>`).join('')}</select>`}</div></div></div>`; };
@@ -8858,7 +8891,10 @@ A.mlRead = async b => { const it = Mail.items().find(x => x.id === b.dataset.id)
   drawReader(it); };
 A.mlFmt = b => { const r = RD[b.dataset.id], it = Mail.items().find(x => x.id === b.dataset.id); if (!r || !it) return; r.fmt = r.fmt === +b.dataset.i ? -1 : +b.dataset.i; drawReader(it); };
 Mail.read = id => A.mlRead({ dataset: { id } });
+Mail._frame = h => frame(h); Mail._linkify = t => linkify(t); Mail._name = f => nameOf(f); Mail._addr = f => addrOf(f);
 const P = {};
+// Faculdade: Outlook da universidade separado por matéria (unimail.js)
+P.faculdade = () => OS.UniMail ? OS.UniMail.view() : '';
 P[''] = when => { const L = Mail.items(), c = Mail.counts(), by = k => L.filter(x => x.c === k);
   if (!M.at) return ready() && ver() >= 9 ? `<div class="pn">${UI.empty('Ainda sem e-mails. Toca em Atualizar.')}</div>` : '';
   return `<div class="kpis">${UI.kpi('Urgentes', c.urg, '', { tone: c.urg ? 'neg' : '' })}${UI.kpi('Para responder', c.resp)}${UI.kpi('Não lidos', c.unread)}${UI.kpi('Spam suspeito', c.spam, '', { tone: c.spam ? 'warn' : '' })}</div>
@@ -8946,6 +8982,130 @@ OS.on('upd:tasks', (t, b) => { if (!t.mail || !b || b.status === t.status || t.s
 /* ---------- atualizar sozinho (só com a app aberta) ---------- */
 const tick = () => { if (document.hidden || !ready() || ver() < 9 || !cfg().auto) return; if (Date.now() - (M.at || 0) > 15 * 60e3) refresh(); else if (Date.now() - (M.li.at || 0) > 90 * 60e3 && M.li.at) refreshLi(); };
 OS.on('ready', () => setTimeout(tick, 4000)); setInterval(tick, 60e3);
+})();
+
+</script>
+<script>
+/* OCEANUM — E-mail da faculdade (Outlook / Microsoft 365) separado por matéria.
+   Ligação: pela Parte 4 do teu script Google (login oficial da Microsoft; o acesso fica guardado no teu script, por isso
+   ligas uma vez e funciona em todos os aparelhos). Nada passa por servidores do Oceanum.
+   Matéria de cada e-mail: 1) a que escolheste à mão; 2) a que aprendeu com esse remetente; 3) nome da cadeira, palavras
+   dos e-mails e professor(a) (definidos em cada disciplina); 4) a IA; senão, "Geral".
+   Se a universidade não deixar ligar apps, reencaminha o Outlook para o Gmail e escolhe o domínio (ex.: ua.pt): esses e-mails
+   aparecem aqui na mesma. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
+OS.ONE_DEF.unimail = { dom: '', map: {}, snd: {} };
+const C = () => { const c = OS.one('unimail'); c.map = c.map || {}; c.snd = c.snd || {}; return c; };
+const LK = 'os2ol'; let L = U.ls.get(LK, null) || { at: 0, items: [], user: '', ai: {} }; L.ai = L.ai || {};
+const saveL = () => { const keep = new Set(L.items.map(x => x.id)); Object.keys(L.ai).forEach(k => { if (!keep.has(k)) delete L.ai[k]; }); U.ls.set(LK, L); };
+let INFO = null, busy = '', err = '', aiBusy = false, RD = {};
+const ib = () => OS.one('inbox'), ready = () => !!(ib().url && ib().key);
+const url = extra => ib().url.trim() + (ib().url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(ib().key) + extra;
+const getJ = async extra => { const j = await OS.Inbox.getJSON(url(extra + '&_=' + Date.now()), 2); if (!j) throw new Error('o script não respondeu'); return j; };
+const postJ = async params => { const r = await fetch(ib().url.trim(), { method: 'POST', body: new URLSearchParams(Object.assign({ k: ib().key }, params)), credentials: 'omit', cache: 'no-store' }); return JSON.parse(await r.text()); };
+const nm = f => OS.Mail && OS.Mail._name ? OS.Mail._name(f) : f, addr = f => OS.Mail && OS.Mail._addr ? OS.Mail._addr(f) : String(f || '').toLowerCase();
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ');
+
+/* ---------- matérias ---------- */
+const subs = () => U.sortBy(OS.all('subjects'), s => (s.status === 'Em curso' ? '0' : '1') + (s.name || ''));
+const PAL = ['#38BDF8', '#A78BFA', '#34D399', '#F59E0B', '#F472B6', '#FB7185', '#2DD4BF', '#FACC15', '#818CF8', '#F97316'];
+const col = id => PAL[U.hash(id || 'geral') % PAL.length];
+const keysOf = s => [s.name].concat(String(s.mail || '').split(/[,;]+/), [s.prof]).map(x => norm(x).trim()).filter(x => x.length >= 3);
+const byRule = it => { const txt = norm(it.s + ' ' + it.f + ' ' + it.sn); let best = '', bs = 0;
+  subs().forEach(s => { let sc = 0; keysOf(s).forEach((k, i) => { if (txt.includes(k)) sc += i === 0 ? 3 : 2; }); norm(s.name).split(' ').filter(w => w.length > 5).forEach(w => { if (txt.includes(w)) sc += .6; }); if (sc > bs) { bs = sc; best = s.id; } });
+  return bs >= 1.8 ? best : ''; };
+const subjOf = it => { const c = C(), m = c.map[it.id] || c.snd[addr(it.f)] || byRule(it) || L.ai[it.id] || 'geral'; return m === 'geral' || OS.get('subjects', m) ? m : 'geral'; };
+const subjName = id => id === 'geral' ? 'Geral' : (OS.get('subjects', id) || {}).name || 'Geral';
+// a IA arruma os que as regras não souberam (Google; se não der, a IA grátis de reserva)
+const aiSort = async () => { if (aiBusy || !OS.AI || !(OS.AI.key() || (OS.AI.freeOn && OS.AI.freeOn()))) return; const S = subs(); if (!S.length) return;
+  const todo = L.items.filter(it => !(it.id in L.ai) && !C().map[it.id] && !C().snd[addr(it.f)] && !byRule(it)).slice(0, 25); if (!todo.length) return; aiBusy = true;
+  try { const o = await OS.AI.json([{ text: `Separa estes e-mails da faculdade do Ryan pela disciplina (matéria) a que dizem respeito. Disciplinas: ${JSON.stringify(S.map(s => ({ id: s.id, nome: s.name, professor: s.prof || '', palavras: s.mail || '' })))}.
+Se o e-mail não for de nenhuma disciplina (avisos gerais, secretaria, eventos, propinas…), usa "geral". Responde APENAS JSON: {"m":[{"id":"…","disc":"id da disciplina ou geral"}]}
+E-mails: ${JSON.stringify(todo.map(it => ({ id: it.id, de: it.f, assunto: it.s, inicio: String(it.sn || '').slice(0, 220) })))}` }], .1);
+    (o.m || []).forEach(r => { if (r && r.id && todo.some(t => t.id === r.id)) L.ai[r.id] = r.disc === 'geral' || S.some(s => s.id === r.disc) ? r.disc : 'geral'; });
+    todo.forEach(t => { if (!(t.id in L.ai)) L.ai[t.id] = 'geral'; }); saveL(); } catch (e) { } aiBusy = false; OS.request(); };
+
+/* ---------- buscar ---------- */
+const info = async () => { try { const j = await getJ('&op=olinfo'); if (j && j.ok && j.v >= 12) INFO = Object.assign({ has4: true }, j); else INFO = { has4: false }; } catch (e) { INFO = { has4: false, off: true }; } OS.request(); return INFO; };
+const gmailUni = () => { const d = String(C().dom || '').trim().toLowerCase().replace(/^@/, ''); if (!d || !OS.Mail) return []; return OS.Mail.items().filter(m => (addr(m.f) + ' ' + String(m.to || '')).toLowerCase().includes('@' + d) || addr(m.f).endsWith('.' + d)).map(m => Object.assign({}, m, { gm: 1 })); };
+const refresh = async manual => { if (busy || !ready()) return; busy = 'ol'; err = ''; OS.request();
+  try { if (!INFO || !INFO.linked) await info(); if (INFO && INFO.linked) { const j = await getJ('&op=ol&n=40'); if (!j.ok) throw new Error(j.msg || 'o Outlook não respondeu'); L = Object.assign(L, { at: Date.now(), items: j.items || [], user: j.user || L.user }); saveL(); aiSort(); }
+    else if (manual && !gmailUni().length) UI.toast('Liga primeiro o Outlook (passos abaixo)', 'warn'); }
+  catch (e) { err = 'Não consegui ler o Outlook: ' + (e.message || 'erro') + '.'; } busy = ''; OS.request(); };
+const all = () => U.sortBy(L.items.concat(gmailUni()), x => x.d || '').reverse();
+
+/* ---------- ecrã ---------- */
+const STEPS_AZ = red => `<ol class="ai-steps">
+  <li>No computador (ou no telemóvel em modo computador), abre <a class="acc" href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noopener">portal.azure.com → Registos de aplicações</a> e entra com a <b>conta da faculdade</b>.</li>
+  <li><b>Novo registo</b> → Nome: <b>Oceanum</b> → Tipos de conta: <b>Apenas as contas deste diretório organizacional</b> → URI de redirecionamento: escolhe <b>Web</b> e cola este endereço:<div class="ol-copy"><code>${esc(red || '…')}</code><button class="btn xs" data-act="olCopy" data-v="${esc(red || '')}">Copiar</button></div> → <b>Registar</b>.</li>
+  <li>Na página da aplicação, copia o <b>ID da Aplicação (cliente)</b> e o <b>ID do Diretório (inquilino)</b>.</li>
+  <li><b>Certificados e segredos</b> → <b>Novo segredo de cliente</b> → validade 24 meses → <b>Adicionar</b> → copia o <b>Valor</b> (só aparece uma vez).</li>
+  <li><b>Permissões de API</b> → <b>Adicionar uma permissão</b> → <b>Microsoft Graph</b> → <b>Permissões delegadas</b> → marca <b>Mail.Read</b>, <b>Mail.Send</b>, <b>User.Read</b> e <b>offline_access</b> → <b>Adicionar</b>.</li>
+  <li>Cola os três valores aqui em baixo e toca em <b>Guardar</b>. Depois <b>Entrar com a conta da faculdade</b>.</li></ol>`;
+const setup = () => { if (!ready()) return `<div class="pn"><b>Primeiro liga o script Google</b><p class="mut">O Outlook liga-se através do teu script (o mesmo do Gmail e da sincronização).</p><a class="btn sm pri" href="#email.contas">Ver os passos</a></div>`;
+  if (!INFO) { if (!busy) setTimeout(info, 30); return `<div class="pn"><div class="sai-busy"><div class="fd-spin"></div><span>A verificar a ligação ao Outlook…</span></div></div>`; }
+  if (!INFO.has4) return `<div class="pn ol-setup"><div class="pn-h"><h3>1 · Junta a Parte 4 ao teu script Google</h3></div><p class="mut" style="margin:0 0 8px">A Parte 4 liga o Outlook da faculdade (e põe a IA sem limites nas perguntas pela Siri). É um ficheiro novo: não apagas nada.</p>
+    <ol class="ai-steps"><li>Toca para copiar: <span class="row gap8" style="display:inline-flex;flex-wrap:wrap">${OS.Inbox.partsBtns('btn sm pri', 3, 3)}</span></li><li>Em <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a>, no teu projeto: <b>Arquivos → + → Script</b> → nome <b>Parte4</b> → apaga o que vier → cola → <b>Guardar</b>.</li><li><b>Implantar → Gerenciar implantações → lápis → Nova versão → Implantar</b>.</li><li>Volta aqui e toca em <b>Verificar</b>.</li></ol>
+    <button class="btn sm" data-act="olInfo">${UI.ic('sync')}Verificar</button></div>`;
+  const admin = /AADSTS65001|AADSTS90094|admin|administrador|consent/i.test(INFO.err || '');
+  return `<div class="pn ol-setup"><div class="pn-h"><h3>Ligar o Outlook da faculdade</h3><span class="bdg ${INFO.cfg ? 'pos' : ''}">${INFO.cfg ? 'aplicação guardada' : 'por configurar'}</span></div>
+    ${INFO.err ? `<div class="ib-st bad">Na última tentativa: ${esc(INFO.err)}</div>${admin ? `<p class="mut" style="font-size:13px">A tua universidade exige autorização do administrador para apps que leem o e-mail. Duas saídas: (1) pedir ao apoio informático (ex.: <b>sti@ua.pt</b>) para aprovar a app "Oceanum"; ou (2) no Outlook, <b>Definições → Correio → Reencaminhamento</b> para o teu Gmail e escrever o domínio da faculdade em baixo: os e-mails aparecem aqui na mesma, separados por matéria.</p>` : ''}` : ''}
+    ${STEPS_AZ(INFO.redirect)}
+    <form class="ol-f" data-form="olCfg" autocomplete="off"><input class="field" name="id" placeholder="ID da Aplicação (cliente)" aria-label="ID da Aplicação (cliente)" spellcheck="false" autocapitalize="none"><input class="field" name="ten" placeholder="ID do Diretório (inquilino)" aria-label="ID do Diretório (inquilino)" spellcheck="false" autocapitalize="none"><input class="field" name="sec" type="password" placeholder="Valor do segredo do cliente" aria-label="Segredo do cliente" autocomplete="new-password"><button class="btn sm pri">Guardar no meu script</button></form>
+    <div class="row gap8" style="margin-top:10px;flex-wrap:wrap"><button class="btn pri" data-act="olAuth" ${INFO.cfg ? '' : 'disabled'}>${UI.ic('user')}Entrar com a conta da faculdade</button><button class="btn sm ghost" data-act="olInfo">${UI.ic('sync')}Verificar</button></div>
+    <small class="mut">O segredo fica guardado só no teu script Google. Podes desligar a qualquer momento.</small></div>`; };
+const row = it => { const sid = subjOf(it), S = subs();
+  return `<div class="ml-it ol-it ${it.u ? 'unread' : ''}"><div class="ol-bar" style="background:${col(sid)}"></div><div class="ml-t click" data-act="${it.gm ? 'mlRead' : 'olRead'}" data-id="${esc(it.id)}" role="button" tabindex="0"><div class="ml-h"><b>${esc(nm(it.f))}</b><small>${it.d ? U.fmtDS(String(it.d).slice(0, 10)) + ' ' + new Date(it.d).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : ''}</small></div><div class="ml-s">${esc(it.s || '(sem assunto)')}</div><div class="ml-sn">${esc(String(it.sn || '').slice(0, 160))}</div></div>
+    <div class="ml-a"><span class="bdg" style="border-color:${col(sid)};color:${col(sid)}">${esc(subjName(sid))}</span><select class="ol-sel" data-id="${esc(it.id)}" data-f="${esc(addr(it.f))}" aria-label="Mudar a matéria"><option value="">Mudar matéria…</option>${S.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}<option value="geral">Geral</option></select>${it.gm ? '<small class="mut">via Gmail</small>' : ''}</div></div>`; };
+const view = () => { const items = all(), linked = INFO && INFO.linked, f = OS.ui.olF || '', S = subs(), cnt = id => items.filter(x => subjOf(x) === id).length, list = f ? items.filter(x => subjOf(x) === f) : items;
+  if (ready() && !INFO && !busy) setTimeout(info, 30);
+  if (linked && !L.at && !busy) setTimeout(() => refresh(false), 30);
+  const head = `<div class="row between gap8" style="flex-wrap:wrap;margin-bottom:10px"><div><b>${linked ? 'Outlook ligado' : 'Faculdade'}</b>${linked ? `<small class="mut" style="display:block">${esc(INFO.user || L.user || '')}${L.at ? ' · atualizado ' + new Date(L.at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : ''}</small>` : ''}</div>
+    <div class="row gap8">${linked ? `<button class="btn sm" data-act="olRefresh" ${busy ? 'disabled' : ''}>${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button><button class="btn sm ghost" data-act="olOff">Desligar</button>` : ''}</div></div>`;
+  return `${err ? `<div class="ib-st bad" style="margin-bottom:10px">${esc(err)}</div>` : ''}${linked ? '' : setup()}
+    ${linked || items.length ? `<div class="pn">${head}
+      ${S.length ? '' : `<p class="mut">Para separar por matéria, cria as tuas disciplinas em <a class="acc" href="#universidade">Universidade</a> (e, em cada uma, as palavras dos e-mails: sigla, código ou e-mail do professor).</p>`}
+      <div class="ml-f">${UI.chip('Todas · ' + items.length, 'olF', !f, 'data-v=""')}${S.filter(s => cnt(s.id)).map(s => UI.chip(esc(s.name) + ' · ' + cnt(s.id), 'olF', f === s.id, `data-v="${s.id}"`)).join('')}${cnt('geral') ? UI.chip('Geral · ' + cnt('geral'), 'olF', f === 'geral', 'data-v="geral"') : ''}${aiBusy ? '<small class="mut">a separar com a IA…</small>' : ''}</div>
+      <div class="ml-list">${list.map(row).join('') || UI.empty(L.at ? 'Nada aqui.' : 'Toca em Atualizar.')}</div></div>` : ''}
+    <details class="pn ol-dom"><summary>Reencaminhas o Outlook para o Gmail?</summary><p class="mut" style="font-size:13px">Escreve o domínio do teu e-mail da faculdade e os e-mails dele que chegam ao Gmail aparecem aqui, separados por matéria.</p><form class="row gap8" data-form="olDom"><input class="field grow" name="dom" placeholder="ex.: ua.pt" value="${esc(C().dom || '')}" aria-label="Domínio da faculdade" autocapitalize="none"><button class="btn sm">Guardar</button></form></details>`; };
+
+/* ---------- ler e responder ---------- */
+const readerHTML = (it, r) => `<div class="ml-rd"><div class="pn-h"><h3>${esc((r && r.s) || it.s || '(sem assunto)')}</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+  <div><span class="bdg" style="border-color:${col(subjOf(it))};color:${col(subjOf(it))}">${esc(subjName(subjOf(it)))}</span></div>
+  ${!r || r.busy ? `<div class="sai-busy"><div class="fd-spin"></div><span>A abrir o e-mail…</span></div>` : r.err ? `<div class="note">${esc(r.err)}</div><p class="ml-rb">${esc(it.sn || '')}</p>` : r.t.map(m => `<div class="ml-msg last"><div class="ml-mh"><b>${esc(nm(m.f))}</b><small>${esc(addr(m.f))} · ${m.d ? new Date(m.d).toLocaleString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}</small>${m.to ? `<small>para ${esc(m.to)}</small>` : ''}</div>
+    ${r.fmt && m.h ? OS.Mail._frame(m.h) : `<div class="ml-rb">${OS.Mail._linkify(m.b || '(mensagem sem texto)')}</div>`}
+    <div class="row gap6" style="margin-top:6px;flex-wrap:wrap">${m.h ? `<button class="btn xs ghost" data-act="olFmt" data-id="${esc(it.id)}">${r.fmt ? 'Ver só o texto' : 'Ver formatado'}</button>` : ''}${(m.at || []).map(a => `<span class="bdg">${UI.ic('note')} ${esc(a)}</span>`).join('')}</div></div>`).join('')}
+  <div class="ol-rp"><textarea class="field" id="olRpT" rows="3" placeholder="Responder… (vai pelo teu Outlook)"></textarea><div class="row gap8" style="margin-top:6px"><button class="btn sm pri" data-act="olSend" data-id="${esc(it.id)}">Enviar resposta</button><button class="btn sm ghost" data-act="olTask" data-id="${esc(it.id)}">${UI.ic('plus')}Tarefa</button><span class="grow"></span><a class="btn sm ghost" href="https://outlook.office.com/mail/" target="_blank" rel="noopener">Outlook</a></div></div></div>`;
+const draw = it => { const m = document.querySelector('#modal .ml-rd'); if (m) m.outerHTML = readerHTML(it, RD[it.id]); else UI.modal(readerHTML(it, RD[it.id]), 'tall'); document.querySelectorAll('#modal [data-mclose]').forEach(b => b.onclick = UI.closeModal); };
+const get = id => L.items.find(x => x.id === id);
+A.olRead = async b => { const it = get(b.dataset.id); if (!it) return; if (!RD[it.id] || RD[it.id].err) { RD[it.id] = { busy: true }; draw(it);
+    try { const j = await getJ('&op=olx&id=' + encodeURIComponent(it.id)); if (!j.ok) throw new Error(j.msg || 'erro'); RD[it.id] = { s: j.s, t: j.t || [], fmt: false }; if (it.u) { it.u = false; saveL(); } } catch (e) { RD[it.id] = { err: 'Não consegui abrir o e-mail: ' + (e.message || 'erro') + '.', t: [] }; } }
+  draw(it); };
+A.olFmt = b => { const r = RD[b.dataset.id], it = get(b.dataset.id); if (r && it) { r.fmt = !r.fmt; draw(it); } };
+A.olSend = async b => { const it = get(b.dataset.id), t = (document.getElementById('olRpT') || {}).value || ''; if (!it || !t.trim()) return UI.toast('Escreve a resposta', 'warn'); b.disabled = true;
+  try { const j = await postJ({ op: 'ols', id: it.id, b: t.trim() }); if (!j.ok) throw new Error(j.msg || 'erro'); UI.toast('Resposta enviada pelo teu Outlook', 'pos'); UI.closeModal(); } catch (e) { UI.toast('Não enviei: ' + (e.message || 'erro'), 'warn'); b.disabled = false; } };
+A.olTask = b => { const it = get(b.dataset.id); if (!it) return; const sid = subjOf(it), s = OS.get('subjects', sid); OS.add('tasks', { title: (it.s || 'E-mail da faculdade').slice(0, 120), status: 'Próxima', area: 'Universidade', notes: (s ? s.name + ' · ' : '') + nm(it.f) }); UI.toast('Tarefa criada', 'pos'); };
+A.olSubj = b => { const v = b.value; if (!v) return; const c = C(); c.map[b.dataset.id] = v; if (b.dataset.f) c.snd[b.dataset.f] = v; OS.touch('unimail'); UI.toast(`Agora os e-mails deste remetente vão para ${subjName(v)}`, 'pos'); };
+A.olF = b => OS.setUI('olF', b.dataset.v);
+A.olRefresh = () => refresh(true);
+A.olInfo = async () => { INFO = null; OS.request(); const i = await info(); UI.toast(!i.has4 ? 'O script ainda não tem a Parte 4 (ou falta a Nova versão na implantação).' : i.linked ? 'Outlook ligado' : 'Parte 4 instalada: falta ligar a conta.', i.has4 ? 'pos' : 'warn'); if (i.linked) refresh(false); };
+A.olCopy = b => { try { navigator.clipboard.writeText(b.dataset.v).then(() => UI.toast('Copiado', 'pos')); } catch (e) { UI.toast(b.dataset.v); } };
+A.olAuth = async () => { const w = window.open('', '_blank'); try { const j = await getJ('&op=olauth'); if (!j.ok || !j.url) throw new Error(j.msg || 'erro'); if (w) w.location = j.url; else location.href = j.url; UI.toast('Entra com a conta da faculdade. Depois volta aqui e toca em Verificar.'); }
+  catch (e) { if (w) w.close(); UI.toast('Não consegui começar o login: ' + (e.message || 'erro'), 'warn'); } };
+A.olOff = () => UI.ask('Desligar o Outlook?', 'O acesso guardado no teu script é apagado. Podes voltar a ligar quando quiseres.', 'Desligar', async () => { try { await getJ('&op=oloff'); } catch (e) { } INFO = null; L = { at: 0, items: [], user: '', ai: {} }; saveL(); OS.request(); });
+document.addEventListener('change', e => { const sel = e.target && e.target.closest && e.target.closest('select.ol-sel'); if (sel) A.olSubj(sel); });
+OS.forms = OS.forms || {};
+OS.forms.olCfg = async (f, v) => { const id = String(v('id') || '').trim(), ten = String(v('ten') || '').trim(), sec = String(v('sec') || '').trim();
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-z.-]{3,80}$/i.test(ten) || sec.length < 8) return UI.toast('Confirma os três valores (os IDs têm 36 caracteres)', 'warn');
+  try { const j = await postJ({ op: 'olcfg', id, ten, sec }); if (!j.ok) throw new Error(j.msg || 'erro'); UI.toast('Guardado no teu script. Agora entra com a conta da faculdade.', 'pos'); INFO = Object.assign(INFO || {}, { cfg: true, err: '' }); OS.request(); }
+  catch (e) { UI.toast('Não guardei: ' + (e.message || 'erro'), 'warn'); } };
+OS.forms.olDom = (f, v) => { OS.setOne('unimail', { dom: String(v('dom') || '').trim().toLowerCase().replace(/^@/, '') }); UI.toast('Guardado', 'pos'); };
+// atualiza sozinho de 10 em 10 minutos com a app aberta (se estiver ligado)
+OS.on('ready', () => setInterval(() => { if (!document.hidden && INFO && INFO.linked) refresh(false); }, 10 * 60e3));
+OS.UniMail = { view, items: () => all(), get, subjOf, subjName, refresh, info: () => INFO, _set: (o, i) => { if (o) { L = Object.assign({ ai: {} }, o); saveL(); } if (i) INFO = i; },
+  summary: () => all().slice(0, 20).map(it => ({ materia: subjName(subjOf(it)), de: it.f, assunto: it.s, nao_lido: !!it.u, trecho: String(it.sn || '').slice(0, 140) })) };
 })();
 
 </script>
@@ -9287,7 +9447,7 @@ OS.on('ready', () => setTimeout(newsTick, 6000)); setInterval(newsTick, 30 * 60e
 /* ================= comandos ================= */
 const hist = [];
 const pickR = a => a[Math.floor(Math.random() * a.length)];
-const routes = () => { const out = []; document.querySelectorAll('.tn-dd a[href^="#"], #side a[href^="#"]').forEach(a => { const k = a.getAttribute('href').slice(1), l = (a.querySelector('b') || a.querySelector('span') || a).textContent.trim(); if (k && l && !out.some(x => x[0] === k)) out.push([k, l]); }); return out.concat([['definicoes', 'Definições'], ['painel', 'Control Room'], ['painel', 'Centro de controlo'], ['spyke', 'Spyke'], ['email', 'E-mail']]); };
+const routes = () => { const out = []; document.querySelectorAll('.tn-dd a[href^="#"], #side a[href^="#"]').forEach(a => { const k = a.getAttribute('href').slice(1), l = (a.querySelector('b') || a.querySelector('span') || a).textContent.trim(); if (k && l && !out.some(x => x[0] === k)) out.push([k, l]); }); return out.concat([['definicoes', 'Definições'], ['visao', 'Visão geral'], ['visao', 'Painel'], ['visao', 'Control Room'], ['visao', 'Centro de controlo'], ['spyke', 'Spyke'], ['email', 'E-mail']]); };
 const findRoute = q => { const n = N(q).replace(/^(o|a|os|as|aba|pagina|separador)\s+/, '').replace(/^(aba|pagina)\s+(de|do|da)?\s*/, ''); if (!n) return null; const R = routes(); return R.find(([k, l]) => N(l) === n || k === n) || R.find(([k, l]) => N(l).startsWith(n) || n.startsWith(N(l))) || R.find(([k, l]) => N(l).includes(n) || n.includes(N(l).split(' ')[0])); };
 S.handle = async (raw, ho = {}) => { const t = N(raw); if (!ho.quiet) push('user', raw); hist.push({ r: 'ryan', t: raw }); let m;
   if (EARSTOP.test(t)) return earQuit(true);
@@ -9325,8 +9485,8 @@ S.handle = async (raw, ho = {}) => { const t = N(raw); if (!ho.quiet) push('user
   if (/habitos?/.test(t)) { const hb = OS.all('habits').filter(x => x.active && OS.Hab.due(x, U.today()) && !OS.Hab.done(x, U.today())); return S.say(hb.length ? `Faltam ${hb.length}: ${listS(hb.slice(0, 5).map(x => x.name))}.` : 'Hábitos de hoje todos feitos. Bom trabalho.'); }
   if (/(treino|ginasio)/.test(t) && !/(abre|abrir|mostra)/.test(t)) { const sp = OS.one('fit').split[String(new Date().getDay())]; return S.say(sp ? (sp === 'Descanso' ? 'Hoje é dia de descanso.' : 'Hoje é dia de ' + sp + '.') : 'Não tens divisão de treino definida para hoje.'); }
   if (/(ajuda(-me| me)? a decidir|decision center|minhas decisoes|as decisoes|o que (eu )?decido|qual (e|seria) a melhor (opcao|escolha))/.test(t)) { const D = U.sortBy(OS.all('decisions').filter(d => d.status === 'Em análise'), d => d.deadline || '9')[0]; location.hash = 'decisoes';
-    if (!D) return S.say('Abri o Decision Center. Cria a decisão com as alternativas e eu ajudo-te a pensar.');
-    if (!OS.AI || !OS.AI.key() || !OS.Decide) return S.say(`Abri o Decision Center na decisão ${D.title}.`);
+    if (!D) return S.say('Abri o Centro de decisões. Cria a decisão com as alternativas e eu ajudo-te a pensar.');
+    if (!OS.AI || !OS.AI.key() || !OS.Decide) return S.say(`Abri o Centro de decisões na decisão ${D.title}.`);
     setSt('thinking'); setTimeout(() => OS.Decide.open(D.id), 300); await OS.Decide.run(D.id, 'an'); const r = ((OS.get('decisions', D.id) || {}).ai || {}).r; if (!r) return S.say('Não consegui analisar agora.'); const inc = r.inclinacao || {};
     return S.say([`Sobre ${D.title}: ${r.resumo || ''}`, inc.nome ? `Os dados apontam para ${inc.nome}. ${inc.porque || ''}` : '', r.emocao || '', r.passo ? 'Próximo passo: ' + r.passo : '', 'A decisão é tua.'].filter(Boolean).join(' ')); }
   if (/(bloco de foco|modo foco|quero focar|vamos focar|concentrar)/.test(t)) { location.hash = 'foco'; return S.say('Abri o Bloco de foco. Escolhe o tema, ou deixa que eu escolho pela prioridade.'); }
@@ -9442,7 +9602,7 @@ const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url 
     </div>
     ${oldScr ? `<div class="spy-upd">${v >= 10 ? `<b>Atualizar o script do Google · só falta a Parte 3 (uns 3 minutos)</b>
       <ol><li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> e entra no <b>teu projeto do Oceanum</b> (o que já tem o Código.gs e a Parte2). No iPhone usa <b>aA → Pedir site para computador</b>. <b>Não apagues nada</b>: as partes 1 e 2 ficam como estão.</li>
-      <li>Toca no botão para copiar a Parte 3 → no projeto: <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte3</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte3 já existir, abre-a e substitui o conteúdo.<div class="row gap8" style="margin-top:6px;flex-wrap:wrap">${OS.Inbox && OS.Inbox.partsBtns ? OS.Inbox.partsBtns('btn sm pri', OS.Inbox.partsHelp().n - 1) : ''}</div></li>
+      <li>Toca no botão para copiar a Parte 3 → no projeto: <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte3</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte3 já existir, abre-a e substitui o conteúdo.<div class="row gap8" style="margin-top:6px;flex-wrap:wrap">${OS.Inbox && OS.Inbox.partsBtns ? OS.Inbox.partsBtns('btn sm pri', 2, 2) : ''}</div></li>
       <li>Na lista de funções ao lado de <b>▶ Executar</b>, escolhe <b>autorizar</b> → <b>▶ Executar</b> → <b>Rever permissões</b> → a tua conta → <b>Avançado</b> → <b>Aceder</b> → <b>Permitir</b> (Gmail, Agenda e páginas de uma vez). É o teu próprio script: o aviso do Google é normal.</li>
       <li><b>Implantar</b> → <b>Gerenciar implantações</b> → lápis (<b>Editar</b>) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>. Se houver mais de uma implantação, edita a que tem o endereço que termina em <code>…${esc(String(c.url || '').slice(-16))}</code>.</li>
       <li>Volta aqui e toca em <b>Verificar tudo</b>. Se ainda disser versão 10, a Parte3 tem de ficar <b>por baixo</b> das outras na lista de ficheiros (⋮ ao lado do nome → Mover para baixo) e repete o passo 4.</li></ol>
@@ -9562,7 +9722,7 @@ const cut = (o, n = 6000) => { const s = typeof o === 'string' ? o : JSON.string
 const safe = f => { try { return f(); } catch (e) { return null; } };
 
 /* ---------- o que o Spyke consegue consultar ---------- */
-const AREAS = ['agenda', 'tarefas', 'financas', 'habitos', 'universidade', 'investimentos', 'emails', 'noticias', 'clima', 'metas', 'treino', 'pessoas', 'decisoes', 'memoria', 'trabalho'];
+const AREAS = ['agenda', 'tarefas', 'financas', 'habitos', 'universidade', 'investimentos', 'emails', 'noticias', 'clima', 'metas', 'treino', 'pessoas', 'decisoes', 'memoria', 'trabalho', 'proximos_passos'];
 const consult = async area => { const t = today(), F = OS.Fin;
   switch (area) {
     case 'agenda': return safe(() => OS.Cal.items(t, U.addDays(t, 14)).filter(x => x.src !== 'bill').slice(0, 60).map(x => ({ dia: x.date, hora: x.start || '', fim: x.end || '', titulo: x.title, tipo: x.src, feito: !!x.done })));
@@ -9571,9 +9731,10 @@ const consult = async area => { const t = today(), F = OS.Fin;
     case 'habitos': return safe(() => OS.all('habits').filter(h => h.active).map(h => ({ nome: h.name, hoje: OS.Hab.due(h, t) ? (OS.Hab.done(h, t) ? 'feito' : 'por fazer') : 'não é hoje', sequencia: OS.Hab.streak(h), inegociavel: !!h.core })));
     case 'universidade': return safe(() => ({ media: OS.St.gpa(), disciplinas: OS.St.current().map(s => { const x = OS.St.stats(s); return { nome: s.name, media: x.avg, horas: x.hours, situacao: x.sit[0] }; }), avaliacoes: U.sortBy(OS.all('assessments').filter(a => a.date >= t), a => a.date).slice(0, 12).map(a => ({ dia: a.date, tipo: a.type, titulo: a.title, disciplina: (OS.get('subjects', a.subject) || {}).name || '', peso: a.weight, preparacao: a.prep || 'Não comecei' })), revisoes_hoje: OS.St.revDue().length }));
     case 'investimentos': return safe(() => ({ valor_total: OS.Inv && OS.Inv.value ? U.r2(OS.Inv.value()) : null, ativos: OS.all('assets').slice(0, 30).map(a => ({ nome: a.name || a.symbol, simbolo: a.symbol || '', tipo: a.type || '' })) }));
-    case 'emails': return safe(() => OS.Mail ? { resumo: OS.Mail.sum ? OS.Mail.sum() : '', itens: OS.Mail.items().slice(0, 15).map(m => ({ de: m.f, assunto: m.s, categoria: m.c, trecho: String(m.sn || '').slice(0, 160), nao_lido: !!m.u })) } : 'O e-mail não está ligado.');
+    case 'emails': return safe(() => OS.Mail ? { resumo: OS.Mail.sum ? OS.Mail.sum() : '', itens: OS.Mail.items().slice(0, 15).map(m => ({ de: m.f, assunto: m.s, categoria: m.c, trecho: String(m.sn || '').slice(0, 160), nao_lido: !!m.u })), faculdade_outlook: OS.UniMail ? OS.UniMail.summary() : [] } : 'O e-mail não está ligado.');
     case 'noticias': try { return OS.News && OS.News.headlines ? await OS.News.headlines(8) : []; } catch (e) { return 'Sem notícias agora.'; }
     case 'clima': try { const w = OS.Weather && await OS.Weather.get(); return w && w.now ? OS.Weather.say(w, 0) + ' ' + OS.Weather.say(w, 1) : 'Sem dados do clima.'; } catch (e) { return 'Sem dados do clima.'; }
+    case 'proximos_passos': return safe(() => { const { out } = OS.LifePlan.build(); return Object.fromEntries(Object.entries(out).map(([k, L]) => [k, L.slice(0, 12).map(x => ({ nivel: ['', 'hoje', 'esta semana', 'este mês', 'este ano', 'longo prazo'][x.lv], passo: x.t, porque: x.why || '' }))])); }, {});
     case 'metas': return safe(() => OS.all('goals').filter(g => g.status === 'Ativa').map(g => { const i = OS.Goal.info(g); return { meta: g.title, progresso: Math.round(i.p * 100) + '%', estado: i.st[0], prazo: g.due || '' }; }));
     case 'treino': return safe(() => ({ divisao: OS.one('fit').split, hoje: OS.one('fit').split[String(new Date().getDay())] || '', ultimos: U.sortBy(OS.all('workouts'), w => w.date).slice(-5).map(w => ({ dia: w.date, treino: w.title })), corridas: U.sortBy(OS.all('runs'), r => r.date).slice(-5).map(r => ({ dia: r.date, km: r.km })) }));
     case 'pessoas': return safe(() => OS.all('people').slice(0, 60).map(p => ({ nome: p.name, relacao: p.rel || '', aniversario: p.birth || '' })));
@@ -9619,19 +9780,19 @@ Regras:
 const brief = () => { try { return OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx().slice(0, 3500) : ''; } catch (e) { return ''; } };
 
 /* ---------- Gemini (grátis) ---------- */
-const GM = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+// os modelos vêm da lista que a app descobre com a tua chave (o Google desliga os antigos); gemma não serve aqui (não usa ferramentas nem pesquisa)
 const gemCall = async (model, body) => { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(OS.AI.key())}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const j = await r.json().catch(() => ({})); if (!r.ok) { const m = (j.error && j.error.message) || 'erro ' + r.status; if (r.status === 429 && OS.AI.markLimit) OS.AI.markLimit(model, m); const e = new Error(/API key/i.test(m) ? 'a chave da IA não é válida' : r.status === 429 ? 'limite grátis da IA atingido por agora' : m); e.status = r.status; throw e; } return j; };
+  const j = await r.json().catch(() => ({})); if (!r.ok) { const m = (j.error && j.error.message) || 'erro ' + r.status; if (r.status === 429 && OS.AI.markLimit) OS.AI.markLimit(model, m); if (OS.AI.isDead && OS.AI.isDead(r.status, m)) { OS.AI.markDead(model); const e = new Error('modelo desligado'); e.status = 404; throw e; } const e = new Error(/API key/i.test(m) ? 'a chave da IA não é válida' : r.status === 429 ? 'limite grátis da IA atingido por agora' : m); e.status = r.status; throw e; } return j; };
 // limite grátis: passa ao modelo seguinte (cada um tem a sua cota)
-const gemModel = async body => { const list = OS.AI.models ? OS.AI.models(GM) : GM; if (!list.length) throw new Error(OS.AI.limitMsg || 'limite grátis da IA atingido'); let last;
-  for (const m of list) { try { return await gemCall(m, body); } catch (e) { last = e; if (e.status !== 404 && e.status !== 400 && e.status !== 429) throw e; } }
-  if (last && last.status === 429 && OS.AI.models && !OS.AI.models(GM).length) throw new Error(OS.AI.limitMsg); throw last; };
+const gemModel = async body => { await OS.AI.discover(); const list = OS.AI.gemini(); if (!list.length) { const e = new Error(OS.AI.limitMsg || 'limite grátis da IA atingido'); e.status = 429; throw e; } let last;
+  for (const m of list) { try { return await gemCall(m, body); } catch (e) { last = e; if (e.status !== 404 && e.status !== 400 && e.status !== 429 && e.status !== 500 && e.status !== 503) throw e; } }
+  throw last; };
 // pesquisa na internet (Google) feita pelo Gemini, com as fontes
 const webSearch = async q => { const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: `Pesquisa e responde em português, de forma factual e atual, em 4 a 6 frases: ${q}` }] }], tools: [{ google_search: {} }] });
   const c = (j.candidates || [])[0] || {}, txt = ((c.content || {}).parts || []).map(p => p.text || '').join(''), src = ((c.groundingMetadata || {}).groundingChunks || []).map(x => x.web && x.web.title).filter(Boolean).slice(0, 4);
   return txt + (src.length ? '\nFontes: ' + src.join(', ') : ''); };
 // pesquisa para outras partes da app (ex.: ler uma notícia inteira): texto + fontes { t, u }
-B.search = async (prompt, temp = .3) => { const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: prompt }] }], tools: [{ google_search: {} }], generationConfig: { temperature: temp } });
+B.search = async (prompt, temp = .3) => { if (!OS.AI.key()) throw new Error('pesquisa precisa da chave do Google'); const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: prompt }] }], tools: [{ google_search: {} }], generationConfig: { temperature: temp } });
   const c = (j.candidates || [])[0] || {}, txt = ((c.content || {}).parts || []).map(p => p.text || '').join('').trim(), seen = new Set();
   const src = ((c.groundingMetadata || {}).groundingChunks || []).map(x => x.web).filter(w => w && w.title && !seen.has(w.title) && seen.add(w.title)).slice(0, 8).map(w => ({ t: w.title, u: w.uri }));
   if (!txt) throw new Error('a IA não respondeu'); return { text: txt, src }; };
@@ -9665,14 +9826,29 @@ const claudeErr = async e => { try { const { Anthropic } = await sdk(); if (e in
 
 /* ---------- conversa ---------- */
 const H = []; // últimas trocas (para continuar a conversa)
-B.which = () => cfg().brain === 'claude' && cfg().anKey ? 'claude' : OS.AI && OS.AI.key() ? 'gemini' : '';
+B.which = () => cfg().brain === 'claude' && cfg().anKey ? 'claude' : OS.AI && OS.AI.key() ? 'gemini' : OS.AI && OS.AI.freeOn && OS.AI.freeOn() ? 'free' : '';
+/* ---------- reserva grátis (sem chave, sem limite diário): o mesmo Spyke com ferramentas, se o Google não responder ---------- */
+const wiki = async q => { try { const u = 'https://pt.wikipedia.org/w/api.php?action=query&generator=search&gsrlimit=3&prop=extracts&exintro=1&explaintext=1&exchars=700&format=json&origin=*&gsrsearch=' + encodeURIComponent(q);
+    const j = await (await fetch(u)).json(), ps = Object.values((j.query || {}).pages || {}); return ps.length ? ps.map(p => p.title + ': ' + p.extract).join('\n') + '\nFonte: Wikipédia' : 'Não encontrei nada sobre isso.'; } catch (e) { return 'Pesquisa indisponível agora.'; } };
+const askFree = async (q, hist) => { const tools = T.concat([{ name: WEB.name, description: WEB.description + ' (na reserva: Wikipédia)', props: WEB.props, req: WEB.req, run: a => wiki(String(a.pergunta || '').slice(0, 200)) }]);
+  const fns = tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: { type: 'object', properties: t.props, required: t.req } } }));
+  const msgs = [{ role: 'system', content: system() + '\nResumo atual dos dados dele (consulta para detalhes):\n' + brief() }].concat(hist, [{ role: 'user', content: q }]);
+  for (let i = 0; i < 6; i++) { const m = await OS.AI.free(msgs, { tools: fns, temp: .4 }), calls = m.tool_calls || [];
+    if (!calls.length) return String(m.content || '').trim();
+    msgs.push({ role: 'assistant', content: m.content || '', tool_calls: calls });
+    for (const c of calls) { const f = tools.find(t => t.name === (c.function || {}).name); let out; try { let a = {}; try { a = JSON.parse((c.function || {}).arguments || '{}'); } catch (e) { } out = f ? await f.run(a) : 'Ferramenta desconhecida.'; } catch (e) { out = 'Erro: ' + (e.message || 'falhou'); }
+      msgs.push({ role: 'tool', tool_call_id: c.id, content: String(out).slice(0, 6000) }); } }
+  return 'Fiz o que consegui, mas precisei de passos demais. Diz-me de outra forma.'; };
 B.ask = async q => { did.length = 0; const w = B.which(); if (!w) return { text: '', err: 'sem IA' };
   let text = '', err = '';
-  try { if (w === 'claude') { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })); text = await askClaude(q, hist); }
+  try { if (w === 'free') text = await askFree(q, H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })));
+    else if (w === 'claude') { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })); text = await askClaude(q, hist); }
     else { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); } }
   catch (e) { err = w === 'claude' ? await claudeErr(e) : (e.message || 'erro');
     // o Claude falhou: tenta com o Gemini grátis para não ficar sem resposta
-    if (w === 'claude' && OS.AI && OS.AI.key()) { try { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); err = ''; } catch (e2) { } } }
+    if (w === 'claude' && OS.AI && OS.AI.key()) { try { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); err = ''; } catch (e2) { } }
+    // o Google também não deu (cota esgotada, modelo desligado…): reserva grátis, sem esperar
+    if (!text && OS.AI.freeOn()) { try { did.length = 0; text = await askFree(q, H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t }))); err = ''; } catch (e3) { err = err || e3.message; } } }
   if (text) { H.push({ r: 'u', t: q }, { r: 'a', t: text }); if (H.length > 20) H.splice(0, H.length - 20); }
   return { text, err, did: did.slice(), brain: w }; };
 B.reset = () => { H.length = 0; };
@@ -9725,7 +9901,7 @@ function render() { if (!el) return; const o = D(), t = U.today(), urg = o.alert
       <section class="jv-core"><canvas class="jv-cv" width="520" height="520" aria-hidden="true"></canvas><div class="jv-hi">${esc(greet())}, ${esc(name())}</div>
         <div class="jv-meta"><span><i style="background:#38bdf8"></i>Dia ${Math.round(o.dayP * 100)}%</span><span><i style="background:#22c55e"></i>Hábitos ${o.hab[0]}/${o.hab[1]}</span><span><i style="background:#f59e0b"></i>Estudo ${o.study} min</span></div>
         <div class="jv-btns"><button class="btn pri" data-act="jvTalk">${UI.ic('mic')}Falar</button><button class="btn" data-act="jvSay" data-q="bom dia">Resumo</button><button class="btn" data-act="jvSay" data-q="modo estudo">Estudo</button><button class="btn" data-act="jvSay" data-q="boa noite">Boa noite</button></div></section>
-      ${card(1, 'Clima', wx)}${card(2, 'Agenda de hoje', ag, 'calendario')}${card(3, 'Prioridades', nx, 'next')}${card(4, 'Alertas', al, 'painel')}
+      ${card(1, 'Clima', wx)}${card(2, 'Agenda de hoje', ag, 'calendario')}${card(3, 'Prioridades', nx, 'next')}${card(4, 'Alertas', al, 'visao')}
       ${card(5, 'Finanças', fin, 'financas')}${card(6, 'Universidade', un, 'universidade')}${card(7, 'E-mail', ml, 'email')}${card(8, 'Hoje', `<div class="jv-kv"><span>Hábitos</span><b>${o.hab[0]}/${o.hab[1]}</b></div><div class="jv-bar"><i style="width:${o.hab[1] ? Math.round(o.hab[0] / o.hab[1] * 100) : 0}%"></i></div><div class="jv-kv"><span>Estudo</span><b>${o.study} min</b></div><div class="jv-kv"><span>Tarefas feitas</span><b>${o.doneT}</b></div>`, 'habitos')}
     </div>
     ${o.news.length ? `<div class="jv-news"><b>NOTÍCIAS</b><div class="jv-tk"><span class="jv-tr">${o.news.map(esc).join('<i></i>')}</span></div></div>` : ''}
@@ -10025,7 +10201,7 @@ V.trabalho = () => {
 
 /* ================= CARREIRA ================= */
 V.carreira = sub => {
-  const head = UI.head('Carreira & Networking', 'Candidaturas, entrevistas, rede de contactos, experiências e metas profissionais.', `${UI.addBtn('applications', 'Candidatura')}${UI.addBtn('contacts', 'Contacto', null, '')}`, 'Carreira') + UI.tabs('carreira', [['', 'Candidaturas'], ['rede', 'Networking'], ['experiencias', 'Experiências'], ['metas', 'Metas profissionais']], sub);
+  const head = UI.head('Carreira e contactos', 'Candidaturas, entrevistas, rede de contactos, experiências e metas profissionais.', `${UI.addBtn('applications', 'Candidatura')}${UI.addBtn('contacts', 'Contacto', null, '')}`, 'Carreira') + UI.tabs('carreira', [['', 'Candidaturas'], ['rede', 'Rede de contactos'], ['experiencias', 'Experiências'], ['metas', 'Metas profissionais']], sub);
   const t = U.today();
   if (sub === 'rede') {
     const Cn = OS.all('contacts'), act = Cn.filter(c => c.last && U.diff(t, c.last) <= 90), due = Cn.filter(c => c.next && c.next <= t);
@@ -10071,7 +10247,7 @@ V.oportunidades = () => {
   const open = O.filter(o => !['Aceite', 'Recusada', 'Perdida'].includes(o.status)), soon = open.filter(o => o.deadline && o.deadline >= t && U.diff(o.deadline, t) <= 14 && !['Submetida', 'Em avaliação'].includes(o.status));
   const ST = ['Identificada', 'A preparar', 'Submetida', 'Em avaliação', 'Aceite', 'Recusada', 'Perdida'];
   const kinds = [...new Set(O.map(o => o.kind).filter(Boolean))];
-  return UI.head('Opportunity Center', 'Cursos, certificações, eventos, palestras, programas da UA, estágios, empregos, competições, bolsas e oportunidades de negócio. Cada uma com prazo e próxima ação.', UI.addBtn('opps', 'Nova oportunidade'), 'Carreira') +
+  return UI.head('Centro de oportunidades', 'Cursos, certificações, eventos, palestras, programas da UA, estágios, empregos, competições, bolsas e oportunidades de negócio. Cada uma com prazo e próxima ação.', UI.addBtn('opps', 'Nova oportunidade'), 'Carreira') +
   `<div class="kpis">${UI.kpi('Abertas', open.length)}${UI.kpi('Prazo em 14 dias', soon.length, '', { tone: soon.length ? 'warn' : '' })}${UI.kpi('Submetidas', O.filter(o => ['Submetida', 'Em avaliação'].includes(o.status)).length)}${UI.kpi('Aceites', O.filter(o => o.status === 'Aceite').length, '', { tone: 'pos' })}${UI.kpi('Perdidas por prazo', O.filter(o => o.status === 'Perdida').length)}</div>
   ${kinds.length > 1 ? `<div class="row gap8">${UI.chip('Todas', 'oppK', !f, 'data-v=""')}${kinds.map(k => UI.chip(k, 'oppK', f === k, `data-v="${k}"`)).join('')}</div>` : ''}
   ${O.length ? `<div class="kan">${ST.map(s => { const it = U.sortBy(vis.filter(o => (o.status || 'Identificada') === s), o => o.deadline || '9'); return `<div class="kcol"><h4>${s}<span class="mono">${it.length}</span></h4>${it.map(o => { const d = o.deadline ? U.diff(o.deadline, t) : null; return `<div class="kcard" data-edit="opps:${o.id}"><span class="eyebrow">${esc(o.kind || '')}</span><b>${esc(o.name)}</b>${o.inst ? `<span class="mut" style="font-size:12px">${esc(o.inst)}</span>` : ''}<div class="meta">${o.deadline ? UI.badge(d < 0 ? 'prazo passou' : 'prazo ' + U.fmtDS(o.deadline), d != null && d >= 0 && d <= 7 ? 'neg' : d != null && d <= 21 && d >= 0 ? 'warn' : '') : ''}</div>${o.next ? `<span class="tx2" style="font-size:12px">→ ${esc(o.next)}</span>` : ''}${o.link ? `<a class="acc" style="font-size:12px" href="${esc(o.link)}" target="_blank" rel="noopener">abrir link</a>` : ''}</div>`; }).join('')}</div>`; }).join('')}</div>` : UI.empty('Regista a primeira oportunidade: programa de voluntariado da UA, estágio de verão, curso de Excel, bolsa, evento de networking em Aveiro…', UI.addBtn('opps', 'Adicionar oportunidade', null, ''))}`;
@@ -10129,7 +10305,7 @@ V.northstar = () => {
   const byH = {}; L.HORIZON.forEach(h => byH[h] = 0);
   done.forEach(x => { const g = OS.get('goals', x.goal) || OS.get('goals', (OS.get('projects', x.project) || {}).goal); if (g) byH[g.horizon] = (byH[g.horizon] || 0) + 1; });
   const mins = { 'Universidade': U.sum(OS.all('sessions').filter(s => s.date >= from && s.subject), s => s.minutes) / 60, 'Aprendizagem': U.sum(OS.all('sessions').filter(s => s.date >= from && s.skill), s => s.minutes) / 60, 'Treino': U.sum(OS.all('workouts').filter(w => w.date >= from), w => U.num(w.dur) || 60) / 60, 'Corrida': U.sum(OS.all('runs').filter(r => r.date >= from), r => U.parseDur(r.time)) / 3600, 'Trabalho': U.sum(OS.all('shifts').filter(s => s.date >= from), OS.Car.shiftHours) };
-  return UI.head('North Star', 'A tua direção. Tudo o que fazes deve empurrar pelo menos um destes horizontes. Em baixo, o sistema mostra se os últimos 30 dias estão alinhados.', '', 'Direção') +
+  return UI.head('Estrela-guia', 'A tua direção. Tudo o que fazes deve empurrar pelo menos um destes horizontes. Em baixo, o sistema mostra se os últimos 30 dias estão alinhados.', '', 'Direção') +
   `<div class="g g-main"><div class="col gap16">${H.map(([k, l, h]) => { const gs = OS.all('goals').filter(g => g.horizon === h && g.status === 'Ativa'); return `<div class="pn"><div class="pn-h"><h3>${l}</h3>${UI.addBtn('goals', 'Meta', { horizon: h }, 'ghost sm')}</div><div class="qa"><textarea aria-label="Visão a ${l}" data-bind="northstar.${k}" data-fk="ns${k}" placeholder="Onde queres estar daqui a ${l.toLowerCase()}?">${esc(ns[k])}</textarea></div>${gs.length ? `<div style="margin-top:10px">${gs.map(g => { const i = Goal.info(g); return `<div class="bar-row" style="grid-template-columns:minmax(120px,1fr) 140px 60px;cursor:pointer" data-edit="goals:${g.id}"><span class="l">${esc(g.title)}</span>${UI.bar(i.p, i.p >= 1 ? 'pos' : i.behind ? 'warn' : '', i.exp)}<span class="v">${Math.round(i.p * 100)}%</span></div>`; }).join('')}</div>` : ''}</div>`; }).join('')}</div>
   <div class="col gap16"><div class="pn"><div class="pn-h"><h3>${UI.ic('compass')}Alinhamento · 30 dias</h3></div>
     <div class="big-num">${done.length ? U.pct(linked.length / done.length) : '—'}</div><div class="mut" style="font-size:12.5px;margin-bottom:12px">das ${done.length} tarefas concluídas estavam ligadas a uma meta ou projeto</div>
@@ -10157,7 +10333,7 @@ V.roadmap = () => {
       ${(g.steps || []).map(s => `<div class="tree-it"><span class="k">Etapa</span><span style="${s.done ? 'text-decoration:line-through;color:var(--mut)' : ''}">${esc(s.t)}</span></div>`).join('')}
       ${ts.slice(0, 5).map(x => `<div class="tree-it"><span class="k">Tarefa</span>${esc(x.title)}</div>`).join('')}
       <div class="tree-it"><span class="k">Indicador</span>${Goal.fmt(g, i.cur)} de ${Goal.fmt(g, i.tgt)}</div></div></div></div>`; }).join('');
-  return UI.head('Roadmap da vida', 'Os teus objetivos, projetos e marcos no tempo. Tudo editável: clica em qualquer elemento.', `${UI.addBtn('milestones', 'Marco')}${UI.addBtn('goals', 'Objetivo', null, '')}`, 'Direção') +
+  return UI.head('Roteiro da vida', 'Os teus objetivos, projetos e marcos no tempo. Tudo editável: clica em qualquer elemento.', `${UI.addBtn('milestones', 'Marco')}${UI.addBtn('goals', 'Objetivo', null, '')}`, 'Direção') +
   `<div class="row between gap8">${UI.seg('rmH', [['curto', 'Curto prazo · 3 meses'], ['medio', 'Médio · 1 ano'], ['longo', 'Longo · 5 anos']], hz)}<div class="legend" style="margin:0"><span><i style="background:var(--c8)"></i>Metas</span><span><i style="background:var(--c2)"></i>Projetos</span><span><i style="background:var(--warn)"></i>Marcos</span></div></div>
   ${lanes.length ? `<div class="road"><div class="road-in"><div class="road-lane" style="min-height:0"><div class="lname"></div><div class="road-axis" style="position:relative">${ticks.map(tk => `<div style="position:absolute;left:${X(tk)}%;border-left:1px solid var(--line);padding:6px 6px;font:11px var(--mono);color:var(--mut)">${U.fmtYM(U.ym(tk))}</div>`).join('')}<div style="height:28px"></div></div></div>
     ${lanes.map(l => `<div class="road-lane"><div class="lname">${esc(l)}</div><div class="ltrack" style="min-height:${Math.max(52, 40 * (goals.filter(g => g.cat === l).length + projs.filter(p => 'Projetos · ' + p.type === l).length + (l === 'Marcos' ? 1 : 0)) + 12)}px"><div class="road-today" style="left:${X(t)}%"></div>
@@ -10176,7 +10352,7 @@ V.longterm = () => {
   const hoursAll = U.sum(OS.all('sessions'), s => s.minutes) / 60, km = U.sum(OS.all('runs'), r2 => r2.km), wk = OS.all('workouts').length, tasks = OS.all('tasks').filter(x => x.status === 'Feita').length, books = OS.all('learn').filter(l => l.kind === 'Livro' && l.status === 'Concluído').length, inv = OS.Inv.cost();
   const done = U.sortBy([...OS.all('goals').filter(g => g.status === 'Concluída').map(g => ({ d: g.due || U.iso(new Date(g._u)), t: g.title, k: 'Meta' })), ...OS.all('milestones').filter(m => m.done || m.date <= t).map(m => ({ d: m.date, t: m.title, k: m.kind }))], x => x.d, -1);
   const cap = OS.Car.capital(), cap1y = OS.Car.capital(U.addDays(t, -365));
-  return UI.head('Long Term', 'A visão de longo prazo para não te perderes no dia a dia: patrimônio, educação, carreira, grandes metas e tudo o que já acumulaste.', '', 'Direção') +
+  return UI.head('Longo prazo', 'A visão de longo prazo para não te perderes no dia a dia: patrimônio, educação, carreira, grandes metas e tudo o que já acumulaste.', '', 'Direção') +
   `<div class="kpis">${UI.kpi('Horas de estudo', U.nf(hoursAll, 0) + ' h', 'desde sempre')}${UI.kpi('Km corridos', U.nf(km, 0))}${UI.kpi('Treinos', wk)}${UI.kpi('Tarefas concluídas', tasks)}${UI.kpi('Livros lidos', books)}${UI.kpi('Capital investido', U.eur(inv, { dec: 0 }))}</div>
   <div class="g g2"><div class="pn"><div class="pn-h"><h3>Patrimônio · projeção <span class="est">estimativa</span></h3></div>${C.mount({ type: 'bar', labels: ['hoje', '1 ano', '2 anos', '3 anos', '5 anos', '10 anos'], series: [{ name: 'Patrimônio', data: proj, color: 'var(--c2)' }], fmt: U.eurK }, 220)}<div class="note">Premissas: continuas a poupar ${U.eur(Math.max(0, mn))}/mês (saldo médio atual${pr.hasHist ? ' dos últimos 3 meses' : ', estimado pelas recorrentes'}) e o patrimônio rende 5% ao ano. Muda o ritmo e esta curva muda.</div></div>
   <div class="pn"><div class="pn-h"><h3>Educação</h3></div><div class="big-num">${ects}<span class="mut" style="font-size:16px"> / ${tot} ECTS</span></div>${UI.bar(ects / tot, 'pos')}<dl class="kv" style="margin-top:14px"><dt>Universidade</dt><dd>${esc(p.uni || '—')}</dd><dt>Média</dt><dd>${OS.St.gpa() || '—'}</dd><dt>Semestres restantes (a 30 ECTS)</dt><dd>${semsLeft}</dd><dt>Competências em trilha</dt><dd>${OS.all('skills').length}</dd><dt>Certificações</dt><dd>${OS.all('learn').filter(l => l.kind === 'Certificação' && l.status === 'Concluído').length}</dd></dl></div></div>
@@ -10191,7 +10367,7 @@ const ALPHA = ['Estou a decidir com base em emoção?', 'Estou a considerar o lo
 const alphaRes = (a, cost) => { const v = [0, 1, 2, 3, 4].map(i => (a || {})['q' + i]); if (v.some(x => !x)) return ['Responde às 5 perguntas', '']; if (U.num(cost) > 50 && v[0] === 'Sim' || U.num(cost) > 50 && v.slice(1).includes('Não')) return ['Esperar 3 dias', 'neg']; if (v[0] === 'Sim' || v.slice(1).includes('Não')) return ['Esperar 24 h', 'warn']; return ['Filtro passado', 'pos']; };
 V.decisoes = () => {
   const D = U.sortBy(OS.all('decisions'), d => (d.status === 'Em análise' ? '0' : '1') + (d.deadline || '9'));
-  return UI.head('Decision Center', 'Organiza decisões importantes: alternativas, custos, riscos e impacto nos teus objetivos, lado a lado. A decisão continua a ser tua.', UI.addBtn('decisions', 'Nova decisão'), 'Direção') +
+  return UI.head('Centro de decisões', 'Organiza decisões importantes: alternativas, custos, riscos e impacto nos teus objetivos, lado a lado. A decisão continua a ser tua.', UI.addBtn('decisions', 'Nova decisão'), 'Direção') +
   (D.length ? `<div class="g g2">${D.map(d => { const ar = alphaRes(d.alpha, Math.max(0, ...(d.alts || []).map(a => U.num(a.cost)))); return `<div class="pn click" data-act="decOpen" data-id="${d.id}" style="cursor:pointer"><div class="row between gap8"><span class="eyebrow">${esc(d.status)}${d.deadline ? ' · decidir até ' + U.fmtDS(d.deadline) : ''}</span>${UI.badge(ar[0], ar[1])}</div><div style="font-size:16px;font-weight:600;margin:4px 0 6px">${esc(d.title)}</div>${d.context ? `<div class="tx2" style="font-size:13px">${esc(d.context)}</div>` : ''}<div class="row gap4" style="margin-top:10px">${(d.alts || []).map(a => UI.badge(a.name || 'Alternativa', d.chosen === a.name ? 'pos' : 'out')).join('')}</div>${d.ai && d.ai.r && d.ai.r.inclinacao && d.ai.r.inclinacao.nome ? `<div class="dc-lean"><span class="ai-orb sm" aria-hidden="true"></span>Spyke: os dados apontam para <b>${esc(d.ai.r.inclinacao.nome)}</b></div>` : ''}</div>`; }).join('')}</div>` : UI.empty('Quando tiveres uma decisão importante (curso, emprego, compra grande, investimento, mudança), estrutura-a aqui.', UI.addBtn('decisions', 'Criar decisão', null, '')));
 };
 A.decOpen = b => decDrawer(b.dataset.id);
@@ -10371,6 +10547,112 @@ A.exportData = async () => { const name = 'oceanum-' + U.today() + '.json', txt 
   let dl = null; try { dl = window.claude && await window.claude.use('downloads'); } catch (e) { } if (!dl) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(OS.exportAll())], { type: 'application/json' })); a.download = 'oceanum-' + U.today() + '.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); UI.toast('Cópia exportada', 'pos'); } catch (e) { UI.toast('Exportação indisponível nesta vista', 'warn'); } return; } try { await dl.save({ filename: 'oceanum-' + U.today() + '.json', data: JSON.stringify(OS.exportAll()) }); UI.toast('Cópia exportada', 'pos'); } catch (e) { UI.toast('Exportação cancelada'); } };
 A.wipeData = () => UI.ask('Apagar todos os dados?', 'Tudo o que registaste no Oceanum é apagado em todos os dispositivos. Exporta uma cópia antes.', 'Apagar tudo', () => { Object.keys(OS.D).forEach(c => { [...OS.all(c)].forEach(r => OS.del(c, r.id)); }); Object.keys(OS.ONE).forEach(k => { OS.ONE[k] = U.clone(OS.ONE_DEF[k] || {}); OS.touch(k); }); UI.toast('Dados apagados'); });
 document.addEventListener('change', e => { if (e.target.id !== 'impData' || !e.target.files[0]) return; const fr = new FileReader(); fr.onload = () => { try { OS.importAll(JSON.parse(fr.result)); UI.toast('Cópia importada', 'pos'); } catch (er) { UI.toast('Ficheiro inválido: escolhe um .json exportado do Oceanum', 'neg'); } }; fr.readAsText(e.target.files[0]); });
+})();
+
+</script>
+<script>
+/* OCEANUM — Próximos passos: o plano da tua vida inteira, do passo mais pequeno ao maior, por área.
+   Junta tudo o que a app sabe: estrela-guia, metas (e as etapas de cada uma), marcos, projetos, tarefas, hábitos,
+   estudos e avaliações, treino e corrida, dinheiro (contas, poupança, dívidas), carreira e oportunidades.
+   A "Próxima ação agora" (o que fazer neste minuto, com filtros de sítio, tempo e energia) continua numa aba. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc, I = OS.Intel, Fin = OS.Fin, Goal = OS.Goal, St = OS.St, Run = OS.Run, Hab = OS.Hab;
+OS.ONE_DEF.lifeplan = { at: 0, foco: '', steps: [] };
+const agora = V.next; // a lista de sempre: o que fazer agora
+// áreas da vida: [chave, nome, ícone, categorias de metas, áreas de tarefas]
+const CATS = [
+  ['estudos', 'Estudos', 'school', ['Estudos'], ['Universidade', 'Aprendizagem']],
+  ['dinheiro', 'Dinheiro', 'wallet', ['Finanças'], ['Finanças', 'Investimentos']],
+  ['corpo', 'Corpo e saúde', 'heart', ['Academia', 'Corrida'], ['Treino', 'Corrida', 'Saúde']],
+  ['carreira', 'Carreira e trabalho', 'briefcase', ['Trabalho', 'Empresa'], ['Trabalho', 'Carreira', 'Mova']],
+  ['pessoal', 'Pessoal e fé', 'user', ['Desenvolvimento pessoal', 'Outros'], ['Pessoal', 'Fé', 'Casa', 'Projetos']]];
+const LV = { 1: ['Hoje', 'passo pequeno'], 2: ['Esta semana', 'passo médio'], 3: ['Este mês', 'passo grande'], 4: ['Este ano', 'grande objetivo'], 5: ['Longo prazo', 'a visão'] };
+const byGoal = g => (CATS.find(c => c[3].includes(g.cat)) || CATS[4])[0];
+const byArea = a => (CATS.find(c => c[4].includes(a)) || [])[0] || '';
+const KIND = { Estudo: 'estudos', Treino: 'corpo', Corrida: 'corpo', Pagamento: 'dinheiro', 'Decisão': 'dinheiro', Oportunidade: 'carreira', Contactos: 'carreira', 'Hábito': 'pessoal', 'Revisão': 'pessoal' };
+const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
+
+/* ---------- os passos (calculados a partir dos dados) ---------- */
+const build = () => { const t = U.today(), p = OS.one('profile'), wk = U.monday(t), we = U.addDays(wk, 6), ym = U.ym(t), out = { estudos: [], dinheiro: [], corpo: [], carreira: [], pessoal: [] }, urg = { estudos: 0, dinheiro: 0, corpo: 0, carreira: 0, pessoal: 0 };
+  const seenT = new Set(), key = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const add = (c, lv, t2, o = {}) => { if (!out[c]) c = 'pessoal'; const k = key(t2); if (lv < 4 && seenT.has(k)) return; seenT.add(k); out[c].push(Object.assign({ lv, t: t2 }, o)); if (o.tone === 'neg') urg[c]++; };
+  const goals = OS.all('goals').filter(g => g.status === 'Ativa');
+  const catOfTask = x => { const g = OS.get('goals', x.goal); return g ? byGoal(g) : byArea(x.area) || 'pessoal'; };
+  // 1 · hoje: a próxima ação de cada área (a mesma pontuação da "Próxima ação")
+  const seen = {}; safe(() => I.next(), []).forEach(n => { const c = byArea(n.area) || KIND[n.kind] || 'pessoal'; seen[c] = (seen[c] || 0) + 1; if (seen[c] > 3) return;
+    add(c, 1, n.title, { why: n.why.slice(0, 2).join(' · '), edit: n.edit, act: n.act, actL: n.actL, href: n.href }); });
+  // 2 · esta semana
+  OS.Tasks.open().filter(x => { const d = x.due || x.sched; return d && d > t && d <= we; }).slice(0, 30).forEach(x => add(catOfTask(x), 2, x.title, { why: 'prazo ' + U.rel(x.due || x.sched), edit: 'tasks:' + x.id }));
+  safe(() => { const done = St.weekMins(wk) / 60, tgt = St.targetWeek(); if (tgt && done < tgt) add('estudos', 2, `Estudar mais ${U.nf(tgt - done, 1)} h até domingo`, { why: `levas ${U.nf(done, 1)} de ${tgt} h esta semana`, href: '#universidade' }); });
+  OS.all('assessments').filter(a => a.date >= t && a.date <= U.addDays(t, 7) && a.prep !== 'Feito').forEach(a => add('estudos', 2, 'Preparar ' + a.title, { why: (a.type || 'avaliação') + ' ' + U.rel(a.date), tone: U.diff(a.date, t) <= 2 ? 'neg' : '', edit: 'assessments:' + a.id }));
+  safe(() => { const n = OS.all('workouts').filter(w => w.date >= wk && w.date <= t).length, tg = U.num(p.trainTarget) || 4; if (n < tg) add('corpo', 2, `Fazer mais ${tg - n} treino${tg - n > 1 ? 's' : ''} esta semana`, { why: `${n} de ${tg} feitos`, href: '#treino' }); });
+  safe(() => { const km = Run.kmIn(wk, t), tg = U.num(p.runKmTarget); if (tg && km < tg) add('corpo', 2, `Correr mais ${U.nf(tg - km, 1)} km esta semana`, { why: `${U.nf(km, 1)} de ${tg} km`, href: '#corrida' }); });
+  safe(() => Fin.upcoming(7).filter(x => x.amount < 0).slice(0, 4).forEach(x => add('dinheiro', 2, 'Pagar ' + x.title + ' · ' + U.eur(-x.amount), { why: x.late ? 'em atraso' : 'vence ' + U.rel(x.date), tone: x.late ? 'neg' : '', href: '#financas.recorrentes' })));
+  OS.all('opps').filter(o => o.deadline && o.deadline >= t && o.deadline <= U.addDays(t, 7) && !['Aceite', 'Recusada', 'Perdida', 'Submetida'].includes(o.status)).forEach(o => add('carreira', 2, (o.next || 'Avançar') + ': ' + o.name, { why: 'prazo ' + U.rel(o.deadline), edit: 'opps:' + o.id }));
+  OS.all('habits').filter(h => h.active && h.core).slice(0, 3).forEach(h => add(byArea(h.area) || 'pessoal', 2, 'Cumprir "' + h.name + '" todos os dias', { why: 'sequência de ' + safe(() => Hab.streak(h), 0) + ' dias', href: '#habitos' }));
+  // 3 · este mês: a próxima etapa de cada meta, o ritmo necessário, projetos e avaliações
+  goals.forEach(g => { const i = safe(() => Goal.info(g), null); if (!i) return; const c = byGoal(g), step = (g.steps || []).find(s => !s.done);
+    if (step) add(c, 3, step.t, { why: 'etapa da meta "' + g.title + '"', goal: g.title, edit: 'goals:' + g.id });
+    if (g.due && g.metric !== 'steps' && i.tgt != null && i.cur != null && i.p < 1) { const months = Math.max(1, U.diff(g.due, t) / 30.4), rest = Goal.lower(g) ? i.cur - i.tgt : i.tgt - i.cur;
+      if (rest > 0) add(c, 3, `${g.title}: avançar ${Goal.fmt(g, rest / months)} este mês`, { why: `para chegar a ${Goal.fmt(g, i.tgt)} até ${U.fmtDS(g.due)}${i.behind ? ' · estás atrás do ritmo' : ''}`, tone: i.late || i.behind ? 'neg' : '', goal: g.title, edit: 'goals:' + g.id }); } });
+  OS.all('projects').filter(x => x.status === 'Em andamento').slice(0, 8).forEach(x => { const nx = OS.Tasks.open().filter(k => k.project === x.id).sort((a, b) => (a.due || '9') < (b.due || '9') ? -1 : 1)[0], g = OS.get('goals', x.goal);
+    add(g ? byGoal(g) : ['Profissional', 'Empresarial'].includes(x.type) || x.area === 'Trabalho' ? 'carreira' : x.type === 'Académico' ? 'estudos' : 'pessoal', 3, nx ? `${x.name}: ${nx.title}` : `${x.name}: definir a próxima tarefa`, { why: 'projeto em andamento', edit: nx ? 'tasks:' + nx.id : 'projects:' + x.id }); });
+  OS.all('assessments').filter(a => a.date > U.addDays(t, 7) && a.date <= U.addDays(t, 31) && a.prep !== 'Feito').forEach(a => add('estudos', 3, 'Começar a preparar ' + a.title, { why: (a.type || 'avaliação') + ' a ' + U.fmtDS(a.date), edit: 'assessments:' + a.id }));
+  safe(() => { const m = Fin.month(ym), tg = (U.num(p.savingsTarget) || 20) / 100; if (m.inc > 0) { const want = m.inc * tg, have = m.inc - m.exp; if (have < want) add('dinheiro', 3, `Poupar mais ${U.eur(want - have, { dec: 0 })} este mês`, { why: `alvo de ${Math.round(tg * 100)}% das receitas`, tone: have < 0 ? 'neg' : '', href: '#financas' }); } });
+  safe(() => OS.all('debts').filter(d => Fin.debtBal(d) > 0).slice(0, 2).forEach(d => add('dinheiro', 3, 'Abater a dívida ' + (d.name || d.title || ''), { why: 'falta ' + U.eur(Fin.debtBal(d), { dec: 0 }), edit: 'debts:' + d.id })));
+  OS.all('milestones').filter(m => !m.done && m.date >= t && m.date <= U.addDays(t, 31)).forEach(m => add(byArea(m.area) || 'pessoal', 3, '◆ ' + m.title, { why: 'marco a ' + U.fmtDS(m.date), edit: 'milestones:' + m.id }));
+  // 4 · este ano e 5 · longo prazo: as metas grandes e os marcos
+  goals.forEach(g => { const i = safe(() => Goal.info(g), null); if (!i) return; const lv = ['3 anos', '5 anos', 'Longo prazo'].includes(g.horizon) ? 5 : 4;
+    add(byGoal(g), lv, g.title, { why: `${Math.round(i.p * 100)}% feito${g.due ? ' · prazo ' + U.fmtDS(g.due) : ''} · ${i.st[0]}`, tone: i.late ? 'neg' : '', edit: 'goals:' + g.id, goal: g.title }); });
+  OS.all('milestones').filter(m => !m.done && m.date > U.addDays(t, 31) && m.date <= U.addDays(t, 366)).forEach(m => add(byArea(m.area) || 'pessoal', 4, '◆ ' + m.title, { why: 'marco a ' + U.fmtDS(m.date), edit: 'milestones:' + m.id }));
+  safe(() => { const tot = U.num(p.ectsTotal) || 180, done = OS.St.ectsDone(); if (done < tot) add('estudos', 5, `Terminar o curso: faltam ${tot - done} ECTS`, { why: `cerca de ${Math.ceil((tot - done) / 60)} ano(s) letivo(s)`, href: '#universidade' }); });
+  // sugestões do Spyke (IA), guardadas
+  (OS.one('lifeplan').steps || []).forEach(s => { if (out[s.cat] && s.t) add(s.cat, Math.min(5, Math.max(1, +s.lvl || 3)), s.t, { why: s.why || '', ai: 1 }); });
+  Object.keys(out).forEach(c => out[c].sort((a, b) => a.lv - b.lv));
+  return { out, urg }; };
+OS.LifePlan = { build, CATS };
+
+/* ---------- ecrã ---------- */
+const ns = () => { const n = OS.one('northstar'); return [['Quem quero ser', n.identity], ['Daqui a 1 ano', n.h1y], ['Daqui a 3 anos', n.h3y], ['Daqui a 5 anos', n.h5y], ['A visão', n.hlong]].filter(x => String(x[1] || '').trim()); };
+let busy = false;
+const plano = () => { const { out, urg } = build(), lp = OS.one('lifeplan'), f = OS.ui.lpCat || '', star = ns(), order = CATS.slice().sort((a, b) => (urg[b[0]] - urg[a[0]]) || (out[b[0]].length - out[a[0]].length));
+  const total = Object.values(out).reduce((s, l) => s + l.length, 0);
+  const row = (s, c) => `<div class="lp-st lv${s.lv} ${s.tone || ''} ${s.ai ? 'ai' : ''}"><i class="lp-dot" aria-hidden="true"></i><div class="lp-tx ${s.edit || s.href ? 'click' : ''}" ${s.edit ? `data-edit="${s.edit}"` : s.href ? `data-go="${esc(s.href.slice(1))}"` : ''}><b>${s.ai ? '✦ ' : ''}${esc(s.t)}</b>${s.why ? `<small>${esc(s.why)}</small>` : ''}</div>
+    <div class="lp-a">${s.act ? `<button class="btn xs" ${s.act}>${esc(s.actL || 'Feito')}</button>` : ''}${!s.edit && !s.act ? `<button class="btn xs ghost" data-act="lpTask" data-c="${c}" data-t="${esc(s.t)}" title="Transformar em tarefa">${UI.ic('plus')}Tarefa</button>` : ''}</div></div>`;
+  const card = ([k, name, ic]) => { const L = out[k]; if (f && f !== k) return '';
+    return `<section class="pn lp-c" data-cat="${k}"><div class="pn-h"><h3>${UI.ic(ic)}${name}</h3><span class="mut" style="font-size:12px">${L.length} passo${L.length === 1 ? '' : 's'}${urg[k] ? ` · <span class="neg">${urg[k]} urgente${urg[k] > 1 ? 's' : ''}</span>` : ''}</span></div>
+      ${L.length ? [1, 2, 3, 4, 5].map(lv => { const S = L.filter(s => s.lv === lv); return S.length ? `<div class="lp-lv"><div class="lp-lh"><span>${lv}</span><b>${LV[lv][0]}</b><small>${LV[lv][1]}</small></div>${S.slice(0, lv === 1 ? 3 : 6).map(s => row(s, k)).join('')}</div>` : ''; }).join('')
+        : `<p class="mut" style="margin:6px 0">Ainda não há nada para ${name.toLowerCase()}. Cria uma meta e a app desenha os passos.</p>`}
+      <div class="row gap8" style="margin-top:8px">${UI.addBtn('goals', 'Meta em ' + name.toLowerCase(), { cat: (CATS.find(c => c[0] === k) || [])[3][0], horizon: '1 ano' }, 'ghost sm')}</div></section>`; };
+  return `${star.length ? `<div class="pn lp-star"><div class="eyebrow">A tua estrela-guia</div>${star.map(([l, v]) => `<div class="lp-sv"><small>${l}</small><b>${esc(v)}</b></div>`).join('')}<a class="more" href="#northstar">Editar ${UI.ic('right')}</a></div>`
+      : `<div class="pn lp-star"><b>Define a tua estrela-guia</b><p class="mut" style="margin:4px 0 8px">Quem queres ser e onde queres estar daqui a 1, 3 e 5 anos. Os passos ficam alinhados com isso.</p><a class="btn sm pri" href="#northstar">Definir agora</a></div>`}
+    <div class="pn lp-ai"><div class="row between gap8" style="flex-wrap:wrap"><div><b>Plano do Spyke</b><small class="mut" style="display:block">${lp.at ? 'Feito ' + U.rel(U.iso(new Date(lp.at))) + '. ' : ''}O Spyke lê toda a tua vida na app (metas, estudos, dinheiro, corpo, carreira) e sugere os passos que faltam, do pequeno ao grande.</small></div><button class="btn sm pri" data-act="lpAI" ${busy ? 'disabled' : ''}>${busy ? 'A pensar…' : lp.at ? 'Atualizar plano' : 'Pedir plano ao Spyke'}</button></div>${lp.foco ? `<p class="lp-foco">${esc(lp.foco)}</p>` : ''}</div>
+    <div class="row gap8" style="flex-wrap:wrap;margin:4px 0 12px">${UI.chip('Todas · ' + total, 'lpCat', !f, 'data-v=""')}${order.map(([k, n]) => UI.chip(n + ' · ' + out[k].length, 'lpCat', f === k, `data-v="${k}"`)).join('')}</div>
+    <div class="lp-g">${order.map(card).join('')}</div>`; };
+const TB = [['', 'Plano da vida'], ['agora', 'Agora']];
+V.next = sub => { const k = sub === 'agora' ? 'agora' : '';
+  const head = UI.head('Próximos passos', 'O caminho da tua vida, por áreas: do passo mais pequeno (hoje) ao maior (longo prazo), ligado às tuas metas e a tudo o que registas na app.', '', 'Direção') + UI.tabs('next', TB, k);
+  if (k === 'agora') { const h = agora ? agora(sub) : ''; return head + h.replace(/^[\s\S]*?<\/header>/, ''); }
+  return head + plano(); };
+A.lpCat = b => OS.setUI('lpCat', b.dataset.v);
+A.lpTask = b => { const c = CATS.find(x => x[0] === b.dataset.c) || CATS[4]; OS.add('tasks', { title: b.dataset.t, status: 'Próxima', area: c[4][0] }); UI.toast('Tarefa criada', 'pos'); };
+// plano pela IA (Google; se não der, a IA grátis de reserva)
+const ctx = () => { const { out } = build(), n = OS.one('northstar'), p = OS.one('profile');
+  return JSON.stringify({ hoje: U.today(), estrela: { identidade: n.identity, ano1: n.h1y, anos3: n.h3y, anos5: n.h5y, visao: n.hlong, valores: n.values },
+    metas: OS.all('goals').filter(g => g.status === 'Ativa').slice(0, 25).map(g => { const i = safe(() => Goal.info(g), {}); return { titulo: g.title, area: byGoal(g), horizonte: g.horizon, prazo: g.due, progresso: Math.round((i.p || 0) * 100) + '%', etapas_por_fazer: (g.steps || []).filter(s => !s.done).map(s => s.t).slice(0, 6), porque: g.why }; }),
+    passos_atuais: Object.fromEntries(Object.entries(out).map(([k, L]) => [k, L.filter(s => !s.ai).slice(0, 10).map(s => ({ nivel: s.lv, passo: s.t }))])),
+    perfil: { curso: p.course || p.uni, trabalho: p.employer, cidade: 'Aveiro' } }).slice(0, 12000); };
+A.lpAI = async () => { if (busy) return; busy = true; OS.request();
+  try { const o = await OS.AI.json([{ text: `És o Spyke, o mentor pessoal do Ryan (brasileiro, vive em Aveiro, estuda, trabalha e investe). Com base nos dados reais abaixo, cria o plano de próximos passos da vida dele para alcançar as metas e a estrela-guia.
+Regras: para cada área (estudos, dinheiro, corpo, carreira, pessoal) dá 3 a 6 passos NOVOS (não repitas os "passos_atuais"), do mais pequeno ao maior, concretos e acionáveis, em português de Portugal. Nível: 1 = hoje (pequeno), 2 = esta semana, 3 = este mês, 4 = este ano, 5 = longo prazo. Se uma área não tiver metas, sugere passos para começar.
+Responde APENAS JSON: {"foco":"1 frase: o que mais importa agora","passos":[{"area":"estudos|dinheiro|corpo|carreira|pessoal","nivel":1,"passo":"…","porque":"ligação à meta ou à visão (curto)"}]}
+DADOS: ${ctx()}` }], .4);
+    const steps = (o.passos || []).filter(s => s && s.passo && CATS.some(c => c[0] === s.area)).slice(0, 40).map(s => ({ cat: s.area, lvl: Math.min(5, Math.max(1, +s.nivel || 3)), t: String(s.passo).slice(0, 160), why: String(s.porque || '').slice(0, 160) }));
+    if (!steps.length) throw new Error('a IA não devolveu passos');
+    OS.setOne('lifeplan', { at: Date.now(), foco: String(o.foco || '').slice(0, 220), steps }); UI.toast('Plano atualizado pelo Spyke', 'pos'); }
+  catch (e) { UI.toast('Não consegui fazer o plano agora: ' + (e.message || 'erro'), 'warn'); }
+  busy = false; OS.request(); };
 })();
 
 </script>
@@ -11903,7 +12185,7 @@ const AI = OS.AI = {};
 AI.key = () => OS.one('diet').aiKey || '';
 /* A IA do OCEANUM é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
    universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio (página do Spyke) ou em qualquer cartão abaixo. */
-AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Decision Center)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
+AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Centro de decisões)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
 const STEPS = `<ol class="ai-steps"><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em <b>Ligar</b>.</li></ol>`;
 const FORM = act => `<div class="row gap8 ai-row"><input class="field grow" data-aikey placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Ligar</button></div>`;
 const moved = () => OS.Move && !OS.Move.isOld && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
@@ -11914,38 +12196,81 @@ AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" ar
 AI.panel = () => { const k = AI.key(), st = U.ls.get('os2aiOk', null);
   return `<div class="pn" id="spyBrain"><div class="pn-h"><h3>Cérebro do Spyke (IA)</h3><span class="bdg ${k ? (st && st.ok === false ? 'neg' : 'pos') : ''}">${k ? (st && st.ok === false ? 'chave com problema' : 'ligado') : 'desligado'}</span></div>
     <p class="mut" style="margin:0 0 8px;font-size:13px">Uma só ligação para a app inteira: ${AI.uses.join(', ')}.</p>
+    <div class="ai-eng"><b>Sem limites e sem pagar:</b> a app usa os modelos mais recentes do Google (descobertos sozinhos: ${esc(MODELS.slice(0, 3).join(', '))}${MODELS.length > 3 ? '…' : ''}) e, quando a cota grátis de um acaba, passa logo ao seguinte. Se todos acabarem, responde a <b>IA grátis de reserva</b> (modelo aberto GPT-OSS, sem chave).${AI.lastEngine ? ` <small class="mut">Última resposta: ${esc(AI.lastEngine === 'reserva' ? 'IA de reserva' : AI.lastEngine)}.</small>` : ''}
+      <label class="ai-free"><input type="checkbox" data-act="aiFreeTg" ${AI.freeOn() ? 'checked' : ''}> Usar a IA grátis de reserva quando o Google não responder <small class="mut">(o texto do pedido vai para a Pollinations; fotos e e-mails só pelo Google)</small></label></div>
     ${k ? `<div class="row gap8" style="flex-wrap:wrap"><code class="ai-k">${'•'.repeat(8) + esc(k.slice(-4))}</code><button class="btn sm" data-act="aiTest">${UI.ic('zap')}Testar</button><button class="btn sm ghost" data-act="aiChange">Mudar a chave</button><button class="btn sm ghost" data-act="dietAiOff">Desligar</button></div>${st && st.ok === false ? `<p class="neg" style="font-size:12.5px;margin:8px 0 0">${esc(st.msg || '')}</p>` : ''}${OS.ui.aiChg ? FORM('') : ''}`
       : `${STEPS}${FORM('')}${moved()}`}</div>`; };
 A.aiChange = () => { OS.ui.aiChg = !OS.ui.aiChg; OS.request(); };
+A.aiFreeTg = b => { OS.setOne('diet', { freeAI: !!b.checked }); UI.toast(b.checked ? 'IA de reserva ligada: a IA nunca fica parada' : 'IA de reserva desligada', b.checked ? 'pos' : ''); };
 AI.test = async () => { const k = AI.key(); if (!k) return { ok: false, msg: 'Sem chave.' };
   try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=5&key=${encodeURIComponent(k)}`), j = await r.json().catch(() => ({}));
     const o = r.ok ? { ok: true } : { ok: false, msg: /API key not valid|API_KEY_INVALID/i.test((j.error && j.error.message) || '') || r.status === 400 ? 'A chave não é válida: volta a copiá-la em aistudio.google.com/apikey.' : 'O Google respondeu com erro ' + r.status + '.' };
-    U.ls.set('os2aiOk', Object.assign({ at: Date.now() }, o)); return o; } catch (e) { return { ok: null, msg: 'Sem internet para testar agora.' }; } };
+    U.ls.set('os2aiOk', Object.assign({ at: Date.now() }, o)); if (o.ok) AI.discover(true); return o; } catch (e) { return { ok: null, msg: 'Sem internet para testar agora.' }; } };
 A.aiTest = async () => { UI.toast('A testar…'); const o = await AI.test(); UI.toast(o.ok ? 'O Spyke está ligado e a funcionar' : o.msg, o.ok ? 'pos' : 'warn'); OS.request(); };
 A.aiKeySave = b => { const box = b.closest('.ai-row') || document, inp = box.querySelector('[data-aikey]') || document.getElementById('aiKeyIn'), v = ((inp || {}).value || '').trim().replace(/^['"]|['"]$/g, '');
   if (v.length < 20) { UI.toast('Esta chave parece incompleta', 'warn'); return; } OS.setOne('diet', { aiKey: v }); OS.ui.aiChg = false; U.ls.del('os2aiOk'); UI.toast('Spyke ligado: a IA já funciona em toda a app', 'pos'); OS.emit('ai:on');
   AI.test().then(o => { if (o.ok === false) UI.toast(o.msg, 'warn'); OS.request(); });
   if (b.dataset.next && A[b.dataset.next]) A[b.dataset.next](b); else OS.request(); };
-/* Limite grátis: o Google dá uma cota por modelo (por minuto e por dia). Quando um modelo esgota, passa-se ao seguinte
-   e fica anotado até ao dia seguinte (a cota diária renova à meia-noite da Califórnia). Assim o uso grátis multiplica-se. */
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemma-3-27b-it', 'gemma-3-12b-it'];
+/* IA sem parar:
+   1) Os modelos do Google mudam (o Google desliga os antigos, ex.: gemini-2.0): a app pergunta ao Google, com a tua chave,
+      que modelos existem hoje e usa os mais recentes. Nunca mais fica presa num modelo desligado.
+   2) Cada modelo tem a sua cota grátis (por minuto e por dia): quando um esgota, passa logo ao seguinte, sem esperar.
+   3) Se todos os do Google estiverem esgotados (ou sem chave), usa uma IA grátis e sem chave (Pollinations, modelo aberto GPT-OSS). */
+const FALLBACK = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemma-3-27b-it', 'gemma-3-12b-it'];
+const MK = 'os2aiModels', QK = 'os2aiQuota';
+let MODELS = (() => { const c = U.ls.get(MK, null); return c && Array.isArray(c.m) && c.m.length ? c.m : FALLBACK; })();
 const ptDay = () => { try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return U.today(); } };
-const QK = 'os2aiQuota';
-AI.blocked = m => { const q = U.ls.get(QK, {}) || {}, x = q[m]; return !!x && (x.d ? x.d === ptDay() : x.until > Date.now()); };
+// ordem: "latest" (o Google aponta sempre para o mais recente) → versões mais novas → flash antes de lite → pro → gemma (cota diária enorme, menos inteligente)
+const rank = n => { const v = +((n.match(/-(\d+(?:\.\d+)?)/) || [])[1] || 0), fam = /^gemma/.test(n) ? 3 : /pro/.test(n) ? 2 : /lite/.test(n) ? 1 : 0;
+  return (/latest/.test(n) ? -1e4 : 0) + fam * 1e3 - v * 10 + (/preview|exp/.test(n) ? 3 : 0) + (/lite/.test(n) ? 1 : 0); };
+AI.discover = async force => { const k = AI.key(); if (!k) return MODELS; const c = U.ls.get(MK, null);
+  if (!force && c && c.k === k.slice(-6) && Date.now() - c.at < 12 * 36e5 && Array.isArray(c.m) && c.m.length) return (MODELS = c.m);
+  try { let names = [], tok = '';
+    for (let i = 0; i < 5; i++) { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=200${tok ? '&pageToken=' + encodeURIComponent(tok) : ''}&key=${encodeURIComponent(k)}`); const j = await r.json().catch(() => ({})); if (!r.ok) break;
+      (j.models || []).forEach(m => { const n = String(m.name || '').replace(/^models\//, ''); if ((m.supportedGenerationMethods || []).includes('generateContent') && /^(gemini|gemma)/.test(n) && !/(tts|image|embed|aqa|live|audio|robotics|computer|veo|imagen|native|banana|nano|learnlm|vision)/i.test(n)) names.push(n); });
+      tok = j.nextPageToken; if (!tok) break; }
+    if (names.length) { MODELS = [...new Set(names)].sort((x, y) => rank(x) - rank(y)).slice(0, 16); U.ls.set(MK, { k: k.slice(-6), at: Date.now(), m: MODELS }); } } catch (e) { }
+  return MODELS; };
+AI.blocked = m => { const q = U.ls.get(QK, {}) || {}, x = q[m]; return !!x && (x.dead ? x.dead > Date.now() : x.d ? x.d === ptDay() : x.until > Date.now()); };
 AI.markLimit = (m, msg) => { const q = U.ls.get(QK, {}) || {}; q[m] = /per ?day|perday|daily|diári/i.test(msg || '') ? { d: ptDay() } : { until: Date.now() + 65000 }; U.ls.set(QK, q); };
+// modelo desligado pelo Google ("no longer available", "not found"): fica de lado 7 dias e a lista é pedida outra vez
+AI.markDead = m => { const q = U.ls.get(QK, {}) || {}; q[m] = { dead: Date.now() + 7 * 864e5 }; U.ls.set(QK, q); U.ls.del(MK); };
+AI.isDead = (status, msg) => status === 404 || (status === 400 && /no longer available|is not found|not supported for generateContent|deprecated|has been shut ?down/i.test(msg || ''));
 AI.models = list => (list || MODELS).filter(m => !AI.blocked(m));
-AI.limitMsg = 'Hoje já se gastou a cota grátis de todos os modelos de IA do Google. Volta a funcionar sozinho amanhã. Para nunca parar: liga o Claude na página do Spyke, ou ativa a faturação na tua chave do Google (paga-se só o que passar da cota grátis).';
-AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '', limited = 0; const list = AI.models();
-  if (!list.length) throw Object.assign(new Error(AI.limitMsg), { fatal: 1 });
+AI.gemini = () => AI.models(MODELS).filter(m => !/^gemma/.test(m));
+AI.limitMsg = 'A cota grátis dos modelos do Google acabou por hoje e a IA de reserva não respondeu. Tenta daqui a um minuto.';
+// IA grátis de reserva: sem chave e sem limite diário (modelo aberto GPT-OSS na Pollinations). Desliga-se em Definições da IA (freeAI = false).
+AI.freeOn = () => OS.one('diet').freeAI !== false;
+AI.free = async (messages, o = {}) => { if (!AI.freeOn()) throw new Error('A IA de reserva está desligada.');
+  let last = ''; for (let i = 0; i < 3; i++) { const ac = window.AbortController ? new AbortController() : null, to = ac && setTimeout(() => ac.abort(), 45000);
+    try { const r = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ac ? ac.signal : undefined, credentials: 'omit', referrerPolicy: 'no-referrer',
+        body: JSON.stringify(Object.assign({ model: 'openai', messages, temperature: o.temp == null ? .3 : o.temp, private: true, referrer: 'oceanum' }, o.tools ? { tools: o.tools } : {}, o.json ? { response_format: { type: 'json_object' } } : {})) });
+      const j = await r.json().catch(() => ({})); if (r.ok && j.choices && j.choices[0]) { AI.lastEngine = 'reserva'; return j.choices[0].message || {}; }
+      last = (j.error && (j.error.message || j.error)) || 'erro ' + r.status; if (r.status === 429) await new Promise(res => setTimeout(res, 1500 * (i + 1))); else if (r.status < 500) break; }
+    catch (e) { last = e.name === 'AbortError' ? 'demorou demasiado' : (e.message || 'sem rede'); } finally { to && clearTimeout(to); } }
+  throw new Error('IA de reserva: ' + last); };
+const freeJSON = async (parts, temp) => { const txt = parts.filter(p => p.text).map(p => p.text).join('\n'); if (!txt || parts.some(p => p.inline_data)) throw new Error('sem texto');
+  const m = await AI.free([{ role: 'system', content: 'Respondes APENAS com JSON válido, sem texto à volta.' }, { role: 'user', content: txt }], { temp, json: true }), t = String(m.content || '').replace(/```(?:json)?/g, '').trim();
+  try { return JSON.parse(t); } catch (e) { const mm = t.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } };
+AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) { if (AI.freeOn()) return freeJSON(parts, temp); throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); }
+  let last = '', limited = 0; await AI.discover(); const list = AI.models();
   for (const m of list) { const gemma = /^gemma/.test(m); try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: gemma ? parts.concat([{ text: '\nResponde APENAS com o JSON pedido, sem texto à volta.' }]) : parts }], generationConfig: gemma ? { temperature: temp } : { responseMimeType: 'application/json', temperature: temp } }) });
-      const j = await r.json().catch(() => ({})); if (r.status === 404) { last = 'modelo indisponível'; continue; }
-      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 });
-        if (r.status === 429) { AI.markLimit(m, msg); limited++; last = 'limite'; continue; } last = msg || 'erro ' + r.status; continue; }
+      const j = await r.json().catch(() => ({})), msg = (j.error && j.error.message) || '';
+      if (!r.ok) { if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 });
+        if (r.status === 429) { AI.markLimit(m, msg); limited++; last = 'limite'; continue; } if (AI.isDead(r.status, msg)) { AI.markDead(m); last = 'modelo desligado'; continue; } last = msg || 'erro ' + r.status; continue; }
       const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('').replace(/```(?:json)?/g, '').trim();
-      try { return JSON.parse(txt); } catch (e) { const mm = txt.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } }
+      try { AI.lastEngine = m; return JSON.parse(txt); } catch (e) { const mm = txt.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } }
     catch (e) { if (e.fatal) throw e; last = e.message; } }
+  // o Google não deu: IA grátis de reserva (só texto; fotos e PDFs precisam do Google)
+  if (AI.freeOn() && !parts.some(p => p.inline_data)) { try { return await freeJSON(parts, temp); } catch (e) { last = e.message; } }
   if (limited && !AI.models().length) throw Object.assign(new Error(AI.limitMsg), { fatal: 1 });
-  throw new Error(last === 'limite' ? 'A IA está ocupada por um minuto (limite por minuto). Tenta já a seguir.' : 'A IA não respondeu (' + last + '). Verifica a internet e tenta de novo.'); };
+  throw new Error('A IA não respondeu (' + last + '). Verifica a internet e tenta de novo.'); };
+// texto simples (resumos, explicações): Google primeiro, reserva grátis depois
+AI.text = async (prompt, o = {}) => { const key = AI.key(); if (key) { await AI.discover(); for (const m of AI.models()) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: (o.system ? o.system + '\n\n' : '') + prompt }] }], generationConfig: { temperature: o.temp == null ? .4 : o.temp } }) });
+      const j = await r.json().catch(() => ({})), msg = (j.error && j.error.message) || ''; if (!r.ok) { if (r.status === 429) AI.markLimit(m, msg); else if (AI.isDead(r.status, msg)) AI.markDead(m); continue; }
+      const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('').trim(); if (t) { AI.lastEngine = m; return t; } } catch (e) { } } }
+  const m = await AI.free([o.system ? { role: 'system', content: o.system } : null, { role: 'user', content: prompt }].filter(Boolean), { temp: o.temp }); return String(m.content || '').trim(); };
+OS.on('ready', () => { if (AI.key()) setTimeout(() => AI.discover(), 5000); });
 
 /* ================= ler o exame ================= */
 const FIELDS = { weight: 'peso total em kg', bf: 'percentagem de gordura corporal (PBF, %)', fatKg: 'massa de gordura corporal em kg (Body Fat Mass)', muscleKg: 'massa muscular esquelética em kg (SMM)', leanKg: 'massa livre de gordura / massa magra em kg (FFM, LBM)', water: 'água corporal em % do peso', waterL: 'água corporal total em litros (TBW)', protein: 'proteína em % do peso (se só houver kg, converte para % do peso)', bone: 'minerais / massa óssea em kg', visceral: 'nível de gordura visceral (número)', subq: 'gordura subcutânea em %', bmr: 'taxa metabólica basal em kcal', metAge: 'idade metabólica em anos', lArmL: 'massa magra braço esquerdo kg', lArmR: 'massa magra braço direito kg', lTrunk: 'massa magra tronco kg', lLegL: 'massa magra perna esquerda kg', lLegR: 'massa magra perna direita kg', gArmL: 'gordura braço esquerdo em %', gArmR: 'gordura braço direito em %', gTrunk: 'gordura tronco em %', gLegL: 'gordura perna esquerda em %', gLegR: 'gordura perna direita em %', ecw: 'rácio água extracelular / água total (ECW/TBW, ex. 0.380)', phase: 'ângulo de fase em graus', score: 'pontuação do aparelho (ex. InBody score)', waist: 'perímetro da cintura cm', hip: 'perímetro da anca cm', neck: 'pescoço cm', chest: 'peito cm', abdomen: 'abdómen cm', armLc: 'braço esquerdo cm', armRc: 'braço direito cm', thighL: 'coxa esquerda cm', thighR: 'coxa direita cm', calf: 'gémeo cm' };
@@ -12288,11 +12613,11 @@ const photoBody = () => { const key = OS.one('diet').aiKey;
 document.addEventListener('change', e => { if (e.target.id !== 'fdCam') return; const f = e.target.files && e.target.files[0]; if (!f) return; shrink(f).then(d => { PH.img = d; photoRun(); }).catch(() => { PH.err = 'Não consegui abrir esta imagem.'; fDraw(); }); });
 const shrink = file => new Promise((ok, ko) => { const r = new FileReader(); r.onerror = ko; r.onload = () => { const im = new Image(); im.onerror = ko; im.onload = () => { const m = 896, k = Math.min(1, m / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); ok(c.toDataURL('image/jpeg', .82)); }; im.src = r.result; }; r.readAsDataURL(file); });
 const PROMPT = 'És um nutricionista. Identifica TODOS os alimentos e bebidas visíveis nesta foto. Para cada um, estima a quantidade em gramas (ou ml para bebidas) com base no tamanho do prato e das porções, e calcula as calorias e macronutrientes para essa quantidade. Usa nomes simples em português (ex.: "Arroz branco cozido", "Peito de frango grelhado", "Coca-Cola"). Se não houver comida na foto, devolve itens vazio. Responde APENAS com JSON neste formato: {"itens":[{"nome":"","gramas":0,"kcal":0,"proteina":0,"hidratos":0,"gordura":0,"fibra":0}],"nota":"frase curta opcional"}';
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
-Diet.vision = async (dataUrl, key) => { let last = '';
-  for (const m of MODELS) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: PROMPT }, { inline_data: { mime_type: 'image/jpeg', data: dataUrl.split(',')[1] } }] }], generationConfig: { responseMimeType: 'application/json', temperature: .2 } }) });
-      const j = await r.json().catch(() => ({})); if (r.status === 404) { last = 'modelo indisponível'; continue; }
-      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 }); if (r.status === 429) throw Object.assign(new Error('Limite gratuito atingido por agora. Tenta daqui a um minuto.'), { fatal: 1 }); last = msg || 'erro ' + r.status; continue; }
+// fotos: modelos Gemini descobertos com a tua chave (passa ao seguinte se um esgotar ou estiver desligado)
+Diet.vision = async (dataUrl, key) => { let last = ''; await OS.AI.discover(); const list = OS.AI.gemini(); if (!list.length) throw Object.assign(new Error(OS.AI.limitMsg), { fatal: 1 });
+  for (const m of list) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: PROMPT }, { inline_data: { mime_type: 'image/jpeg', data: dataUrl.split(',')[1] } }] }], generationConfig: { responseMimeType: 'application/json', temperature: .2 } }) });
+      const j = await r.json().catch(() => ({})), msg = (j.error && j.error.message) || '';
+      if (!r.ok) { if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 }); if (r.status === 429) { OS.AI.markLimit(m, msg); last = 'limite'; continue; } if (OS.AI.isDead(r.status, msg)) { OS.AI.markDead(m); last = 'modelo desligado'; continue; } last = msg || 'erro ' + r.status; continue; }
       const txt = (((j.candidates || [])[0] || {}).content || {}).parts ? j.candidates[0].content.parts.map(p => p.text || '').join('') : ''; const o = JSON.parse(txt.replace(/^```(json)?|```$/g, '').trim()); return { itens: (o.itens || o.items || []).filter(i => i && i.nome), nota: o.nota || '' }; }
     catch (e) { if (e.fatal) throw e; last = e.message; } }
   throw new Error('Não consegui analisar a foto (' + last + '). Verifica a internet e tenta de novo.'); };
@@ -12354,7 +12679,7 @@ S.foods.fields.push(F('fib', 'Fibra', 'num', { unit: 'g' }));
 
 </script>
 <script>
-/* OCEANUM — Visão Geral: o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
+/* OCEANUM — Painel (antes Visão Geral + Painel, agora uma só página): o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
    dinheiro, agenda, tarefas, corpo, dieta, estudos e jogo. */
 (() => {
 'use strict';
@@ -12376,8 +12701,7 @@ V.visao = () => {
   const cats = Fin.byCat(R.a, R.b), bank = safe(() => Fin.cashTotal(), 0), liq = safe(() => Fin.liquid(), 0), nw = safe(() => Fin.netWorth(), 0);
   const dIn = days.map(d => U.sum(tx.filter(x => x.date === d && x.type === 'Receita'), x => x.amount)), dOut = days.map(d => U.sum(tx.filter(x => x.date === d && x.type === 'Despesa'), x => x.amount));
   const cards = Fin.accounts().filter(a => a.type === 'Cartão de crédito').map(a => ({ l: a.name, v: U.sum(tx.filter(x => x.type === 'Despesa' && x.account === a.id), x => x.amount) })).filter(x => x.v > 0);
-  const agenda = Cal.items(t, U.addDays(t, 2)).filter(x => x.src !== 'routine' && x.src !== 'task').slice(0, 5);
-  const tasks = OS.Tasks.open().filter(x => (x.sched && x.sched <= t) || (x.due && x.due <= U.addDays(t, 1)) || x.status === 'Em curso').slice(0, 5), doneP = OS.all('tasks').filter(x => x.doneAt && x.doneAt >= R.a && x.doneAt <= R.b).length;
+    const tasks = OS.Tasks.open().filter(x => (x.sched && x.sched <= t) || (x.due && x.due <= U.addDays(t, 1)) || x.status === 'Em curso').slice(0, 5), doneP = OS.all('tasks').filter(x => x.doneAt && x.doneAt >= R.a && x.doneAt <= R.b).length;
   const wk = OS.all('workouts').filter(w => w.date >= R.a && w.date <= R.b).length, km = OS.Run.kmIn(R.a, R.b), diet = safe(() => OS.Diet.day(t), { kcal: 0, p: 0 }), dg = OS.one('diet');
   const studyH = U.sum(OS.all('sessions').filter(s => s.date >= R.a && s.date <= R.b), s => s.minutes) / 60, habit = safe(() => OS.Hab.dayScore(t), 0);
   const dom = OS.one('dominus'), lvl = safe(() => OS.Dom.sumLv(), 0), rank = (OS.Dom.RANKS || [])[dom.rank || 0] || '';
@@ -12391,25 +12715,31 @@ V.visao = () => {
   const work = W ? card('Trabalho', `<div class="dc-tiles"><a href="#trabalho"><b class="mono">${U.nf(W.h, 1)}</b><span>horas ${R.per === 'hoje' ? 'hoje' : R.per === 'semana' ? 'na semana' : 'no mês'}</span></a><a href="#trabalho"><b class="mono">${U.eur(W.pay, { dec: 0 })}</b><span>ganhos estimados</span></a><a href="#trabalho.horario"><b class="mono">${W.n}</b><span>turnos</span></a><a href="#trabalho.horario"><b class="mono">${W.offP}</b><span>folgas</span></a></div>
       <div class="dc-wk">${W.week.map(x => `<span class="${x.sh ? 'sh' : x.off ? 'off' : ''} ${x.d === t ? 'today' : ''}" title="${U.fmtDS(x.d)}">${U.WDS[U.parse(x.d).getDay()].slice(0, 1)}</span>`).join('')}</div>
       <div class="dc-rows"><div><span>Próximo turno</span><b>${W.nx ? (W.nx.date === t ? 'hoje' : U.rel(W.nx.date)) + ' ' + esc(W.nx.start || '') + (W.nx.place ? ' · ' + esc(W.nx.place) : '') : '—'}</b></div><div><span>Próxima folga</span><b>${W.off ? (W.off.date === t ? 'hoje' : U.fmtDS(W.off.date)) : '—'}</b></div><div><span>Tarefas · projetos de trabalho</span><b class="mono">${W.tasks} · ${W.proj}</b></div>${W.rate ? `<div><span>Valor por hora</span><b class="mono">${U.eur(W.rate)}</b></div>` : ''}</div>`, { cls: 'span4', act: more('trabalho', 'Trabalho') }) : '';
+  const P = safe(() => OS.PainelParts(), null), part = k => (P && P[k]) || '';
   return `<div class="dash">
-  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1></div>
+  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
     <div class="dash-ctl">${R.per === 'mes' ? `<div class="dash-month"><button class="icon-btn" data-act="dashYM" data-d="-1" aria-label="Mês anterior">${UI.ic('left')}</button><b>${R.label}</b><button class="icon-btn" data-act="dashYM" data-d="1" aria-label="Mês seguinte" ${R.ym >= U.ym(t) ? 'disabled' : ''}>${UI.ic('right')}</button></div>` : `<div class="dash-month"><b>${R.label}</b></div>`}
       <div class="dash-seg" role="group">${per.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="dashPer" data-p="${k}">${l}</button>`).join('')}</div></div></div>
+  ${part('life')}
+  ${part('control')}
+  ${part('next')}
   <div class="dash-grid">
     ${card('Saldo do período', `<div class="dc-big ${net < 0 ? 'neg' : ''}">${U.eur(net)}</div><div class="dc-sub">receitas ${U.eur(inc, { dec: 0 })} · despesas ${U.eur(exp, { dec: 0 })}</div>${UI.spark(cum.length > 1 ? cum : [0, 0], '#7FE3F5', 300, 54)}`, { cls: 'hero h-abyss span4' })}
     ${card('Categorias', C.mount({ type: 'donut', data: cats.slice(0, 6), label: 'Gastos por categoria', centerSub: 'gastos', max: 5, empty: 'Sem despesas neste período.' }, 170), { cls: 'span4', act: more('financas', 'Finanças') })}
     ${card('Fluxo de caixa', `<div class="dc-mid ${acc < 0 ? 'neg' : ''}">${U.eur(acc)}</div>${C.mount({ type: 'line', labels: days.map(d => U.fmtDS(d)), series: [{ name: 'Saldo acumulado', data: cum, color: '#38BDF8' }], fmt: U.eurK, min0: false, empty: 'Sem movimentos.' }, 150)}`, { cls: 'span4' })}
     ${card('Saldo bancário total', `<div class="dc-big">${U.eur(bank)}</div><div class="dc-rows"><div><span>Disponível</span><b class="mono">${U.eur(liq, { dec: 0 })}</b></div><div><span>Patrimônio</span><b class="mono">${U.eur(nw, { dec: 0 })}</b></div></div><div class="dc-acts"><button class="btn sm" data-new="transactions" data-defs='{"type":"Receita"}'>${UI.ic('plus')}Receita</button><button class="btn sm" data-new="transactions" data-defs='{"type":"Despesa"}'>${UI.ic('plus')}Despesa</button></div>`, { cls: 'hero h-tide span4', act: more('financas.contas', 'Contas') })}
     ${card('Movimentação diária', C.mount({ type: 'bar', labels: days.map(d => U.fmtDS(d)), series: [{ name: 'Entradas', data: dIn, color: '#2DD4BF' }, { name: 'Saídas', data: dOut, color: '#3B82F6' }], fmt: U.eurK, empty: 'Sem movimentos neste período.' }, 190), { cls: 'span8' })}
-    ${card('Agenda', agenda.length ? agenda.map(x => `<div class="dc-li" ${x.edit ? `data-edit="${x.edit}"` : ''}><span class="mono">${x.date === t ? (x.start || 'hoje') : U.fmtDS(x.date)}</span><b>${esc(x.title)}</b></div>`).join('') : '<p class="dc-empty">Agenda livre nos próximos dias.</p>', { cls: 'span4', act: more('calendario', 'Calendário') })}
     ${card('Tarefas', `<div class="dc-kp"><b class="mono">${OS.Tasks.open().length}</b><span>abertas</span><b class="mono">${doneP}</b><span>feitas no período</span></div>${tasks.map(x => `<div class="dc-li" data-edit="tasks:${x.id}"><input type="checkbox" class="cbx round" data-act="taskToggle" data-id="${x.id}" aria-label="Concluir ${esc(x.title)}"><b>${esc(x.title)}</b></div>`).join('') || '<p class="dc-empty">Nada para hoje.</p>'}`, { cls: 'span4', act: more('tarefas') })}
     ${card('Corpo', `<div class="dc-tiles"><a href="#treino"><b class="mono">${wk}</b><span>treinos</span></a><a href="#corrida"><b class="mono">${U.nf(km, 1)}</b><span>km</span></a><a href="#dieta"><b class="mono">${U.nf(diet.kcal, 0)}</b><span>kcal hoje</span></a><a href="#dieta"><b class="mono">${U.nf(diet.p, 0)}<small>/${U.num(dg.p) || '—'}</small></b><span>proteína</span></a></div>`, { cls: 'hero h-reef span4', act: more('treino', 'Treino') })}
     ${work}
-    ${card('Estudos', `<div class="dc-big">${U.nf(studyH, 1)} h</div><div class="dc-sub">de estudo no período</div>`, { cls: 'span4', act: more('universidade') })}
     ${card('Hábitos de hoje', `<div class="dc-big">${Math.round(habit * 100)}%</div><div class="dc-bar"><i style="width:${Math.round(habit * 100)}%"></i></div><div class="dc-sub">inegociáveis cumpridos</div>`, { cls: 'span4', act: more('habitos') })}
     ${card('Dominus', `<div class="dc-big">Nível ${lvl}</div><div class="dc-sub">${esc(rank)}${dom.started ? '' : ' · ainda não começaste'}</div>`, { cls: 'hero h-deep span4', act: more('dominus', 'Jogar') })}
     ${cards.length ? card('Gastos por cartão', cards.map(c => `<div class="dc-li"><b>${esc(c.l)}</b><span class="mono">${U.eur(c.v)}</span></div>`).join(''), { cls: 'span4' }) : ''}
-  </div></div>`;
+  </div>
+  ${part('money')}
+  ${part('study')}
+  ${part('goals')}
+  ${part('trends')}</div>`;
 };
 
 /* ================= GASTO RÁPIDO: o "widget" do telemóvel ================= */
@@ -12439,7 +12769,7 @@ OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 
   UI.toast(`Registado: ${U.eur(amount)}${cat ? ' · ' + cat : ''}`, 'pos'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } };
 A.qgCopy = () => { const url = (() => { try { return window.top.location.href.split('#')[0]; } catch (e) { return ''; } })() || document.referrer || 'https://claude.ai/artifact/AUtUtqFR4x46BWPVcR3kLZ'; const ok = () => UI.toast('Link copiado', 'pos'); try { navigator.clipboard.writeText(url).then(ok, () => UI.toast(url)); } catch (e) { UI.toast(url); } };
 A.ibGo = (b, e) => { e && e.preventDefault(); OS.go('definicoes'); setTimeout(() => { const el = document.getElementById('inboxPn'); el && el.scrollIntoView({ behavior: 'smooth' }); }, 250); };
-A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Oceanum vai abrir no Gasto rápido' : 'Abre normalmente na Visão Geral'); };
+A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Oceanum vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
 A.dashPer = b => OS.setUI('dashPer', b.dataset.p);
 A.dashYM = b => { const cur = OS.ui.dashYM || U.ym(U.today()), n = U.addMonths(cur, +b.dataset.d); OS.setUI('dashYM', n > U.ym(U.today()) ? U.ym(U.today()) : n); };
 })();
@@ -13575,8 +13905,68 @@ function criarEvento_(p) { const t = String(p.t || '').slice(0, 200), d = String
   const s = new Date(d + 'T' + p.h + ':00'), e = /^\\d\\d:\\d\\d$/.test(p.f || '') ? new Date(d + 'T' + p.f + ':00') : new Date(s.getTime() + 3600000); c.createEvent(t, s, e, { location: String(p.l || '').slice(0, 200) }); return { ok: true }; }
 function buscar_(u) { if (!/^https?:\\/\\/[^\\s]+$/.test(u)) return { ok: false, msg: 'Endereço inválido' }; try { const r = UrlFetchApp.fetch(u, { muteHttpExceptions: true, followRedirects: true, headers: UA_ }); return { ok: true, code: r.getResponseCode(), ct: String(r.getHeaders()['Content-Type'] || ''), t: r.getContentText().slice(0, 1500000) }; } catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 200) }; } }
 `;
-// o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e a parte 3 por baixo
-IB.script = key => IB.core(key) + '\n' + IB.addon();
+// parte 4: Outlook da faculdade (Microsoft 365) e IA sem limites na Siri — também num ficheiro novo
+IB.addon4 = () => `// Oceanum · PARTE 4 — Outlook da faculdade (Microsoft 365) e IA sem limites nas perguntas pela Siri.
+// Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte4), por baixo das outras. Não apagues nada: liga-se às partes 1, 2 e 3.
+// Depois: Implantar → Gerenciar implantações → lápis → Nova versão → Implantar.
+const OL_SCOPE_ = 'offline_access User.Read Mail.Read Mail.Send';
+function olRedirect_() { return 'https://script.google.com/macros/d/' + ScriptApp.getScriptId() + '/usercallback'; }
+function op_olinfo(p) { const P = PropertiesService.getScriptProperties(); return { ok: true, v: 12, redirect: olRedirect_(), cfg: !!P.getProperty('OL_ID'), linked: !!P.getProperty('OL_RT'), user: P.getProperty('OL_USER') || '', err: P.getProperty('OL_ERR') || '' }; }
+function op_olcfg(p) { const id = String(p.id || '').trim(), sec = String(p.sec || '').trim(), ten = String(p.ten || 'organizations').trim();
+  if (!/^[0-9a-fA-F-]{36}$/.test(id) || sec.length < 8 || !/^[A-Za-z0-9.-]{3,80}$/.test(ten)) return { ok: false, msg: 'Dados inválidos: confirma o ID da aplicação, o ID do diretório e o segredo.' };
+  const P = PropertiesService.getScriptProperties(); P.setProperties({ OL_ID: id, OL_SEC: sec, OL_TEN: ten }); P.deleteProperty('OL_RT'); P.deleteProperty('OL_ERR'); CacheService.getScriptCache().remove('OL_AT'); return { ok: true }; }
+function op_olauth(p) { const P = PropertiesService.getScriptProperties(), id = P.getProperty('OL_ID'), ten = P.getProperty('OL_TEN') || 'organizations'; if (!id) return { ok: false, msg: 'Falta configurar a ligação ao Outlook.' };
+  const st = ScriptApp.newStateToken().withMethod('olCallback').withTimeout(1200).createToken();
+  return { ok: true, url: 'https://login.microsoftonline.com/' + ten + '/oauth2/v2.0/authorize?client_id=' + encodeURIComponent(id) + '&response_type=code&response_mode=query&redirect_uri=' + encodeURIComponent(olRedirect_()) + '&scope=' + encodeURIComponent(OL_SCOPE_) + '&state=' + encodeURIComponent(st) + '&prompt=select_account' }; }
+function olPage_(t, m) { const e = function (x) { return String(x || '').replace(/[<>&"]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]; }); };
+  return HtmlService.createHtmlOutput('<meta name="viewport" content="width=device-width,initial-scale=1"><div style="font-family:system-ui,sans-serif;padding:28px;max-width:560px;line-height:1.5"><h2>' + e(t) + '</h2><p>' + e(m) + '</p></div>'); }
+function olCallback(req) { const p = (req && req.parameter) || {}, P = PropertiesService.getScriptProperties();
+  if (p.error) { P.setProperty('OL_ERR', String(p.error_description || p.error).slice(0, 400)); return olPage_('Não foi possível ligar o Outlook', p.error_description || p.error); }
+  const r = olToken_({ grant_type: 'authorization_code', code: p.code, redirect_uri: olRedirect_() });
+  if (!r.ok) { P.setProperty('OL_ERR', r.msg); return olPage_('Não foi possível ligar o Outlook', r.msg); }
+  let user = ''; try { const me = JSON.parse(UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/me?$select=mail,userPrincipalName', { headers: { Authorization: 'Bearer ' + r.at }, muteHttpExceptions: true }).getContentText()); user = me.mail || me.userPrincipalName || ''; } catch (e) { }
+  P.setProperty('OL_USER', user); P.deleteProperty('OL_ERR'); return olPage_('Outlook ligado ✓', (user ? user + ' · ' : '') + 'Podes fechar esta janela e voltar ao Oceanum.'); }
+function olToken_(extra) { const P = PropertiesService.getScriptProperties(), ten = P.getProperty('OL_TEN') || 'organizations';
+  const body = { client_id: P.getProperty('OL_ID'), client_secret: P.getProperty('OL_SEC'), scope: OL_SCOPE_ }; Object.keys(extra).forEach(function (k) { body[k] = extra[k]; });
+  const r = UrlFetchApp.fetch('https://login.microsoftonline.com/' + ten + '/oauth2/v2.0/token', { method: 'post', payload: body, muteHttpExceptions: true });
+  let j = {}; try { j = JSON.parse(r.getContentText()); } catch (e) { }
+  if (!j.access_token) return { ok: false, msg: String(j.error_description || j.error || ('erro ' + r.getResponseCode())).slice(0, 400) };
+  if (j.refresh_token) P.setProperty('OL_RT', j.refresh_token);
+  CacheService.getScriptCache().put('OL_AT', j.access_token, Math.max(60, Math.min(3000, (j.expires_in || 3600) - 120))); return { ok: true, at: j.access_token }; }
+function olAt_() { const c = CacheService.getScriptCache().get('OL_AT'); if (c) return c; const rt = PropertiesService.getScriptProperties().getProperty('OL_RT'); if (!rt) throw new Error('O Outlook não está ligado.');
+  const r = olToken_({ grant_type: 'refresh_token', refresh_token: rt }); if (!r.ok) throw new Error(r.msg); return r.at; }
+function olGraph_(path, opt) { opt = opt || {}; const o = { method: opt.method || 'get', headers: { Authorization: 'Bearer ' + olAt_() }, muteHttpExceptions: true }; if (opt.prefer) o.headers.Prefer = opt.prefer;
+  if (opt.body) { o.contentType = 'application/json'; o.payload = JSON.stringify(opt.body); }
+  const r = UrlFetchApp.fetch('https://graph.microsoft.com/v1.0' + path, o), code = r.getResponseCode(), t = r.getContentText();
+  if (code >= 400) { let m = ''; try { m = JSON.parse(t).error.message; } catch (e) { } throw new Error(m || 'erro ' + code); } return t ? JSON.parse(t) : {}; }
+const olFrom_ = function (x) { const f = (x || {}).emailAddress || {}; return f.name ? f.name + ' <' + (f.address || '') + '>' : f.address || ''; };
+function op_ol(p) { try { const n = Math.min(60, Math.max(5, Number(p.n) || 40)), j = olGraph_('/me/mailFolders/inbox/messages?$top=' + n + '&$orderby=receivedDateTime%20desc&$select=id,subject,from,receivedDateTime,isRead,bodyPreview,importance,hasAttachments');
+    return { ok: true, user: PropertiesService.getScriptProperties().getProperty('OL_USER') || '', items: (j.value || []).map(function (m) { return { id: m.id, s: m.subject || '', f: olFrom_(m.from), d: m.receivedDateTime, u: !m.isRead, sn: String(m.bodyPreview || '').slice(0, 500), imp: m.importance === 'high', at: !!m.hasAttachments }; }) }; }
+  catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 300) }; } }
+function op_olx(p) { try { const id = encodeURIComponent(String(p.id || '')), h = olGraph_('/me/messages/' + id + '?$select=subject,from,toRecipients,receivedDateTime,body,hasAttachments'), t = olGraph_('/me/messages/' + id + '?$select=body', { prefer: 'outlook.body-content-type="text"' });
+    let at = []; if (h.hasAttachments) { try { at = (olGraph_('/me/messages/' + id + '/attachments?$select=name').value || []).map(function (a) { return a.name; }).slice(0, 10); } catch (e) { } }
+    return { ok: true, s: h.subject || '', t: [{ id: String(p.id), f: olFrom_(h.from), to: (h.toRecipients || []).map(function (x) { return (x.emailAddress || {}).address; }).join(', '), d: h.receivedDateTime, s: h.subject || '', b: String((t.body || {}).content || '').slice(0, 60000), h: String((h.body || {}).content || '').slice(0, 150000), at: at }] }; }
+  catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 300) }; } }
+function op_ols(p) { try { if (!p.id || !p.b) return { ok: false, msg: 'Faltam dados' }; olGraph_('/me/messages/' + encodeURIComponent(String(p.id)) + '/reply', { method: 'post', body: { comment: String(p.b).slice(0, 20000) } }); return { ok: true }; }
+  catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 300) }; } }
+function op_oloff(p) { const P = PropertiesService.getScriptProperties(); ['OL_RT', 'OL_USER', 'OL_ERR'].forEach(function (k) { P.deleteProperty(k); }); CacheService.getScriptCache().remove('OL_AT'); return { ok: true }; }
+// ---- IA sem limites na Siri: modelos do Google descobertos sozinhos e, se a cota acabar, IA grátis de reserva ----
+function iaModelos_(gk) { const C = CacheService.getScriptCache(), h = C.get('IA_MS'); if (h) return JSON.parse(h); let ms = [];
+  try { const j = JSON.parse(UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key=' + encodeURIComponent(gk), { muteHttpExceptions: true }).getContentText());
+    ms = (j.models || []).filter(function (m) { return (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0 && /^models\\/gemini/.test(m.name) && !/(tts|image|embed|live|audio|native|robotics|computer|pro)/.test(m.name); }).map(function (m) { return m.name.replace('models/', ''); }); } catch (e) { }
+  const v = function (n) { return /latest/.test(n) ? 99 : parseFloat((n.match(/-(\\d+(?:\\.\\d+)?)/) || [0, 0])[1]) || 0; }; ms.sort(function (a, b) { return v(b) - v(a); }); if (!ms.length) ms = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+  C.put('IA_MS', JSON.stringify(ms.slice(0, 8)), 21600); return ms.slice(0, 8); }
+function iaTexto_(prompt, gk) { if (gk) { const ms = iaModelos_(gk); for (let i = 0; i < ms.length; i++) { try { const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + ms[i] + ':generateContent?key=' + encodeURIComponent(gk), { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } }) });
+      if (r.getResponseCode() !== 200) continue; const t = ((((JSON.parse(r.getContentText()).candidates || [])[0] || {}).content || {}).parts || []).map(function (x) { return x.text || ''; }).join('').trim(); if (t) return t; } catch (e) { } } }
+  try { const r = UrlFetchApp.fetch('https://text.pollinations.ai/openai', { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ model: 'openai', private: true, referrer: 'oceanum', messages: [{ role: 'user', content: prompt }] }) });
+    if (r.getResponseCode() === 200) { const m = ((JSON.parse(r.getContentText()).choices || [])[0] || {}).message || {}; return String(m.content || '').trim(); } } catch (e) { }
+  return ''; }
+function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || ''; if (!q) return resumo_();
+  const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
+  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Oceanum do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
+// o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
+IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4();
 
 /* ---- adivinhar categoria e conta ---- */
 const KW = [[/uber|bolt|taxi|táxi|metro|comboio|autocarro|gasolina|combust|portagem|estaciona|cp |carris/i, ['Transporte', 'Carro']], [/caf[eé]|restaurante|almo[cç]o|jantar|lanche|mercado|continente|pingo|lidl|aldi|mercadona|supermercado|padaria|pizza|burger|mcdonald|kfc|glovo|uber ?eats|bolt ?food|a[cç]a[ií]/i, ['Alimentação', 'Restauração', 'Supermercado']],
@@ -13690,9 +14080,9 @@ IB.MAXP = 12000;
 // as partes 1 e 2 (o núcleo, igual desde a versão 10) cortam-se ao meio numa linha de topo; a parte 3 é o ficheiro das novidades
 IB.parts = key => { const L = IB.core(key).split('\n'), half = L.join('\n').length / 2, out = []; let cur = [], n = 0, cut = false;
   L.forEach(l => { if (!cut && n > half && /^(function |\/\/ ---- |const )/.test(l)) { out.push(cur); cur = []; cut = true; } cur.push(l); n += l.length + 1; });
-  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon()); };
+  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4()); };
 IB.partsHelp = () => { const n = IB.parts(cfg().key || 'x').length; return { n, files: Array.from({ length: n }, (_, i) => i ? 'Parte' + (i + 1) : 'Código.gs') }; };
-const partsBtns = (cls = 'btn pri', from = 0) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
+const partsBtns = (cls = 'btn pri', from = 0, to = 99) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from || i > to ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
 IB.partsBtns = partsBtns;
 const partsModal = () => { const { n, files } = IB.partsHelp(); UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>Código do script em ${n} partes</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
   <p class="mut" style="margin:0 0 10px">No telemóvel e no tablet o "colar" corta textos muito grandes, por isso o código vai em partes. O Apps Script junta os ficheiros sozinho.</p>
@@ -13982,22 +14372,22 @@ if (Cloud.enabled) init().then(u => { Cloud.state = u ? 'ligado' : 'por entrar';
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc;
 const NAV = [
-  ['Visão geral', [['visao', 'Visão Geral', 'grid'], ['hoje', 'Hoje', 'sun'], ['jornal', 'Jornal', 'news', () => { const n = OS.News && OS.News.unread(); return n ? [n, ''] : null; }], ['spyke', 'Spyke (assistente)', 'mic'], ['email', 'E-mail & LinkedIn', 'mail', () => { const c = OS.Mail && OS.Mail.counts(); return c && c.urg ? [c.urg, 'neg'] : null; }], ['painel', 'Painel', 'radar', () => { const n = OS.Intel.alerts().filter(a => a.lvl === 'urgent').length; return n ? [n, 'neg'] : null; }], ['next', 'Next Action', 'zap'], ['calendario', 'Calendário', 'cal']]],
-  ['Execução', [['tarefas', 'Tarefas', 'checksq', () => { const n = OS.Tasks.open().filter(OS.Tasks.late).length; return n ? [n, 'neg'] : [OS.Tasks.open().length, '']; }], ['habitos', 'Hábitos & Rotina', 'repeat'], ['foco', 'Bloco de foco', 'focus', () => { const b = OS.FocusBlock && OS.FocusBlock.state(); return b && b.phase !== 'end' ? ['●', 'pos'] : null; }], ['projetos', 'Projetos', 'folder'], ['metas', 'Metas', 'target']]],
+  ['Visão geral', [['visao', 'Painel', 'grid', () => { const n = OS.Intel.alerts().filter(a => a.lvl === 'urgent').length; return n ? [n, 'neg'] : null; }], ['hoje', 'Hoje', 'sun'], ['jornal', 'Jornal', 'news', () => { const n = OS.News && OS.News.unread(); return n ? [n, ''] : null; }], ['spyke', 'Spyke (assistente)', 'mic'], ['email', 'E-mail e LinkedIn', 'mail', () => { const c = OS.Mail && OS.Mail.counts(); return c && c.urg ? [c.urg, 'neg'] : null; }], ['calendario', 'Calendário', 'cal']]],
+  ['Execução', [['tarefas', 'Tarefas', 'checksq', () => { const n = OS.Tasks.open().filter(OS.Tasks.late).length; return n ? [n, 'neg'] : [OS.Tasks.open().length, '']; }], ['habitos', 'Hábitos e rotina', 'repeat'], ['foco', 'Bloco de foco', 'focus', () => { const b = OS.FocusBlock && OS.FocusBlock.state(); return b && b.phase !== 'end' ? ['●', 'pos'] : null; }], ['projetos', 'Projetos', 'folder'], ['metas', 'Metas', 'target']]],
   ['Eu', [['eu', 'Quem sou eu', 'user']]],
   ['Fé', [['fe', 'Fé & Devoção', 'cross']]],
   ['Dinheiro', [['gasto', 'Gasto rápido', 'bolt'], ['financas', 'Finanças', 'wallet'], ['investimentos', 'Investimentos', 'trend'], ['compras', 'Compras', 'cart', () => { const n = OS.all('wishlist').filter(w => w.status === 'Em espera').length; return n ? [n, ''] : null; }], ['simuladores', 'Simuladores', 'calc']]],
-  ['Estudos', [['universidade', 'Universidade', 'school'], ['floresta', 'Floresta (foco)', 'tree', () => { const r = OS.Forest && OS.Forest.run(); return r ? ['●', 'pos'] : null; }], ['cursos', 'Cursos', 'play'], ['certificacoes', 'Certificações', 'shield'], ['leituras', 'Leituras', 'book', () => { const n = OS.all('books').filter(b => b.status === 'A ler').length; return n ? [n, ''] : null; }], ['aprendizagem', 'Trilhas & competências', 'brain'], ['conhecimento', 'Knowledge Base', 'note']]],
+  ['Estudos', [['universidade', 'Universidade', 'school'], ['floresta', 'Floresta (foco)', 'tree', () => { const r = OS.Forest && OS.Forest.run(); return r ? ['●', 'pos'] : null; }], ['cursos', 'Cursos', 'play'], ['certificacoes', 'Certificações', 'shield'], ['leituras', 'Leituras', 'book', () => { const n = OS.all('books').filter(b => b.status === 'A ler').length; return n ? [n, ''] : null; }], ['aprendizagem', 'Trilhas e competências', 'brain'], ['conhecimento', 'Base de conhecimento', 'note']]],
   ['Corpo', [['corpo', 'Visão do corpo', 'heart'], ['treino', 'Treino', 'dumbbell'], ['dieta', 'Dieta', 'apple'], ['corrida', 'Corrida', 'run'], ['desporto', 'Desporto', 'target']]],
-  ['Carreira', [['trabalho', 'Trabalho', 'briefcase'], ['carreira', 'Carreira & Networking', 'users'], ['capital', 'Capital Profissional', 'star'], ['oportunidades', 'Oportunidades', 'door']]],
-  ['Direção', [['northstar', 'North Star', 'compass'], ['roadmap', 'Roadmap', 'map'], ['longterm', 'Long Term', 'mountain'], ['decisoes', 'Decision Center', 'scale'], ['revisao', 'Revisões', 'rewind'], ['evolucao', 'Minha Evolução', 'chart']]]];
+  ['Carreira', [['trabalho', 'Trabalho', 'briefcase'], ['carreira', 'Carreira e contactos', 'users'], ['capital', 'Capital Profissional', 'star'], ['oportunidades', 'Oportunidades', 'door']]],
+  ['Direção', [['next', 'Próximos passos', 'zap'], ['northstar', 'Estrela-guia', 'compass'], ['roadmap', 'Roteiro da vida', 'map'], ['longterm', 'Longo prazo', 'mountain'], ['decisoes', 'Centro de decisões', 'scale'], ['revisao', 'Revisões', 'rewind'], ['evolucao', 'Minha Evolução', 'chart']]]];
 const TITLES = { dominus: ['Dominus', 'Jogo'], definicoes: ['Definições', 'Sistema'] };
 NAV.forEach(([g, items]) => items.forEach(([k, l]) => TITLES[k] = [l, g]));
-TITLES.control = ['Painel', 'Visão geral'];
+TITLES.control = ['Painel', 'Visão geral']; TITLES.painel = ['Painel', 'Visão geral'];
 TITLES.mova = [OS.one ? 'Mova' : 'Mova', 'Empresa'];
 
 const CORE = ['visao', 'eu', 'fe', 'jornal', 'gasto', 'hoje', 'tarefas', 'habitos', 'financas', 'treino', 'dieta', 'universidade', 'metas'];
-const DESC = { spyke: 'O teu assistente de voz: resumo do dia, perguntas e comandos.', email: 'E-mails e LinkedIn resumidos: urgente, responder, spam.', foco: 'Resolver pendências por prioridade, sem fugir, com saída por Face ID.', desporto: 'Os teus desportos, práticas, estatísticas e treinos para melhorar.', floresta: 'Foca-te e faz crescer a tua floresta.', cursos: 'Os cursos que estás a fazer, com progresso.', certificacoes: 'Todas as tuas certificações.', leituras: 'Estante virtual: livros, resenhas e desafios.', eu: 'A tua história, família, amigos e quem és.', jornal: 'As notícias do mundo e de cada país, em tempo real.', fe: 'Versículo do dia, Bíblia, devocional e oração.', visao: 'Painel com tudo: dinheiro, agenda, corpo e estudos.', gasto: 'Registar uma compra em segundos.', hoje: 'O teu dia numa página.', painel: 'Os números da tua vida e o centro de controlo: o que precisa de atenção.', control: 'Agora faz parte do Painel.', next: 'A próxima ação certa, agora.', calendario: 'Aulas, turnos, compromissos e Google Calendar.', tarefas: 'Tudo o que tens para fazer.', habitos: 'Inegociáveis, rotina e sequências.', projetos: 'Projetos com fases e progresso.', metas: 'Metas grandes e o caminho até elas.', financas: 'Contas, gastos, orçamento e dívidas.', investimentos: 'Carteira, movimentos e cotações.', compras: 'Pensar antes de comprar.', simuladores: 'Empréstimos, compras, metas e juros.', universidade: 'Disciplinas, avaliações, revisões.', aprendizagem: 'Competências a dominar, etapa a etapa.', conhecimento: 'Notas e conhecimento guardado.', corpo: 'Treino, dieta e corrida ligados.', treino: 'Rotinas, treino em curso, exercícios com imagens.', dieta: 'Refeições, calorias, proteína e água.', dieta: 'Refeições, calorias, proteína e água.', corrida: 'Corridas, plano e ritmo.', trabalho: 'Turnos e horas de trabalho.', carreira: 'Rede de contactos e experiências.', capital: 'O teu valor profissional a crescer.', oportunidades: 'Vagas, candidaturas e oportunidades.', mova: 'A tua empresa: vendas, clientes, custos.', northstar: 'A direção que guia tudo.', roadmap: 'O plano no tempo.', longterm: 'Visão a 1, 5 e 10 anos.', decisoes: 'Decidir bem, com critérios.', revisao: 'Revisões semanais e mensais.', evolucao: 'Como estás a evoluir.' };
+const DESC = { spyke: 'O teu assistente de voz: resumo do dia, perguntas e comandos.', email: 'E-mails e LinkedIn resumidos: urgente, responder, spam.', foco: 'Resolver pendências por prioridade, sem fugir, com saída por Face ID.', desporto: 'Os teus desportos, práticas, estatísticas e treinos para melhorar.', floresta: 'Foca-te e faz crescer a tua floresta.', cursos: 'Os cursos que estás a fazer, com progresso.', certificacoes: 'Todas as tuas certificações.', leituras: 'Estante virtual: livros, resenhas e desafios.', eu: 'A tua história, família, amigos e quem és.', jornal: 'As notícias do mundo e de cada país, em tempo real.', fe: 'Versículo do dia, Bíblia, devocional e oração.', visao: 'Tudo num só lugar: dinheiro, agenda, alertas, próxima ação, trabalho, corpo e estudos.', gasto: 'Registar uma compra em segundos.', hoje: 'O teu dia numa página.',  next: 'O plano da tua vida: do passo pequeno ao grande, por área.', calendario: 'Aulas, turnos, compromissos e Google Calendar.', tarefas: 'Tudo o que tens para fazer.', habitos: 'Inegociáveis, rotina e sequências.', projetos: 'Projetos com fases e progresso.', metas: 'Metas grandes e o caminho até elas.', financas: 'Contas, gastos, orçamento e dívidas.', investimentos: 'Carteira, movimentos e cotações.', compras: 'Pensar antes de comprar.', simuladores: 'Empréstimos, compras, metas e juros.', universidade: 'Disciplinas, avaliações, revisões.', aprendizagem: 'Competências a dominar, etapa a etapa.', conhecimento: 'Notas e conhecimento guardado.', corpo: 'Treino, dieta e corrida ligados.', treino: 'Rotinas, treino em curso, exercícios com imagens.', dieta: 'Refeições, calorias, proteína e água.', dieta: 'Refeições, calorias, proteína e água.', corrida: 'Corridas, plano e ritmo.', trabalho: 'Turnos e horas de trabalho.', carreira: 'Rede de contactos e experiências.', capital: 'O teu valor profissional a crescer.', oportunidades: 'Vagas, candidaturas e oportunidades.', mova: 'A tua empresa: vendas, clientes, custos.', northstar: 'A direção que guia tudo.', roadmap: 'O plano no tempo.', longterm: 'Visão a 1, 5 e 10 anos.', decisoes: 'Decidir bem, com critérios.', revisao: 'Revisões semanais e mensais.', evolucao: 'Como estás a evoluir.' };
 const unlocked = () => new Set(CORE.concat(Object.keys((OS.ui.nav) || {})));
 const unlock = k => { if (!k || CORE.includes(k) || !DESC[k]) return; const n = Object.assign({}, OS.ui.nav || {}); if (!n[k]) { n[k] = 1; OS.ui.nav = n; try { OS.setUI('nav', n); } catch (e) { } } };
 const setH = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = h; } };
@@ -14011,11 +14401,11 @@ V.explorar = () => { const un = unlocked(); return `<div class="exp"><div class=
   ${NAV.map(([g, items]) => `<section class="exp-g"><h6>${g}</h6><div class="exp-grid">${items.map(([k, l, ic]) => `<a class="exp-t ${un.has(k) ? 'in' : ''}" href="#${k}">${UI.ic(ic)}<b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${DESC[k] || ''}</small>${un.has(k) ? '<em>no menu</em>' : '<em class="new">novo</em>'}</a>`).join('')}</div></section>`).join('')}
   <section class="exp-g"><h6>Jogo</h6><div class="exp-grid"><a class="exp-t in" href="#dominus">${UI.ic('crown')}<b>Dominus</b><small>O teu personagem: nível, classe e título, só com conquistas reais.</small><em>no menu</em></a></div></section></div>`; };
 TITLES.explorar = ['Explorar', 'OCEANUM'];
-TITLES.visao = ['Visão Geral', 'Visão geral'];
+TITLES.visao = ['Painel', 'Visão geral'];
 function renderTop(cur) {
   const grp = (NAV.find(([, items]) => items.some(([k]) => k === cur)) || [''])[0];
   setH(U.$('#top'), `<button class="icon-btn tn-menu" data-act="navOpen" aria-label="Menu">${UI.ic('menu')}</button>
-  <a class="tn-brand" href="#visao" aria-label="Oceanum, Visão Geral">${OS.Lock.logo(22, '#BFEFFF', 4)}<b>OCEANUM</b></a>
+  <a class="tn-brand" href="#visao" aria-label="Oceanum, Painel">${OS.Lock.logo(22, '#BFEFFF', 4)}<b>OCEANUM</b></a>
   <nav class="tn" aria-label="Secções">${NAV.map(([g, items]) => `<div class="tn-g ${grp === g ? 'cur' : ''}"><button class="tn-b" data-act="tnToggle" aria-haspopup="true">${g === 'Visão geral' ? 'Visão Geral' : g}<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button>
     <div class="tn-dd">${items.map(([k, l, ic]) => `<a href="#${k}" class="${cur === k ? 'on' : ''}">${UI.ic(ic)}<span><b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${esc(DESC[k] || '')}</small></span></a>`).join('')}</div></div>`).join('')}</nav>
   <div class="tn-r"><i class="sync-dot ${OS.sync.status}" id="syncDot2" title="${esc(OS.sync.msg)}"></i>
