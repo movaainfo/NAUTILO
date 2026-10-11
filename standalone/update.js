@@ -29,23 +29,37 @@ if (VER.v && prev !== VER.v) { ls.set(KEY, VER.v);
   if (prev) { const go = () => { const el = show(`<div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>Atualizado</b><small>versão ${VER.v} · ${VER.date || ''}</small>${(VER.notes || []).length ? `<ul>${VER.notes.slice(0, 4).map(n => `<li>${String(n).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;')}</li>`).join('')}</ul>` : ''}<div class="bar"><i></i></div>`);
       const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }; el.addEventListener('click', close); setTimeout(close, 2600); };
     if (document.readyState === 'loading') addEventListener('DOMContentLoaded', go); else go(); } }
-// 3) garantia extra: compara a versão desta página com a do servidor. Se o servidor tiver uma mais nova e o service worker
-//    não a trouxer em 15 s (acontecia em alguns Android), apaga a cache da app (os teus dados ficam) e recarrega já com a nova.
+// 3) atualização automática: ao abrir, ao voltar à app e de 10 em 10 minutos compara a versão desta página com a do servidor.
+//    Se houver uma mais nova, recarrega logo (a app vem sempre da internet primeiro, por isso o recarregar já traz a nova).
+//    Se mesmo assim não vier, apaga a cópia guardada da app (os teus dados ficam) e recarrega. Nunca interrompe um formulário a meio.
 const num = v => { const m = String(v || '').match(/^(\d+)\.(\d+)/); return m ? +m[1] * 1000 + +m[2] : 0; };
 const note = (t, k) => { try { if (window.OS && OS.UI && OS.UI.toast) OS.UI.toast(t, k); } catch (e) { } };
-let checking = false, lastCheck = 0, forcing = false;
+let checking = false, lastCheck = 0, forcing = false, waitT = 0;
+const TK = 'os2updT', tget = () => { try { return JSON.parse(ls.get(TK) || '{}') || {}; } catch (e) { return {}; } };
+if (num(VER.v) >= num(tget().v)) ls.set(TK, '{}'); // já estamos na versão pedida
 const serverVer = async () => { const r = await fetch(location.pathname + '?vchk=' + Date.now(), { cache: 'no-store', credentials: 'omit' }); if (!r.ok) return ''; const m = (await r.text()).match(/OCEANUM_VERSION=\{"v": *"([^"]+)"/); return m ? m[1] : ''; };
-const hard = async () => { if (forcing) return; const last = +(ls.get('os2hardAt') || 0); if (Date.now() - last < 10 * 60000) return; ls.set('os2hardAt', String(Date.now())); forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão nova encontrada</small>');
+const hard = async () => { if (forcing) return; forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão nova encontrada</small>');
   try { if (navigator.serviceWorker) { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r => r.unregister())); } if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.filter(k => k !== 'oceanum-img').map(k => caches.delete(k))); } } catch (e) { }
   setTimeout(() => location.reload(), 300); };
-window.OceanumCheckUpdate = async manual => { if (checking || forcing) return ''; if (!manual && Date.now() - lastCheck < 60000) return ''; lastCheck = Date.now(); checking = true;
+// a meio de escrever (campo com texto, formulário aberto): espera
+const busy = () => { const a = document.activeElement; if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.value && a.type !== 'search') return true; const d = document.getElementById('drawer'); return !!(d && !d.hidden && d.querySelector('form, input, textarea')); };
+const apply = sv => { if (forcing) return; if (busy()) { clearTimeout(waitT); waitT = setTimeout(() => apply(sv), 20000); return; }
+  const t = tget(), n = t.v === sv ? (+t.n || 0) + 1 : 1; ls.set(TK, JSON.stringify({ v: sv, n, at: Date.now() }));
+  if (n > 5) return; // algo está mesmo errado: não fica em ciclo (o botão "Procurar atualização" continua a funcionar)
+  try { navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => { }); } catch (e) { }
+  if (n >= 2) return hard();
+  forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão ' + String(sv).replace(/[<&]/g, '') + '</small>'); setTimeout(() => location.reload(), 700); };
+window.OceanumCheckUpdate = async manual => { if (checking || forcing) return ''; if (!manual && Date.now() - lastCheck < 15000) return ''; if (!manual && navigator.onLine === false) return 'off'; lastCheck = Date.now(); checking = true;
   try { const sv = await serverVer(); if (!sv || num(sv) <= num(VER.v)) { if (manual) note('Já tens a versão mais recente (' + (VER.v || '') + ').', 'pos'); return 'ok'; }
-    if (manual) note('Versão ' + sv + ' encontrada. A atualizar…');
-    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) reg.update(); } catch (e) { }
-    setTimeout(() => { if (manual || !document.hidden) hard(); }, manual ? 3000 : 15000); return 'new'; }
+    if (manual) { ls.set(TK, JSON.stringify({ v: sv, n: 1 })); note('Versão ' + sv + ' encontrada. A atualizar…'); }
+    apply(sv); return 'new'; }
   catch (e) { if (manual) note('Sem internet para procurar a atualização agora.', 'warn'); return 'off'; } finally { checking = false; } };
-addEventListener('load', () => setTimeout(() => window.OceanumCheckUpdate(false), 4000));
-document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => window.OceanumCheckUpdate(false), 2500); });
+const soon = ms => setTimeout(() => { if (!document.hidden) window.OceanumCheckUpdate(false); }, ms);
+addEventListener('load', () => soon(1500));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) soon(800); });
+addEventListener('pageshow', e => { if (e.persisted) soon(800); });
+addEventListener('online', () => soon(1000));
+setInterval(() => { if (!document.hidden) window.OceanumCheckUpdate(false); }, 10 * 60000);
 // versão visível no ecrã de abertura
 addEventListener('DOMContentLoaded', () => { const f = document.querySelector('.sp-foot'); if (f && VER.v) f.textContent = 'MIND CONTROL · v' + VER.v; });
 window.OceanumVersion = VER;

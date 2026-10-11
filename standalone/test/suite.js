@@ -11,7 +11,7 @@ const PORT = 8781, BASE = `http://localhost:${PORT}/Oceanum/`;
 const CODE = 'teste1234', HASH = crypto.createHash('sha256').update('oceanum-v1|' + CODE).digest('hex');
 let OVERRIDE = {}; // ficheiros substituídos (teste de atualização)
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.json': 'application/json', '.md': 'text/plain', '.glb': 'model/gltf-binary' };
-let OFFLINE = false, GSFAIL = 0;
+let OFFLINE = false, GSFAIL = 0, SLOWIDX = 0, FAILP = '';
 // os mesmos cabeçalhos de segurança do Vercel (CSP incluída), para os testes apanharem o que ela bloquearia; o Apps Script simulado está em http://127.0.0.1
 const SECH = (() => { try { const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')), all = v.headers.find(h => h.source === '/(.*)'), o = {}; all.headers.forEach(h => { o[h.key] = h.key === 'Content-Security-Policy' ? h.value.replace("connect-src 'self'", `connect-src 'self' http://127.0.0.1:${PORT}`) : h.value; }); delete o['Strict-Transport-Security']; return o; } catch (e) { return {}; } })();
 // servidor estático + caixa de entrada simulada (Apps Script)
@@ -37,8 +37,9 @@ const srv = http.createServer((req, res) => {
   let p = decodeURIComponent(u.pathname);
   if (!p.startsWith('/Oceanum/')) { res.writeHead(404); return res.end(); }
   p = p.slice('/Oceanum/'.length) || 'index.html';
+  if (FAILP && FAILP === p) { res.writeHead(500); return res.end('erro'); }
   const file = OVERRIDE[p] || path.join(ROOT, p);
-  fs.readFile(file, (e, d) => { if (e) { res.writeHead(404); return res.end('404'); } res.writeHead(200, Object.assign({}, SECH, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' })); res.end(d); });
+  setTimeout(() => fs.readFile(file, (e, d) => { if (e) { res.writeHead(404); return res.end('404'); } res.writeHead(200, Object.assign({}, SECH, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' })); res.end(d); }), SLOWIDX && p === 'index.html' && !u.query.vchk ? SLOWIDX : 0);
 });
 
 const PROFILES = [
@@ -1065,6 +1066,48 @@ async function newFeatureTests(b) {
     ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }
 }
 
+/* ================= ATUALIZAÇÃO AUTOMÁTICA: nunca mais desinstalar ================= */
+async function updateTests(b) { cur = 'Atualização'; console.log('\n=== Atualização automática (sem reinstalar) ===');
+  const NEWV = (v, swTag) => { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').replace(/OCEANUM_VERSION=\{"v": "[^"]+"/, `OCEANUM_VERSION={"v": "${v}"`); fs.writeFileSync('/tmp/oc_u_' + v + '.html', html); OVERRIDE = { 'index.html': '/tmp/oc_u_' + v + '.html' };
+    if (swTag) { fs.writeFileSync('/tmp/oc_u_sw.js', fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8').replace(/oceanum-[a-z0-9]+/, 'oceanum-' + swTag)); OVERRIDE['sw.js'] = '/tmp/oc_u_sw.js'; } };
+  const ver = p => p.evaluate(() => (window.OceanumVersion || {}).v || '').catch(() => '');
+  const waitVer = async (p, v, ms) => { const t0 = Date.now(); let x = ''; while (Date.now() - t0 < ms) { x = await ver(p); if (x === v) return Date.now() - t0; await sleep(200); } return -1; };
+  const installed = async p => { await p.goto(BASE); await unlock(p); await p.waitForFunction(() => navigator.serviceWorker && navigator.serviceWorker.controller, null, { timeout: 10000 }).catch(() => { }); await p.reload(); await unlock(p).catch(() => { }); await sleep(600); };
+  for (const prof of PROFILES) { const { ctx, p, errs } = await newPage(b, prof); await installed(p); const v0 = await ver(p);
+    ok(prof.id + ': app instalada (a funcionar com a cópia guardada)', !!v0 && await p.evaluate(() => !!navigator.serviceWorker.controller));
+    // publicaram uma versão nova: ao abrir outra vez já vem a nova (antes vinha a antiga da cópia guardada)
+    NEWV('9.1'); await p.reload(); await unlock(p).catch(() => { });
+    ok(prof.id + ': ao abrir a app depois de publicar, abre logo a versão nova', await ver(p) === '9.1', 'versão ' + await ver(p));
+    // app aberta em segundo plano e sai outra versão: ao voltar atualiza-se sozinha, sem tocar em nada
+    NEWV('9.2'); await p.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); });
+    await sleep(300); await p.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => false }); document.dispatchEvent(new Event('visibilitychange')); });
+    const t = await waitVer(p, '9.2', 12000);
+    ok(prof.id + ': ao voltar à app, atualiza-se sozinha em poucos segundos', t >= 0, t >= 0 ? (t / 1000).toFixed(1) + ' s' : 'ficou ' + await ver(p));
+    const er = errs.filter(e => !/Failed to load|net::/.test(e)); ok(prof.id + ': sem erros de JavaScript (atualização)', !er.length, er.slice(0, 2).join(' | '));
+    OVERRIDE = {}; await ctx.close(); }
+  // instalação da versão nova a falhar (um ficheiro dá erro, como acontecia no iPhone): mesmo assim atualiza
+  { const { ctx, p } = await newPage(b, PROFILES[0]); await installed(p); FAILP = 'manifest.webmanifest'; NEWV('9.3', 'falha93');
+    await p.evaluate(() => navigator.serviceWorker.getRegistration().then(r => r && r.update())).catch(() => { }); await sleep(1500); await p.reload().catch(() => { }); await unlock(p).catch(() => { });
+    const t = await waitVer(p, '9.3', 8000); ok('atualização: mesmo com um ficheiro da instalação a falhar, a versão nova entra', t >= 0, 'ficou ' + await ver(p)); FAILP = ''; OVERRIDE = {}; await ctx.close(); }
+  // service worker antigo preso: a verificação de versão apaga a cópia guardada e recarrega (os dados ficam)
+  { const { ctx, p } = await newPage(b, PROFILES[0]); await installed(p); const id = await p.evaluate(() => OS.add('tasks', { title: 'Fica depois de atualizar', status: 'Próxima' }).id); await sleep(800);
+    NEWV('9.4'); await p.evaluate(() => localStorage.setItem('os2updT', JSON.stringify({ v: '9.4', n: 1 }))); await p.evaluate(() => window.OceanumCheckUpdate(false)).catch(() => { });
+    const t = await waitVer(p, '9.4', 10000); ok('atualização: se recarregar não chegar, limpa a cópia guardada e entra a nova', t >= 0, 'ficou ' + await ver(p));
+    await unlock(p).catch(() => { }); let kept = false; for (let i = 0; i < 30 && !kept; i++) { await sleep(200); kept = await p.evaluate(id => !!(window.OS && OS.get && OS.get('tasks', id)), id).catch(() => false); }
+    ok('atualização: os dados ficam depois de atualizar', kept); OVERRIDE = {}; await ctx.close(); }
+  // a meio de escrever: não recarrega por baixo do dedo; atualiza quando acabares
+  { const { ctx, p } = await newPage(b, PROFILES[0]); await installed(p); await p.evaluate(() => OS.UI.openForm('tasks')); await sleep(300); await p.fill('#drawer input', 'a escrever uma tarefa');
+    NEWV('9.5'); await p.evaluate(() => window.OceanumCheckUpdate(false)).catch(() => { }); await sleep(2500);
+    ok('atualização: com um formulário a meio, espera (não perde o que escreves)', await ver(p) !== '9.5' && await p.evaluate(() => (document.querySelector('#drawer input') || {}).value === 'a escrever uma tarefa'));
+    await p.evaluate(() => OS.UI.closeDrawer()); const t = await waitVer(p, '9.5', 25000); ok('atualização: depois de fechar o formulário, atualiza sozinha', t >= 0, 'ficou ' + await ver(p)); OVERRIDE = {}; await ctx.close(); }
+  // rede muito lenta: não fica à espera, abre logo a cópia guardada (e atualiza depois)
+  { const { ctx, p } = await newPage(b, PROFILES[0]); await installed(p); SLOWIDX = 9000; const t0 = Date.now(); await p.reload({ waitUntil: 'domcontentloaded' }).catch(() => { }); const dt = Date.now() - t0;
+    ok('atualização: com rede muito lenta, abre em menos de 5 s com a cópia guardada', dt < 5500, (dt / 1000).toFixed(1) + ' s'); SLOWIDX = 0; await ctx.close(); }
+  // sem internet: abre na mesma
+  { const { ctx, p } = await newPage(b, PROFILES[0]); await installed(p); OFFLINE = true; await ctx.setOffline(true); await p.reload().catch(() => { }); let off = false; try { await unlock(p); off = await p.evaluate(() => !!document.querySelector('#view')); } catch (e) { }
+    OFFLINE = false; await ctx.setOffline(false); ok('atualização: sem internet a app abre na mesma', off); await ctx.close(); }
+}
+
 /* ================= SEGURANÇA: tentar atacar a própria app ================= */
 async function securityTests(b) { cur = 'Segurança'; console.log('\n=== Segurança: ataques à própria app ===');
   const PAY = `"'><img src=x onerror="window.__xss=(window.__xss||0)+1"><svg onload="window.__xss=1"></svg><script>window.__xss=1</script>`, JSP = 'javascript:window.__xss=1';
@@ -1189,7 +1232,7 @@ async function stress(b) {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);
