@@ -670,6 +670,10 @@ async function sharedTests(b) {
     ok('e-mail: separa urgente e promoções (sem IA)', await E(p, () => OS.Mail.counts().urg === 1 && OS.Mail.items().some(x => x.c === 'promo') && !!document.querySelector('#view .ml-it.c-urgente')));
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
     ok('google script v9 é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
+    const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
+      return { n: P.length, ok1: v(P[0]), ok2: v(P[1]), l1: P[0].length, l2: P[1].length, same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '')).replace(/\s+$/, '') === full.replace(/\s+$/, ''), key1: /const KEY = 'abc'/.test(P[0]), fns: /function doGet/.test(P[0]) && /function verificarAlertas|function noticias_/.test(P[0] + P[1]) }; });
+    ok('script em 2 partes: cada parte é JavaScript válido sozinha e juntas dão o código completo', gp.n === 2 && gp.ok1 && gp.ok2 && gp.same && gp.key1 && gp.fns, JSON.stringify(gp));
+    ok('script em 2 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.l1 < 15000 && gp.l2 < 15000, gp.l1 + ' + ' + gp.l2);
     // SPYKE+: memória, rotinas, balanço da noite, modo Jarvis, eventos do e-mail
     await E(p, () => OS.Spyke.handle('lembra-te que gosto de estudar de manhã')); await sleep(300);
     ok('spyke: memória guarda o que lhe dizes', await E(p, () => OS.all('spymem').some(m => /estudar de manhã/.test(m.text))));

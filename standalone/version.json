@@ -1,8 +1,8 @@
 {
- "n": 100,
- "hash": "04206fc70f05",
+ "n": 101,
+ "hash": "ab5579868474",
  "notes": [
-  "Estado do Spyke: verifica a IA, o microfone, o script Google, as notícias e o e-mail, e mostra o passo a passo para atualizar o script. Jornal explica quando o script é antigo."
+  "Script do Google em 2 partes (o colar no telemóvel/tablet cortava o código); um projeto novo do script usa os dados que já estão no Drive."
  ],
- "date": "10/10/2026"
+ "date": "11/10/2026"
 }
