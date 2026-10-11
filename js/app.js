@@ -3,7 +3,7 @@
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc;
 const NAV = [
-  ['Visão geral', [['visao', 'Visão Geral', 'grid'], ['hoje', 'Hoje', 'sun'], ['jornal', 'Jornal', 'news', () => { const n = OS.News && OS.News.unread(); return n ? [n, ''] : null; }], ['spyke', 'Spyke (assistente)', 'mic'], ['email', 'E-mail & LinkedIn', 'mail', () => { const c = OS.Mail && OS.Mail.counts(); return c && c.urg ? [c.urg, 'neg'] : null; }], ['painel', 'Painel', 'grid'], ['control', 'Control Room', 'radar', () => { const n = OS.Intel.alerts().filter(a => a.lvl === 'urgent').length; return n ? [n, 'neg'] : null; }], ['next', 'Next Action', 'zap'], ['calendario', 'Calendário', 'cal']]],
+  ['Visão geral', [['visao', 'Visão Geral', 'grid'], ['hoje', 'Hoje', 'sun'], ['jornal', 'Jornal', 'news', () => { const n = OS.News && OS.News.unread(); return n ? [n, ''] : null; }], ['spyke', 'Spyke (assistente)', 'mic'], ['email', 'E-mail & LinkedIn', 'mail', () => { const c = OS.Mail && OS.Mail.counts(); return c && c.urg ? [c.urg, 'neg'] : null; }], ['painel', 'Painel', 'radar', () => { const n = OS.Intel.alerts().filter(a => a.lvl === 'urgent').length; return n ? [n, 'neg'] : null; }], ['next', 'Next Action', 'zap'], ['calendario', 'Calendário', 'cal']]],
   ['Execução', [['tarefas', 'Tarefas', 'checksq', () => { const n = OS.Tasks.open().filter(OS.Tasks.late).length; return n ? [n, 'neg'] : [OS.Tasks.open().length, '']; }], ['habitos', 'Hábitos & Rotina', 'repeat'], ['foco', 'Bloco de foco', 'focus', () => { const b = OS.FocusBlock && OS.FocusBlock.state(); return b && b.phase !== 'end' ? ['●', 'pos'] : null; }], ['projetos', 'Projetos', 'folder'], ['metas', 'Metas', 'target']]],
   ['Eu', [['eu', 'Quem sou eu', 'user']]],
   ['Fé', [['fe', 'Fé & Devoção', 'cross']]],
@@ -14,17 +14,19 @@ const NAV = [
   ['Direção', [['northstar', 'North Star', 'compass'], ['roadmap', 'Roadmap', 'map'], ['longterm', 'Long Term', 'mountain'], ['decisoes', 'Decision Center', 'scale'], ['revisao', 'Revisões', 'rewind'], ['evolucao', 'Minha Evolução', 'chart']]]];
 const TITLES = { dominus: ['Dominus', 'Jogo'], definicoes: ['Definições', 'Sistema'] };
 NAV.forEach(([g, items]) => items.forEach(([k, l]) => TITLES[k] = [l, g]));
+TITLES.control = ['Painel', 'Visão geral'];
 TITLES.mova = [OS.one ? 'Mova' : 'Mova', 'Empresa'];
 
 const CORE = ['visao', 'eu', 'fe', 'jornal', 'gasto', 'hoje', 'tarefas', 'habitos', 'financas', 'treino', 'dieta', 'universidade', 'metas'];
-const DESC = { spyke: 'O teu assistente de voz: resumo do dia, perguntas e comandos.', email: 'E-mails e LinkedIn resumidos: urgente, responder, spam.', foco: 'Resolver pendências por prioridade, sem fugir, com saída por Face ID.', desporto: 'Os teus desportos, práticas, estatísticas e treinos para melhorar.', floresta: 'Foca-te e faz crescer a tua floresta.', cursos: 'Os cursos que estás a fazer, com progresso.', certificacoes: 'Todas as tuas certificações.', leituras: 'Estante virtual: livros, resenhas e desafios.', eu: 'A tua história, família, amigos e quem és.', jornal: 'As notícias do mundo e de cada país, em tempo real.', fe: 'Versículo do dia, Bíblia, devocional e oração.', visao: 'Painel com tudo: dinheiro, agenda, corpo e estudos.', gasto: 'Registar uma compra em segundos.', hoje: 'O teu dia numa página.', painel: 'Os números da tua vida de relance.', control: 'Alertas e o que precisa de atenção.', next: 'A próxima ação certa, agora.', calendario: 'Aulas, turnos, compromissos e Google Calendar.', tarefas: 'Tudo o que tens para fazer.', habitos: 'Inegociáveis, rotina e sequências.', projetos: 'Projetos com fases e progresso.', metas: 'Metas grandes e o caminho até elas.', financas: 'Contas, gastos, orçamento e dívidas.', investimentos: 'Carteira, movimentos e cotações.', compras: 'Pensar antes de comprar.', simuladores: 'Empréstimos, compras, metas e juros.', universidade: 'Disciplinas, avaliações, revisões.', aprendizagem: 'Competências a dominar, etapa a etapa.', conhecimento: 'Notas e conhecimento guardado.', corpo: 'Treino, dieta e corrida ligados.', treino: 'Rotinas, treino em curso, exercícios com imagens.', dieta: 'Refeições, calorias, proteína e água.', dieta: 'Refeições, calorias, proteína e água.', corrida: 'Corridas, plano e ritmo.', trabalho: 'Turnos e horas de trabalho.', carreira: 'Rede de contactos e experiências.', capital: 'O teu valor profissional a crescer.', oportunidades: 'Vagas, candidaturas e oportunidades.', mova: 'A tua empresa: vendas, clientes, custos.', northstar: 'A direção que guia tudo.', roadmap: 'O plano no tempo.', longterm: 'Visão a 1, 5 e 10 anos.', decisoes: 'Decidir bem, com critérios.', revisao: 'Revisões semanais e mensais.', evolucao: 'Como estás a evoluir.' };
+const DESC = { spyke: 'O teu assistente de voz: resumo do dia, perguntas e comandos.', email: 'E-mails e LinkedIn resumidos: urgente, responder, spam.', foco: 'Resolver pendências por prioridade, sem fugir, com saída por Face ID.', desporto: 'Os teus desportos, práticas, estatísticas e treinos para melhorar.', floresta: 'Foca-te e faz crescer a tua floresta.', cursos: 'Os cursos que estás a fazer, com progresso.', certificacoes: 'Todas as tuas certificações.', leituras: 'Estante virtual: livros, resenhas e desafios.', eu: 'A tua história, família, amigos e quem és.', jornal: 'As notícias do mundo e de cada país, em tempo real.', fe: 'Versículo do dia, Bíblia, devocional e oração.', visao: 'Painel com tudo: dinheiro, agenda, corpo e estudos.', gasto: 'Registar uma compra em segundos.', hoje: 'O teu dia numa página.', painel: 'Os números da tua vida e o centro de controlo: o que precisa de atenção.', control: 'Agora faz parte do Painel.', next: 'A próxima ação certa, agora.', calendario: 'Aulas, turnos, compromissos e Google Calendar.', tarefas: 'Tudo o que tens para fazer.', habitos: 'Inegociáveis, rotina e sequências.', projetos: 'Projetos com fases e progresso.', metas: 'Metas grandes e o caminho até elas.', financas: 'Contas, gastos, orçamento e dívidas.', investimentos: 'Carteira, movimentos e cotações.', compras: 'Pensar antes de comprar.', simuladores: 'Empréstimos, compras, metas e juros.', universidade: 'Disciplinas, avaliações, revisões.', aprendizagem: 'Competências a dominar, etapa a etapa.', conhecimento: 'Notas e conhecimento guardado.', corpo: 'Treino, dieta e corrida ligados.', treino: 'Rotinas, treino em curso, exercícios com imagens.', dieta: 'Refeições, calorias, proteína e água.', dieta: 'Refeições, calorias, proteína e água.', corrida: 'Corridas, plano e ritmo.', trabalho: 'Turnos e horas de trabalho.', carreira: 'Rede de contactos e experiências.', capital: 'O teu valor profissional a crescer.', oportunidades: 'Vagas, candidaturas e oportunidades.', mova: 'A tua empresa: vendas, clientes, custos.', northstar: 'A direção que guia tudo.', roadmap: 'O plano no tempo.', longterm: 'Visão a 1, 5 e 10 anos.', decisoes: 'Decidir bem, com critérios.', revisao: 'Revisões semanais e mensais.', evolucao: 'Como estás a evoluir.' };
 const unlocked = () => new Set(CORE.concat(Object.keys((OS.ui.nav) || {})));
 const unlock = k => { if (!k || CORE.includes(k) || !DESC[k]) return; const n = Object.assign({}, OS.ui.nav || {}); if (!n[k]) { n[k] = 1; OS.ui.nav = n; try { OS.setUI('nav', n); } catch (e) { } } };
+const setH = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = h; } };
 function renderSide(cur) {
-  U.$('#side').innerHTML = `<a class="brand" href="#visao"><span class="brand-mark oc">${OS.Lock.logo(20, '#EDE6DA', 4)}</span><span><b>OCEANUM</b></span></a>
+  setH(U.$('#side'), `<a class="brand" href="#visao"><span class="brand-mark oc">${OS.Lock.logo(20, '#EDE6DA', 4)}</span><span><b>OCEANUM</b></span></a>
   <a class="side-set ${cur === 'definicoes' ? 'on' : ''}" href="#definicoes">${UI.ic('settings')}<span>Definições</span></a>
   ${NAV.map(([g, items]) => `<div class="nav-g"><h6>${g}</h6>${items.map(([k, l, ic, cnt]) => { let c = null; if (cnt) { try { c = cnt(); } catch (e) { } } return `<a href="#${k}" class="${cur === k ? 'on' : ''}">${UI.ic(ic)}<span>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</span>${c && c[1] === 'neg' ? `<span class="cnt neg">${c[0]}</span>` : ''}</a>`; }).join('')}</div>`).join('')}
-  <div class="side-foot"><i class="sync-dot ${OS.sync.status}" id="syncDot"></i><span id="syncMsg">${esc(OS.sync.msg)}</span><button class="icon-btn" style="margin-left:auto" data-act="lockNow" aria-label="Bloquear" title="Bloquear">${UI.ic('lock')}</button><a class="icon-btn" href="#definicoes" aria-label="Definições">${UI.ic('settings')}</a></div>`;
+  <div class="side-foot"><i class="sync-dot ${OS.sync.status}" id="syncDot"></i><span id="syncMsg">${esc(OS.sync.msg)}</span><button class="icon-btn" style="margin-left:auto" data-act="lockNow" aria-label="Bloquear" title="Bloquear">${UI.ic('lock')}</button><a class="icon-btn" href="#definicoes" aria-label="Definições">${UI.ic('settings')}</a></div>`);
 }
 V.explorar = () => { const un = unlocked(); return `<div class="exp"><div class="exp-h"><h1>Explorar</h1><p>Tudo o que o Oceanum faz. Abre um lugar e ele passa a aparecer no teu menu.</p></div>
   ${NAV.map(([g, items]) => `<section class="exp-g"><h6>${g}</h6><div class="exp-grid">${items.map(([k, l, ic]) => `<a class="exp-t ${un.has(k) ? 'in' : ''}" href="#${k}">${UI.ic(ic)}<b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${DESC[k] || ''}</small>${un.has(k) ? '<em>no menu</em>' : '<em class="new">novo</em>'}</a>`).join('')}</div></section>`).join('')}
@@ -33,7 +35,7 @@ TITLES.explorar = ['Explorar', 'OCEANUM'];
 TITLES.visao = ['Visão Geral', 'Visão geral'];
 function renderTop(cur) {
   const grp = (NAV.find(([, items]) => items.some(([k]) => k === cur)) || [''])[0];
-  U.$('#top').innerHTML = `<button class="icon-btn tn-menu" data-act="navOpen" aria-label="Menu">${UI.ic('menu')}</button>
+  setH(U.$('#top'), `<button class="icon-btn tn-menu" data-act="navOpen" aria-label="Menu">${UI.ic('menu')}</button>
   <a class="tn-brand" href="#visao" aria-label="Oceanum, Visão Geral">${OS.Lock.logo(22, '#BFEFFF', 4)}<b>OCEANUM</b></a>
   <nav class="tn" aria-label="Secções">${NAV.map(([g, items]) => `<div class="tn-g ${grp === g ? 'cur' : ''}"><button class="tn-b" data-act="tnToggle" aria-haspopup="true">${g === 'Visão geral' ? 'Visão Geral' : g}<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button>
     <div class="tn-dd">${items.map(([k, l, ic]) => `<a href="#${k}" class="${cur === k ? 'on' : ''}">${UI.ic(ic)}<span><b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${esc(DESC[k] || '')}</small></span></a>`).join('')}</div></div>`).join('')}</nav>
@@ -42,10 +44,10 @@ function renderTop(cur) {
   <button class="icon-btn" data-act="cmdOpen" aria-label="Procurar (Ctrl K)" title="Procurar (Ctrl K)">${UI.ic('search')}</button>
   <button class="icon-btn tn-hide-s" data-act="focusStart" aria-label="Modo foco" title="Modo foco">${UI.ic('focus')}</button>
   <a class="icon-btn" href="#definicoes" aria-label="Definições" title="Definições">${UI.ic('settings')}</a>
-  <button class="btn pri sm tn-add" data-act="quickAdd" aria-label="Registar">${UI.ic('plus')}<span>Registar</span></button></div>`;
+  <button class="btn pri sm tn-add" data-act="quickAdd" aria-label="Registar">${UI.ic('plus')}<span>Registar</span></button></div>`);
 }
 function renderTab(cur) {
-  U.$('#tabbar').innerHTML = '';
+  setH(U.$('#tabbar'), '');
   let fab = document.getElementById('gameFab');
   if (!fab) { fab = document.createElement('a'); fab.id = 'gameFab'; fab.href = '#dominus'; document.body.appendChild(fab); }
   const dom = OS.one('dominus'), lv = OS.Dom ? OS.Dom.sumLv() : 0, pend = ((dom.rwv2 || {}).pend || []).length;
@@ -80,9 +82,11 @@ function render() {
   C.reset(); let html;
   try { html = V[cur](r.sub); } catch (e) { console.error(e); html = `<div class="pn"><b>Não foi possível mostrar esta página.</b><p class="mut">${esc(e.message)}</p></div>`; }
   if (!html || !String(html).trim()) html = `<div class="pn"><b>Esta página ainda está vazia.</b><p class="mut"><a href="#hoje">Voltar ao Hoje</a></p></div>`;
-  U.$('#view').innerHTML = html;
-  try { C.drawAll(); } catch (e) { console.error(e); }
-  try { progressive(cur, r.raw); } catch (e) { console.error(e); }
+  // se nada mudou na página, não a substitui (evita piscar, perder o toque e redesenhar gráficos à toa)
+  const sig = r.raw + '|' + String(html).replace(/ id="ch\d+"/g, ''), view = U.$('#view');
+  if (sig !== view._sig || !view.firstChild) { view.innerHTML = html; view._sig = sig;
+    try { C.drawAll(); } catch (e) { console.error(e); }
+    try { progressive(cur, r.raw); } catch (e) { console.error(e); } }
   if (fsel) { const el = U.$('#view').querySelector(fsel); if (el) { el.focus({ preventScroll: true }); try { if (caret != null && el.setSelectionRange) el.setSelectionRange(caret, caret); } catch (e) { } } }
   if (r.raw !== lastRoute) { window.scrollTo(0, 0); lastRoute = r.raw; }
   document.title = OS.focusState && OS.focusState() ? document.title : 'OCEANUM';

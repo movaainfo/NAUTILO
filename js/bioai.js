@@ -33,14 +33,26 @@ A.aiKeySave = b => { const box = b.closest('.ai-row') || document, inp = box.que
   if (v.length < 20) { UI.toast('Esta chave parece incompleta', 'warn'); return; } OS.setOne('diet', { aiKey: v }); OS.ui.aiChg = false; U.ls.del('os2aiOk'); UI.toast('Spyke ligado: a IA já funciona em toda a app', 'pos'); OS.emit('ai:on');
   AI.test().then(o => { if (o.ok === false) UI.toast(o.msg, 'warn'); OS.request(); });
   if (b.dataset.next && A[b.dataset.next]) A[b.dataset.next](b); else OS.request(); };
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
-AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '';
-  for (const m of MODELS) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseMimeType: 'application/json', temperature: temp } }) });
+/* Limite grátis: o Google dá uma cota por modelo (por minuto e por dia). Quando um modelo esgota, passa-se ao seguinte
+   e fica anotado até ao dia seguinte (a cota diária renova à meia-noite da Califórnia). Assim o uso grátis multiplica-se. */
+const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemma-3-27b-it', 'gemma-3-12b-it'];
+const ptDay = () => { try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return U.today(); } };
+const QK = 'os2aiQuota';
+AI.blocked = m => { const q = U.ls.get(QK, {}) || {}, x = q[m]; return !!x && (x.d ? x.d === ptDay() : x.until > Date.now()); };
+AI.markLimit = (m, msg) => { const q = U.ls.get(QK, {}) || {}; q[m] = /per ?day|perday|daily|diári/i.test(msg || '') ? { d: ptDay() } : { until: Date.now() + 65000 }; U.ls.set(QK, q); };
+AI.models = list => (list || MODELS).filter(m => !AI.blocked(m));
+AI.limitMsg = 'Hoje já se gastou a cota grátis de todos os modelos de IA do Google. Volta a funcionar sozinho amanhã. Para nunca parar: liga o Claude na página do Spyke, ou ativa a faturação na tua chave do Google (paga-se só o que passar da cota grátis).';
+AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '', limited = 0; const list = AI.models();
+  if (!list.length) throw Object.assign(new Error(AI.limitMsg), { fatal: 1 });
+  for (const m of list) { const gemma = /^gemma/.test(m); try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: gemma ? parts.concat([{ text: '\nResponde APENAS com o JSON pedido, sem texto à volta.' }]) : parts }], generationConfig: gemma ? { temperature: temp } : { responseMimeType: 'application/json', temperature: temp } }) });
       const j = await r.json().catch(() => ({})); if (r.status === 404) { last = 'modelo indisponível'; continue; }
-      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 }); if (r.status === 429) throw Object.assign(new Error('Limite gratuito atingido por agora. Tenta daqui a um minuto.'), { fatal: 1 }); last = msg || 'erro ' + r.status; continue; }
-      const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join(''); return JSON.parse(txt.replace(/^```(json)?|```$/g, '').trim()); }
+      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 });
+        if (r.status === 429) { AI.markLimit(m, msg); limited++; last = 'limite'; continue; } last = msg || 'erro ' + r.status; continue; }
+      const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('').replace(/```(?:json)?/g, '').trim();
+      try { return JSON.parse(txt); } catch (e) { const mm = txt.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } }
     catch (e) { if (e.fatal) throw e; last = e.message; } }
-  throw new Error('A IA não respondeu (' + last + '). Verifica a internet e tenta de novo.'); };
+  if (limited && !AI.models().length) throw Object.assign(new Error(AI.limitMsg), { fatal: 1 });
+  throw new Error(last === 'limite' ? 'A IA está ocupada por um minuto (limite por minuto). Tenta já a seguir.' : 'A IA não respondeu (' + last + '). Verifica a internet e tenta de novo.'); };
 
 /* ================= ler o exame ================= */
 const FIELDS = { weight: 'peso total em kg', bf: 'percentagem de gordura corporal (PBF, %)', fatKg: 'massa de gordura corporal em kg (Body Fat Mass)', muscleKg: 'massa muscular esquelética em kg (SMM)', leanKg: 'massa livre de gordura / massa magra em kg (FFM, LBM)', water: 'água corporal em % do peso', waterL: 'água corporal total em litros (TBW)', protein: 'proteína em % do peso (se só houver kg, converte para % do peso)', bone: 'minerais / massa óssea em kg', visceral: 'nível de gordura visceral (número)', subq: 'gordura subcutânea em %', bmr: 'taxa metabólica basal em kcal', metAge: 'idade metabólica em anos', lArmL: 'massa magra braço esquerdo kg', lArmR: 'massa magra braço direito kg', lTrunk: 'massa magra tronco kg', lLegL: 'massa magra perna esquerda kg', lLegR: 'massa magra perna direita kg', gArmL: 'gordura braço esquerdo em %', gArmR: 'gordura braço direito em %', gTrunk: 'gordura tronco em %', gLegL: 'gordura perna esquerda em %', gLegR: 'gordura perna direita em %', ecw: 'rácio água extracelular / água total (ECW/TBW, ex. 0.380)', phase: 'ângulo de fase em graus', score: 'pontuação do aparelho (ex. InBody score)', waist: 'perímetro da cintura cm', hip: 'perímetro da anca cm', neck: 'pescoço cm', chest: 'peito cm', abdomen: 'abdómen cm', armLc: 'braço esquerdo cm', armRc: 'braço direito cm', thighL: 'coxa esquerda cm', thighR: 'coxa direita cm', calf: 'gémeo cm' };

@@ -1,0 +1,135 @@
+/* OCEANUM — cérebro do Spyke: um agente que pensa e age.
+   Recebe o pedido, decide o que precisa (consultar os teus dados, pesquisar na internet, criar uma tarefa, um compromisso, um gasto…),
+   usa as ferramentas e responde em poucas frases para ser dito em voz alta.
+   Dois cérebros:
+   - Gemini (grátis, com a chave do Google): chamadas de função + pesquisa Google;
+   - Claude (opcional, pago, com a tua chave da Anthropic): SDK oficial carregado só quando o escolhes (vendor/anthropic-sdk.min.js),
+     com a pesquisa web da Anthropic e recurso automático a outro modelo se um pedido for recusado. */
+(() => {
+'use strict';
+const U = OS.U;
+const B = OS.Brain = {};
+const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
+const who = () => OS.one('profile').short || 'Ryan';
+const today = () => U.today();
+const cut = (o, n = 6000) => { const s = typeof o === 'string' ? o : JSON.stringify(o); return s.length > n ? s.slice(0, n) + '…' : s; };
+const safe = f => { try { return f(); } catch (e) { return null; } };
+
+/* ---------- o que o Spyke consegue consultar ---------- */
+const AREAS = ['agenda', 'tarefas', 'financas', 'habitos', 'universidade', 'investimentos', 'emails', 'noticias', 'clima', 'metas', 'treino', 'pessoas', 'decisoes', 'memoria', 'trabalho'];
+const consult = async area => { const t = today(), F = OS.Fin;
+  switch (area) {
+    case 'agenda': return safe(() => OS.Cal.items(t, U.addDays(t, 14)).filter(x => x.src !== 'bill').slice(0, 60).map(x => ({ dia: x.date, hora: x.start || '', fim: x.end || '', titulo: x.title, tipo: x.src, feito: !!x.done })));
+    case 'tarefas': return safe(() => U.sortBy(OS.Tasks.open(), x => (+x.prio || 3) + (x.due || '9')).slice(0, 40).map(x => ({ titulo: x.title, prazo: x.due || '', planeada: x.sched || '', prioridade: x.prio || '', projeto: (OS.get('projects', x.project) || {}).name || '', atrasada: OS.Tasks.late(x) })));
+    case 'financas': return safe(() => { const m = F.month(U.ym(t)); return { disponivel: U.r2(F.liquid()), reserva: U.r2(F.reserve()), mes: { receitas: U.r2(m.inc), despesas: U.r2(m.exp), saldo: U.r2(m.net) }, por_categoria: F.byCat(U.ym(t) + '-01', t).slice(0, 10), a_pagar_14_dias: F.upcoming(14).filter(x => x.amount < 0).slice(0, 15).map(x => ({ dia: x.date, o_que: x.title, valor: U.r2(-x.amount), atraso: !!x.late })), dividas: U.r2(F.debtsTotal()), patrimonio: U.r2(F.netWorth()) }; });
+    case 'habitos': return safe(() => OS.all('habits').filter(h => h.active).map(h => ({ nome: h.name, hoje: OS.Hab.due(h, t) ? (OS.Hab.done(h, t) ? 'feito' : 'por fazer') : 'não é hoje', sequencia: OS.Hab.streak(h), inegociavel: !!h.core })));
+    case 'universidade': return safe(() => ({ media: OS.St.gpa(), disciplinas: OS.St.current().map(s => { const x = OS.St.stats(s); return { nome: s.name, media: x.avg, horas: x.hours, situacao: x.sit[0] }; }), avaliacoes: U.sortBy(OS.all('assessments').filter(a => a.date >= t), a => a.date).slice(0, 12).map(a => ({ dia: a.date, tipo: a.type, titulo: a.title, disciplina: (OS.get('subjects', a.subject) || {}).name || '', peso: a.weight, preparacao: a.prep || 'Não comecei' })), revisoes_hoje: OS.St.revDue().length }));
+    case 'investimentos': return safe(() => ({ valor_total: OS.Inv && OS.Inv.value ? U.r2(OS.Inv.value()) : null, ativos: OS.all('assets').slice(0, 30).map(a => ({ nome: a.name || a.symbol, simbolo: a.symbol || '', tipo: a.type || '' })) }));
+    case 'emails': return safe(() => OS.Mail ? { resumo: OS.Mail.sum ? OS.Mail.sum() : '', itens: OS.Mail.items().slice(0, 15).map(m => ({ de: m.f, assunto: m.s, categoria: m.c, trecho: String(m.sn || '').slice(0, 160), nao_lido: !!m.u })) } : 'O e-mail não está ligado.');
+    case 'noticias': try { return OS.News && OS.News.headlines ? await OS.News.headlines(8) : []; } catch (e) { return 'Sem notícias agora.'; }
+    case 'clima': try { const w = OS.Weather && await OS.Weather.get(); return w && w.now ? OS.Weather.say(w, 0) + ' ' + OS.Weather.say(w, 1) : 'Sem dados do clima.'; } catch (e) { return 'Sem dados do clima.'; }
+    case 'metas': return safe(() => OS.all('goals').filter(g => g.status === 'Ativa').map(g => { const i = OS.Goal.info(g); return { meta: g.title, progresso: Math.round(i.p * 100) + '%', estado: i.st[0], prazo: g.due || '' }; }));
+    case 'treino': return safe(() => ({ divisao: OS.one('fit').split, hoje: OS.one('fit').split[String(new Date().getDay())] || '', ultimos: U.sortBy(OS.all('workouts'), w => w.date).slice(-5).map(w => ({ dia: w.date, treino: w.title })), corridas: U.sortBy(OS.all('runs'), r => r.date).slice(-5).map(r => ({ dia: r.date, km: r.km })) }));
+    case 'pessoas': return safe(() => OS.all('people').slice(0, 60).map(p => ({ nome: p.name, relacao: p.rel || '', aniversario: p.birth || '' })));
+    case 'decisoes': return safe(() => OS.all('decisions').filter(d => d.status === 'Em análise').map(d => ({ decisao: d.title, alternativas: (d.alts || []).map(a => a.name), analise: d.ai && d.ai.r ? d.ai.r.resumo : '' })));
+    case 'memoria': return safe(() => OS.all('spymem').map(m => m.text));
+    case 'trabalho': return safe(() => ({ turnos: OS.all('shifts').filter(s => s.date >= t).slice(0, 14).map(s => ({ dia: s.date, inicio: s.start, fim: s.end })), folgas: OS.all('dayoffs').filter(o => o.date >= t).slice(0, 10).map(o => o.date) }));
+    default: return 'Área desconhecida. Usa uma destas: ' + AREAS.join(', ');
+  } };
+
+/* ---------- ferramentas (as mesmas para os dois cérebros) ---------- */
+const did = [];   // o que o Spyke fez nesta resposta (aparece no ecrã)
+const T = [
+  { name: 'consultar', description: 'Lê os dados atuais do OCEANUM numa área (agenda, tarefas, finanças, hábitos, universidade, investimentos, e-mails, notícias, clima, metas, treino, pessoas, decisões, memória, trabalho). Usa sempre antes de responder sobre dados dele.', props: { area: { type: 'string', enum: AREAS, description: 'A área a consultar' } }, req: ['area'],
+    run: async a => cut(await consult(a.area)) },
+  { name: 'criar_tarefa', description: 'Cria uma tarefa na lista dele. Só quando ele pede para anotar, lembrar ou criar uma tarefa.', props: { titulo: { type: 'string' }, data: { type: 'string', description: 'AAAA-MM-DD, opcional' }, prioridade: { type: 'integer', description: '1 (crítica) a 4 (baixa), opcional' } }, req: ['titulo'],
+    run: a => { const o = OS.Tasks.quickParse(String(a.titulo).slice(0, 200)); o.status = 'Próxima'; if (/^\d{4}-\d\d-\d\d$/.test(a.data || '')) o.due = a.data; if (a.prioridade >= 1 && a.prioridade <= 4) o.prio = String(a.prioridade); OS.add('tasks', o); did.push('Tarefa: ' + o.title); return 'Tarefa criada: ' + o.title; } },
+  { name: 'concluir_tarefa', description: 'Marca como feita a tarefa aberta cujo título mais se parece com o indicado.', props: { titulo: { type: 'string' } }, req: ['titulo'],
+    run: a => { const n = s => String(s || '').toLowerCase(), q = n(a.titulo), L = OS.Tasks.open(), t = L.find(x => n(x.title) === q) || L.find(x => n(x.title).includes(q) || q.includes(n(x.title))); if (!t) return 'Não encontrei essa tarefa.'; OS.Tasks.complete(t.id); did.push('Feita: ' + t.title); return 'Concluída: ' + t.title; } },
+  { name: 'criar_compromisso', description: 'Marca um compromisso/evento na agenda dele. Com google=true (só quando ele pede a agenda Google) vai para a agenda Google em vez da do Oceanum.', props: { titulo: { type: 'string' }, data: { type: 'string', description: 'AAAA-MM-DD' }, hora: { type: 'string', description: 'HH:MM, opcional' }, fim: { type: 'string', description: 'HH:MM, opcional' }, google: { type: 'boolean', description: 'true só se ele pedir a agenda Google' } }, req: ['titulo', 'data'],
+    run: async a => { if (!/^\d{4}-\d\d-\d\d$/.test(a.data || '')) return 'Data inválida (usa AAAA-MM-DD).'; const o = { title: String(a.titulo).slice(0, 200), date: a.data }; if (/^\d\d:\d\d$/.test(a.hora || '')) o.start = a.hora; if (/^\d\d:\d\d$/.test(a.fim || '')) o.end = a.fim;
+      if (a.google && OS.gcalAdd) { const r = await OS.gcalAdd(o); if (r && r.ok) { did.push('Agenda Google: ' + o.title + ' · ' + U.fmtDS(o.date) + (o.start ? ' ' + o.start : '')); return 'Marcado na agenda Google.'; } }
+      OS.add('events', o); did.push('Agenda: ' + o.title + ' · ' + U.fmtDS(o.date) + (o.start ? ' ' + o.start : '')); return 'Compromisso marcado' + (a.google ? ' no Oceanum (a agenda Google ainda não está ligada pelo script).' : '.'); } },
+  { name: 'registar_gasto', description: 'Regista uma despesa nas finanças dele (só quando ele diz que gastou/pagou/comprou algo).', props: { valor: { type: 'number', description: 'em euros' }, descricao: { type: 'string' } }, req: ['valor', 'descricao'],
+    run: a => { const r = OS.Spyke && OS.Spyke.addExpense ? OS.Spyke.addExpense(+a.valor, String(a.descricao).slice(0, 120)) : null; if (!r || !r.ok) return (r && r.msg) || 'Não consegui registar.'; did.push('Gasto: ' + r.text); return 'Registado: ' + r.text; } },
+  { name: 'marcar_habito', description: 'Marca um hábito de hoje como feito.', props: { nome: { type: 'string' } }, req: ['nome'],
+    run: a => { const q = String(a.nome).toLowerCase(), h = OS.all('habits').find(x => x.active && String(x.name).toLowerCase().includes(q)); if (!h) return 'Não encontrei esse hábito.'; if (OS.Hab.done(h, today())) return 'Já estava feito.'; OS.Hab.toggle(h.id, today()); did.push('Hábito: ' + h.name); return 'Hábito marcado: ' + h.name; } },
+  { name: 'memorizar', description: 'Guarda um facto duradouro sobre a vida dele (pessoas, gostos, planos, datas) quando ele conta ou pede para lembrares.', props: { facto: { type: 'string', description: 'uma frase curta na 3.ª pessoa' } }, req: ['facto'],
+    run: a => { const ok = OS.Spyke && OS.Spyke.memAdd ? OS.Spyke.memAdd(String(a.facto).slice(0, 300), 'ia') : false; if (ok) did.push('Memória: ' + a.facto); return ok ? 'Guardado.' : 'Já sabia isso.'; } },
+  { name: 'responder_email', description: 'Escreve uma resposta a um e-mail recebido e guarda-a como rascunho no Gmail dele (não envia).', props: { pessoa: { type: 'string', description: 'nome ou e-mail de quem escreveu' }, instrucao: { type: 'string', description: 'o que ele quer responder' } }, req: ['pessoa', 'instrucao'],
+    run: async a => { if (!OS.Mail || !OS.Mail.replyByName) return 'O e-mail não está ligado.'; const r = await OS.Mail.replyByName(String(a.pessoa), String(a.instrucao)); if (r.ok) did.push('Rascunho para ' + r.to); return r.ok ? 'Rascunho guardado no Gmail para ' + r.to + ': ' + String(r.body).slice(0, 300) : r.msg; } },
+  { name: 'abrir_pagina', description: 'Abre uma página da app quando ele pede para ver/abrir algo.', props: { pagina: { type: 'string', description: 'nome da página, ex.: finanças, floresta, universidade, e-mail, jornal, investimentos' } }, req: ['pagina'],
+    run: a => { const r = OS.Spyke && OS.Spyke.findRoute ? OS.Spyke.findRoute(a.pagina) : null; if (!r) return 'Não encontrei essa página.'; location.hash = r[0]; return 'Abri ' + r[1] + '.'; } }];
+
+/* ---------- instruções ---------- */
+const system = () => `És o Spyke, o assistente pessoal do ${who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco. Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.
+Regras:
+- Responde SEMPRE em português do Brasil, para ser dito em voz alta: no máximo 3 ou 4 frases curtas, sem listas, sem markdown, sem emojis. Nunca digas o teu próprio nome.
+- Antes de responder sobre a vida dele, usa "consultar" para ler os dados certos (podes consultar várias áreas). Não inventes números nem factos.
+- Para perguntas sobre o mundo (notícias, factos, preços, como fazer algo), pesquisa na internet antes de responder.
+- Age quando ele pedir (criar tarefa, compromisso, gasto, marcar hábito, memorizar, abrir página) e confirma numa frase o que fizeste. Não faças ações que ele não pediu.
+- Se não tiveres a informação, diz isso com honestidade e sugere o que ele pode fazer.
+- Hoje é ${new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}, ${new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })} (hora de Portugal). As datas vão no formato AAAA-MM-DD.`;
+const brief = () => { try { return OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx().slice(0, 3500) : ''; } catch (e) { return ''; } };
+
+/* ---------- Gemini (grátis) ---------- */
+const GM = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+const gemCall = async (model, body) => { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(OS.AI.key())}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({})); if (!r.ok) { const m = (j.error && j.error.message) || 'erro ' + r.status; if (r.status === 429 && OS.AI.markLimit) OS.AI.markLimit(model, m); const e = new Error(/API key/i.test(m) ? 'a chave da IA não é válida' : r.status === 429 ? 'limite grátis da IA atingido por agora' : m); e.status = r.status; throw e; } return j; };
+// limite grátis: passa ao modelo seguinte (cada um tem a sua cota)
+const gemModel = async body => { const list = OS.AI.models ? OS.AI.models(GM) : GM; if (!list.length) throw new Error(OS.AI.limitMsg || 'limite grátis da IA atingido'); let last;
+  for (const m of list) { try { return await gemCall(m, body); } catch (e) { last = e; if (e.status !== 404 && e.status !== 400 && e.status !== 429) throw e; } }
+  if (last && last.status === 429 && OS.AI.models && !OS.AI.models(GM).length) throw new Error(OS.AI.limitMsg); throw last; };
+// pesquisa na internet (Google) feita pelo Gemini, com as fontes
+const webSearch = async q => { const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: `Pesquisa e responde em português, de forma factual e atual, em 4 a 6 frases: ${q}` }] }], tools: [{ google_search: {} }] });
+  const c = (j.candidates || [])[0] || {}, txt = ((c.content || {}).parts || []).map(p => p.text || '').join(''), src = ((c.groundingMetadata || {}).groundingChunks || []).map(x => x.web && x.web.title).filter(Boolean).slice(0, 4);
+  return txt + (src.length ? '\nFontes: ' + src.join(', ') : ''); };
+// pesquisa para outras partes da app (ex.: ler uma notícia inteira): texto + fontes { t, u }
+B.search = async (prompt, temp = .3) => { const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: prompt }] }], tools: [{ google_search: {} }], generationConfig: { temperature: temp } });
+  const c = (j.candidates || [])[0] || {}, txt = ((c.content || {}).parts || []).map(p => p.text || '').join('').trim(), seen = new Set();
+  const src = ((c.groundingMetadata || {}).groundingChunks || []).map(x => x.web).filter(w => w && w.title && !seen.has(w.title) && seen.add(w.title)).slice(0, 8).map(w => ({ t: w.title, u: w.uri }));
+  if (!txt) throw new Error('a IA não respondeu'); return { text: txt, src }; };
+const WEB = { name: 'pesquisar_internet', description: 'Pesquisa na internet (Google) informação atual: notícias, factos, preços, horários, como fazer algo.', props: { pergunta: { type: 'string' } }, req: ['pergunta'], run: async a => cut(await webSearch(String(a.pergunta).slice(0, 300)), 4000) };
+const gemTools = list => [{ functionDeclarations: list.map(t => ({ name: t.name, description: t.description, parameters: { type: 'object', properties: t.props, required: t.req } })) }];
+const askGemini = async (q, hist) => { const tools = T.concat([WEB]), contents = hist.concat([{ role: 'user', parts: [{ text: `Resumo atual dos dados dele (para contexto; consulta para detalhes):\n${brief()}\n\nPedido: ${q}` }] }]);
+  for (let i = 0; i < 6; i++) { const j = await gemModel({ systemInstruction: { parts: [{ text: system() }] }, contents, tools: gemTools(tools), generationConfig: { temperature: .4 } });
+    const c = (j.candidates || [])[0]; if (!c || !c.content) throw new Error('a IA não respondeu'); contents.push(c.content);
+    const calls = (c.content.parts || []).filter(p => p.functionCall); if (!calls.length) return (c.content.parts || []).map(p => p.text || '').join('').trim();
+    const res = []; for (const p of calls) { const f = tools.find(t => t.name === p.functionCall.name); let out; try { out = f ? await f.run(p.functionCall.args || {}) : 'Ferramenta desconhecida.'; } catch (e) { out = 'Erro: ' + (e.message || 'falhou'); } res.push({ functionResponse: { name: p.functionCall.name, response: { resultado: String(out) } } }); }
+    contents.push({ role: 'user', parts: res }); }
+  return 'Fiz o que consegui, mas precisei de passos demais. Diz-me de outra forma.'; };
+
+/* ---------- Claude (opcional, SDK oficial) ---------- */
+let SDK = null;
+const sdk = () => SDK || (SDK = import(new URL('vendor/anthropic-sdk.min.js', document.baseURI).href));
+B.MODELS = [['claude-opus-5-5', 'Claude Opus 5.5 · o mais inteligente (~10 cêntimos por conversa)'], ['claude-sonnet-5-5', 'Claude Sonnet 5.5 · rápido e muito bom (~5 cêntimos)'], ['claude-haiku-5-5', 'Claude Haiku 5.5 · o mais barato (~0,3 cêntimos)']];
+const askClaude = async (q, hist) => { const { Anthropic, betaTool } = await sdk(), c = cfg();
+  const client = new Anthropic({ apiKey: c.anKey.trim(), dangerouslyAllowBrowser: true, maxRetries: 1, timeout: 60000 });
+  const tools = T.map(t => betaTool({ name: t.name, description: t.description, inputSchema: { type: 'object', properties: t.props, required: t.req, additionalProperties: false }, run: async a => String(await t.run(a)) }));
+  const model = c.anModel || B.MODELS[0][0], fb = model === 'claude-opus-5-5' || model === 'claude-sonnet-5-5';
+  const runner = client.beta.messages.toolRunner(Object.assign({ model, max_tokens: 8000, max_iterations: 6, system: system(), output_config: { effort: 'low' },
+    tools: tools.concat([{ type: 'web_search_20260209', name: 'web_search', max_uses: 3 }]),
+    messages: hist.concat([{ role: 'user', content: `Resumo atual dos dados dele (para contexto; consulta para detalhes):\n${brief()}\n\nPedido: ${q}` }]) },
+    // se um pedido for recusado por engano, a Anthropic responde com outro modelo no mesmo pedido
+    fb ? { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' } : {}));
+  for await (const message of runner) { if (message.stop_reason === 'pause_turn') runner.pushMessages({ role: 'assistant', content: message.content }); }
+  const fin = await runner.done(); if (fin.stop_reason === 'refusal') return 'Prefiro não responder a isso.';
+  return fin.content.filter(b => b.type === 'text').map(b => b.text).join(' ').trim(); };
+const claudeErr = async e => { try { const { Anthropic } = await sdk(); if (e instanceof Anthropic.AuthenticationError) return 'a chave da Anthropic não é válida'; if (e instanceof Anthropic.RateLimitError) return 'limite da Anthropic atingido, tenta daqui a pouco'; if (e instanceof Anthropic.PermissionDeniedError) return 'a conta da Anthropic não tem acesso a esse modelo ou não tem saldo'; if (e instanceof Anthropic.BadRequestError) return 'pedido recusado pela Anthropic (' + String(e.message).slice(0, 80) + ')'; if (e instanceof Anthropic.APIConnectionError) return 'sem ligação à Anthropic'; } catch (x) { } return e.message || 'erro'; };
+
+/* ---------- conversa ---------- */
+const H = []; // últimas trocas (para continuar a conversa)
+B.which = () => cfg().brain === 'claude' && cfg().anKey ? 'claude' : OS.AI && OS.AI.key() ? 'gemini' : '';
+B.ask = async q => { did.length = 0; const w = B.which(); if (!w) return { text: '', err: 'sem IA' };
+  let text = '', err = '';
+  try { if (w === 'claude') { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })); text = await askClaude(q, hist); }
+    else { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); } }
+  catch (e) { err = w === 'claude' ? await claudeErr(e) : (e.message || 'erro');
+    // o Claude falhou: tenta com o Gemini grátis para não ficar sem resposta
+    if (w === 'claude' && OS.AI && OS.AI.key()) { try { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); err = ''; } catch (e2) { } } }
+  if (text) { H.push({ r: 'u', t: q }, { r: 'a', t: text }); if (H.length > 20) H.splice(0, H.length - 20); }
+  return { text, err, did: did.slice(), brain: w }; };
+B.reset = () => { H.length = 0; };
+B.test = async () => { const w = B.which(); if (w !== 'claude') return { ok: !!w }; try { const { Anthropic } = await sdk(), client = new Anthropic({ apiKey: cfg().anKey.trim(), dangerouslyAllowBrowser: true, maxRetries: 0 }); await client.models.retrieve(cfg().anModel || B.MODELS[0][0]); return { ok: true }; } catch (e) { return { ok: false, msg: await claudeErr(e) }; } };
+B._tools = T; B._consult = consult;
+})();

@@ -13,7 +13,7 @@ OS.srcColor = s => (Cal.src[s] || [, 'var(--mut)'])[1];
 
 /* ---------- componentes partilhados ---------- */
 const taskRow = (t, o = {}) => `<div class="li ${t.status === 'Feita' ? 'done' : ''}"><input type="checkbox" class="cbx round" data-act="taskToggle" data-id="${t.id}" aria-label="Concluir ${esc(t.title)}"${t.status === 'Feita' ? ' checked' : ''}>
-  <div class="li-t click" data-edit="tasks:${t.id}"><b>${esc(t.title)}</b><small>${[t.due ? (OS.Tasks.late(t) ? `<span class="neg">atrasada · ${U.fmtDS(t.due)}</span>` : 'prazo ' + U.rel(t.due)) : '', (OS.get('projects', t.project) || {}).name, (t.ctx || []).join(' '), t.area].filter(Boolean).join(' · ')}</small></div>
+  <div class="li-t click" data-edit="tasks:${t.id}"><b>${esc(t.title)}</b><small>${[t.due ? (OS.Tasks.late(t) ? `<span class="neg">atrasada · ${U.fmtDS(t.due)}</span>` : 'prazo ' + U.rel(t.due)) : '', esc((OS.get('projects', t.project) || {}).name || ''), esc((Array.isArray(t.ctx) ? t.ctx : []).join(' ')), esc(t.area || '')].filter(Boolean).join(' · ')}</small></div>
   <div class="li-r">${+t.prio <= 2 ? UI.badge(prioL(t.prio), prioT(t.prio)) : ''}${o.focus !== false && t.status !== 'Feita' ? `<button class="icon-btn" data-act="focusStart" data-task="${t.id}" title="Modo foco" aria-label="Modo foco">${UI.ic('focus')}</button>` : ''}</div></div>`;
 OS.taskRow = taskRow;
 const attRow = a => `<div class="att-it"><i class="${a.lvl}"></i><div class="${a.href ? 'click' : ''}" ${a.href ? `data-go="${a.href.slice(1)}"` : ''} style="${a.href ? 'cursor:pointer' : ''}"><b><span class="area">${esc(a.area)}</span>${esc(a.title)}</b><small>${esc(a.detail || '')}</small></div>${a.act ? `<button class="btn sm" ${a.act.a}>${a.act.l}</button>` : a.href ? `<a class="icon-btn" href="${a.href}" aria-label="Abrir">${UI.ic('right')}</a>` : '<span></span>'}</div>`;
@@ -51,7 +51,7 @@ V.hoje = () => {
     <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || 'Ryan')}.</h1>
     <p class="tx2" style="margin:4px 0 0">${nextIt ? `A seguir: <b style="color:var(--tx)">${esc(nextIt.title)}</b> às ${nextIt.start}` : 'Sem mais compromissos com hora hoje.'}</p></div><div class="today-clock" data-clock>${U.hm()}</div></div>
     <p class="today-q" style="margin-top:14px">${esc(dayQuote())}</p></div>
-  ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#control">Control Room ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
+  ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#painel">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
   <section><div class="sech"><div><h2>Prioridades</h2><p>${doneToday.length} concluída(s) hoje · ordenadas por prazo, importância e impacto</p></div><a class="btn ghost sm" href="#next">${UI.ic('zap')}Next Action</a></div>
     <form class="row gap8" data-form="quickTask" data-today="1" style="margin-bottom:8px"><input class="field grow" name="t" placeholder="Nova tarefa para hoje… (@Casa, !1)" aria-label="Nova tarefa para hoje"><button class="btn">${UI.ic('plus')}</button></form>
     <div class="list">${tasks.slice(0, 7).map(x => taskRow(x)).join('') || UI.empty('Nada planeado para hoje. Puxa algo em Next Action.')}${doneToday.slice(0, 3).map(x => taskRow(x, { focus: false })).join('')}</div></section>
@@ -87,12 +87,14 @@ V.painel = () => {
   const goals = OS.all('goals').filter(g => g.status === 'Ativa').map(g => Object.assign({ g }, Goal.info(g)));
   const onPace = goals.filter(x => !x.late && !x.behind).length;
   const na = I.next().slice(0, 3);
+  const SH = OS.all('shifts'), wH = U.sum(SH.filter(s => s.date >= wk && s.date <= U.addDays(wk, 6)), OS.Car.shiftHours), wNext = U.sortBy(SH.filter(s => s.date > t || (s.date === t && (s.end || '99') > U.hm())), s => s.date + s.start)[0];
   const months = Fin.months(6);
   const life = [
     ['financas', 'Dinheiro', 'Finanças', U.eur(liq, { dec: 0 }), `disponível · patrimônio ${U.eurK(nw)}`],
     ['universidade', 'Estudos', 'Universidade', U.nf(studyWk, 1) + (studyTgt ? '/' + studyTgt : '') + ' h', 'esta semana' + (St.gpa() ? ' · média ' + St.gpa() : '')],
     ['treino', 'Corpo', 'Treino', wkW + '/' + (p.trainTarget || 4) + ' treinos', U.nf(kmW, 1) + ' km corridos esta semana'],
     ['capital', 'Carreira', 'Carreira', U.nf(cap.score) + ' pts', 'capital profissional ' + (cap.score >= capPrev.score ? '+' : '') + (cap.score - capPrev.score) + ' em 30d'],
+    ['trabalho', 'Trabalho', 'Trabalho', U.nf(wH, 1) + ' h', 'esta semana' + (wNext ? ' · próximo turno ' + (wNext.date === t ? 'hoje' : U.fmtDS(wNext.date)) + ' ' + (wNext.start || '') : '')],
     ['metas', 'Metas', 'Metas', onPace + '/' + goals.length, 'metas no ritmo']
   ];
   const lifeTone = k => k === 'Finanças' ? areaTone('Finanças') : k === 'Universidade' ? areaTone('Universidade') : k === 'Treino' ? (areaTone('Treino') === 'pos' && areaTone('Corrida') === 'pos' ? 'pos' : 'warn') : k === 'Carreira' ? (areaTone('Oportunidades') === 'neg' || areaTone('Carreira') === 'neg' ? 'neg' : areaTone('Oportunidades') === 'warn' ? 'warn' : 'pos') : k === 'Mova' ? areaTone('Mova') : areaTone('Metas');
@@ -107,12 +109,11 @@ V.painel = () => {
   const ins = I.insights().slice(0, 4);
   return `<div class="phead greet"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}.</h1>
     <p>${urg.length ? `<b class="neg">${urg.length} urgente${urg.length > 1 ? 's' : ''}</b> · ` : ''}${att.length} para atenção${na[0] ? ` · Próxima ação: <b style="color:var(--tx)">${esc(na[0].title)}</b>` : ''}</p></div>
-    <div class="phead-a"><a class="btn" href="#control">${UI.ic('radar')}Control Room</a><button class="btn pri" data-act="quickAdd">${UI.ic('plus')}Registar</button></div></div>
+    <div class="phead-a"><a class="btn" href="#next">${UI.ic('zap')}Next Action</a><button class="btn pri" data-act="quickAdd">${UI.ic('plus')}Registar</button></div></div>
   <div class="life">${life.map(([h, l, k, v, s]) => `<a href="#${h}"><span class="lh">${UI.dot(lifeTone(k))}${l}</span><span class="lv">${v}</span><span class="ls">${esc(s)}</span></a>`).join('')}</div>
+  ${controlRoom(alerts)}
   <div class="g g-main">
     <div class="col gap16">
-      <div class="pn"><div class="pn-h"><h3>${UI.ic('radar')}Precisa da tua atenção</h3><a class="more" href="#control">Ver tudo ${UI.ic('right')}</a></div>
-        ${alerts.length ? `<div class="att">${alerts.slice(0, 6).map(attRow).join('')}</div>` : UI.empty('Tudo sob controlo. Nada urgente nem em risco.')}</div>
       <div class="pn"><div class="pn-h"><h3>${UI.ic('zap')}Next Action</h3><a class="more" href="#next">Mais ${UI.ic('right')}</a></div>
         ${na.map((n, i) => `<div class="na ${i ? '' : 'top'}"><span class="na-score">${Math.round(n.score)}</span><div><b>${esc(n.title)}</b><div class="na-why">${n.why.slice(0, 3).map(w => UI.badge(w, 'out')).join('')}${UI.badge(U.hours(n.eff), '')}</div></div><div class="row gap4">${n.focus ? `<button class="icon-btn" ${n.focus} aria-label="Modo foco">${UI.ic('focus')}</button>` : ''}${n.act ? `<button class="btn sm" ${n.act}>${n.actL}</button>` : ''}</div></div>`).join('') || UI.empty('Sem ações pendentes. Adiciona tarefas ao Inbox.')}</div>
     </div>
@@ -146,21 +147,23 @@ V.painel = () => {
   ${ins.length ? `<div class="pn"><div class="pn-h"><h3>${UI.ic('chart')}Tendências</h3><a class="more" href="#evolucao">Minha evolução ${UI.ic('right')}</a></div>${ins.map(x => `<div class="ins">${UI.ic(x.tone === 'pos' ? 'arrowUp' : 'arrowDown', x.tone)}<div><span class="eyebrow">${esc(x.area)}</span><div>${esc(x.text)}</div></div></div>`).join('')}</div>` : ''}`;
 };
 
-/* ================= CONTROL ROOM ================= */
-V.control = () => {
-  const al = I.alerts(), f = OS.ui.crArea || '', fl = f ? al.filter(a => a.area === f) : al;
+/* ================= CENTRO DE CONTROLO (era o Control Room; agora vive dentro do Painel) ================= */
+const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a => a.area === f) : al;
   const urg = fl.filter(a => a.lvl === 'urgent'), att = fl.filter(a => a.lvl === 'attention'), ok = I.controlled(al).filter(x => !f || x.area === f);
-  const areas = [...new Set(al.map(a => a.area))];
+  const areas = [...new Set(al.map(a => a.area))], more = !!OS.ui.crMore;
   const card = a => `<div class="cr-card ${a.lvl}"><div class="row between gap8"><span class="eyebrow">${esc(a.area)}</span>${a.href ? `<a class="icon-btn" href="${a.href}" aria-label="Abrir">${UI.ic('right')}</a>` : ''}</div><div class="t">${esc(a.title)}</div>${a.detail ? `<small>${esc(a.detail)}</small>` : ''}${a.act ? `<div><button class="btn sm" ${a.act.a}>${a.act.l}</button></div>` : ''}</div>`;
-  return UI.head('Control Room', 'O que precisa da tua atenção agora. Calculado a partir de todos os módulos: prazos, orçamentos, metas, projetos parados, provas, oportunidades e hábitos.', '', 'Visão geral') +
-  `<div class="kpis">${UI.kpi('Urgente', urg.length, 'resolve hoje', { tone: urg.length ? 'neg' : '' })}${UI.kpi('Atenção', att.length, 'resolve esta semana', { tone: att.length ? 'warn' : '' })}${UI.kpi('Sob controlo', ok.length, 'áreas sem problemas', { tone: 'pos' })}${UI.kpi('Próxima ação', '', (I.next()[0] || {}).title ? esc(I.next()[0].title) : '—', { href: 'next' })}</div>
-  ${areas.length > 1 ? `<div class="row gap8">${UI.chip('Todas', 'crArea', !f, 'data-v=""')}${areas.map(a => UI.chip(esc(a) + ' · ' + al.filter(x => x.area === a).length, 'crArea', f === a, `data-v="${esc(a)}"`)).join('')}</div>` : ''}
-  <div class="g g3">
-    <div class="cr-col"><h3>${UI.dot('neg')}Urgente</h3>${urg.map(card).join('') || UI.empty('Nada urgente.')}</div>
-    <div class="cr-col"><h3>${UI.dot('warn')}Atenção</h3>${att.map(card).join('') || UI.empty('Nada a vigiar.')}</div>
-    <div class="cr-col"><h3>${UI.dot('pos')}Sob controlo</h3>${ok.map(o => `<div class="cr-card"><span class="eyebrow">${esc(o.area)}</span><small>${esc(o.text)}</small></div>`).join('') || UI.empty('Regista dados nas áreas para o sistema as poder avaliar.')}</div>
-  </div>`;
-};
+  const cut = (L, n) => more ? L : L.slice(0, n);
+  return `<section id="control"><div class="sech"><div><h2>${UI.ic('radar')} Centro de controlo</h2><p>O que precisa da tua atenção agora, calculado a partir de todas as áreas: prazos, orçamentos, metas, projetos parados, provas, oportunidades e hábitos.</p></div></div>
+  <div class="kpis">${UI.kpi('Urgente', urg.length, 'resolve hoje', { tone: urg.length ? 'neg' : '' })}${UI.kpi('Atenção', att.length, 'resolve esta semana', { tone: att.length ? 'warn' : '' })}${UI.kpi('Sob controlo', ok.length, 'áreas sem problemas', { tone: 'pos' })}${UI.kpi('Próxima ação', '', (I.next()[0] || {}).title ? esc(I.next()[0].title) : '—', { href: 'next' })}</div>
+  ${areas.length > 1 ? `<div class="row gap8" style="flex-wrap:wrap;margin-top:10px">${UI.chip('Todas', 'crArea', !f, 'data-v=""')}${areas.map(a => UI.chip(esc(a) + ' · ' + al.filter(x => x.area === a).length, 'crArea', f === a, `data-v="${esc(a)}"`)).join('')}</div>` : ''}
+  <div class="g g3" style="margin-top:12px">
+    <div class="cr-col"><h3>${UI.dot('neg')}Urgente</h3>${cut(urg, 6).map(card).join('') || UI.empty('Nada urgente.')}</div>
+    <div class="cr-col"><h3>${UI.dot('warn')}Atenção</h3>${cut(att, 6).map(card).join('') || UI.empty('Nada a vigiar.')}</div>
+    <div class="cr-col"><h3>${UI.dot('pos')}Sob controlo</h3>${cut(ok, 5).map(o => `<div class="cr-card"><span class="eyebrow">${esc(o.area)}</span><small>${esc(o.text)}</small></div>`).join('') || UI.empty('Regista dados nas áreas para o sistema as poder avaliar.')}</div>
+  </div>${urg.length > 6 || att.length > 6 || ok.length > 5 ? `<button class="btn sm ghost" data-act="crMore" style="margin-top:8px">${more ? 'Mostrar menos' : 'Ver tudo'}</button>` : ''}</section>`; };
+// o antigo endereço #control abre o Painel, já na secção do centro de controlo
+V.control = sub => { setTimeout(() => { try { history.replaceState(null, '', '#painel'); } catch (e) { } const el = document.getElementById('control'); el && el.scrollIntoView({ block: 'start' }); }, 60); return V.painel(sub); };
+A.crMore = () => OS.setUI('crMore', !OS.ui.crMore);
 A.crArea = b => OS.setUI('crArea', b.dataset.v);
 
 /* ================= NEXT ACTION ================= */
@@ -177,6 +180,7 @@ V.next = () => {
     <div class="row gap4">${n.focus ? `<button class="btn sm" ${n.focus}>${UI.ic('play')}Começar</button>` : ''}${n.act ? `<button class="btn sm ${n.focus ? 'ghost' : ''}" ${n.act}>${n.actL}</button>` : ''}</div></div>`).join('') || UI.empty('Nada encaixa nestes filtros. Muda o contexto ou o tempo disponível.')}</div>`;
 };
 ['naCtx'].forEach(k => A[k] = b => OS.setUI(k, b.dataset.v));
+A.tgAll = b => OS.setUI('tgAll_' + b.dataset.g, true);
 
 /* ================= CALENDÁRIO ================= */
 V.calendario = sub => {
@@ -207,7 +211,7 @@ V.calendario = sub => {
    <div class="seg">${[['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([k, l]) => `<button class="${view === k ? 'on' : ''}" data-act="calView" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="src-chips">${Object.entries(Cal.src).filter(([k]) => k !== 'gcal' || integ.gcal).map(([k, [l, c]]) => `<button class="chip ${off[k] ? '' : 'on'}" data-act="calSrc" data-v="${k}"><i style="background:${c}"></i>${l}</button>`).join('')}</div>
   ${body}
-  <div class="pn"><div class="row between gap12"><div class="row gap12">${UI.ic('link')}<div><b>Google Calendar</b><div class="mut" style="font-size:12.5px">${integ.gcal ? (OS.gcalState || 'A carregar os teus eventos…') : 'Mostrar aqui os eventos da tua agenda Google (só leitura). Pede autorização na primeira vez.'}</div></div></div>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div></div>`;
+  <div class="pn"><div class="row between gap12"><div class="row gap12">${UI.ic('link')}<div><b>Google Calendar</b><div class="mut" style="font-size:12.5px">${integ.gcal ? (OS.gcalState || 'A carregar os teus eventos…') : 'Mostrar aqui os eventos da tua agenda Google (todas as agendas), pelo teu script Google.'}</div></div></div>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div></div>`;
 };
 A.calView = b => { OS.setUI('calView', b.dataset.v); OS.go('calendario.' + b.dataset.v); };
 A.calToday = () => OS.setUI('calDate', U.today());
@@ -216,12 +220,24 @@ A.calSrc = b => { const o = Object.assign({}, OS.ui.calOff || {}); o[b.dataset.v
 A.calDay = (b, e) => { if (e.target.closest('[data-edit]')) return; OS.ui.calDate = b.dataset.d; OS.ui.calView = 'dia'; OS.go('calendario.dia'); };
 A.calSlot = (b, e) => { if (e.target.closest('[data-edit]')) return; const r = b.getBoundingClientRect(); const h = Math.floor((e.clientY - r.top) / 44) + 6; UI.openForm('events', null, { date: b.dataset.d, start: U.pad(h) + ':00', end: U.pad(h + 1) + ':00' }); };
 
-/* Integração Google Calendar (via conector MCP do claude.ai, só leitura) */
-let gcalUnsub = null;
+/* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; dentro do claude.ai também pelo conector */
+let gcalUnsub = null, gcalTimer = 0, gcalBusy = false;
+const gscr = () => { const c = OS.one('inbox'); return c && c.url && c.key && +(c.ver || 0) >= 11 ? c : null; };
+const gmap = L => L.map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
+try { const sv = U.ls.get('os2gcal', null); if (sv && OS.one('integ').gcal) Cal.gcal = sv.ev || []; } catch (e) { }
+const gcalScript = async quiet => { const c = gscr(); if (!c || gcalBusy) return; gcalBusy = true;
+  const from = U.addDays(U.today(), -14), to = U.addDays(U.today(), 90);
+  try { const j = await OS.Inbox.getJSON(c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=cl&a=' + from + '&b=' + to + '&_=' + Date.now(), 2);
+    if (!j || !j.ok) throw new Error((j && j.msg) || 'o script não respondeu');
+    Cal.gcal = gmap(j.ev || []); U.ls.set('os2gcal', { at: Date.now(), ev: Cal.gcal });
+    OS.gcalState = `${Cal.gcal.length} eventos entre ${U.fmtDS(from)} e ${U.fmtDS(to)} · atualizado às ${U.hm(new Date())}`; }
+  catch (e) { OS.gcalState = /Calendar|autoriz|permiss/i.test(e.message || '') ? 'Falta autorizar a Agenda no script: no Apps Script escolhe a função "autorizar" → ▶ Executar → Permitir, e faz Nova versão na implementação.' : 'Não consegui ler a agenda agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.'; if (!quiet) UI.toast(OS.gcalState, 'warn'); }
+  gcalBusy = false; OS.request(); };
 OS.gcalStart = async () => {
+  if (gscr()) { gcalScript(true); if (!gcalTimer) gcalTimer = setInterval(() => { if (!document.hidden && OS.one('integ').gcal) gcalScript(true); }, 15 * 60 * 1000); return; }
   if (gcalUnsub) return; let mcp = null;
   try { mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { }
-  if (!mcp) { OS.gcalState = 'Integração indisponível nesta vista (só funciona dentro do claude.ai).'; OS.request(); return; }
+  if (!mcp) { OS.gcalState = OS.one('inbox').url ? 'Para ver a tua agenda Google aqui, atualiza o script Google (página do Spyke → Estado do Spyke → só falta a Parte 3).' : 'Para ver a tua agenda Google aqui, liga o script Google (Definições → Sincronizar aparelhos).'; OS.request(); return; }
   const from = new Date(); from.setDate(from.getDate() - 14); const to = new Date(); to.setDate(to.getDate() + 60);
   gcalUnsub = mcp.watchTool('Google Calendar', 'list_events', { startTime: from.toISOString(), endTime: to.toISOString(), pageSize: 250, orderBy: 'startTime', timeZone: 'Europe/Lisbon' }, ev => {
     if (ev.type === 'error') { const c = ev.error && ev.error.code;
@@ -236,9 +252,13 @@ OS.gcalStart = async () => {
     OS.request();
   }, { refetchInterval: 15 * 60 * 1000 });
 };
+// criar um evento na agenda Google (o Spyke usa isto quando pedes "põe na minha agenda Google")
+OS.gcalAdd = async ev => { const c = gscr(); if (!c) return { ok: false, msg: 'o script Google ainda não tem a Parte 3' };
+  const u = c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=ce&t=' + encodeURIComponent(ev.title || '') + '&d=' + encodeURIComponent(ev.date || '') + (ev.start ? '&h=' + ev.start : '') + (ev.end ? '&f=' + ev.end : '') + (ev.loc ? '&l=' + encodeURIComponent(ev.loc) : '');
+  try { const j = await OS.Inbox.getJSON(u, 2); if (j && j.ok) setTimeout(() => gcalScript(true), 1500); return j || { ok: false }; } catch (e) { return { ok: false, msg: e.message }; } };
 A.gcalOn = () => { OS.setOne('integ', { gcal: true }); OS.gcalStart(); };
-A.gcalOff = () => { OS.setOne('integ', { gcal: false }); if (gcalUnsub) { gcalUnsub(); gcalUnsub = null; } Cal.gcal = []; OS.gcalState = ''; };
-A.gcalRefresh = async () => { try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
+A.gcalOff = () => { OS.setOne('integ', { gcal: false }); if (gcalUnsub) { gcalUnsub(); gcalUnsub = null; } clearInterval(gcalTimer); gcalTimer = 0; Cal.gcal = []; OS.gcalState = ''; U.ls.del ? U.ls.del('os2gcal') : U.ls.set('os2gcal', null); };
+A.gcalRefresh = async () => { if (gscr()) return gcalScript(false); try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
 OS.on('ready', () => { if (OS.one('integ').gcal) OS.gcalStart(); });
 
 /* ================= TAREFAS ================= */
@@ -252,7 +272,7 @@ V.tarefas = sub => {
   const doneW = weeks.map(w => OS.all('tasks').filter(x => x.doneAt && x.doneAt >= w && x.doneAt <= U.addDays(w, 6)).length);
   const groups = [['Em curso', open.filter(x => x.status === 'Em curso')], ['Atrasadas', late.filter(x => x.status !== 'Em curso')], ['Hoje', open.filter(x => !OS.Tasks.late(x) && x.status !== 'Em curso' && (x.sched === t || x.due === t))], ['Próximas', open.filter(x => !OS.Tasks.late(x) && !['Em curso', 'Inbox', 'Aguardando'].includes(x.status) && x.sched !== t && x.due !== t)], ['Inbox', open.filter(x => x.status === 'Inbox' && !OS.Tasks.late(x) && x.sched !== t && x.due !== t)], ['Aguardando', open.filter(x => x.status === 'Aguardando' && !OS.Tasks.late(x))], ['Concluídas recentemente', U.sortBy(all.filter(x => x.status === 'Feita'), x => x.doneAt || '', -1).slice(0, 8)]];
   const body = view === 'projetos' ? tpGroups(all) : view === 'quadro' ? `<div class="kan">${L.TSTAT.map(s => { const it = s === 'Feita' ? U.sortBy(all.filter(x => x.status === s), x => x.doneAt || '', -1).slice(0, 12) : all.filter(x => x.status === s); return `<div class="kcol"><h4>${s}<span class="mono">${it.length}</span></h4>${it.map(x => `<div class="kcard" data-edit="tasks:${x.id}"><b>${esc(x.title)}</b><div class="meta">${+x.prio <= 2 ? UI.badge(prioL(x.prio), prioT(x.prio)) : ''}${x.due ? UI.badge(U.fmtDS(x.due), OS.Tasks.late(x) ? 'neg' : '') : ''}${(x.ctx || []).map(c => `<span>${c}</span>`).join('')}</div><div class="row gap4">${L.TSTAT.filter(z => z !== s).slice(0, 3).map(z => `<button class="btn xs ghost" data-act="taskStatus" data-id="${x.id}" data-v="${z}">→ ${z}</button>`).join('')}</div></div>`).join('')}</div>`; }).join('')}</div>`
-    : groups.filter(g => g[1].length).map(([n, arr]) => `<section><div class="sech"><h2>${n} <span class="mut mono" style="font-weight:400">${arr.length}</span></h2></div><div class="pn" style="padding:4px 16px">${arr.map(x => taskRow(x)).join('')}</div></section>`).join('') || UI.empty('Sem tarefas com estes filtros.');
+    : groups.filter(g => g[1].length).map(([n, arr]) => { const lim = OS.ui['tgAll_' + n] ? arr.length : 25; return `<section><div class="sech"><h2>${n} <span class="mut mono" style="font-weight:400">${arr.length}</span></h2></div><div class="pn" style="padding:4px 16px">${arr.slice(0, lim).map(x => taskRow(x)).join('')}${arr.length > lim ? `<button class="pg-more sm" data-act="tgAll" data-g="${esc(n)}">Ver mais ${arr.length - lim}</button>` : ''}</div></section>`; }).join('') || UI.empty('Sem tarefas com estes filtros.');
   return UI.head('Tarefas', 'Tudo entra no Inbox. Escreve @contexto, !prioridade (1–4) e #projeto na criação rápida; "hoje" ou "amanhã" agenda. Separa as tarefas por projeto na barra abaixo.', UI.addBtn('tasks', 'Nova tarefa'), 'Execução') +
   UI.tabs('tarefas', [['', 'Lista'], ['projetos', 'Por projeto'], ['quadro', 'Quadro']], sub) +
   tpStrip(PJ, f) + (sp ? tpHead(sp) : '') +

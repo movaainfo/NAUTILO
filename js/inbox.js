@@ -10,7 +10,7 @@ const cfg = () => OS.one('inbox');
 const SEEN = 'os2inboxSeen';
 const genKey = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
 
-IB.script = key => `// Oceanum · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
+IB.core = key => `// Oceanum · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
 const KEY = '${key}';
 function doGet(e) {
   const p = e.parameter || {};
@@ -190,6 +190,82 @@ function procura_(q, n) { if (!q) return { q: [], news: [] }; const C = CacheSer
     news: (j.news || []).map(function (x) { return { ti: x.title, l: x.link, pub: x.publisher, t: x.providerPublishTime }; }) };
   try { C.put(k, JSON.stringify(o), 600); } catch (e) { } return o; }
 `;
+// parte 3 (versão 11): vai num ficheiro novo, liga-se às partes 1 e 2 sem as mudar
+IB.addon = () => `// Oceanum · PARTE 3 (versão 11) — e-mail completo, responder e-mails, Google Agenda e leitura de páginas dentro da app.
+// Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte3), por baixo do Código.gs e da Parte2. Não apagues as outras partes: esta liga-se a elas.
+// Esta função doGet substitui a da parte 1 (o Apps Script usa a do último ficheiro).
+const G_ = this;
+function doGet(e) {
+  const p = e.parameter || {};
+  if (p.k !== KEY) return out({ ok: false, msg: 'Chave errada' });
+  if (p.op === 'ping') return out({ ok: true, v: 11 });
+  // novidades futuras: um ficheiro novo com function op_nome(p) { ... } e o Oceanum chama-a com &op=nome (sem mexer nesta parte)
+  if (/^[a-z0-9]{1,12}$/.test(p.op || '') && typeof G_['op_' + p.op] === 'function') return out(G_['op_' + p.op](p));
+  // ---- cotações em tempo real (Yahoo Finance) para os Investimentos ----
+  if (p.op === 'q') return out({ ok: true, q: cotacoes_(String(p.s || '')) });
+  if (p.op === 'h') return out({ ok: true, h: historico_(String(p.s || ''), String(p.r || '1y'), String(p.i || '1d')) });
+  if (p.op === 's') return out(Object.assign({ ok: true }, procura_(String(p.q || ''), Number(p.n || 0))));
+  if (p.op === 'f') return out({ ok: true, f: empresa_(String(p.s || '')) });
+  if (p.op === 'td') return out({ ok: true, td: tesouro_() });
+  if (p.op === 'nw') { let fs = []; try { fs = JSON.parse(p.f || '[]'); } catch (e) { } return out({ ok: true, nw: noticias_(fs.slice(0, 10)) }); }
+  if (p.op === 'al') { PropertiesService.getScriptProperties().setProperty('AL', String(p.j || '[]').slice(0, 8500)); const on = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'verificarAlertas'; }); return out({ ok: true, ativo: on }); }
+  if (p.op === 'c') return out({ ok: true, c: agenda_(String(p.s || '')) });
+  // ---- e-mail (Gmail) e LinkedIn (pelas notificações no Gmail), para o resumo do Oceanum ----
+  if (p.op === 'gm') return out({ ok: true, gm: correio_(String(p.q || ''), Number(p.n || 30)) });
+  if (p.op === 'ga') return out({ ok: true, n: acaoCorreio_(String(p.a || ''), String(p.ids || '')) });
+  if (p.op === 'dr') return out(rascunho_(String(p.id || ''), String(p.b || '')));
+  if (p.op === 'gx') return out(mensagem_(String(p.id || '')));
+  if (p.op === 'gs') return out(enviar_(String(p.id || ''), String(p.b || '')));
+  // ---- Google Agenda (versão 11) ----
+  if (p.op === 'cl') return out({ ok: true, ev: eventos_(String(p.a || ''), String(p.b || '')) });
+  if (p.op === 'ce') return out(criarEvento_(p));
+  // ---- leitura genérica de páginas: funções novas da app sem voltar a mudar o script ----
+  if (p.op === 'px') return out(buscar_(String(p.u || '')));
+  // ---- Spyke: resumo do dia e perguntas pela Siri (funciona com a app fechada) ----
+  if (p.op === 'br') { const P = PropertiesService.getScriptProperties(); P.setProperty('BR', String(p.j || '{}').slice(0, 8500)); P.setProperty('CX', String(p.cx || '').slice(0, 8500)); if (p.gk) P.setProperty('GK', String(p.gk).slice(0, 120)); else if (p.nogk) P.deleteProperty('GK'); return out({ ok: true }); }
+  if (p.op === 'brief') return ContentService.createTextOutput(resumo_());
+  if (p.op === 'ask') return ContentService.createTextOutput(pergunta_(String(p.q || '')));
+  // ---- sincronização: os dados do Oceanum num ficheiro do teu Google Drive ----
+  if (p.op === 'list') { const all = dados_(); const m = {}; Object.keys(all).forEach(function (id) { m[id] = all[id].t || 0; }); return out({ ok: true, docs: m }); }
+  if (p.op === 'get') { const all = dados_(), ids = String(p.ids || '').split(',').filter(String); const o = {}; (ids.length ? ids : Object.keys(all)).forEach(function (id) { if (all[id]) o[id] = all[id]; }); return out({ ok: true, docs: o }); }
+  if (p.op === 'put') { const L = LockService.getScriptLock(); L.waitLock(20000);
+    try { const all = dados_(), d = JSON.parse(p.j); Object.keys(d).forEach(function (id) { all[id] = d[id]; }); guardar_(all); } finally { L.releaseLock(); }
+    return out({ ok: true }); }
+  // ---- caixa de entrada de gastos (atalho do iPhone) ----
+  const sh = folha_();
+  if (sh.getLastRow() === 0) sh.appendRow(['id', 'data', 'valor', 'descricao', 'categoria', 'importado', 'reservado']);
+  if (p.op === 'pull') { const L = LockService.getScriptLock(); L.waitLock(20000);
+    try { const rows = sh.getDataRange().getValues(), items = [], now = Date.now();
+      for (let i = 1; i < rows.length; i++) { if (rows[i][5]) continue; const res = Number(rows[i][6] || 0); if (res && now - res < 10 * 60 * 1000) continue;
+        items.push({ id: String(rows[i][0]), t: String(rows[i][1]), v: Number(rows[i][2]), d: String(rows[i][3]), c: String(rows[i][4]) }); sh.getRange(i + 1, 7).setValue(now); }
+      return out({ ok: true, items: items }); } finally { L.releaseLock(); } }
+  if (p.op === 'ack') {
+    const ids = String(p.ids || '').split(','), rows = sh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) if (ids.indexOf(String(rows[i][0])) >= 0) sh.getRange(i + 1, 6).setValue(new Date());
+    return out({ ok: true });
+  }
+  const txt = String(p.v || '') + ' ', m = txt.match(/\\d+(?:[.,]\\d+)?/), v = m ? Number(m[0].replace(',', '.')) : 0;
+  if (!(v > 0)) return out({ ok: false, msg: 'Valor inválido' });
+  sh.appendRow([Utilities.getUuid(), new Date().toISOString(), v, p.d || '', p.c || '', '', '']);
+  return ContentService.createTextOutput('✓ ' + v.toFixed(2).replace('.', ',') + ' € registado no Oceanum');
+}
+// ---- versão 11: e-mail completo, responder, Google Agenda e leitura de páginas ----
+// Corre UMA vez esta função no editor (▶ Executar) para dar todas as autorizações de uma vez.
+function autorizar() { GmailApp.getInboxUnreadCount(); CalendarApp.getDefaultCalendar(); DriveApp.getRootFolder(); UrlFetchApp.fetch('https://www.google.com'); }
+function mensagem_(id) { if (!id) return { ok: false, msg: 'Falta o id' }; const m = GmailApp.getMessageById(id); if (!m) return { ok: false, msg: 'Mensagem não encontrada' };
+  const th = m.getThread(), L = th.getMessages().slice(-8).map(function (x) { return { id: x.getId(), f: x.getFrom(), to: x.getTo(), cc: x.getCc(), d: x.getDate().toISOString(), s: x.getSubject(), b: String(x.getPlainBody() || '').slice(0, 60000), h: String(x.getBody() || '').slice(0, 150000), at: x.getAttachments({ includeInlineImages: false }).slice(0, 10).map(function (a) { return a.getName(); }) }; });
+  if (th.isUnread()) th.markRead(); return { ok: true, s: th.getFirstMessageSubject(), t: L }; }
+function enviar_(id, b) { if (!id || !b) return { ok: false, msg: 'Faltam dados' }; const m = GmailApp.getMessageById(id); if (!m) return { ok: false, msg: 'Mensagem não encontrada' }; m.reply(b.slice(0, 20000)); return { ok: true }; }
+function eventos_(a, b) { const ini = /^\\d{4}-\\d\\d-\\d\\d$/.test(a) ? new Date(a + 'T00:00:00') : new Date(), fim = /^\\d{4}-\\d\\d-\\d\\d$/.test(b) ? new Date(b + 'T23:59:59') : new Date(Date.now() + 60 * 864e5), r = [];
+  CalendarApp.getAllCalendars().forEach(function (c) { if (c.isHidden && c.isHidden()) return; c.getEvents(ini, fim).slice(0, 400).forEach(function (e) { r.push({ id: e.getId(), t: e.getTitle(), s: e.getStartTime().toISOString(), e: e.getEndTime().toISOString(), all: e.isAllDayEvent(), loc: e.getLocation(), cal: c.getName() }); }); });
+  return r.slice(0, 600); }
+function criarEvento_(p) { const t = String(p.t || '').slice(0, 200), d = String(p.d || ''); if (!t || !/^\\d{4}-\\d\\d-\\d\\d$/.test(d)) return { ok: false, msg: 'Faltam dados' }; const c = CalendarApp.getDefaultCalendar();
+  if (!/^\\d\\d:\\d\\d$/.test(p.h || '')) { c.createAllDayEvent(t, new Date(d + 'T00:00:00')); return { ok: true }; }
+  const s = new Date(d + 'T' + p.h + ':00'), e = /^\\d\\d:\\d\\d$/.test(p.f || '') ? new Date(d + 'T' + p.f + ':00') : new Date(s.getTime() + 3600000); c.createEvent(t, s, e, { location: String(p.l || '').slice(0, 200) }); return { ok: true }; }
+function buscar_(u) { if (!/^https?:\\/\\/[^\\s]+$/.test(u)) return { ok: false, msg: 'Endereço inválido' }; try { const r = UrlFetchApp.fetch(u, { muteHttpExceptions: true, followRedirects: true, headers: UA_ }); return { ok: true, code: r.getResponseCode(), ct: String(r.getHeaders()['Content-Type'] || ''), t: r.getContentText().slice(0, 1500000) }; } catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 200) }; } }
+`;
+// o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e a parte 3 por baixo
+IB.script = key => IB.core(key) + '\n' + IB.addon();
 
 /* ---- adivinhar categoria e conta ---- */
 const KW = [[/uber|bolt|taxi|táxi|metro|comboio|autocarro|gasolina|combust|portagem|estaciona|cp |carris/i, ['Transporte', 'Carro']], [/caf[eé]|restaurante|almo[cç]o|jantar|lanche|mercado|continente|pingo|lidl|aldi|mercadona|supermercado|padaria|pizza|burger|mcdonald|kfc|glovo|uber ?eats|bolt ?food|a[cç]a[ií]/i, ['Alimentação', 'Restauração', 'Supermercado']],
@@ -299,20 +375,25 @@ A.syCopy = async () => { const SY = window.OceanumSync; const code = SY.linkCode
 const copy = t => new Promise(res => { try { navigator.clipboard.writeText(t).then(() => res(true), () => res(false)); } catch (e) { res(false); } });
 // O código tem ~25 mil caracteres: no telemóvel e no tablet o "colar" corta o texto a meio (~20 mil). Por isso vai em 2 partes,
 // cada uma num ficheiro do mesmo projeto (o Apps Script junta os ficheiros). Corta sempre entre funções.
-IB.parts = key => { const L = IB.script(key).split('\n'), half = L.join('\n').length / 2; let n = 0, cut = 0;
-  for (let i = 0; i < L.length; i++) { if (n >= half && /^(function |\/\/ ---- )/.test(L[i])) { cut = i; break; } n += L[i].length + 1; }
-  if (!cut) cut = Math.floor(L.length / 2); return [L.slice(0, cut).join('\n') + '\n', '// Oceanum · parte 2 do código (fica num ficheiro à parte no mesmo projeto)\n' + L.slice(cut).join('\n')]; };
-const partsModal = () => UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>Código do script em 2 partes</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
-  <p class="mut" style="margin:0 0 10px">No telemóvel e no tablet o "colar" corta textos muito grandes, por isso o código vai em duas partes.</p>
-  <ol class="ai-steps"><li>Toca em <b>Copiar parte 1</b>. No Apps Script, no ficheiro <b>Código.gs</b>: seleciona tudo → apaga → cola → <b>Guardar</b>.</li>
-  <li>Volta aqui e toca em <b>Copiar parte 2</b>. No Apps Script: <b>Ficheiros/Arquivos → +</b> → <b>Script</b> → nome <b>Parte2</b> → apaga o que vier lá → cola → <b>Guardar</b>.</li>
-  <li>Confirma: o fim do <b>Código.gs</b> e o fim da <b>Parte2</b> não podem ficar cortados (a Parte2 acaba em <code>}</code>).</li></ol>
-  <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="ibCopy" data-t="p1">${UI.ic('link')}Copiar parte 1</button><button class="btn pri" data-act="ibCopy" data-t="p2">${UI.ic('link')}Copiar parte 2</button></div></div>`, 'tall');
+IB.MAXP = 12000;
+// as partes 1 e 2 (o núcleo, igual desde a versão 10) cortam-se ao meio numa linha de topo; a parte 3 é o ficheiro das novidades
+IB.parts = key => { const L = IB.core(key).split('\n'), half = L.join('\n').length / 2, out = []; let cur = [], n = 0, cut = false;
+  L.forEach(l => { if (!cut && n > half && /^(function |\/\/ ---- |const )/.test(l)) { out.push(cur); cur = []; cut = true; } cur.push(l); n += l.length + 1; });
+  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon()); };
+IB.partsHelp = () => { const n = IB.parts(cfg().key || 'x').length; return { n, files: Array.from({ length: n }, (_, i) => i ? 'Parte' + (i + 1) : 'Código.gs') }; };
+const partsBtns = (cls = 'btn pri', from = 0) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
+IB.partsBtns = partsBtns;
+const partsModal = () => { const { n, files } = IB.partsHelp(); UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>Código do script em ${n} partes</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+  <p class="mut" style="margin:0 0 10px">No telemóvel e no tablet o "colar" corta textos muito grandes, por isso o código vai em partes. O Apps Script junta os ficheiros sozinho.</p>
+  <ol class="ai-steps"><li>Parte 1 vai no ficheiro <b>Código.gs</b>: abre-o, <b>Paleta de comandos → Selecionar tudo</b> → apaga → cola → <b>Guardar</b>.</li>
+  <li>Cada parte seguinte vai num ficheiro seu (${files.slice(1).join(', ')}): <b>Arquivos → +</b> → <b>Script</b> → o nome → apaga o que vier → cola → <b>Guardar</b>. Se o ficheiro já existir, substitui o conteúdo.</li>
+  <li>Confirma que nenhuma parte ficou cortada: cada uma acaba numa linha com <code>}</code>.</li></ol>
+  <div class="row gap8" style="flex-wrap:wrap">${partsBtns()}</div></div>`, 'tall'); };
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   if (b.dataset.t === 'code') return partsModal();
-  const P = b.dataset.t === 'p1' || b.dataset.t === 'p2' ? IB.parts(c.key) : null;
-  const t = P ? P[b.dataset.t === 'p1' ? 0 : 1] : b.dataset.t === 'all' ? IB.script(c.key) : q('');
-  if (P) { if (await copy(t)) UI.toast((b.dataset.t === 'p1' ? 'Parte 1 copiada: cola-a no Código.gs.' : 'Parte 2 copiada: cola-a no ficheiro Parte2.'), 'pos'); else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); return; }
+  const pi = /^p(\d+)$/.test(b.dataset.t || '') ? +b.dataset.t.slice(1) - 1 : -1, P = pi >= 0 ? IB.parts(c.key) : null;
+  const t = P ? P[Math.min(pi, P.length - 1)] : b.dataset.t === 'all' ? IB.script(c.key) : q('');
+  if (P) { if (await copy(t)) UI.toast(pi ? `Parte ${pi + 1} copiada: cola-a no ficheiro Parte${pi + 1}.` : 'Parte 1 copiada: cola-a no Código.gs.', 'pos'); else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); return; }
   if (await copy(t)) UI.toast(b.dataset.t === 'code' ? 'Código copiado. Agora cola-o no teu script em script.google.com.' : 'Link copiado', 'pos');
   else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); };
 A.ibSave = async () => { const el = document.getElementById('ibUrl'), c = cfg(); c.url = (el ? el.value : '').trim(); OS.touch('inbox'); IB.st = { ok: false, m: 'A verificar…' }; OS.request(); await IB.check(); OS.request(); };

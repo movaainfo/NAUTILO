@@ -34,7 +34,7 @@ const sget = async (qs, ms = 25000) => { const c = scr(); if (!c) throw new Erro
   if (j.msg === 'Chave errada') throw new Error('chave do script errada'); return j; };
 IX.scriptQuotes = async syms => { syms = [...new Set(syms.filter(Boolean))]; if (!syms.length) return 0; let got = 0;
   for (let i = 0; i < syms.length; i += 40) { const j = await sget('&op=q&s=' + encodeURIComponent(syms.slice(i, i + 40).join(',')));
-    if (!j.q) { IX.st.script = 'old'; throw new Error('script antigo'); }
+    if (!j.q) { IX.st.script = 'old'; IX.st.oldAt = Date.now(); throw new Error('script antigo'); }
     Object.entries(j.q).forEach(([s, o]) => { if (o && o.p != null) { IX.setQ(s, o, 'Yahoo Finance'); got++; } }); }
   IX.st.script = 'ok'; IX.st.scriptAt = Date.now(); return got; };
 IX.fund = async s => { const k = 'oc_f1_' + s, c = U.ls.get(k, null); if (c && Date.now() - c.at < 12 * 36e5) return c.f; const j = await sget('&op=f&s=' + encodeURIComponent(s), 40000); if (!j.f) { IX.st.script = 'old'; throw new Error('script antigo'); } try { U.ls.set(k, { at: Date.now(), f: j.f }); } catch (e) { } return j.f; };
@@ -197,14 +197,21 @@ IX.symsHeld = () => OS.all('assets').filter(a => a.sym && !IX.isRF(a) && Inv.pos
 IX.tdList = (U.ls.get('oc_td1', null) || {}).l || [];
 IX.loadTD = async (force) => { const c = U.ls.get('oc_td1', null); if (!force && c && Date.now() - c.at < 10 * 6e4) return c.l; const j = await sget('&op=td'); if (!j.td) { IX.st.script = 'old'; throw new Error('script antigo'); } IX.tdList = j.td; U.ls.set('oc_td1', { at: Date.now(), l: j.td }); j.td.forEach(x => IX.setQ('TD:' + x.n, { p: x.pr, pc: null, cur: 'BRL', nm: x.n, ex: 'Tesouro Direto', open: true, t: x.t, buy: x.pc, txc: x.tc, txv: x.tv, venc: x.v }, 'Tesouro Direto')); return j.td; };
 IX.symsWatch = () => (cfg().watch || []).slice();
+// reserva: função do próprio site (Vercel) quando o script não traz a cotação (o Yahoo às vezes bloqueia os servidores do Google)
+let apiOff = 0;
+IX.apiQuotes = async syms => { syms = [...new Set(syms.filter(Boolean))]; if (!syms.length || Date.now() < apiOff) return 0; let got = 0;
+  for (let i = 0; i < syms.length; i += 30) { let j; try { const r = await fetch(new URL('api/q?s=' + encodeURIComponent(syms.slice(i, i + 30).join(',')), document.baseURI).href, { cache: 'no-store', credentials: 'omit' }); if (!r.ok) { apiOff = Date.now() + 10 * 6e4; return got; } j = await r.json(); } catch (e) { apiOff = Date.now() + 2 * 6e4; return got; }
+    Object.entries(j.q || {}).forEach(([s, o]) => { if (o && o.p != null) { IX.setQ(s, o, 'Yahoo Finance'); got++; } }); }
+  IX.st.api = 'ok'; IX.st.apiAt = Date.now(); return got; };
 IX.extra = new Set(); // símbolos pedidos pelo ecrã aberto (índices, detalhe de um ativo)
 const onInv = () => /^#?investimentos/.test(location.hash.replace(/^#/, '#'));
 let busy = false, lastTick = 0;
 IX.tick = async (force) => { if (busy) { if (force) IX._again = true; return; } if (document.hidden && !force) return; busy = true; lastTick = Date.now();
   const held = IX.symsHeld(), all = [...new Set([...held, ...IX.symsWatch(), ...IX.extra, ...Object.values(FXLIVE).filter(s => OS.all('assets').some(a => a.currency && FXLIVE[a.currency] === s) || FXLIVE[IX.view()] === s)])];
   wsStart(all); fhStart(all); IX.loadFx();
-  try { if (scr() && IX.st.script !== 'old') await IX.scriptQuotes(all.filter(s => !(isCrypto(s) && IX.age(s) < 15000 && PX[s].src === 'Binance (tempo real)'))); }
+  try { if (scr() && (IX.st.script !== 'old' || Date.now() - (IX.st.oldAt || 0) > 120000)) await IX.scriptQuotes(all.filter(s => !(isCrypto(s) && IX.age(s) < 15000 && PX[s].src === 'Binance (tempo real)'))); }
   catch (e) { IX.st.script = IX.st.script === 'old' ? 'old' : 'erro'; IX.st.scriptErr = e.message; }
+  try { await IX.apiQuotes(all.filter(s => !isCrypto(s) && !/=X$/.test(s) && (!PX[s] || IX.age(s) > 10 * 6e4))); } catch (e) { }
   try { await IX.cgQuotes(all.filter(s => isCrypto(s) && (!scr() || IX.st.script !== 'ok'))); } catch (e) { }
   if (scr() && OS.all('assets').some(a => IX.tdSym(a))) { try { await IX.loadTD(); } catch (e) { } }
   const need = IX.needSeries(); for (const [k, d] of Object.entries(need)) { try { await IX.loadSeries(k, d); } catch (e) { } }

@@ -8,6 +8,7 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url); if (e.request.method !== 'GET') return;
   if (u.searchParams.has('vchk')) return; // verificação de versão: vai sempre à rede
+  if (/\/api\//.test(u.pathname)) return; // funções do servidor (cotações, leitor de notícias): sempre à rede, nunca da cache
   if (IMGHOST.test(u.hostname) && /\.(jpe?g|png|webp)$/i.test(u.pathname)) { e.respondWith(caches.open(IMG).then(c => c.match(e.request).then(hit => hit || fetch(e.request).then(r => { if (r.ok || r.type === 'opaque') c.put(e.request, r.clone()); return r; })))); return; }
   if (u.hostname === 'cdnjs.cloudflare.com' && /three\.js/.test(u.pathname)) { e.respondWith(caches.open(IMG).then(c => c.match(e.request).then(hit => hit || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })))); return; }
   if (u.origin !== location.origin) return;

@@ -137,7 +137,7 @@ TR.mapa = () => OS.BodyMap.view();
 A.muscle = b => OS.setUI('bmSel', b.dataset.m);
 TR.historico = () => V.treinoHist();
 TR.historicoTabela = () => UI.table({ key: 'wk', coll: 'workouts', rows: U.sortBy(OS.all('workouts'), w => w.date, -1), limit: 40, empty: 'Sem treinos registados.', emptyAct: UI.addBtn('workouts', 'Registar treino', null, ''), cols: [
-  { l: 'Data', v: w => `<span class="mono">${U.fmtD(w.date)}</span>`, s: w => w.date }, { l: 'Treino', v: w => esc(w.title || '—') }, { l: 'Exercícios', v: w => (w.items || []).map(it => esc((OS.get('exercises', it.ex) || {}).name || '')).filter(Boolean).join(', '), cls: 'wrap' },
+  { l: 'Data', v: w => `<span class="mono">${U.fmtD(w.date)}</span>`, s: w => w.date }, { l: 'Treino', v: w => esc(w.title || '—') }, { l: 'Exercícios', v: w => (Array.isArray(w.items) ? w.items : []).map(it => esc((OS.get('exercises', it.ex) || {}).name || '')).filter(Boolean).join(', '), cls: 'wrap' },
   { l: 'Séries', cls: 'r', v: w => Fit.sets(w) }, { l: 'Volume', cls: 'r', v: w => `<span class="mono">${U.nf(Fit.volume(w))} kg</span>`, s: w => Fit.volume(w) }, { l: 'Duração', cls: 'r', v: w => w.dur ? w.dur + ' min' : '—' }, { l: 'RPE', cls: 'r', v: w => w.rpe || '—' }] });
 TR.exercicios = () => V.treinoEx();
 TR.exerciciosAntigo = () => {

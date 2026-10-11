@@ -1,8 +1,14 @@
 {
- "n": 101,
- "hash": "ab5579868474",
+ "n": 102,
+ "hash": "b430dcdf735b",
  "notes": [
-  "Script do Google em 2 partes (o colar no telemóvel/tablet cortava o código); um projeto novo do script usa os dados que já estão no Drive."
+  "Script do Google: as novidades vêm numa Parte 3 (ficheiro novo, sem apagar as partes 1 e 2): e-mail inteiro, responder, Google Agenda e leitura de páginas.",
+  "E-mail: abre o e-mail completo dentro da app (texto ou formatado, com anexos), sem ir ao Gmail.",
+  "Jornal: cada notícia abre dentro da app com o texto do jornal; se o jornal bloquear, o Spyke escreve a notícia completa com as fontes.",
+  "Floresta: 15 cenários 3D a sério (Jardim japonês, Ilha tropical, Inverno, Quinta, Deserto, Zen, Lago, Doces, Acampamento, Mágica, Vulcão, Lua, Fundo do mar…), com objetos, céu e partículas próprias.",
+  "Painel e Control Room juntos num só \"Painel\"; a Visão geral mostra o Trabalho (horas, ganhos, turnos, folgas, próximo turno).",
+  "Menos travamentos: a página já não é redesenhada com o dedo no ecrã nem quando nada mudou; Tarefas abre 3× mais depressa.",
+  "Segurança: escudo contra código malicioso em toda a app, cabeçalhos de segurança e proteção das funções do servidor."
  ],
  "date": "11/10/2026"
 }

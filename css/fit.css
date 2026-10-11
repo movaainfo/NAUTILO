@@ -599,7 +599,7 @@ html.lite .fo-ov{backdrop-filter:none;-webkit-backdrop-filter:none;background:rg
 .fo-ft{display:flex;gap:6px;padding:6px 8px}.fo-ft button{flex:1}
 .fo-float.mini{width:auto;border-radius:99px;background:#0d2a1d;border-color:#6fd17f}.fo-float.mini .fo-fc,.fo-float.mini .fo-ft{display:none}.fo-float.mini .fo-fh{padding:8px 8px 8px 16px;font-size:15px;gap:6px}.fo-float.mini .fo-fh button{padding:4px 7px;font-size:12px}
 .fo-vid{position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1}
-.fo-rw{gap:6px}.fo-scn{width:100%;aspect-ratio:2/1;border-radius:10px}
+.fo-rw{gap:6px}.fo-th.fo-scn{width:100%;aspect-ratio:4/3;border-radius:10px}.fo-th.fo-scn img{width:100%;height:100%;object-fit:cover}
 @media (max-width:860px){.fo-float{width:160px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}}
 /* Hábitos: grelha alinhada */
 .hab-wrap{overflow-x:auto}.hab-tbl{table-layout:fixed;border-collapse:separate;border-spacing:0;width:100%;min-width:780px}.hab-tbl col.c{width:40px}
@@ -806,3 +806,45 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .spy-chk.ok i{background:#16a34a}.spy-chk.bad i{background:#dc2626}.spy-chk.wait i{background:#d97706}
 .spy-chk b{display:block;font-size:13.5px}.spy-chk small{color:var(--mut);font-size:12.5px;line-height:1.4}
 .spy-upd{margin-top:12px;padding:12px;border-radius:12px;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.06)}.spy-upd ol{margin:8px 0;padding-left:20px;line-height:1.55;font-size:13.5px}.spy-upd li{margin-bottom:6px}
+/* Spyke: ações feitas pelo cérebro */
+.spy-m.act{justify-content:center}.spy-m.act .spy-bb{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;font-size:12px;padding:5px 10px;border-radius:999px}
+/* leitor de e-mail dentro da app */
+.ml-rd{padding:18px;display:flex;flex-direction:column;gap:12px}
+.ml-msg{border:1px solid var(--line2);border-radius:14px;padding:12px 14px;background:var(--pn2)}
+.ml-msg.last{border-color:var(--line3)}
+.ml-mh{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.ml-mh small{color:var(--mut);font-size:12px;overflow-wrap:anywhere}
+.ml-rb{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.55;margin:0}
+.ml-rb a{color:var(--accent);text-decoration:underline}
+.ml-fr{width:100%;height:62vh;border:0;border-radius:10px;background:#fff}
+.ml-rt{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ml-at{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ml-at span{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--pn2);color:var(--mut)}
+/* Jornal: leitor da notícia dentro da app */
+.nw-a{cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.nw-rel button,.nw-oth button{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px dashed var(--line);color:var(--tx2);font:inherit;font-size:12.5px;padding:6px 0;cursor:pointer}
+.nw-bs button{background:none;border:1px solid var(--line2);border-radius:999px;color:var(--accent);font:inherit;font-size:12px;padding:2px 9px;cursor:pointer}
+.nw-rd{padding:18px;display:flex;flex-direction:column;gap:10px}
+.nw-rd h2{margin:0;font-size:22px;line-height:1.3}
+.nw-img{width:100%;max-height:300px;object-fit:cover;border-radius:12px;background:var(--pn2)}
+.nw-tag{font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.nw-body p{font-size:16px;line-height:1.7;margin:0 0 12px;color:var(--tx)}
+.nw-body h4{margin:14px 0 6px;font-size:16px}
+.nw-fon{font-size:12px;color:var(--mut);border-top:1px solid var(--line);padding-top:8px}
+.nw-rda{flex-wrap:wrap}
+.nw-oth{display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:12px;padding:10px 12px}
+.nw-oth>b{font-size:13px;margin-bottom:4px}
+.nw-site{font-size:11.5px;margin:4px 0 0}
+/* Visão geral: semana de trabalho */
+.dc-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0 4px}
+.dc-wk span{height:24px;border-radius:7px;display:grid;place-items:center;font-size:11px;color:var(--mut);background:var(--pn2)}
+.dc-wk span.sh{background:color-mix(in srgb,var(--c4) 55%,transparent);color:var(--tx)}
+.dc-wk span.off{background:rgba(34,197,94,.28);color:var(--tx)}
+.dc-wk span.today{outline:1.5px solid var(--accent)}
+/* Floresta: céu próprio de cada cenário */
+.fo-sky.fo-bg-noite{background:radial-gradient(1.5px 1.5px at 14% 16%,#fff 60%,transparent),radial-gradient(1px 1px at 38% 9%,#fff 60%,transparent),radial-gradient(1.5px 1.5px at 70% 18%,#fff 60%,transparent),radial-gradient(1px 1px at 88% 34%,#fff 60%,transparent),radial-gradient(120px 120px at 82% 14%,rgba(255,244,214,.35),transparent 70%),linear-gradient(180deg,#0b1430 0%,#1a2a52 55%,#2c3d5c 100%)}
+.fo-sky.fo-bg-magica{background:radial-gradient(160px 100px at 20% 20%,rgba(183,136,255,.35),transparent 70%),radial-gradient(180px 120px at 80% 30%,rgba(125,249,255,.28),transparent 70%),linear-gradient(180deg,#2a1858 0%,#3f2a7a 45%,#1f6f78 100%)}
+.fo-sky.fo-bg-vulcao{background:radial-gradient(220px 120px at 70% 85%,rgba(255,106,0,.45),transparent 70%),linear-gradient(180deg,#2a1414 0%,#5a2418 50%,#a2421c 100%)}
+.fo-sky.fo-bg-espaco{background:radial-gradient(1.5px 1.5px at 10% 12%,#fff 60%,transparent),radial-gradient(1px 1px at 26% 40%,#fff 60%,transparent),radial-gradient(1.5px 1.5px at 52% 8%,#fff 60%,transparent),radial-gradient(1px 1px at 66% 30%,#cfe3ff 60%,transparent),radial-gradient(1.5px 1.5px at 90% 20%,#fff 60%,transparent),radial-gradient(260px 160px at 30% 30%,rgba(90,70,170,.35),transparent 70%),linear-gradient(180deg,#02030a 0%,#0a0f26 60%,#151b3a 100%)}
+.fo-sky.fo-bg-mar{background:radial-gradient(240px 140px at 50% -10%,rgba(190,240,255,.55),transparent 70%),repeating-linear-gradient(100deg,rgba(255,255,255,.05) 0 18px,transparent 18px 60px),linear-gradient(180deg,#1f8fc4 0%,#0d5f93 55%,#073c63 100%)}
+.fo-stage.fo-bg-noite::before,.fo-stage.fo-bg-magica::before,.fo-stage.fo-bg-vulcao::before,.fo-stage.fo-bg-espaco::before,.fo-stage.fo-bg-mar::before{display:none}

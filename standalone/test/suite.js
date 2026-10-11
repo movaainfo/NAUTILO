@@ -12,6 +12,8 @@ const CODE = 'teste1234', HASH = crypto.createHash('sha256').update('oceanum-v1|
 let OVERRIDE = {}; // ficheiros substituídos (teste de atualização)
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.json': 'application/json', '.md': 'text/plain', '.glb': 'model/gltf-binary' };
 let OFFLINE = false, GSFAIL = 0;
+// os mesmos cabeçalhos de segurança do Vercel (CSP incluída), para os testes apanharem o que ela bloquearia; o Apps Script simulado está em http://127.0.0.1
+const SECH = (() => { try { const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')), all = v.headers.find(h => h.source === '/(.*)'), o = {}; all.headers.forEach(h => { o[h.key] = h.key === 'Content-Security-Policy' ? h.value.replace("connect-src 'self'", `connect-src 'self' http://127.0.0.1:${PORT}`) : h.value; }); delete o['Strict-Transport-Security']; return o; } catch (e) { return {}; } })();
 // servidor estático + caixa de entrada simulada (Apps Script)
 const INBOX = [], STORE = {};
 const srv = http.createServer((req, res) => {
@@ -36,7 +38,7 @@ const srv = http.createServer((req, res) => {
   if (!p.startsWith('/Oceanum/')) { res.writeHead(404); return res.end(); }
   p = p.slice('/Oceanum/'.length) || 'index.html';
   const file = OVERRIDE[p] || path.join(ROOT, p);
-  fs.readFile(file, (e, d) => { if (e) { res.writeHead(404); return res.end('404'); } res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' }); res.end(d); });
+  fs.readFile(file, (e, d) => { if (e) { res.writeHead(404); return res.end('404'); } res.writeHead(200, Object.assign({}, SECH, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' })); res.end(d); });
 });
 
 const PROFILES = [
@@ -669,11 +671,18 @@ async function sharedTests(b) {
     await E(p, () => { const d = new Date().toISOString(); OS.Mail._set({ at: Date.now(), items: [{ id: 'z1', s: 'Último aviso: pagamento em atraso', f: 'Banco <b@b.pt>', d, u: true, sn: 'regularize' }, { id: 'z2', s: '50% desconto', f: 'Loja <news@l.pt>', d, u: false, sn: 'unsubscribe' }], ai: {}, sum: '' }); location.hash = 'email'; }); await sleep(400);
     ok('e-mail: separa urgente e promoções (sem IA)', await E(p, () => OS.Mail.counts().urg === 1 && OS.Mail.items().some(x => x.c === 'promo') && !!document.querySelector('#view .ml-it.c-urgente')));
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
-    ok('google script v9 é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
+    ok('google script completo é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
     const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
-      return { n: P.length, ok1: v(P[0]), ok2: v(P[1]), l1: P[0].length, l2: P[1].length, same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '')).replace(/\s+$/, '') === full.replace(/\s+$/, ''), key1: /const KEY = 'abc'/.test(P[0]), fns: /function doGet/.test(P[0]) && /function verificarAlertas|function noticias_/.test(P[0] + P[1]) }; });
-    ok('script em 2 partes: cada parte é JavaScript válido sozinha e juntas dão o código completo', gp.n === 2 && gp.ok1 && gp.ok2 && gp.same && gp.key1 && gp.fns, JSON.stringify(gp));
-    ok('script em 2 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.l1 < 15000 && gp.l2 < 15000, gp.l1 + ' + ' + gp.l2);
+      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] }; });
+    ok('script em 3 partes: 1 e 2 = núcleo, 3 = ficheiro das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 3 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
+    ok('script em 3 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
+    { // como o Apps Script: cada ficheiro é carregado à parte, pela ordem; a Parte 3 substitui o doGet e liga-se às funções das partes 1 e 2
+      const vm = require('vm'), ctx = vm.createContext({ ContentService: { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 1 } } });
+      vm.runInContext(gp.P[0], ctx); vm.runInContext(gp.P[1], ctx); const before = vm.runInContext("doGet({ parameter: { k: 'abc', op: 'ping' } }).t", ctx); vm.runInContext(gp.P[2], ctx);
+      const r = vm.runInContext("[doGet({ parameter: { k: 'abc', op: 'ping' } }).t, doPost({ parameter: { k: 'abc', op: 'ping' } }).t, doGet({ parameter: { k: 'x', op: 'ping' } }).t, typeof mensagem_, typeof eventos_, typeof noticias_, typeof cotacoes_]", ctx);
+      ok('script: só com as partes 1 e 2 responde versão 10; com a Parte 3 num ficheiro novo responde versão 11 (sem apagar nada)', /"v":10/.test(before) && /"v":11/.test(r[0]) && /"v":11/.test(r[1]) && /Chave errada/.test(r[2]) && r.slice(3).every(x => x === 'function'), before + ' → ' + r.join(' | '));
+      vm.runInContext("function op_novo(p) { return { ok: true, eco: p.x }; }", ctx);
+      ok('script: novidades futuras entram num ficheiro novo (function op_nome) sem mexer na Parte 3', /"eco":"7"/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'novo', x: '7' } }).t", ctx))); }
     // SPYKE+: memória, rotinas, balanço da noite, modo Jarvis, eventos do e-mail
     await E(p, () => OS.Spyke.handle('lembra-te que gosto de estudar de manhã')); await sleep(300);
     ok('spyke: memória guarda o que lhe dizes', await E(p, () => OS.all('spymem').some(m => /estudar de manhã/.test(m.text))));
@@ -932,9 +941,11 @@ async function newFeatureTests(b) {
     const last = () => E(p, () => { const L = [...document.querySelectorAll('#spy .spy-m.spyke .spy-bb')]; return L.length ? L[L.length - 1].textContent : ''; });
     const users = () => E(p, () => document.querySelectorAll('#spy .spy-m.user:not(.live)').length);
     ok('Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)', await E(p, () => OS.Spyke.earOn() && document.documentElement.classList.contains('spy-ear')));
-    await E(p, () => window.__cur.say('que horas são')); await sleep(900); ok('Spyke: logo ao entrar falo sem dizer "Spyke"', /^São \d/.test(await last()), await last());
-    const n1 = await E(p, () => window.__srN); await E(p, () => window.__cur.say('que dia é hoje')); await sleep(900);
+    const u00 = await users(); await E(p, () => window.__cur.say('que horas são')); await sleep(900); ok('Spyke: sem dizer o nome dele não responde (só "Spyke, …")', await users() === u00 && !/^São \d/.test(await last()), await last());
+    await E(p, () => window.__cur.say('Spyke que horas são')); await sleep(900); ok('Spyke: com o nome responde logo', /^São \d/.test(await last()), await last());
+    const n1 = await E(p, () => window.__srN); await E(p, () => window.__cur.say('Spyke que dia é hoje')); await sleep(900);
     ok('Spyke: conversa seguida no mesmo microfone (não volta a pedir autorização)', /Hoje é/.test(await last()) && await E(p, () => window.__srN) === n1);
+    await E(p, () => window.__cur.say('e amanhã vai chover')); await sleep(900); ok('Spyke: depois de responder, sem o nome volta a ignorar', !/chover|Amanhã/i.test(await E(p, () => [...document.querySelectorAll('#spy .spy-m.user:not(.live)')].map(x => x.textContent).join('|'))));
     await E(p, () => OS.Spyke._endConv()); const u0 = await users(); await E(p, () => window.__cur.say('isto é a televisão a falar')); await sleep(800);
     ok('Spyke: fora da conversa ignora o que não é para ele', await users() === u0);
     await E(p, () => window.__cur.say('Spyke que horas são')); await sleep(900); ok('Spyke: "Spyke, …" funciona sempre', /^São \d/.test(await last()));
@@ -992,7 +1003,7 @@ async function newFeatureTests(b) {
   { const { ctx, p, errs } = await newPage(b, PROFILES[0]); let NEWV = false;
     await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.fromEntries(new URLSearchParams(rt.request().postData() || '')), op = u.searchParams.get('op') || P.op, J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
       if (!NEWV && op !== 'list' && op !== 'get' && op !== 'put' && op !== 'pull') return J({ ok: false, msg: 'Valor inválido' });
-      if (op === 'ping') return J({ ok: true, v: 10 }); if (op === 'put') return J({ ok: true }); if (op === 'nw') return J({ ok: true, nw: { 'PT:WORLD': [{ t: 'Notícia de teste - Público', s: 'Público', l: 'https://x.pt', d: Date.now() }], 'BR:WORLD': [], 'PT:TOP': [], 'W:TOP': [] } }); return J({ ok: true, items: [], docs: {} }); });
+      if (op === 'ping') return J({ ok: true, v: 11 }); if (op === 'put') return J({ ok: true }); if (op === 'nw') return J({ ok: true, nw: { 'PT:WORLD': [{ t: 'Notícia de teste - Público', s: 'Público', l: 'https://x.pt', d: Date.now() }], 'BR:WORLD': [], 'PT:TOP': [], 'W:TOP': [] } }); return J({ ok: true, items: [], docs: {} }); });
     await ctx.route(/generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [] }) }));
     await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 1 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
     ok('script antigo: o Jornal explica que o script é antigo e leva ao passo a passo', await E(p, () => /versão antiga/.test(document.getElementById('view').innerText) && !!document.querySelector('#view a[href="#spyke"]')));
@@ -1005,10 +1016,104 @@ async function newFeatureTests(b) {
     await E(p, () => { OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
     ok('script atualizado: o Jornal mostra as notícias', await E(p, () => /Notícia de teste/.test(document.getElementById('view').innerText)));
     ok('sem erros de JavaScript (estado do Spyke)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // script v10 → só falta a Parte 3 (um ficheiro novo, sem apagar nada)
+  { const { ctx, p, errs } = await newPage(b, PROFILES[0]);
+    await ctx.route(/script\.google\.com/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, v: 10, items: [], docs: {} }) }));
+    await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 10 }); location.hash = 'spyke'; }); await sleep(600);
+    const g = await E(p, () => { const u = document.querySelector('#spyState .spy-upd'); return u ? { t: u.innerText, btns: [...u.querySelectorAll('[data-act=ibCopy]')].map(x => x.dataset.t) } : null; });
+    ok('script v10: o guia pede só a Parte 3 num ficheiro novo (não apagar as partes 1 e 2)', g && /só falta a Parte 3/.test(g.t) && /Não apagues nada/.test(g.t) && g.btns.length === 1 && g.btns[0] === 'p3', JSON.stringify(g && g.btns));
+    await p.evaluate(() => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
+    await p.click('#spyState .spy-upd [data-act=ibCopy]'); await sleep(300);
+    ok('script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)', await E(p, () => /PARTE 3/.test(window.__clip) && /function doGet/.test(window.__clip) && !/const KEY/.test(window.__clip)));
+    ok('sem erros de JavaScript (Parte 3)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+  // leitores dentro da app: e-mail inteiro, notícia completa (texto do jornal ou escrita pelo Spyke) e agenda Google pelo script
+  { const { ctx, p, errs } = await newPage(b, PROFILES[0]); const d0 = new Date(); d0.setDate(d0.getDate() + 2); d0.setHours(19, 30, 0, 0); let ce = null;
+    await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), op = u.searchParams.get('op'), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+      if (op === 'ping') return J({ ok: true, v: 11 });
+      if (op === 'gx') return J({ ok: true, s: 'Proposta de estágio', t: [{ id: 'z1', f: 'Ana RH <ana@empresa.pt>', to: 'ryan@x.pt', d: new Date().toISOString(), s: 'Proposta de estágio', b: 'Olá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a parte final que antes não aparecia. Fim da mensagem.', h: '<p>Olá <b>Ryan</b></p><script>parent.__x=1</script><img src=x onerror="parent.__x=1"><a href="javascript:parent.__x=1">x</a>', at: ['contrato.pdf'] }] });
+      if (op === 'cl') return J({ ok: true, ev: [{ id: 'g1', t: 'Jantar (Google)', s: d0.toISOString(), e: new Date(d0.getTime() + 36e5).toISOString(), all: false, loc: 'Aveiro', cal: 'Pessoal' }] });
+      if (op === 'ce') { ce = Object.fromEntries(u.searchParams); return J({ ok: true }); }
+      if (op === 'nw') return J({ ok: true, nw: { 'PT:WORLD': [{ t: 'Notícia aberta pelo jornal', s: 'JN', l: 'https://news.google.com/rss/articles/AAA', d: Date.now() }, { t: 'Notícia de jornal fechado', s: 'Público', l: 'https://news.google.com/rss/articles/BBB', d: Date.now() - 6e4 }], 'BR:WORLD': [] } });
+      return J({ ok: true, items: [], docs: {} }); });
+    await ctx.route(/\/api\/read/, rt => { const u = new URL(rt.request().url()).searchParams.get('u'), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+      if (/AAA/.test(u)) return J({ ok: true, u: 'https://www.jn.pt/a', t: 'Notícia aberta pelo jornal', s: 'Jornal de Notícias', img: '', p: ['Primeiro parágrafo da notícia completa, com os factos principais do que aconteceu hoje em Aveiro e no resto do país.', 'Segundo parágrafo com as declarações dos envolvidos e o contexto do que levou a esta situação inesperada para todos.', 'Terceiro parágrafo com números: 120 pessoas, 3 cidades e um investimento de 4 milhões de euros anunciado pelo governo.', 'Quarto parágrafo com o que vem a seguir, as próximas reuniões e o calendário previsto pelas autoridades responsáveis.', '<img src=x onerror="parent.__x=1"> parágrafo com texto perigoso que tem de aparecer só como texto e nunca como código a correr.'] });
+      return J({ ok: true, u: 'https://www.publico.pt/b', t: 'x', s: 'publico.pt', p: [], desc: 'Resumo curto.' }); });
+    await ctx.route(/generativelanguage/, rt => { const b = rt.request().postData() || ''; if (/conta-a COMPLETA/.test(b) && /google_search/.test(b)) return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: 'O Spyke escreveu o primeiro parágrafo.\n\nSegundo parágrafo escrito.\n\nTerceiro parágrafo escrito.' }] }, groundingMetadata: { groundingChunks: [{ web: { uri: 'https://vertexaisearch.cloud.google.com/x', title: 'publico.pt' } }, { web: { uri: 'https://vertexaisearch.cloud.google.com/y', title: 'rtp.pt' } }] } }] }) }); return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }) }); });
+    await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 11 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' });
+      OS.Mail._set({ at: Date.now(), items: [{ id: 'z1', s: 'Proposta de estágio', f: 'Ana RH <ana@empresa.pt>', d: new Date().toISOString(), u: true, sn: 'Segue a proposta…' }], ai: {}, sum: '' }); location.hash = 'email.caixa'; }); await sleep(500);
+    await p.click('#view .ml-it .ml-t'); await sleep(800);
+    const em = await E(p, () => { const m = document.querySelector('#modal .ml-rd'); return m ? m.innerText : ''; });
+    ok('e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)', /parte final que antes não aparecia\. Fim da mensagem/.test(em) && /contrato\.pdf/.test(em), em.slice(0, 160));
+    ok('e-mail: nada abre fora da app', ctx.pages().length === 1);
+    await p.click('#modal [data-act=mlFmt]'); await sleep(800);
+    ok('e-mail formatado: num quadro isolado, sem scripts (o código malicioso de um e-mail não corre)', await E(p, () => { const f = document.querySelector('#modal iframe.ml-fr'); return !!f && !/allow-scripts|allow-same-origin/.test(f.getAttribute('sandbox')) && window.__x === undefined; }));
+    await E(p, () => { OS.UI.closeModal(); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
+    await p.click('#view .nw-c .nw-a'); await sleep(1200);
+    const n1 = await E(p, () => { const m = document.querySelector('#modal .nw-rd'); return m ? m.innerText : ''; });
+    ok('jornal: a notícia abre dentro da app com o texto completo do jornal', /Texto de Jornal de Notícias/i.test(n1) && /Quarto parágrafo/.test(n1) && ctx.pages().length === 1, n1.replace(/\s+/g, ' ').slice(0, 300));
+    ok('jornal: texto do jornal entra só como texto (sem código a correr)', await E(p, () => window.__x === undefined && /onerror/.test(document.querySelector('#modal .nw-body').textContent)));
+    await E(p, () => OS.UI.closeModal()); await sleep(200); await p.click('#view .nw-c:nth-child(2) .nw-a'); await sleep(1500);
+    const n2 = await E(p, () => { const m = document.querySelector('#modal .nw-rd'); return m ? m.innerText : ''; });
+    ok('jornal: jornal que bloqueia → o Spyke escreve a notícia completa com as fontes, dentro da app', /escrita pelo Spyke/i.test(n2) && /Terceiro parágrafo escrito/.test(n2) && /publico\.pt · rtp\.pt/.test(n2), n2.replace(/\s+/g, ' ').slice(0, 300));
+    await E(p, () => { OS.UI.closeModal(); OS.setOne('integ', { gcal: true }); OS.gcalStart(); }); await sleep(800);
+    ok('agenda Google pelo script: os eventos aparecem no Calendário', await E(p, d => OS.Cal.items(d, d).some(x => x.src === 'gcal' && x.title === 'Jantar (Google)' && x.start === '19:30'), await E(p, t => OS.U.iso(new Date(t)), d0.getTime())));
+    const ad = await E(p, () => OS.gcalAdd({ title: 'Dentista', date: OS.U.addDays(OS.U.today(), 5), start: '10:00' }));
+    ok('agenda Google: o Spyke consegue marcar eventos na agenda Google', ad && ad.ok && ce && ce.t === 'Dentista' && ce.h === '10:00', JSON.stringify(ce));
+    const er2 = errs.filter(e => !/sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (leitores)', !er2.length, er2.slice(0, 3).join(' | ')); await ctx.close(); }
   // nome da app
   { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), m = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
     ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }
 }
+
+/* ================= SEGURANÇA: tentar atacar a própria app ================= */
+async function securityTests(b) { cur = 'Segurança'; console.log('\n=== Segurança: ataques à própria app ===');
+  const PAY = `"'><img src=x onerror="window.__xss=(window.__xss||0)+1"><svg onload="window.__xss=1"></svg><script>window.__xss=1</script>`, JSP = 'javascript:window.__xss=1';
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]);
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), op = u.searchParams.get('op'), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+    const it = { t: PAY, s: PAY, l: JSP, su: JSP, d: Date.now(), rel: [{ l: JSP, t: PAY, s: PAY }] };
+    if (op === 'ping') return J({ ok: true, v: 11 }); if (op === 'nw') { const nw = {}; JSON.parse(u.searchParams.get('f') || '[]').forEach(f => nw[f.id] = [it, Object.assign({}, it, { d: Date.now() - 1000 })]); return J({ ok: true, nw }); }
+    if (op === 'gm') return J({ ok: true, gm: { items: [{ id: 'x1', s: PAY, f: PAY + ' <a@b.pt>', d: new Date().toISOString(), u: true, sn: PAY, lab: [PAY] }], li: [] } });
+    if (op === 'gx') return J({ ok: true, s: PAY, t: [{ id: 'x1', f: PAY, to: PAY, d: new Date().toISOString(), s: PAY, b: PAY + ' ' + JSP, h: PAY, at: [PAY] }] });
+    if (op === 'cl') return J({ ok: true, ev: [{ id: 'g1', t: PAY, s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, loc: PAY, cal: PAY }] });
+    if (op === 'q') return J({ ok: true, q: { AAPL: { p: 1, pc: 1, nm: PAY, cur: 'USD', ex: PAY } } });
+    if (op === 'pull') return J({ ok: true, items: [{ id: 'i1', t: new Date().toISOString(), v: 3, d: PAY, c: PAY }] });
+    return J({ ok: true, items: [], docs: {} }); });
+  await ctx.route(/\/api\/read/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, u: JSP, t: PAY, s: PAY, img: JSP, p: [PAY, PAY, PAY, PAY + ' texto comprido o bastante para contar como parágrafo de notícia verdadeira, com mais palavras e mais palavras e mais palavras ainda para passar dos 400 caracteres no total da notícia que estamos a ler.'] }) }));
+  await ctx.route(/generativelanguage/, rt => { const T = JSON.stringify({ t: [PAY], titulo: PAY, pontos: [{ titulo: PAY, resumo: PAY, porque: PAY, idx: [0] }], para_ti: PAY, text: PAY, resumo: PAY, sum: PAY, cats: {} });
+    rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { role: 'model', parts: [{ text: /responseMimeType|Responde APENAS JSON|JSON/.test(rt.request().postData() || '') ? T : PAY }] }, groundingMetadata: { groundingChunks: [{ web: { uri: JSP, title: PAY } }] } }] }) }); });
+  await p.goto(BASE); await unlock(p);
+  const seeded = await E(p, ([PAY, JSP]) => { OS.Jarvis && OS.Jarvis.close(); let n = 0; const t = OS.U.today();
+    Object.entries(OS.S).forEach(([c, sc]) => { const o = {}; (sc.fields || []).forEach(f => { const ty = f.t || 'text'; if (/link|url|site|href|web/i.test(f.k)) o[f.k] = JSP; else if (['text', 'area', 'sel', 'custom'].includes(ty)) o[f.k] = PAY; else if (ty === 'multi' || ty === 'tags') o[f.k] = [PAY]; else if (ty === 'date') o[f.k] = t; else if (ty === 'time') o[f.k] = '10:00'; else if (['num', 'money', 'pct', 'rating', 'dur'].includes(ty)) o[f.k] = 1; });
+      try { OS.add(c, Object.assign({}, sc.defaults ? sc.defaults() : {}, o), { silent: true }); n++; } catch (e) { } });
+    OS.setOne('profile', { name: PAY, short: PAY, employer: PAY, jobRole: PAY }); OS.setOne('mova', { name: PAY }); OS.setOne('news', { tabs: ['PT', 'BR'], themes: [PAY] });
+    OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); OS.setOne('integ', { gcal: true }); try { OS.gcalStart(); } catch (e) { }
+    return n; }, [PAY, JSP]);
+  ok('segurança: código malicioso gravado em todos os campos de ' + seeded + ' tipos de registo', seeded > 40);
+  const bad = () => E(p, () => ({ x: window.__xss || 0, img: document.querySelectorAll('img[src="x"][onerror]').length, svg: document.querySelectorAll('svg[onload]').length, scr: [...document.querySelectorAll('script')].filter(s => /__xss/.test(s.textContent)).length, js: [...document.querySelectorAll('a[href]')].filter(a => /^\s*javascript:/i.test(a.getAttribute('href'))).length }));
+  const base = await E(p, () => [...new Set([...document.querySelectorAll('#side a[href^="#"], .tn-dd a[href^="#"]')].map(a => a.getAttribute('href').slice(1)).filter(Boolean))]);
+  const hits = []; const seen = new Set();
+  for (const r of base.concat(['dominus', 'definicoes', 'explorar'])) { for (const rr of [r]) { if (seen.has(rr)) continue; seen.add(rr); await E(p, rr => { location.hash = rr; }, rr); await sleep(350);
+      const subs = await E(p, () => [...document.querySelectorAll('#view .tabs a[href^="#"], #view [role=tablist] a[href^="#"]')].map(a => a.getAttribute('href').slice(1)));
+      const v = await bad(); if (v.x || v.img || v.svg || v.scr || v.js) { hits.push(rr + ' ' + JSON.stringify(v)); if (process.env.XSSDBG) console.log('XSS em', rr, await E(p, () => [...document.querySelectorAll('img[src="x"], svg[onload]')].slice(0, 3).map(e => (e.parentElement.parentElement || e.parentElement).outerHTML.slice(0, 400)).join('\n---\n'))); } await E(p, () => { window.__xss = 0; });
+      for (const s2 of subs) { if (seen.has(s2)) continue; seen.add(s2); await E(p, s2 => { location.hash = s2; }, s2); await sleep(300); const v2 = await bad(); if (v2.x || v2.img || v2.svg || v2.scr || v2.js) { hits.push(s2 + ' ' + JSON.stringify(v2)); if (process.env.XSSDBG) console.log('XSS em', s2, await E(p, () => [...document.querySelectorAll('img[src="x"], svg[onload]')].slice(0, 3).map(e => (e.parentElement.parentElement || e.parentElement).outerHTML.slice(0, 400)).join('\n---\n'))); } await E(p, () => { window.__xss = 0; }); } } }
+  ok('segurança: nenhuma página executa código malicioso guardado nos dados (' + seen.size + ' páginas)', !hits.length, hits.slice(0, 6).join(' | '));
+  // formulários de edição com os dados maliciosos
+  const fh = []; for (const c of await E(p, () => Object.keys(OS.S))) { await E(p, c => { const r = OS.all(c).slice(-1)[0]; if (r) OS.UI.openForm(c, r.id); }, c); await sleep(120); const v = await bad(); if (v.x || v.img || v.svg || v.scr) fh.push(c); await E(p, () => { OS.UI.closeDrawer && OS.UI.closeDrawer(); OS.UI.closeModal && OS.UI.closeModal(); }); }
+  ok('segurança: os formulários de edição mostram o código como texto', !fh.length, fh.join(', '));
+  // leitores, Spyke e endereços com código
+  await E(p, () => { location.hash = 'email.caixa'; }); await sleep(300); await E(p, () => { OS.Mail._set({ at: Date.now(), items: [{ id: 'x1', s: document.title, f: 'a <a@b.pt>', d: new Date().toISOString(), u: true, sn: 'x' }], ai: {}, sum: '' }); OS.Mail.read('x1'); }); await sleep(700);
+  await E(p, () => { const b2 = document.querySelector('#modal [data-act=mlFmt]'); b2 && b2.click(); }); await sleep(500); const em = await bad();
+  await E(p, () => { OS.UI.closeModal(); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500); await E(p, () => { const c = document.querySelector('#view .nw-a'); c && c.click(); }); await sleep(1200); const nw = await bad();
+  await E(p, () => { OS.UI.closeModal(); OS.Spyke.handle(document.querySelector('#view') ? 'Spyke ' + '"\'><img src=x onerror="window.__xss=1">' : ''); }); await sleep(1200); const sp = await bad();
+  for (const h of ['tarefas.<img src=x onerror=window.__xss=1>', 'gasto.<img src=x onerror=window.__xss=1>', 'jornal.<svg onload=window.__xss=1>', 'spyke.<img src=x onerror=window.__xss=1>']) { await E(p, h => { location.hash = h; }, h); await sleep(300); }
+  const hs = await bad();
+  ok('segurança: e-mail (texto e formatado), notícia aberta, conversa com o Spyke e endereços com código não executam nada', !(em.x || em.img || nw.x || nw.img || nw.js || sp.x || sp.img || hs.x || hs.img || hs.svg), JSON.stringify({ em, nw, sp, hs }));
+  // sem desbloquear não se vê nada
+  await E(p, () => { OS.add('transactions', { type: 'Despesa', amount: 1, date: OS.U.today(), desc: 'SEGREDO_XYZ', account: (OS.Fin.accounts()[0] || {}).id }); }); await sleep(800);
+  const p2 = await ctx.newPage(); await p2.goto(BASE + '#financas.transacoes'); await sleep(1500);
+  ok('segurança: sem o código/Face ID não aparece nenhum dado (mesmo abrindo o endereço de uma página)', !(await p2.evaluate(() => document.body.innerText.includes('SEGREDO_XYZ'))));
+  await p2.close();
+  const er2 = errs.filter(e => !/sandboxed|about:srcdoc|Content Security Policy|Failed to load|net::/.test(e)); ok('sem erros de JavaScript (segurança)', !er2.length, er2.slice(0, 3).join(' | ')); await ctx.close(); }
 
 /* ================= TODOS OS APARELHOS: iPhone, Android, tablets e computador ================= */
 async function deviceMatrix(b) {
@@ -1035,8 +1140,8 @@ async function deviceMatrix(b) {
     ok('recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã', await E(p, () => { const f = document.querySelector('#modal form[data-form=mvRec]'), b = f && f.querySelector('button'); if (!b) return false; b.scrollIntoView(); const r = b.getBoundingClientRect(); return r.bottom <= innerHeight && r.top >= 0; }));
     await E(p, () => OS.UI.closeModal());
     // Spyke a ouvir
-    await E(p, () => { OS.setOne('spyke', { eng: 'device' }); }); await E(p, () => window.__cur && window.__cur.say('que horas são')); await sleep(900);
-    ok('Spyke: começa a ouvir sozinho e responde sem tocar', await E(p, () => OS.Spyke.earOn() && [...document.querySelectorAll('#spy .spy-m.spyke .spy-bb')].some(x => /^São \d/.test(x.textContent))));
+    await E(p, () => { OS.setOne('spyke', { eng: 'device' }); }); await E(p, () => window.__cur && window.__cur.say('Spyke que horas são')); await sleep(900);
+    ok('Spyke: começa a ouvir sozinho e responde sem tocar (ao ouvir o nome)', await E(p, () => OS.Spyke.earOn() && [...document.querySelectorAll('#spy .spy-m.spyke .spy-bb')].some(x => /^São \d/.test(x.textContent))));
     ok('Spyke: o painel cabe no ecrã', !(await ovf()) && await E(p, () => { const c = document.querySelector('#spy .spy-card'); if (!c) return false; const r = c.getBoundingClientRect(); return r.left >= -1 && r.right <= innerWidth + 1; }));
     await E(p, () => OS.Spyke.close());
     // Floresta 3D
@@ -1084,7 +1189,7 @@ async function stress(b) {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

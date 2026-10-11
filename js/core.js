@@ -31,8 +31,9 @@ U.longDate = s => { const d = U.parse(s); return U.WD[d.getDay()] + ', ' + d.get
 U.rel = s => { if (!s) return '—'; const d = U.diff(s, U.today()); if (d === 0) return 'hoje'; if (d === 1) return 'amanhã'; if (d === -1) return 'ontem'; return d > 0 ? 'em ' + d + ' dias' : 'há ' + (-d) + ' dias'; };
 U.esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 U.num = v => { const n = typeof v === 'string' ? parseFloat(v.replace(',', '.')) : Number(v); return isFinite(n) ? n : 0; };
-U.sum = (a, f = x => x) => a.reduce((s, x) => s + U.num(f(x)), 0);
-U.avg = (a, f = x => x) => a.length ? U.sum(a, f) / a.length : 0;
+const AR = a => Array.isArray(a) ? a : []; // dados estragados (ex.: vindos de outra versão) não partem a página
+U.sum = (a, f = x => x) => AR(a).reduce((s, x) => s + U.num(f(x)), 0);
+U.avg = (a, f = x => x) => AR(a).length ? U.sum(a, f) / a.length : 0;
 U.r1 = v => Math.round(v * 10) / 10;
 U.r2 = v => Math.round(v * 100) / 100;
 U.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -46,8 +47,8 @@ U.hm = (d = new Date()) => U.pad(d.getHours()) + ':' + U.pad(d.getMinutes());
 U.t2m = t => { if (!t) return null; const [h, m] = String(t).split(':').map(Number); return h * 60 + (m || 0); };
 U.m2t = m => U.pad(Math.floor(m / 60) % 24) + ':' + U.pad(Math.round(m % 60));
 U.hours = min => { const h = Math.floor(min / 60), m = Math.round(min % 60); return h ? h + 'h' + (m ? U.pad(m) : '') : m + 'min'; };
-U.groupBy = (a, f) => a.reduce((o, x) => { const k = f(x); (o[k] = o[k] || []).push(x); return o; }, {});
-U.sortBy = (a, f, dir = 1) => a.slice().sort((x, y) => { const a1 = f(x), b1 = f(y); return (a1 > b1 ? 1 : a1 < b1 ? -1 : 0) * dir; });
+U.groupBy = (a, f) => AR(a).reduce((o, x) => { const k = f(x); (o[k] = o[k] || []).push(x); return o; }, {});
+U.sortBy = (a, f, dir = 1) => AR(a).slice().sort((x, y) => { const a1 = f(x), b1 = f(y); return (a1 > b1 ? 1 : a1 < b1 ? -1 : 0) * dir; });
 U.hash = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 U.rng = seed => { let a = typeof seed === 'number' ? seed : U.hash(String(seed)); return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
 U.range = (a, b) => { const r = []; let d = a; while (d <= b) { r.push(d); d = U.addDays(d, 1); } return r; };
@@ -78,7 +79,12 @@ let db = null, flushTimer = null;
 OS.sync = { status: 'local', msg: 'A iniciar…' };
 
 OS.all = c => OS.D[c] || (OS.D[c] = []);
-OS.get = (c, id) => id ? OS.all(c).find(r => r.id === id) : undefined;
+// procura por id com índice (antes percorria a lista inteira a cada procura: lento com milhares de registos)
+const IDX = {};
+OS.get = (c, id) => { if (!id) return undefined; const a = OS.all(c); if (a.length < 40) return a.find(r => r.id === id);
+  let x = IDX[c]; if (!x || x.a !== a || x.n !== a.length) { x = IDX[c] = { a, n: a.length, m: new Map() }; a.forEach((r, i) => x.m.set(r.id, i)); }
+  const i = x.m.get(id); if (i != null && a[i] && a[i].id === id) return a[i];
+  const f = a.findIndex(r => r.id === id); if (f >= 0) { delete IDX[c]; return a[f]; } return undefined; };
 OS.find = (c, f) => OS.all(c).filter(f);
 function pickShard(c) {
   const cap = OS.SHARD[c] || DEF_SHARD, cnt = {};
@@ -234,8 +240,13 @@ OS.emitAsync = async (evt) => { for (const f of (handlers[evt] || [])) { try { a
 OS.views = {};                 // base -> fn(sub) => html
 OS.route = () => { const h = decodeURIComponent((location.hash || '#visao').slice(1)) || 'visao'; const i = h.indexOf('.'); return { base: i < 0 ? h : h.slice(0, i), sub: i < 0 ? '' : h.slice(i + 1), raw: h }; };
 OS.go = h => { if (location.hash.slice(1) === h) OS.request(); else location.hash = h; };
-let raf = 0;
-OS.request = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; OS.emit('render'); }); };
+let raf = 0, pend = false, touching = 0;
+// não redesenha a página com o dedo no ecrã (o botão mudava debaixo do dedo e o toque perdia-se) nem com a app escondida
+OS.request = () => { if (raf) return; if ((touching && Date.now() - touching < 4000) || document.hidden) { pend = true; return; } raf = requestAnimationFrame(() => { raf = 0; OS.emit('render'); }); };
+const flushR = ms => { if (!pend) return; setTimeout(() => { if (touching || document.hidden || !pend) return; pend = false; OS.request(); }, ms); };
+addEventListener('pointerdown', () => { touching = Date.now(); }, true);
+['pointerup', 'pointercancel'].forEach(ev => addEventListener(ev, () => { touching = 0; flushR(350); }, true));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) flushR(30); });
 
 /* Estado de interface por visitante (filtros, abas) — conveniência local */
 OS.ui = U.ls.get('os2ui', {});
