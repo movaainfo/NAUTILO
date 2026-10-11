@@ -2353,7 +2353,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.0", "date": "10/10/2026", "notes": ["Estado do Spyke: verifica a IA, o microfone, o script Google, as notícias e o e-mail, e mostra o passo a passo para atualizar o script. Jornal explica quando o script é antigo."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.1", "date": "11/10/2026", "notes": ["Script do Google em 2 partes (o colar no telemóvel/tablet cortava o código); um projeto novo do script usa os dados que já estão no Drive."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -9080,9 +9080,9 @@ const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url 
     ${row(hasScr && v >= SCRV ? (mail.at ? true : null) : false, 'E-mail', hasScr && v >= SCRV ? (mail.at ? 'ligado' : 'falta ligar o Gmail: página E-mail → Atualizar') : 'precisa do script Google atualizado')}
     </div>
     ${oldScr ? `<div class="spy-upd"><b>Atualizar o script do Google · passo a passo (uns 5 minutos)</b>
-      <ol><li>Toca em <b>Copiar código novo</b> (já leva a tua chave).<div class="row gap8" style="margin-top:6px"><button class="btn sm pri" data-act="ibCopy" data-t="code">${UI.ic('link')}Copiar código novo</button></div></li>
-      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> e entra no teu projeto do Oceanum. No iPhone é mais fácil com <b>aA → Pedir site para computador</b> (ou faz num computador).</li>
-      <li>No código: <b>seleciona tudo</b> → apaga → <b>cola</b> o código novo → toca na disquete (<b>Guardar</b>).</li>
+      <ol><li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> e entra no <b>teu projeto do Oceanum</b>: o que já tens, com a linha <code>const KEY</code> igual à tua chave (não cries um projeto novo). No iPhone usa <b>aA → Pedir site para computador</b>.</li>
+      <li>O código vai em <b>2 partes</b> (no telemóvel e no tablet o "colar" corta textos grandes). Toca em <b>Copiar parte 1</b> → no Apps Script, no <b>Código.gs</b>: seleciona tudo → apaga → cola → <b>Guardar</b> (disquete).<div class="row gap8" style="margin-top:6px"><button class="btn sm pri" data-act="ibCopy" data-t="p1">${UI.ic('link')}Copiar parte 1</button></div></li>
+      <li>Toca em <b>Copiar parte 2</b> → no Apps Script: <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte2</b> → apaga o que vier → cola → <b>Guardar</b>. Se já tiveres a Parte2 de outra vez, substitui o conteúdo dela.<div class="row gap8" style="margin-top:6px"><button class="btn sm pri" data-act="ibCopy" data-t="p2">${UI.ic('link')}Copiar parte 2</button></div></li>
       <li>Na lista de funções ao lado de <b>▶ Executar</b>, escolhe <b>autorizarGmail</b> → <b>▶ Executar</b> → <b>Rever permissões</b> → a tua conta → <b>Avançado</b> → <b>Aceder</b> → <b>Permitir</b>. É o teu próprio script: o aviso do Google é normal.</li>
       <li><b>Implantar</b> → <b>Gerenciar implantações</b> → lápis (<b>Editar</b>) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>. Se houver mais de uma implantação, edita a que tem o endereço que termina em <code>…${esc(String(c.url || '').slice(-16))}</code>.</li>
       <li>Volta aqui e toca em <b>Verificar tudo</b>.</li></ol>
@@ -12842,6 +12842,9 @@ function folha_() { let ss = null; try { ss = SpreadsheetApp.getActiveSpreadshee
     if (!ss) { ss = SpreadsheetApp.create('Oceanum · Gastos do atalho'); P.setProperty('SHEET', ss.getId()); } }
   return ss.getSheets()[0]; }
 function ficheiro_() { const P = PropertiesService.getScriptProperties(), id = P.getProperty('DATA'); if (id) { try { return DriveApp.getFileById(id); } catch (e) { } }
+  // projeto novo ou copiado: usa o ficheiro de dados que já existe no teu Drive (nunca começa do zero por engano)
+  const it = DriveApp.getFilesByName('Oceanum · dados.json'); let best = null; while (it.hasNext()) { const x = it.next(); if (!x.isTrashed() && (!best || x.getSize() > best.getSize())) best = x; }
+  if (best) { P.setProperty('DATA', best.getId()); return best; }
   const f = DriveApp.createFile('Oceanum · dados.json', '{}', 'application/json'); P.setProperty('DATA', f.getId()); return f; }
 function dados_() { try { return JSON.parse(ficheiro_().getBlob().getDataAsString() || '{}'); } catch (e) { return {}; } }
 function guardar_(all) { const f = ficheiro_();
@@ -13072,8 +13075,22 @@ A.syLink = () => { const el = document.getElementById('syCode'); const SY = wind
 A.syCopy = async () => { const SY = window.OceanumSync; const code = SY.linkCode(); const link = location.origin + location.pathname + '#ligar=' + encodeURIComponent(code);
   try { await navigator.clipboard.writeText(link); UI.toast('Código copiado. Abre-o no outro aparelho.', 'pos'); } catch (e) { UI.modal(`<div style="padding:18px"><b>Copia este código</b><textarea readonly style="width:100%;height:120px;font:12px var(--mono);margin-top:8px" onfocus="this.select()">${esc(link)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); } };
 const copy = t => new Promise(res => { try { navigator.clipboard.writeText(t).then(() => res(true), () => res(false)); } catch (e) { res(false); } });
+// O código tem ~25 mil caracteres: no telemóvel e no tablet o "colar" corta o texto a meio (~20 mil). Por isso vai em 2 partes,
+// cada uma num ficheiro do mesmo projeto (o Apps Script junta os ficheiros). Corta sempre entre funções.
+IB.parts = key => { const L = IB.script(key).split('\n'), half = L.join('\n').length / 2; let n = 0, cut = 0;
+  for (let i = 0; i < L.length; i++) { if (n >= half && /^(function |\/\/ ---- )/.test(L[i])) { cut = i; break; } n += L[i].length + 1; }
+  if (!cut) cut = Math.floor(L.length / 2); return [L.slice(0, cut).join('\n') + '\n', '// Oceanum · parte 2 do código (fica num ficheiro à parte no mesmo projeto)\n' + L.slice(cut).join('\n')]; };
+const partsModal = () => UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>Código do script em 2 partes</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+  <p class="mut" style="margin:0 0 10px">No telemóvel e no tablet o "colar" corta textos muito grandes, por isso o código vai em duas partes.</p>
+  <ol class="ai-steps"><li>Toca em <b>Copiar parte 1</b>. No Apps Script, no ficheiro <b>Código.gs</b>: seleciona tudo → apaga → cola → <b>Guardar</b>.</li>
+  <li>Volta aqui e toca em <b>Copiar parte 2</b>. No Apps Script: <b>Ficheiros/Arquivos → +</b> → <b>Script</b> → nome <b>Parte2</b> → apaga o que vier lá → cola → <b>Guardar</b>.</li>
+  <li>Confirma: o fim do <b>Código.gs</b> e o fim da <b>Parte2</b> não podem ficar cortados (a Parte2 acaba em <code>}</code>).</li></ol>
+  <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="ibCopy" data-t="p1">${UI.ic('link')}Copiar parte 1</button><button class="btn pri" data-act="ibCopy" data-t="p2">${UI.ic('link')}Copiar parte 2</button></div></div>`, 'tall');
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
-  const t = b.dataset.t === 'code' ? IB.script(c.key) : q('');
+  if (b.dataset.t === 'code') return partsModal();
+  const P = b.dataset.t === 'p1' || b.dataset.t === 'p2' ? IB.parts(c.key) : null;
+  const t = P ? P[b.dataset.t === 'p1' ? 0 : 1] : b.dataset.t === 'all' ? IB.script(c.key) : q('');
+  if (P) { if (await copy(t)) UI.toast((b.dataset.t === 'p1' ? 'Parte 1 copiada: cola-a no Código.gs.' : 'Parte 2 copiada: cola-a no ficheiro Parte2.'), 'pos'); else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); return; }
   if (await copy(t)) UI.toast(b.dataset.t === 'code' ? 'Código copiado. Agora cola-o no teu script em script.google.com.' : 'Link copiado', 'pos');
   else UI.modal(`<div style="padding:18px"><b>Copia manualmente</b><p class="mut">Toca no texto, seleciona tudo e copia.</p><textarea readonly style="width:100%;height:240px;font:12px var(--mono)" onfocus="this.select()">${esc(t)}</textarea><div style="text-align:right;margin-top:10px"><button class="btn" data-mclose>Fechar</button></div></div>`); };
 A.ibSave = async () => { const el = document.getElementById('ibUrl'), c = cfg(); c.url = (el ? el.value : '').trim(); OS.touch('inbox'); IB.st = { ok: false, m: 'A verificar…' }; OS.request(); await IB.check(); OS.request(); };
