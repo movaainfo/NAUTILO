@@ -41,7 +41,7 @@ function render() { if (!el) return; const o = D(), t = U.today(), urg = o.alert
       <section class="jv-core"><canvas class="jv-cv" width="520" height="520" aria-hidden="true"></canvas><div class="jv-hi">${esc(greet())}, ${esc(name())}</div>
         <div class="jv-meta"><span><i style="background:#38bdf8"></i>Dia ${Math.round(o.dayP * 100)}%</span><span><i style="background:#22c55e"></i>Hábitos ${o.hab[0]}/${o.hab[1]}</span><span><i style="background:#f59e0b"></i>Estudo ${o.study} min</span></div>
         <div class="jv-btns"><button class="btn pri" data-act="jvTalk">${UI.ic('mic')}Falar</button><button class="btn" data-act="jvSay" data-q="bom dia">Resumo</button><button class="btn" data-act="jvSay" data-q="modo estudo">Estudo</button><button class="btn" data-act="jvSay" data-q="boa noite">Boa noite</button></div></section>
-      ${card(1, 'Clima', wx)}${card(2, 'Agenda de hoje', ag, 'calendario')}${card(3, 'Prioridades', nx, 'next')}${card(4, 'Alertas', al, 'painel')}
+      ${card(1, 'Clima', wx)}${card(2, 'Agenda de hoje', ag, 'calendario')}${card(3, 'Prioridades', nx, 'next')}${card(4, 'Alertas', al, 'visao')}
       ${card(5, 'Finanças', fin, 'financas')}${card(6, 'Universidade', un, 'universidade')}${card(7, 'E-mail', ml, 'email')}${card(8, 'Hoje', `<div class="jv-kv"><span>Hábitos</span><b>${o.hab[0]}/${o.hab[1]}</b></div><div class="jv-bar"><i style="width:${o.hab[1] ? Math.round(o.hab[0] / o.hab[1] * 100) : 0}%"></i></div><div class="jv-kv"><span>Estudo</span><b>${o.study} min</b></div><div class="jv-kv"><span>Tarefas feitas</span><b>${o.doneT}</b></div>`, 'habitos')}
     </div>
     ${o.news.length ? `<div class="jv-news"><b>NOTÍCIAS</b><div class="jv-tk"><span class="jv-tr">${o.news.map(esc).join('<i></i>')}</span></div></div>` : ''}

@@ -80,11 +80,16 @@ IA.facts = (extra = {}) => { const S = IX.summary(), val = S.val || 0, H = IX.he
   }, extra); };
 
 /* ================= chamadas à IA ================= */
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
-const raw = async (body) => { const key = OS.AI && OS.AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '';
-  for (const m of MODELS) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({}));
-      if (r.status === 404) { last = 'modelo indisponível'; continue; } if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida.'), { fatal: 1 }); if (r.status === 429) throw Object.assign(new Error('Limite gratuito da IA atingido por agora. Tenta daqui a um minuto.'), { fatal: 1 }); last = msg || 'erro ' + r.status; continue; }
-      return j; } catch (e) { if (e.fatal) throw e; last = e.message; } }
+// modelos descobertos com a tua chave; se o Google não der, a IA grátis de reserva responde (sem pesquisa na web)
+const raw = async (body) => { const key = OS.AI && OS.AI.key(); let last = '';
+  if (key) { await OS.AI.discover(); for (const m of OS.AI.gemini()) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({}));
+      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida.'), { fatal: 1 }); if (r.status === 429) { OS.AI.markLimit(m, msg); last = 'limite'; continue; } if (OS.AI.isDead(r.status, msg)) { OS.AI.markDead(m); last = 'modelo desligado'; continue; } last = msg || 'erro ' + r.status; continue; }
+      return j; } catch (e) { if (e.fatal) throw e; last = e.message; } } }
+  // reserva grátis: converte o pedido (texto) para a IA aberta e devolve no mesmo formato do Google
+  if (OS.AI.freeOn() && !(body.contents || []).some(c => (c.parts || []).some(p => p.inline_data))) { try { const txt = (body.contents || []).map(c => (c.parts || []).map(p => p.text || '').join('\n')).join('\n'), sys = body.systemInstruction ? (body.systemInstruction.parts || []).map(p => p.text || '').join('\n') : '';
+      const m = await OS.AI.free([sys ? { role: 'system', content: sys } : null, { role: 'user', content: txt }].filter(Boolean), { temp: (body.generationConfig || {}).temperature, json: (body.generationConfig || {}).responseMimeType === 'application/json' });
+      return { candidates: [{ content: { parts: [{ text: String(m.content || '') }] } }] }; } catch (e) { last = e.message; } }
+  if (!key && !OS.AI.freeOn()) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 });
   throw new Error('A IA não respondeu (' + last + ').'); };
 const textOf = j => ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('');
 const parseJ = t => { t = String(t || '').replace(/^```(json)?/m, '').replace(/```\s*$/m, '').trim(); const i = t.indexOf('{'), k = t.lastIndexOf('}'); return JSON.parse(i >= 0 ? t.slice(i, k + 1) : t); };

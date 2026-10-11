@@ -3,13 +3,13 @@
   "p": "iPhone",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "379 ms"
+  "info": "317 ms"
  },
  {
   "p": "iPhone",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.3"
+  "info": "MIND CONTROL · v2.4"
  },
  {
   "p": "iPhone",
@@ -55,7 +55,7 @@
  },
  {
   "p": "iPhone",
-  "name": "152 páginas abrem com conteúdo",
+  "name": "154 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -69,11 +69,11 @@
   "p": "iPhone",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 154 ms"
+  "info": "máx 150 ms"
  },
  {
   "p": "iPhone",
-  "name": "484 botões carregados sem erro",
+  "name": "502 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -99,7 +99,7 @@
   "p": "iPhone",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 2029 elementos"
+  "info": "heap +0 MB · 1606 elementos"
  },
  {
   "p": "iPhone",
@@ -111,13 +111,13 @@
   "p": "Android tel",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "382 ms"
+  "info": "266 ms"
  },
  {
   "p": "Android tel",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.3"
+  "info": "MIND CONTROL · v2.4"
  },
  {
   "p": "Android tel",
@@ -163,7 +163,7 @@
  },
  {
   "p": "Android tel",
-  "name": "152 páginas abrem com conteúdo",
+  "name": "154 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -177,11 +177,11 @@
   "p": "Android tel",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 171 ms"
+  "info": "máx 128 ms"
  },
  {
   "p": "Android tel",
-  "name": "484 botões carregados sem erro",
+  "name": "502 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -207,7 +207,7 @@
   "p": "Android tel",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 2029 elementos"
+  "info": "heap +0 MB · 1606 elementos"
  },
  {
   "p": "Android tel",
@@ -219,13 +219,13 @@
   "p": "Tablet horiz",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "2790 ms"
+  "info": "1709 ms"
  },
  {
   "p": "Tablet horiz",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.3"
+  "info": "MIND CONTROL · v2.4"
  },
  {
   "p": "Tablet horiz",
@@ -271,7 +271,7 @@
  },
  {
   "p": "Tablet horiz",
-  "name": "152 páginas abrem com conteúdo",
+  "name": "154 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -285,11 +285,11 @@
   "p": "Tablet horiz",
   "name": "páginas rápidas (processador 6× mais lento)",
   "pass": true,
-  "info": "máx 728 ms"
+  "info": "máx 312 ms"
  },
  {
   "p": "Tablet horiz",
-  "name": "493 botões carregados sem erro",
+  "name": "510 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -315,7 +315,7 @@
   "p": "Tablet horiz",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1611 elementos"
+  "info": "heap +0 MB · 1188 elementos"
  },
  {
   "p": "Tablet horiz",
@@ -327,13 +327,13 @@
   "p": "Tablet vert",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "369 ms"
+  "info": "326 ms"
  },
  {
   "p": "Tablet vert",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.3"
+  "info": "MIND CONTROL · v2.4"
  },
  {
   "p": "Tablet vert",
@@ -379,7 +379,7 @@
  },
  {
   "p": "Tablet vert",
-  "name": "152 páginas abrem com conteúdo",
+  "name": "154 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -393,11 +393,11 @@
   "p": "Tablet vert",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 199 ms"
+  "info": "máx 113 ms"
  },
  {
   "p": "Tablet vert",
-  "name": "496 botões carregados sem erro",
+  "name": "514 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -423,7 +423,7 @@
   "p": "Tablet vert",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 2029 elementos"
+  "info": "heap +0 MB · 1606 elementos"
  },
  {
   "p": "Tablet vert",
@@ -435,13 +435,13 @@
   "p": "Computador",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "439 ms"
+  "info": "268 ms"
  },
  {
   "p": "Computador",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.3"
+  "info": "MIND CONTROL · v2.4"
  },
  {
   "p": "Computador",
@@ -487,7 +487,7 @@
  },
  {
   "p": "Computador",
-  "name": "152 páginas abrem com conteúdo",
+  "name": "154 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -501,11 +501,11 @@
   "p": "Computador",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 172 ms"
+  "info": "máx 157 ms"
  },
  {
   "p": "Computador",
-  "name": "494 botões carregados sem erro",
+  "name": "512 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -525,7 +525,7 @@
   "p": "Computador",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 2029 elementos"
+  "info": "heap +0 MB · 1606 elementos"
  },
  {
   "p": "Computador",
@@ -621,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 11/10/2026 · Atualização automática a sério: ao abrir,"
+  "info": "Atualizado · versão 9.9 · 11/10/2026 · IA sem parar: a app descobre sozinha os m"
  },
  {
   "p": "Geral",
@@ -981,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-11\",\"meal\":\"Almoço\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"5nbuhutil3j\",\"_c\":1791722837071,\"_u\":1791722837071,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-11\",\"meal\":\"Ceia\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"re36icgaprt\",\"_c\":1791761101049,\"_u\":1791761101049,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1131,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-11\",\"meal\":\"Almoço\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"bxz0watj1sh\",\"_c\":1791722858705,\"_u\":1791722858705,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-11\",\"meal\":\"Ceia\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"3xs40ygb6ar\",\"_c\":1791761122467,\"_u\":1791761122467,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1687,15 +1687,21 @@
  },
  {
   "p": "Geral",
-  "name": "script em 3 partes: 1 e 2 = núcleo, 3 = ficheiro das novidades; cada parte é JavaScript válido e juntas dão o código completo",
+  "name": "script em 4 partes: 1 e 2 = núcleo, 3 e 4 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo",
   "pass": true,
-  "info": "{\"n\":3,\"ok\":[true,true,true],\"len\":[13098,12313,8345],\"same\":true,\"key1\":true,\"core\":25334,\"addon\":true}"
+  "info": "{\"n\":4,\"ok\":[true,true,true,true],\"len\":[13098,12313,8345,10658],\"same\":true,\"key1\":true,\"core\":25334,\"addon\":true}"
  },
  {
   "p": "Geral",
-  "name": "script em 3 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)",
+  "name": "script em 4 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)",
   "pass": true,
-  "info": "13098 + 12313 + 8345"
+  "info": "13098 + 12313 + 8345 + 10658"
+ },
+ {
+  "p": "Geral",
+  "name": "script: a Parte 4 (Outlook) liga-se às outras e responde",
+  "pass": true,
+  "info": ""
  },
  {
   "p": "Geral",
@@ -2197,7 +2203,7 @@
  },
  {
   "p": "Áreas",
-  "name": "todas as 152 páginas: cada botão tem função",
+  "name": "todas as 154 páginas: cada botão tem função",
   "pass": true,
   "info": ""
  },
@@ -2301,7 +2307,7 @@
   "p": "Novidades",
   "name": "Spyke: com o nome responde logo",
   "pass": true,
-  "info": "São 12:50."
+  "info": "São 23:28."
  },
  {
   "p": "Novidades",
@@ -2529,7 +2535,7 @@
   "p": "Novidades",
   "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
   "pass": true,
-  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 11/10, 12:51\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 11/10, 23:28\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
  },
  {
   "p": "Novidades",
@@ -2593,7 +2599,7 @@
  },
  {
   "p": "Segurança",
-  "name": "segurança: nenhuma página executa código malicioso guardado nos dados (138 páginas)",
+  "name": "segurança: nenhuma página executa código malicioso guardado nos dados (139 páginas)",
   "pass": true,
   "info": ""
  },
@@ -2685,7 +2691,7 @@
   "p": "Atualização",
   "name": "Tablet horiz: ao voltar à app, atualiza-se sozinha em poucos segundos",
   "pass": true,
-  "info": "2.2 s"
+  "info": "2.1 s"
  },
  {
   "p": "Atualização",
@@ -2709,7 +2715,7 @@
   "p": "Atualização",
   "name": "Tablet vert: ao voltar à app, atualiza-se sozinha em poucos segundos",
   "pass": true,
-  "info": "1.7 s"
+  "info": "1.6 s"
  },
  {
   "p": "Atualização",
@@ -2775,11 +2781,161 @@
   "p": "Atualização",
   "name": "atualização: com rede muito lenta, abre em menos de 5 s com a cópia guardada",
   "pass": true,
-  "info": "4.3 s"
+  "info": "4.2 s"
  },
  {
   "p": "Atualização",
   "name": "atualização: sem internet a app abre na mesma",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "IA",
+  "name": "IA: descobre sozinha os modelos que o Google tem hoje (sem voz, imagem nem embeddings)",
+  "pass": true,
+  "info": "gemini-3.5-flash, gemini-3.5-flash-lite, gemini-2.0-flash-lite, gemma-3-27b-it"
+ },
+ {
+  "p": "IA",
+  "name": "IA: cota de um modelo esgotada → passa logo ao seguinte, sem esperar",
+  "pass": true,
+  "info": "google · gemini-3.5-flash > gemini-3.5-flash-lite"
+ },
+ {
+  "p": "IA",
+  "name": "IA: modelo desligado pelo Google (como o gemini-2.0) fica de lado e usa outro",
+  "pass": true,
+  "info": "google · gemini-3.5-flash-lite > gemini-2.0-flash-lite > gemma-3-27b-it"
+ },
+ {
+  "p": "IA",
+  "name": "IA: com toda a cota do Google esgotada responde a IA grátis de reserva (sem esperar)",
+  "pass": true,
+  "info": "reserva"
+ },
+ {
+  "p": "IA",
+  "name": "IA: texto (resumos) também passa à reserva",
+  "pass": true,
+  "info": "Primeiro parágrafo do resumo da reserva.\n\nSegundo parágrafo "
+ },
+ {
+  "p": "IA",
+  "name": "IA: o Spyke continua a pensar e a agir com a reserva (criou a tarefa)",
+  "pass": true,
+  "info": "Criei a tarefa, chefe. | Tarefa: Tarefa criada pela reserva"
+ },
+ {
+  "p": "IA",
+  "name": "IA: notícia bloqueada e Google sem cota → o Spyke faz o resumo com o que os jornais publicaram (não mostra erro em inglês)",
+  "pass": true,
+  "info": "Estadão · agora Notícia bloqueada RESUMO FEITO PELO SPYKE COM O QUE 2 JORNAIS PUBLICARAM Primeiro parágrafo do resumo da reserva. Segundo parágrafo do resumo. Fontes consultadas: Estadão · O Globo Spy"
+ },
+ {
+  "p": "IA",
+  "name": "IA: se desligares a reserva, nada vai para fora do Google",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "IA",
+  "name": "sem erros de JavaScript (IA)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Painel: Visão Geral e Painel são uma só página \"Painel\" (o endereço antigo leva lá)",
+  "pass": true,
+  "info": "[\"\",\"OCEANUM\",\"Definições\",\"Painel\",\"Hoje\",\"Jornal\"]"
+ },
+ {
+  "p": "Novos",
+  "name": "Painel: tem tudo (estado das áreas, centro de controlo, cartões, dinheiro em 6 meses, universidade) sem cartões repetidos",
+  "pass": true,
+  "info": "{\"hash\":\"#visao\",\"nav\":[\"\",\"OCEANUM\",\"Definições\",\"Painel\",\"Hoje\",\"Jornal\",\"Spyke (assistente)\",\"E-mail e LinkedIn\",\"Calendário\",\"Tarefas\",\"Hábitos e rotina\",\"Bloco de foco\",\"Projetos\",\"Metas\",\"Quem sou eu\",\"Fé & Devoção\",\"Gasto rápido\",\"Finanças\",\"Investimentos\",\"Compras\",\"Simuladores\",\"Universidade\",\"Floresta (foco)\",\"Cursos\",\"Certificações\",\"Leituras\",\"Trilhas e competências\",\"Base de conhecimento\",\"Visão do corpo\",\"Treino\",\"Dieta\",\"Corrida\",\"Desporto\",\"Trabalho\",\"Carreira e contactos\",\"Capital Profissional\",\"Oportunidades\",\"Próximos passos\",\"Estrela-guia\",\"Roteiro da vida\",\"Longo prazo\",\"Centro de decisões\",\"Revisões\",\"Minha Evolução\"],\"ctrl\":true,\"life\":true,\"grid\":true,\"money\":true,\"uni\":true,\"agendaDup\":false}"
+ },
+ {
+  "p": "Novos",
+  "name": "nomes: nenhum separador em inglês no menu",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Próximos passos: está na Direção, com as áreas da vida e os passos do pequeno ao grande",
+  "pass": true,
+  "info": "DireçãoPróximos passosEstrela-guiaRoteiro da vidaLongo prazoCentro de decisõesRevisõesMinha Evolução"
+ },
+ {
+  "p": "Novos",
+  "name": "Próximos passos: o Spyke faz o plano com novos passos ligados às metas",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Próximos passos: a aba \"Agora\" mantém a próxima ação de sempre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: \"Entrar com a conta da faculdade\" abre o login da Microsoft",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: ligado, lê os e-mails da faculdade",
+  "pass": true,
+  "info": "[\"Todas · 4\",\"Contabilidade · 2\",\"Marketing · 1\",\"Geral · 1\"]"
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: separa por matéria (código da cadeira, professor, IA e Geral)",
+  "pass": true,
+  "info": "{\"o1\":\"Contabilidade\",\"o2\":\"Contabilidade\",\"o3\":\"Marketing\",\"o4\":\"Geral\"}"
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: filtrar por matéria",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: mudar a matéria à mão também ensina o remetente",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: abre o e-mail inteiro dentro da app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Outlook: responder vai pelo Outlook da faculdade",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "sem erros de JavaScript (novos)",
   "pass": true,
   "info": ""
  },
@@ -3213,13 +3369,13 @@
   "p": "Stress",
   "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
   "pass": true,
-  "info": "máx 931 ms"
+  "info": "máx 594 ms"
  },
  {
   "p": "Stress",
   "name": "guardar tudo é rápido",
   "pass": true,
-  "info": "195 ms"
+  "info": "105 ms"
  },
  {
   "p": "Stress",

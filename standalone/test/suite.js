@@ -674,13 +674,15 @@ async function sharedTests(b) {
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
     ok('google script completo é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
     const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
-      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] }; });
-    ok('script em 3 partes: 1 e 2 = núcleo, 3 = ficheiro das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 3 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
-    ok('script em 3 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
+      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2] + P[3]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] }; });
+    ok('script em 4 partes: 1 e 2 = núcleo, 3 e 4 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 4 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
+    ok('script em 4 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
     { // como o Apps Script: cada ficheiro é carregado à parte, pela ordem; a Parte 3 substitui o doGet e liga-se às funções das partes 1 e 2
       const vm = require('vm'), ctx = vm.createContext({ ContentService: { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 1 } } });
-      vm.runInContext(gp.P[0], ctx); vm.runInContext(gp.P[1], ctx); const before = vm.runInContext("doGet({ parameter: { k: 'abc', op: 'ping' } }).t", ctx); vm.runInContext(gp.P[2], ctx);
+      Object.assign(ctx, { PropertiesService: { getScriptProperties: () => ({ getProperty: () => null }) }, ScriptApp: { getScriptId: () => 'ID' } });
+      vm.runInContext(gp.P[0], ctx); vm.runInContext(gp.P[1], ctx); const before = vm.runInContext("doGet({ parameter: { k: 'abc', op: 'ping' } }).t", ctx); vm.runInContext(gp.P[2], ctx); vm.runInContext(gp.P[3], ctx);
       const r = vm.runInContext("[doGet({ parameter: { k: 'abc', op: 'ping' } }).t, doPost({ parameter: { k: 'abc', op: 'ping' } }).t, doGet({ parameter: { k: 'x', op: 'ping' } }).t, typeof mensagem_, typeof eventos_, typeof noticias_, typeof cotacoes_]", ctx);
+      ok('script: a Parte 4 (Outlook) liga-se às outras e responde', /"v":12/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'olinfo' } }).t", ctx)) && /usercallback/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'olinfo' } }).t", ctx)));
       ok('script: só com as partes 1 e 2 responde versão 10; com a Parte 3 num ficheiro novo responde versão 11 (sem apagar nada)', /"v":10/.test(before) && /"v":11/.test(r[0]) && /"v":11/.test(r[1]) && /Chave errada/.test(r[2]) && r.slice(3).every(x => x === 'function'), before + ' → ' + r.join(' | '));
       vm.runInContext("function op_novo(p) { return { ok: true, eco: p.x }; }", ctx);
       ok('script: novidades futuras entram num ficheiro novo (function op_nome) sem mexer na Parte 3', /"eco":"7"/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'novo', x: '7' } }).t", ctx))); }
@@ -1066,6 +1068,99 @@ async function newFeatureTests(b) {
     ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }
 }
 
+/* ================= PAINEL ÚNICO, PRÓXIMOS PASSOS, NOMES EM PORTUGUÊS E OUTLOOK DA FACULDADE ================= */
+async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próximos passos, nomes e Outlook ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const posts = []; let linked = false, opened = '';
+  const ITEMS = [{ id: 'o1', s: 'CONT1 - enunciado do trabalho', f: 'Secretaria <sec@ua.pt>', d: new Date().toISOString(), u: true, sn: 'Segue o enunciado.' }, { id: 'o2', s: 'Dúvidas', f: 'Ana Silva <ana.silva@ua.pt>', d: new Date(Date.now() - 6e4).toISOString(), u: false, sn: 'Olá, sobre a aula.' }, { id: 'o3', s: 'Campanha de produto', f: 'Prof. Rui <rui@ua.pt>', d: new Date(Date.now() - 12e4).toISOString(), u: false, sn: 'Segmentação de mercado e 4P.' }, { id: 'o4', s: 'Propinas', f: 'Serviços <sas@ua.pt>', d: new Date(Date.now() - 18e4).toISOString(), u: false, sn: 'Prazo de pagamento.' }];
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.fromEntries(new URLSearchParams(rt.request().postData() || '')), op = u.searchParams.get('op') || P.op, J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+    if (rt.request().method() === 'POST') posts.push(P);
+    if (op === 'ping') return J({ ok: true, v: 11 }); if (op === 'olinfo') return J({ ok: true, v: 12, redirect: 'https://script.google.com/macros/d/SID/usercallback', cfg: posts.some(x => x.op === 'olcfg'), linked, user: linked ? 'ryan@ua.pt' : '', err: '' });
+    if (op === 'olcfg') return J({ ok: true }); if (op === 'olauth') return J({ ok: true, url: 'https://login.microsoftonline.com/ua.pt/oauth2/v2.0/authorize?client_id=x' });
+    if (op === 'ol') return J({ ok: true, user: 'ryan@ua.pt', items: ITEMS }); if (op === 'olx') return J({ ok: true, s: 'Dúvidas', t: [{ id: 'o2', f: 'Ana Silva <ana.silva@ua.pt>', d: new Date().toISOString(), b: 'Texto completo do e-mail da professora.', h: '<p>Texto</p>', at: ['slides.pdf'] }] });
+    if (op === 'ols') return J({ ok: true }); return J({ ok: true, items: [], docs: {} }); });
+  await ctx.route(/generativelanguage/, rt => { const b2 = rt.request().postData() || ''; if (/\/models\?/.test(rt.request().url())) return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [{ name: 'models/gemini-3.5-flash', supportedGenerationMethods: ['generateContent'] }] }) });
+    if (/Separa estes e-mails/.test(b2)) { const sid = (b2.match(/\\"id\\":\\"([a-z0-9]+)\\",\\"nome\\":\\"Marketing/) || [])[1]; return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({ m: [{ id: 'o3', disc: sid || 'geral' }, { id: 'o4', disc: 'geral' }] }) }] } }] }) }); }
+    if (/plano de próximos passos/.test(b2)) return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({ foco: 'Fechar o semestre com média 15.', passos: [{ area: 'estudos', nivel: 1, passo: 'Resolver 10 exercícios de Contabilidade', porque: 'meta média 15' }, { area: 'dinheiro', nivel: 3, passo: 'Criar transferência automática de 300 €', porque: 'meta poupar' }] }) }] } }] }) });
+    return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }) }); });
+  await p.goto(BASE); await unlock(p); await p.evaluate(() => { window.open = u => { window.__opened = u || 'blank'; return { set location(v) { window.__opened = String(v); }, close() { } }; }; });
+  await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); localStorage.removeItem('os2aiQuota'); });
+  // Painel único
+  await E(p, () => { location.hash = 'painel'; }); await sleep(900);
+  const pv = await E(p, () => ({ hash: location.hash, nav: [...document.querySelectorAll('#side a[href^="#"] span')].map(x => x.textContent), ctrl: !!document.getElementById('control'), life: !!document.querySelector('#view .life'), grid: !!document.querySelector('#view .dash-grid'), money: /Receitas × despesas/.test(document.getElementById('view').innerText), uni: !!document.querySelector('#view .dash') && /Universidade/.test(document.getElementById('view').innerText), agendaDup: [...document.querySelectorAll('#view .dc h3')].some(h => h.textContent === 'Agenda') }));
+  ok('Painel: Visão Geral e Painel são uma só página "Painel" (o endereço antigo leva lá)', pv.hash === '#visao' && pv.nav.includes('Painel') && !pv.nav.includes('Visão Geral') && pv.nav.filter(x => x === 'Painel').length === 1, JSON.stringify(pv.nav.slice(0, 6)));
+  ok('Painel: tem tudo (estado das áreas, centro de controlo, cartões, dinheiro em 6 meses, universidade) sem cartões repetidos', pv.ctrl && pv.life && pv.grid && pv.money && pv.uni && !pv.agendaDup, JSON.stringify(pv));
+  // nomes em português
+  const eng = await E(p, () => [...document.querySelectorAll('#side a span, .tn-dd b, #view .tabs a')].map(x => x.textContent).filter(t => /Next Action|North Star|Roadmap|Long Term|Decision Center|Knowledge Base|Networking|Control Room|Opportunity/i.test(t)));
+  ok('nomes: nenhum separador em inglês no menu', !eng.length, eng.join(', '));
+  // próximos passos
+  await E(p, () => { const U = OS.U, t = U.today(); OS.add('subjects', { name: 'Contabilidade', status: 'Em curso', prof: 'Ana Silva', mail: 'CONT1' }); OS.add('subjects', { name: 'Marketing', status: 'Em curso', prof: 'Rui' });
+    OS.add('goals', { title: 'Poupar 5000 €', cat: 'Finanças', horizon: '1 ano', metric: 'manual', target: 5000, base: 0, cur: 1000, status: 'Ativa', start: U.addDays(t, -30), due: U.addDays(t, 300), steps: [{ t: 'Abrir conta poupança' }] }); location.hash = 'next'; }); await sleep(700);
+  const lp = await E(p, () => ({ dir: [...document.querySelectorAll('#side .nav-g')].filter(g => /Direção/.test(g.querySelector('h6').textContent)).map(g => g.textContent)[0] || '', cats: document.querySelectorAll('.lp-c').length, txt: document.getElementById('view').innerText }));
+  ok('Próximos passos: está na Direção, com as áreas da vida e os passos do pequeno ao grande', /Próximos passos/.test(lp.dir) && lp.cats === 5 && /Abrir conta poupança/.test(lp.txt) && /Hoje/.test(lp.txt) && /Este mês/.test(lp.txt), lp.dir.replace(/\s+/g, ' ').slice(0, 120));
+  await p.click('#view [data-act=lpAI]'); await sleep(1500);
+  ok('Próximos passos: o Spyke faz o plano com novos passos ligados às metas', await E(p, () => /Resolver 10 exercícios de Contabilidade/.test(document.getElementById('view').innerText) && /Fechar o semestre/.test(document.getElementById('view').innerText)));
+  await E(p, () => location.hash = 'next.agora'); await sleep(400); ok('Próximos passos: a aba "Agora" mantém a próxima ação de sempre', await E(p, () => !!document.querySelector('#view .na') || /Nada encaixa/.test(document.getElementById('view').innerText)));
+  // Outlook da faculdade
+  await E(p, () => location.hash = 'email.faculdade'); await sleep(1200);
+  ok('Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar', await E(p, () => /usercallback/.test(document.getElementById('view').innerText) && /Registos de aplicações/.test(document.getElementById('view').innerText)));
+  await p.fill('#view .ol-f [name=id]', '11111111-2222-3333-4444-555555555555'); await p.fill('#view .ol-f [name=ten]', '22222222-3333-4444-5555-666666666666'); await p.fill('#view .ol-f [name=sec]', 'segredo-de-teste-123'); await p.click('#view .ol-f button'); await sleep(800);
+  ok('Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)', posts.some(x => x.op === 'olcfg' && x.sec === 'segredo-de-teste-123' && x.id.length === 36));
+  await p.click('#view [data-act=olAuth]'); await sleep(600); ok('Outlook: "Entrar com a conta da faculdade" abre o login da Microsoft', /login\.microsoftonline\.com/.test(await E(p, () => window.__opened || '')));
+  linked = true; await p.click('#view [data-act=olInfo]'); await sleep(1800);
+  const om = await E(p, () => ({ n: document.querySelectorAll('#view .ol-it').length, chips: [...document.querySelectorAll('#view .ml-f .chip')].map(c => c.textContent.trim()), m: Object.fromEntries(OS.UniMail.items().map(it => [it.id, OS.UniMail.subjName(OS.UniMail.subjOf(it))])) }));
+  ok('Outlook: ligado, lê os e-mails da faculdade', om.n === 4, JSON.stringify(om.chips));
+  ok('Outlook: separa por matéria (código da cadeira, professor, IA e Geral)', om.m.o1 === 'Contabilidade' && om.m.o2 === 'Contabilidade' && om.m.o3 === 'Marketing' && om.m.o4 === 'Geral' && om.chips.some(c => /Contabilidade · 2/.test(c)) && om.chips.some(c => /Marketing · 1/.test(c)), JSON.stringify(om.m));
+  await p.click('#view .ml-f .chip:has-text("Marketing")'); await sleep(300); ok('Outlook: filtrar por matéria', await E(p, () => document.querySelectorAll('#view .ol-it').length === 1));
+  await p.click('#view .ml-f .chip:has-text("Todas")'); await sleep(300);
+  await E(p, () => { const s = document.querySelector('#view .ol-sel[data-id="o4"]'), mk = OS.all('subjects').find(x => x.name === 'Marketing'); s.value = mk.id; s.dispatchEvent(new Event('change', { bubbles: true })); }); await sleep(400);
+  ok('Outlook: mudar a matéria à mão também ensina o remetente', await E(p, () => OS.UniMail.subjName(OS.UniMail.subjOf(OS.UniMail.get('o4'))) === 'Marketing' && Object.keys(OS.one('unimail').snd).includes('sas@ua.pt')));
+  await p.click('#view .ol-it .ml-t[data-id="o2"]'); await sleep(900);
+  ok('Outlook: abre o e-mail inteiro dentro da app', await E(p, () => /Texto completo do e-mail da professora/.test((document.querySelector('#modal .ml-rd') || {}).innerText || '') && /slides\.pdf/.test(document.querySelector('#modal .ml-rd').innerText)));
+  await p.fill('#olRpT', 'Obrigado, professora.'); await p.click('#modal [data-act=olSend]'); await sleep(700);
+  ok('Outlook: responder vai pelo Outlook da faculdade', posts.some(x => x.op === 'ols' && x.id === 'o2' && /Obrigado/.test(x.b)));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (novos)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
+/* ================= IA SEM LIMITES: modelos descobertos sozinhos + reserva grátis ================= */
+async function aiTests(b) { cur = 'IA'; console.log('\n=== IA sem limites ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); let mode = 'ok'; const hits = [], free = [];
+  await ctx.route(/generativelanguage\.googleapis\.com/, rt => { const u = rt.request().url(), J = (st, o) => rt.fulfill({ status: st, contentType: 'application/json', body: JSON.stringify(o) });
+    if (/\/models\?/.test(u)) return J(200, { models: ['gemini-2.0-flash-lite', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemma-3-27b-it', 'text-embedding-005', 'gemini-3.5-flash-preview-tts'].map(n => ({ name: 'models/' + n, supportedGenerationMethods: /embedding/.test(n) ? ['embedContent'] : ['generateContent'] })) });
+    const m = (u.match(/models\/([^:]+):generateContent/) || [])[1]; hits.push(m);
+    if (m === 'gemini-2.0-flash-lite') return J(400, { error: { message: 'This model models/gemini-2.0-flash-lite is no longer available. Please update your code to use models/gemini-3.5-flash-lite' } });
+    if (mode === 'quota' || m === 'gemini-3.5-flash' || (mode === 'old' && m === 'gemini-3.5-flash-lite')) return J(429, { error: { message: 'Quota exceeded for metric generate_content_free_tier_requests, limit per day' } });
+    const body = rt.request().postData() || '';
+    if (/"functionDeclarations"/.test(body)) return J(200, { candidates: [{ content: { role: 'model', parts: [{ text: 'Feito pelo Google.' }] } }] });
+    return J(200, { candidates: [{ content: { parts: [{ text: JSON.stringify({ ok: 'google' }) }] } }] }); });
+  await ctx.route(/text\.pollinations\.ai/, rt => { const b2 = JSON.parse(rt.request().postData() || '{}'); free.push(b2); const J = o => rt.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(o) });
+    const last = (b2.messages || []).slice(-1)[0] || {};
+    if (b2.tools && last.role === 'user') return J({ choices: [{ message: { role: 'assistant', content: '', tool_calls: [{ id: 'c1', type: 'function', function: { name: 'criar_tarefa', arguments: JSON.stringify({ titulo: 'Tarefa criada pela reserva' }) } }] } }] });
+    if (b2.tools) return J({ choices: [{ message: { role: 'assistant', content: 'Criei a tarefa, chefe.' } }] });
+    if (b2.response_format) return J({ choices: [{ message: { role: 'assistant', content: JSON.stringify({ ok: 'reserva' }) } }] });
+    return J({ choices: [{ message: { role: 'assistant', content: 'Primeiro parágrafo do resumo da reserva.\n\nSegundo parágrafo do resumo.' } }] }); });
+  await ctx.route(/\/api\/read/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, u: 'https://x.pt/a', t: 'x', s: 'x.pt', p: [], desc: 'O que o jornal mostra.' }) }));
+  await ctx.route(/script\.google\.com/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, v: 11, nw: {}, items: [], docs: {} }) }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); localStorage.removeItem('os2aiModels'); localStorage.removeItem('os2aiQuota'); });
+  const ms = await E(p, () => OS.AI.discover(true));
+  ok('IA: descobre sozinha os modelos que o Google tem hoje (sem voz, imagem nem embeddings)', ms.includes('gemini-3.5-flash') && ms.includes('gemini-3.5-flash-lite') && !ms.some(m => /tts|embedding/.test(m)) && ms.indexOf('gemini-3.5-flash') < ms.indexOf('gemini-2.0-flash-lite') && ms[ms.length - 1] === 'gemma-3-27b-it', ms.join(', '));
+  const r1 = await E(p, () => OS.AI.json([{ text: 'teste' }]).then(o => o.ok, e => 'ERRO ' + e.message));
+  ok('IA: cota de um modelo esgotada → passa logo ao seguinte, sem esperar', r1 === 'google' && await E(p, () => OS.AI.blocked('gemini-3.5-flash')), r1 + ' · ' + hits.join(' > '));
+  mode = 'old'; hits.length = 0; const r1b = await E(p, () => OS.AI.json([{ text: 'teste' }]).then(o => o.ok, e => 'ERRO ' + e.message));
+  ok('IA: modelo desligado pelo Google (como o gemini-2.0) fica de lado e usa outro', r1b === 'google' && await E(p, () => OS.AI.blocked('gemini-2.0-flash-lite')) && hits.includes('gemma-3-27b-it'), r1b + ' · ' + hits.join(' > ')); mode = 'ok';
+  mode = 'quota'; const r2 = await E(p, () => OS.AI.json([{ text: 'teste' }]).then(o => o.ok, e => 'ERRO ' + e.message));
+  ok('IA: com toda a cota do Google esgotada responde a IA grátis de reserva (sem esperar)', r2 === 'reserva', r2);
+  const r3 = await E(p, () => OS.AI.text('Resume isto').catch(e => 'ERRO ' + e.message));
+  ok('IA: texto (resumos) também passa à reserva', /Primeiro parágrafo/.test(r3), String(r3).slice(0, 60));
+  const r4 = await E(p, () => OS.Brain.ask('cria uma tarefa para estudar contabilidade amanhã de manhã').then(r => r.text + ' | ' + (r.did || []).join(';')));
+  ok('IA: o Spyke continua a pensar e a agir com a reserva (criou a tarefa)', /Criei a tarefa/.test(r4) && await E(p, () => OS.all('tasks').some(t => t.title === 'Tarefa criada pela reserva')), r4);
+  mode = 'quota'; await E(p, () => { OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); OS.News.cache = { 'PT:WORLD': { at: Date.now(), items: [{ t: 'Notícia bloqueada', s: 'Estadão', l: 'https://news.google.com/rss/articles/ZZZ', d: Date.now(), rel: [{ l: 'https://news.google.com/rss/articles/YYY', t: 'Outra versão', s: 'O Globo' }] }] }, 'BR:WORLD': { at: Date.now(), items: [] } }; location.hash = 'jornal'; }); await sleep(800);
+  await E(p, () => { const c = document.querySelector('#view .nw-a'); c && c.click(); }); await sleep(2500);
+  const nr = await E(p, () => (document.querySelector('#modal .nw-rd') || {}).innerText || '');
+  ok('IA: notícia bloqueada e Google sem cota → o Spyke faz o resumo com o que os jornais publicaram (não mostra erro em inglês)', /Resumo feito pelo Spyke/i.test(nr) && /Primeiro parágrafo/.test(nr) && !/no longer available|IA não conseguiu/i.test(nr), nr.replace(/\s+/g, ' ').slice(0, 200));
+  await E(p, () => { OS.UI.closeModal(); OS.setOne('diet', { freeAI: false }); }); const r5 = await E(p, () => OS.AI.json([{ text: 'teste' }]).then(o => o.ok, e => 'ERRO'));
+  ok('IA: se desligares a reserva, nada vai para fora do Google', r5 === 'ERRO' && free.length === await E(p, () => window.__fc || 0) + free.length);
+  await E(p, () => OS.setOne('diet', { freeAI: true }));
+  const er = errs.filter(e => !/Failed to load|net::|status of 4\d\d/.test(e)); ok('sem erros de JavaScript (IA)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 /* ================= ATUALIZAÇÃO AUTOMÁTICA: nunca mais desinstalar ================= */
 async function updateTests(b) { cur = 'Atualização'; console.log('\n=== Atualização automática (sem reinstalar) ===');
   const NEWV = (v, swTag) => { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').replace(/OCEANUM_VERSION=\{"v": "[^"]+"/, `OCEANUM_VERSION={"v": "${v}"`); fs.writeFileSync('/tmp/oc_u_' + v + '.html', html); OVERRIDE = { 'index.html': '/tmp/oc_u_' + v + '.html' };
@@ -1232,7 +1327,7 @@ async function stress(b) {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

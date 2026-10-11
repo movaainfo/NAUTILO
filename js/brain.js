@@ -16,7 +16,7 @@ const cut = (o, n = 6000) => { const s = typeof o === 'string' ? o : JSON.string
 const safe = f => { try { return f(); } catch (e) { return null; } };
 
 /* ---------- o que o Spyke consegue consultar ---------- */
-const AREAS = ['agenda', 'tarefas', 'financas', 'habitos', 'universidade', 'investimentos', 'emails', 'noticias', 'clima', 'metas', 'treino', 'pessoas', 'decisoes', 'memoria', 'trabalho'];
+const AREAS = ['agenda', 'tarefas', 'financas', 'habitos', 'universidade', 'investimentos', 'emails', 'noticias', 'clima', 'metas', 'treino', 'pessoas', 'decisoes', 'memoria', 'trabalho', 'proximos_passos'];
 const consult = async area => { const t = today(), F = OS.Fin;
   switch (area) {
     case 'agenda': return safe(() => OS.Cal.items(t, U.addDays(t, 14)).filter(x => x.src !== 'bill').slice(0, 60).map(x => ({ dia: x.date, hora: x.start || '', fim: x.end || '', titulo: x.title, tipo: x.src, feito: !!x.done })));
@@ -25,9 +25,10 @@ const consult = async area => { const t = today(), F = OS.Fin;
     case 'habitos': return safe(() => OS.all('habits').filter(h => h.active).map(h => ({ nome: h.name, hoje: OS.Hab.due(h, t) ? (OS.Hab.done(h, t) ? 'feito' : 'por fazer') : 'não é hoje', sequencia: OS.Hab.streak(h), inegociavel: !!h.core })));
     case 'universidade': return safe(() => ({ media: OS.St.gpa(), disciplinas: OS.St.current().map(s => { const x = OS.St.stats(s); return { nome: s.name, media: x.avg, horas: x.hours, situacao: x.sit[0] }; }), avaliacoes: U.sortBy(OS.all('assessments').filter(a => a.date >= t), a => a.date).slice(0, 12).map(a => ({ dia: a.date, tipo: a.type, titulo: a.title, disciplina: (OS.get('subjects', a.subject) || {}).name || '', peso: a.weight, preparacao: a.prep || 'Não comecei' })), revisoes_hoje: OS.St.revDue().length }));
     case 'investimentos': return safe(() => ({ valor_total: OS.Inv && OS.Inv.value ? U.r2(OS.Inv.value()) : null, ativos: OS.all('assets').slice(0, 30).map(a => ({ nome: a.name || a.symbol, simbolo: a.symbol || '', tipo: a.type || '' })) }));
-    case 'emails': return safe(() => OS.Mail ? { resumo: OS.Mail.sum ? OS.Mail.sum() : '', itens: OS.Mail.items().slice(0, 15).map(m => ({ de: m.f, assunto: m.s, categoria: m.c, trecho: String(m.sn || '').slice(0, 160), nao_lido: !!m.u })) } : 'O e-mail não está ligado.');
+    case 'emails': return safe(() => OS.Mail ? { resumo: OS.Mail.sum ? OS.Mail.sum() : '', itens: OS.Mail.items().slice(0, 15).map(m => ({ de: m.f, assunto: m.s, categoria: m.c, trecho: String(m.sn || '').slice(0, 160), nao_lido: !!m.u })), faculdade_outlook: OS.UniMail ? OS.UniMail.summary() : [] } : 'O e-mail não está ligado.');
     case 'noticias': try { return OS.News && OS.News.headlines ? await OS.News.headlines(8) : []; } catch (e) { return 'Sem notícias agora.'; }
     case 'clima': try { const w = OS.Weather && await OS.Weather.get(); return w && w.now ? OS.Weather.say(w, 0) + ' ' + OS.Weather.say(w, 1) : 'Sem dados do clima.'; } catch (e) { return 'Sem dados do clima.'; }
+    case 'proximos_passos': return safe(() => { const { out } = OS.LifePlan.build(); return Object.fromEntries(Object.entries(out).map(([k, L]) => [k, L.slice(0, 12).map(x => ({ nivel: ['', 'hoje', 'esta semana', 'este mês', 'este ano', 'longo prazo'][x.lv], passo: x.t, porque: x.why || '' }))])); }, {});
     case 'metas': return safe(() => OS.all('goals').filter(g => g.status === 'Ativa').map(g => { const i = OS.Goal.info(g); return { meta: g.title, progresso: Math.round(i.p * 100) + '%', estado: i.st[0], prazo: g.due || '' }; }));
     case 'treino': return safe(() => ({ divisao: OS.one('fit').split, hoje: OS.one('fit').split[String(new Date().getDay())] || '', ultimos: U.sortBy(OS.all('workouts'), w => w.date).slice(-5).map(w => ({ dia: w.date, treino: w.title })), corridas: U.sortBy(OS.all('runs'), r => r.date).slice(-5).map(r => ({ dia: r.date, km: r.km })) }));
     case 'pessoas': return safe(() => OS.all('people').slice(0, 60).map(p => ({ nome: p.name, relacao: p.rel || '', aniversario: p.birth || '' })));
@@ -73,19 +74,19 @@ Regras:
 const brief = () => { try { return OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx().slice(0, 3500) : ''; } catch (e) { return ''; } };
 
 /* ---------- Gemini (grátis) ---------- */
-const GM = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+// os modelos vêm da lista que a app descobre com a tua chave (o Google desliga os antigos); gemma não serve aqui (não usa ferramentas nem pesquisa)
 const gemCall = async (model, body) => { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(OS.AI.key())}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const j = await r.json().catch(() => ({})); if (!r.ok) { const m = (j.error && j.error.message) || 'erro ' + r.status; if (r.status === 429 && OS.AI.markLimit) OS.AI.markLimit(model, m); const e = new Error(/API key/i.test(m) ? 'a chave da IA não é válida' : r.status === 429 ? 'limite grátis da IA atingido por agora' : m); e.status = r.status; throw e; } return j; };
+  const j = await r.json().catch(() => ({})); if (!r.ok) { const m = (j.error && j.error.message) || 'erro ' + r.status; if (r.status === 429 && OS.AI.markLimit) OS.AI.markLimit(model, m); if (OS.AI.isDead && OS.AI.isDead(r.status, m)) { OS.AI.markDead(model); const e = new Error('modelo desligado'); e.status = 404; throw e; } const e = new Error(/API key/i.test(m) ? 'a chave da IA não é válida' : r.status === 429 ? 'limite grátis da IA atingido por agora' : m); e.status = r.status; throw e; } return j; };
 // limite grátis: passa ao modelo seguinte (cada um tem a sua cota)
-const gemModel = async body => { const list = OS.AI.models ? OS.AI.models(GM) : GM; if (!list.length) throw new Error(OS.AI.limitMsg || 'limite grátis da IA atingido'); let last;
-  for (const m of list) { try { return await gemCall(m, body); } catch (e) { last = e; if (e.status !== 404 && e.status !== 400 && e.status !== 429) throw e; } }
-  if (last && last.status === 429 && OS.AI.models && !OS.AI.models(GM).length) throw new Error(OS.AI.limitMsg); throw last; };
+const gemModel = async body => { await OS.AI.discover(); const list = OS.AI.gemini(); if (!list.length) { const e = new Error(OS.AI.limitMsg || 'limite grátis da IA atingido'); e.status = 429; throw e; } let last;
+  for (const m of list) { try { return await gemCall(m, body); } catch (e) { last = e; if (e.status !== 404 && e.status !== 400 && e.status !== 429 && e.status !== 500 && e.status !== 503) throw e; } }
+  throw last; };
 // pesquisa na internet (Google) feita pelo Gemini, com as fontes
 const webSearch = async q => { const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: `Pesquisa e responde em português, de forma factual e atual, em 4 a 6 frases: ${q}` }] }], tools: [{ google_search: {} }] });
   const c = (j.candidates || [])[0] || {}, txt = ((c.content || {}).parts || []).map(p => p.text || '').join(''), src = ((c.groundingMetadata || {}).groundingChunks || []).map(x => x.web && x.web.title).filter(Boolean).slice(0, 4);
   return txt + (src.length ? '\nFontes: ' + src.join(', ') : ''); };
 // pesquisa para outras partes da app (ex.: ler uma notícia inteira): texto + fontes { t, u }
-B.search = async (prompt, temp = .3) => { const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: prompt }] }], tools: [{ google_search: {} }], generationConfig: { temperature: temp } });
+B.search = async (prompt, temp = .3) => { if (!OS.AI.key()) throw new Error('pesquisa precisa da chave do Google'); const j = await gemModel({ contents: [{ role: 'user', parts: [{ text: prompt }] }], tools: [{ google_search: {} }], generationConfig: { temperature: temp } });
   const c = (j.candidates || [])[0] || {}, txt = ((c.content || {}).parts || []).map(p => p.text || '').join('').trim(), seen = new Set();
   const src = ((c.groundingMetadata || {}).groundingChunks || []).map(x => x.web).filter(w => w && w.title && !seen.has(w.title) && seen.add(w.title)).slice(0, 8).map(w => ({ t: w.title, u: w.uri }));
   if (!txt) throw new Error('a IA não respondeu'); return { text: txt, src }; };
@@ -119,14 +120,29 @@ const claudeErr = async e => { try { const { Anthropic } = await sdk(); if (e in
 
 /* ---------- conversa ---------- */
 const H = []; // últimas trocas (para continuar a conversa)
-B.which = () => cfg().brain === 'claude' && cfg().anKey ? 'claude' : OS.AI && OS.AI.key() ? 'gemini' : '';
+B.which = () => cfg().brain === 'claude' && cfg().anKey ? 'claude' : OS.AI && OS.AI.key() ? 'gemini' : OS.AI && OS.AI.freeOn && OS.AI.freeOn() ? 'free' : '';
+/* ---------- reserva grátis (sem chave, sem limite diário): o mesmo Spyke com ferramentas, se o Google não responder ---------- */
+const wiki = async q => { try { const u = 'https://pt.wikipedia.org/w/api.php?action=query&generator=search&gsrlimit=3&prop=extracts&exintro=1&explaintext=1&exchars=700&format=json&origin=*&gsrsearch=' + encodeURIComponent(q);
+    const j = await (await fetch(u)).json(), ps = Object.values((j.query || {}).pages || {}); return ps.length ? ps.map(p => p.title + ': ' + p.extract).join('\n') + '\nFonte: Wikipédia' : 'Não encontrei nada sobre isso.'; } catch (e) { return 'Pesquisa indisponível agora.'; } };
+const askFree = async (q, hist) => { const tools = T.concat([{ name: WEB.name, description: WEB.description + ' (na reserva: Wikipédia)', props: WEB.props, req: WEB.req, run: a => wiki(String(a.pergunta || '').slice(0, 200)) }]);
+  const fns = tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: { type: 'object', properties: t.props, required: t.req } } }));
+  const msgs = [{ role: 'system', content: system() + '\nResumo atual dos dados dele (consulta para detalhes):\n' + brief() }].concat(hist, [{ role: 'user', content: q }]);
+  for (let i = 0; i < 6; i++) { const m = await OS.AI.free(msgs, { tools: fns, temp: .4 }), calls = m.tool_calls || [];
+    if (!calls.length) return String(m.content || '').trim();
+    msgs.push({ role: 'assistant', content: m.content || '', tool_calls: calls });
+    for (const c of calls) { const f = tools.find(t => t.name === (c.function || {}).name); let out; try { let a = {}; try { a = JSON.parse((c.function || {}).arguments || '{}'); } catch (e) { } out = f ? await f.run(a) : 'Ferramenta desconhecida.'; } catch (e) { out = 'Erro: ' + (e.message || 'falhou'); }
+      msgs.push({ role: 'tool', tool_call_id: c.id, content: String(out).slice(0, 6000) }); } }
+  return 'Fiz o que consegui, mas precisei de passos demais. Diz-me de outra forma.'; };
 B.ask = async q => { did.length = 0; const w = B.which(); if (!w) return { text: '', err: 'sem IA' };
   let text = '', err = '';
-  try { if (w === 'claude') { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })); text = await askClaude(q, hist); }
+  try { if (w === 'free') text = await askFree(q, H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })));
+    else if (w === 'claude') { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t })); text = await askClaude(q, hist); }
     else { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); } }
   catch (e) { err = w === 'claude' ? await claudeErr(e) : (e.message || 'erro');
     // o Claude falhou: tenta com o Gemini grátis para não ficar sem resposta
-    if (w === 'claude' && OS.AI && OS.AI.key()) { try { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); err = ''; } catch (e2) { } } }
+    if (w === 'claude' && OS.AI && OS.AI.key()) { try { const hist = H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'model', parts: [{ text: h.t }] })); text = await askGemini(q, hist); err = ''; } catch (e2) { } }
+    // o Google também não deu (cota esgotada, modelo desligado…): reserva grátis, sem esperar
+    if (!text && OS.AI.freeOn()) { try { did.length = 0; text = await askFree(q, H.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: h.t }))); err = ''; } catch (e3) { err = err || e3.message; } } }
   if (text) { H.push({ r: 'u', t: q }, { r: 'a', t: text }); if (H.length > 20) H.splice(0, H.length - 20); }
   return { text, err, did: did.slice(), brain: w }; };
 B.reset = () => { H.length = 0; };

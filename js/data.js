@@ -197,7 +197,7 @@ S.subjects = { label: 'Disciplina', title: r => r.name, fields: [
   F('name', 'Disciplina', 'text', { req: 1, wide: 1 }), F('sem', 'Semestre', 'sel', { o: L.SEM }), F('status', 'Estado', 'sel', { o: ['Em curso', 'Plano', 'Aprovada', 'Reprovada', 'Em atraso'] }),
   F('ects', 'ECTS', 'num'), F('target', 'Nota alvo', 'num', { h: '0–20' }), F('final', 'Nota final', 'num'),
   F('hoursWeek', 'Horas de estudo alvo / semana', 'num'), F('diff', 'Dificuldade', 'sel', { o: ['Baixa', 'Média', 'Alta'] }),
-  F('prof', 'Professor(a)'), F('room', 'Sala'), F('notes', 'Notas', 'area', { rows: 2 })
+  F('prof', 'Professor(a)'), F('mail', 'Palavras dos e-mails', 'text', { h: 'Sigla, código da cadeira ou e-mail do professor, separados por vírgula: servem para separar os e-mails da faculdade por matéria' }), F('room', 'Sala'), F('notes', 'Notas', 'area', { rows: 2 })
 ], defaults: () => ({ sem: '1.º Semestre 26/27', status: 'Em curso', target: 15, ects: 6, hoursWeek: 4, diff: 'Média' }) };
 S.classes = { label: 'Aula', title: r => (OS.get('subjects', r.subject) || {}).name || 'Aula', fields: [
   rel('subject', 'Disciplina', 'subjects', { req: 1, filter: s => s.status === 'Em curso' }), F('wday', 'Dia', 'sel', { o: L.WEEK, req: 1 }),

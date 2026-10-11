@@ -51,10 +51,10 @@ V.hoje = () => {
     <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || 'Ryan')}.</h1>
     <p class="tx2" style="margin:4px 0 0">${nextIt ? `A seguir: <b style="color:var(--tx)">${esc(nextIt.title)}</b> às ${nextIt.start}` : 'Sem mais compromissos com hora hoje.'}</p></div><div class="today-clock" data-clock>${U.hm()}</div></div>
     <p class="today-q" style="margin-top:14px">${esc(dayQuote())}</p></div>
-  ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#painel">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
+  ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#visao">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
   <section><div class="sech"><div><h2>Prioridades</h2><p>${doneToday.length} concluída(s) hoje · ordenadas por prazo, importância e impacto</p></div><a class="btn ghost sm" href="#next">${UI.ic('zap')}Next Action</a></div>
     <form class="row gap8" data-form="quickTask" data-today="1" style="margin-bottom:8px"><input class="field grow" name="t" placeholder="Nova tarefa para hoje… (@Casa, !1)" aria-label="Nova tarefa para hoje"><button class="btn">${UI.ic('plus')}</button></form>
-    <div class="list">${tasks.slice(0, 7).map(x => taskRow(x)).join('') || UI.empty('Nada planeado para hoje. Puxa algo em Next Action.')}${doneToday.slice(0, 3).map(x => taskRow(x, { focus: false })).join('')}</div></section>
+    <div class="list">${tasks.slice(0, 7).map(x => taskRow(x)).join('') || UI.empty('Nada planeado para hoje. Puxa algo em Próximos passos.')}${doneToday.slice(0, 3).map(x => taskRow(x, { focus: false })).join('')}</div></section>
   <section><div class="sech"><div><h2>Agenda</h2><p>${timed.length} com hora${allDay.length ? ' · ' + allDay.length + ' sem hora' : ''}</p></div>${UI.addBtn('events', 'Compromisso', { date: t }, 'ghost sm')}</div>
     ${allDay.length ? `<div class="row gap8" style="margin-bottom:10px">${allDay.map(x => `<span class="bdg out" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><i class="dot" style="background:${OS.srcColor(x.src)}"></i>${esc(x.title)}</span>`).join('')}</div>` : ''}
     ${tl ? `<div class="tl">${tl}</div>` : UI.empty('Sem compromissos com hora. Aulas, turnos e rotina aparecem aqui sozinhos.')}</section>
@@ -75,7 +75,8 @@ V.hoje = () => {
 };
 
 /* ================= PAINEL ================= */
-V.painel = () => {
+/* ================= PAINEL (partes): a Visão Geral e o antigo Painel são agora uma só página, "Painel" ================= */
+OS.PainelParts = () => {
   const t = U.today(), ym = U.ym(t), p = OS.one('profile');
   const alerts = I.alerts(), urg = alerts.filter(a => a.lvl === 'urgent'), att = alerts.filter(a => a.lvl === 'attention');
   const areaTone = area => alerts.some(a => a.area === area && a.lvl === 'urgent') ? 'neg' : alerts.some(a => a.area === area) ? 'warn' : 'pos';
@@ -107,27 +108,26 @@ V.painel = () => {
   const opps = U.sortBy(OS.all('opps').filter(o => o.deadline && o.deadline >= t && !['Aceite', 'Recusada', 'Perdida'].includes(o.status)), o => o.deadline).slice(0, 3);
   const projs = OS.all('projects').filter(x => x.status === 'Em andamento').map(x => Object.assign({ p: x }, Proj.info(x))).slice(0, 4);
   const ins = I.insights().slice(0, 4);
-  return `<div class="phead greet"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}.</h1>
-    <p>${urg.length ? `<b class="neg">${urg.length} urgente${urg.length > 1 ? 's' : ''}</b> · ` : ''}${att.length} para atenção${na[0] ? ` · Próxima ação: <b style="color:var(--tx)">${esc(na[0].title)}</b>` : ''}</p></div>
-    <div class="phead-a"><a class="btn" href="#next">${UI.ic('zap')}Next Action</a><button class="btn pri" data-act="quickAdd">${UI.ic('plus')}Registar</button></div></div>
-  <div class="life">${life.map(([h, l, k, v, s]) => `<a href="#${h}"><span class="lh">${UI.dot(lifeTone(k))}${l}</span><span class="lv">${v}</span><span class="ls">${esc(s)}</span></a>`).join('')}</div>
-  ${controlRoom(alerts)}
-  <div class="g g-main">
+  return {
+    summary: `<p>${urg.length ? `<b class="neg">${urg.length} urgente${urg.length > 1 ? 's' : ''}</b> · ` : ''}${att.length} para atenção${na[0] ? ` · Próxima ação: <b style="color:var(--tx)">${esc(na[0].title)}</b>` : ''}</p>`,
+    life: `<div class="life">${life.map(([h, l, k, v, s]) => `<a href="#${h}"><span class="lh">${UI.dot(lifeTone(k))}${l}</span><span class="lv">${v}</span><span class="ls">${esc(s)}</span></a>`).join('')}</div>`,
+    control: controlRoom(alerts),
+    next: `<div class="g g-main">
     <div class="col gap16">
-      <div class="pn"><div class="pn-h"><h3>${UI.ic('zap')}Next Action</h3><a class="more" href="#next">Mais ${UI.ic('right')}</a></div>
+      <div class="pn"><div class="pn-h"><h3>${UI.ic('zap')}Próxima ação</h3><a class="more" href="#next.agora">Mais ${UI.ic('right')}</a></div>
         ${na.map((n, i) => `<div class="na ${i ? '' : 'top'}"><span class="na-score">${Math.round(n.score)}</span><div><b>${esc(n.title)}</b><div class="na-why">${n.why.slice(0, 3).map(w => UI.badge(w, 'out')).join('')}${UI.badge(U.hours(n.eff), '')}</div></div><div class="row gap4">${n.focus ? `<button class="icon-btn" ${n.focus} aria-label="Modo foco">${UI.ic('focus')}</button>` : ''}${n.act ? `<button class="btn sm" ${n.act}>${n.actL}</button>` : ''}</div></div>`).join('') || UI.empty('Sem ações pendentes. Adiciona tarefas ao Inbox.')}</div>
     </div>
     <div class="pn"><div class="pn-h"><h3>${UI.ic('cal')}Próximos 7 dias</h3><a class="more" href="#calendario.semana">Calendário ${UI.ic('right')}</a></div>${agendaList(t, U.addDays(t, 6), 12)}</div>
-  </div>
-  <section><div class="sech"><div><h2>Dinheiro</h2><p>${U.fmtYML(ym)}</p></div><a class="btn ghost sm" href="#financas">Finanças ${UI.ic('right')}</a></div>
-    <div class="kpis">${UI.kpi('Saldo disponível', U.eur(liq), 'contas à ordem, poupança e dinheiro', { href: 'financas.contas' })}${UI.kpi('Receitas do mês', U.eur(m.inc), UI.trend(m.inc, Fin.month(U.addMonths(ym, -1)).inc) + ' vs mês anterior')}${UI.kpi('Despesas do mês', U.eur(m.exp), UI.trend(m.exp, Fin.month(U.addMonths(ym, -1)).exp, false) + ' vs mês anterior')}${UI.kpi('Taxa de poupança', m.inc ? U.pct(m.rate) : '—', 'alvo ' + (p.savingsTarget || 20) + '%', { tone: m.inc ? (m.rate * 100 >= (p.savingsTarget || 20) ? 'pos' : m.rate < 0 ? 'neg' : 'warn') : '' })}${UI.kpi('Patrimônio líquido', U.eur(nw, { dec: 0 }), 'investido ' + U.eur(inv, { dec: 0 }), { href: 'evolucao' })}</div>
+  </div>`,
+    money: `<section><div class="sech"><div><h2>Dinheiro</h2><p>${U.fmtYML(ym)}</p></div><a class="btn ghost sm" href="#financas">Finanças ${UI.ic('right')}</a></div>
+    <div class="kpis">${UI.kpi('Taxa de poupança', m.inc ? U.pct(m.rate) : '—', 'este mês · alvo ' + (p.savingsTarget || 20) + '%', { tone: m.inc ? (m.rate * 100 >= (p.savingsTarget || 20) ? 'pos' : m.rate < 0 ? 'neg' : 'warn') : '' })}${UI.kpi('Investido', U.eur(inv, { dec: 0 }), 'carteira de investimentos', { href: 'investimentos' })}</div>
     <div class="g g-main" style="margin-top:16px">
       <div class="pn"><div class="pn-h"><h3>Receitas × despesas</h3><span class="mut" style="font-size:12px">6 meses</span></div>${C.mount({ type: 'bar', labels: months.map(U.fmtYM), series: [{ name: 'Receitas', data: months.map(x => Fin.month(x).inc), color: 'var(--pos)' }, { name: 'Despesas', data: months.map(x => Fin.month(x).exp), color: 'var(--c2)' }], fmt: U.eurK, empty: 'Regista movimentos em Finanças para ver este gráfico.' }, 200)}</div>
       <div class="pn"><div class="pn-h"><h3>Compromissos (30 dias)</h3><a class="more" href="#financas.recorrentes">${UI.ic('right')}</a></div>
         ${upc.length ? `<div class="list">${upc.map(x => `<div class="li"><span class="when">${U.fmtDS(x.date)}</span><div class="li-t"><b>${esc(x.title)}</b><small>${x.kind}</small></div><span class="mono ${x.late ? 'neg' : ''}">${U.eur(x.amount)}</span></div>`).join('')}</div>` : UI.empty('Sem contas previstas. Regista assinaturas e contas fixas em Recorrentes.')}
         ${fgoals.length ? `<div class="divider"></div>${fgoals.map(x => `<div style="margin-bottom:10px"><div class="row between" style="font-size:13px;margin-bottom:5px"><span>${esc(x.g.title)}</span><span class="mono mut">${Goal.fmt(x.g, x.cur)} / ${Goal.fmt(x.g, x.tgt)}</span></div>${UI.bar(x.p, x.p >= 1 ? 'pos' : '', x.exp)}</div>`).join('')}` : ''}</div>
-    </div></section>
-  <div class="g g2">
+    </div></section>`,
+    study: `<div class="g g2">
     <div class="pn"><div class="pn-h"><h3>${UI.ic('school')}Universidade</h3><a class="more" href="#universidade">${UI.ic('right')}</a></div>
       <div class="row gap16" style="margin-bottom:12px"><div><div class="big-num">${U.nf(studyWk, 1)}<span class="mut" style="font-size:16px"> / ${studyTgt || '—'} h</span></div><div class="mut" style="font-size:12px">estudo esta semana</div></div>${nextExam ? `<div class="grow" style="text-align:right"><div style="font-size:13px"><b>${esc(nextExam.title)}</b></div><div class="mut" style="font-size:12px">${esc(subjN(nextExam.subject))} · ${U.rel(nextExam.date)}</div>${UI.badge(nextExam.prep, nextExam.prep === 'Não comecei' ? 'neg' : nextExam.prep === 'Pronto' ? 'pos' : 'warn')}</div>` : ''}</div>
       ${subs.map(x => `<div class="bar-row"><span class="l">${esc(x.s.name)}</span>${UI.bar(x.targetWk ? x.hWk / x.targetWk : 0, x.targetWk && x.hWk >= x.targetWk ? 'pos' : '', ((new Date().getDay() + 6) % 7 + 1) / 7)}<span class="v">${x.hWk}/${x.targetWk || '—'} h${x.avg ? ' · ' + x.avg : ''}</span></div>`).join('') || UI.empty('Sem disciplinas em curso.')}</div>
@@ -135,18 +135,19 @@ V.painel = () => {
       <div class="row gap8" style="margin-bottom:14px">${wdays.map(d => { const w = OS.all('workouts').some(x => x.date === d), r = OS.all('runs').some(x => x.date === d); return `<div style="flex:1;text-align:center"><div class="mut" style="font-size:11px">${U.WDS[U.parse(d).getDay()]}</div><div style="height:30px;margin-top:4px;border-radius:7px;background:${w && r ? 'linear-gradient(135deg,var(--c5) 50%,var(--c6) 50%)' : w ? 'var(--c5)' : r ? 'var(--c6)' : d === t ? 'var(--pn3)' : 'rgba(255,255,255,.04)'};${d === t ? 'box-shadow:inset 0 0 0 1px var(--accent)' : ''}"></div></div>`; }).join('')}</div>
       <div class="legend" style="margin:-4px 0 10px"><span><i style="background:var(--c5)"></i>Musculação</span><span><i style="background:var(--c6)"></i>Corrida</span></div>
       ${C.mount({ type: 'bar', labels: runWeeks.map(w => U.fmtDS(w)), series: [{ name: 'km', data: runWeeks.map(w => Run.kmIn(w, U.addDays(w, 6))), color: 'var(--c6)' }], fmt: v => U.nf(v, 0), target: U.num(p.runKmTarget) || null, targetLabel: 'alvo', empty: 'Regista corridas para ver os km semanais.' }, 130)}</div>
-  </div>
-  <div class="g g2">
+  </div>`,
+    goals: `<div class="g g2">
     <div class="pn"><div class="pn-h"><h3>${UI.ic('target')}Metas e projetos</h3><a class="more" href="#metas">${UI.ic('right')}</a></div>
       ${goals.slice(0, 5).map(x => `<div style="margin-bottom:12px" data-edit="goals:${x.g.id}" class="click"><div class="row between gap8" style="font-size:13px;margin-bottom:5px"><span>${esc(x.g.title)}</span>${UI.badge(x.st[0], x.st[1])}</div>${UI.bar(x.p, x.p >= 1 ? 'pos' : x.late ? 'neg' : x.behind ? 'warn' : '', x.exp)}</div>`).join('') || UI.empty('Sem metas ativas.', UI.addBtn('goals', 'Nova meta', null, ''))}
       ${projs.length ? `<div class="divider"></div>${projs.map(x => `<div class="li"><div class="li-t click" data-edit="projects:${x.p.id}"><b>${esc(x.p.name)}</b><small>${x.done.length}/${x.tasks.length} tarefas${x.stalled ? ' · <span class="warn">parado há ' + x.idle + ' dias</span>' : ''}</small></div><span class="mono" style="font-size:12px">${Math.round(x.prog * 100)}%</span></div>`).join('')}` : ''}</div>
     <div class="pn"><div class="pn-h"><h3>${UI.ic('briefcase')}Carreira e Mova</h3><a class="more" href="#capital">${UI.ic('right')}</a></div>
       <div class="kpis" style="margin-bottom:14px">${UI.kpi('Capital profissional', U.nf(cap.score), UI.trend(cap.score, capPrev.score) + ' em 30 dias', { href: 'capital' })}</div>
       ${opps.length ? opps.map(o => `<div class="li"><span class="when">${U.fmtDS(o.deadline)}</span><div class="li-t click" data-edit="opps:${o.id}"><b>${esc(o.name)}</b><small>${esc([o.kind, o.next].filter(Boolean).join(' · '))}</small></div>${UI.badge(U.rel(o.deadline), U.diff(o.deadline, t) <= 7 ? 'neg' : '')}</div>`).join('') : UI.empty('Sem oportunidades com prazo. Regista-as no Opportunity Center.')}</div>
-  </div>
-  ${ins.length ? `<div class="pn"><div class="pn-h"><h3>${UI.ic('chart')}Tendências</h3><a class="more" href="#evolucao">Minha evolução ${UI.ic('right')}</a></div>${ins.map(x => `<div class="ins">${UI.ic(x.tone === 'pos' ? 'arrowUp' : 'arrowDown', x.tone)}<div><span class="eyebrow">${esc(x.area)}</span><div>${esc(x.text)}</div></div></div>`).join('')}</div>` : ''}`;
+  </div>`,
+    trends: `${ins.length ? `<div class="pn"><div class="pn-h"><h3>${UI.ic('chart')}Tendências</h3><a class="more" href="#evolucao">Minha evolução ${UI.ic('right')}</a></div>${ins.map(x => `<div class="ins">${UI.ic(x.tone === 'pos' ? 'arrowUp' : 'arrowDown', x.tone)}<div><span class="eyebrow">${esc(x.area)}</span><div>${esc(x.text)}</div></div></div>`).join('')}</div>` : ''}` };
 };
-
+// os endereços antigos (#painel e #control) abrem a página única
+V.painel = sub => { setTimeout(() => { try { history.replaceState(null, '', '#visao'); } catch (e) { } }, 0); return V.visao(sub); };
 /* ================= CENTRO DE CONTROLO (era o Control Room; agora vive dentro do Painel) ================= */
 const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a => a.area === f) : al;
   const urg = fl.filter(a => a.lvl === 'urgent'), att = fl.filter(a => a.lvl === 'attention'), ok = I.controlled(al).filter(x => !f || x.area === f);
@@ -154,7 +155,7 @@ const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a =
   const card = a => `<div class="cr-card ${a.lvl}"><div class="row between gap8"><span class="eyebrow">${esc(a.area)}</span>${a.href ? `<a class="icon-btn" href="${a.href}" aria-label="Abrir">${UI.ic('right')}</a>` : ''}</div><div class="t">${esc(a.title)}</div>${a.detail ? `<small>${esc(a.detail)}</small>` : ''}${a.act ? `<div><button class="btn sm" ${a.act.a}>${a.act.l}</button></div>` : ''}</div>`;
   const cut = (L, n) => more ? L : L.slice(0, n);
   return `<section id="control"><div class="sech"><div><h2>${UI.ic('radar')} Centro de controlo</h2><p>O que precisa da tua atenção agora, calculado a partir de todas as áreas: prazos, orçamentos, metas, projetos parados, provas, oportunidades e hábitos.</p></div></div>
-  <div class="kpis">${UI.kpi('Urgente', urg.length, 'resolve hoje', { tone: urg.length ? 'neg' : '' })}${UI.kpi('Atenção', att.length, 'resolve esta semana', { tone: att.length ? 'warn' : '' })}${UI.kpi('Sob controlo', ok.length, 'áreas sem problemas', { tone: 'pos' })}${UI.kpi('Próxima ação', '', (I.next()[0] || {}).title ? esc(I.next()[0].title) : '—', { href: 'next' })}</div>
+  <div class="kpis">${UI.kpi('Urgente', urg.length, 'resolve hoje', { tone: urg.length ? 'neg' : '' })}${UI.kpi('Atenção', att.length, 'resolve esta semana', { tone: att.length ? 'warn' : '' })}${UI.kpi('Sob controlo', ok.length, 'áreas sem problemas', { tone: 'pos' })}${UI.kpi('Próxima ação', '', (I.next()[0] || {}).title ? esc(I.next()[0].title) : '—', { href: 'next.agora' })}</div>
   ${areas.length > 1 ? `<div class="row gap8" style="flex-wrap:wrap;margin-top:10px">${UI.chip('Todas', 'crArea', !f, 'data-v=""')}${areas.map(a => UI.chip(esc(a) + ' · ' + al.filter(x => x.area === a).length, 'crArea', f === a, `data-v="${esc(a)}"`)).join('')}</div>` : ''}
   <div class="g g3" style="margin-top:12px">
     <div class="cr-col"><h3>${UI.dot('neg')}Urgente</h3>${cut(urg, 6).map(card).join('') || UI.empty('Nada urgente.')}</div>
@@ -162,7 +163,7 @@ const controlRoom = al => { const f = OS.ui.crArea || '', fl = f ? al.filter(a =
     <div class="cr-col"><h3>${UI.dot('pos')}Sob controlo</h3>${cut(ok, 5).map(o => `<div class="cr-card"><span class="eyebrow">${esc(o.area)}</span><small>${esc(o.text)}</small></div>`).join('') || UI.empty('Regista dados nas áreas para o sistema as poder avaliar.')}</div>
   </div>${urg.length > 6 || att.length > 6 || ok.length > 5 ? `<button class="btn sm ghost" data-act="crMore" style="margin-top:8px">${more ? 'Mostrar menos' : 'Ver tudo'}</button>` : ''}</section>`; };
 // o antigo endereço #control abre o Painel, já na secção do centro de controlo
-V.control = sub => { setTimeout(() => { try { history.replaceState(null, '', '#painel'); } catch (e) { } const el = document.getElementById('control'); el && el.scrollIntoView({ block: 'start' }); }, 60); return V.painel(sub); };
+V.control = sub => { setTimeout(() => { try { history.replaceState(null, '', '#visao'); } catch (e) { } const el = document.getElementById('control'); el && el.scrollIntoView({ block: 'start' }); }, 60); return V.visao(sub); };
 A.crMore = () => OS.setUI('crMore', !OS.ui.crMore);
 A.crArea = b => OS.setUI('crArea', b.dataset.v);
 
@@ -170,7 +171,7 @@ A.crArea = b => OS.setUI('crArea', b.dataset.v);
 V.next = () => {
   const o = { ctx: OS.ui.naCtx || '', mins: OS.ui.naMins || '', energy: OS.ui.naEnergy || '' };
   const list = I.next(o);
-  return UI.head('Next Action', 'O que merece ser feito primeiro. Pontuação = urgência do prazo + prioridade + impacto + ligação a metas + vitórias rápidas − esforço acima do tempo disponível. Não é só ordenar por data.', '', 'Visão geral') +
+  return UI.head('Próxima ação', 'O que merece ser feito primeiro. Pontuação = urgência do prazo + prioridade + impacto + ligação a metas + vitórias rápidas − esforço acima do tempo disponível. Não é só ordenar por data.', '', 'Visão geral') +
   `<div class="pn"><div class="col gap12">
     <div class="row gap8"><span class="mut" style="font-size:12.5px;width:110px">Onde estou</span>${UI.chip('Qualquer', 'naCtx', !o.ctx, 'data-v=""')}${L.CTX.map(c => UI.chip(c, 'naCtx', o.ctx === c, `data-v="${c}"`)).join('')}</div>
     <div class="row gap8"><span class="mut" style="font-size:12.5px;width:110px">Tempo disponível</span>${UI.seg('naMins', [['', 'Qualquer'], ['15', '15 min'], ['30', '30 min'], ['60', '1 h'], ['120', '2 h']], o.mins)}</div>
@@ -312,21 +313,21 @@ V.habitos = sub => {
   const t = U.today();
   if (sub === 'rotina') {
     const R = OS.all('routine'), days = L.WEEK;
-    return UI.head('Hábitos & Rotina', 'Blocos recorrentes da tua semana. Aparecem em Hoje e no Calendário.', UI.addBtn('routine', 'Novo bloco'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
+    return UI.head('Hábitos e rotina', 'Blocos recorrentes da tua semana. Aparecem em Hoje e no Calendário.', UI.addBtn('routine', 'Novo bloco'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
     (R.length ? `<div class="pn flush" style="overflow-x:auto"><div style="display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));min-width:840px">${days.map(([d, l]) => `<div style="border-right:1px solid var(--line);padding:10px"><div class="eyebrow" style="margin-bottom:8px">${l}</div>${U.sortBy(R.filter(r => (r.days || []).includes(d)), r => r.start).map(r => `<div class="kcard" data-edit="routine:${r.id}" style="margin-bottom:6px"><span class="mono mut" style="font-size:11.5px">${r.start}–${r.end}</span><b>${esc(r.title)}</b></div>`).join('')}</div>`).join('')}</div></div>` : UI.empty('Define os blocos fixos da semana: aulas de estudo, ginásio, igreja, trabalho, revisão de domingo.', UI.addBtn('routine', 'Criar primeiro bloco', null, '')));
   }
   if (sub === 'plano') {
     const pl = OS.one('plan'), wk = U.monday(t), ym = U.ym(t), wp = (pl.week || {})[wk] || {}, mp = (pl.month || {})[ym] || '';
     const days = U.range(wk, U.addDays(wk, 6));
     const goalsM = OS.all('goals').filter(g => g.status === 'Ativa' && g.due && U.ym(g.due) === ym);
-    return UI.head('Hábitos & Rotina', 'Planeamento diário, semanal e mensal.', '', 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
+    return UI.head('Hábitos e rotina', 'Planeamento diário, semanal e mensal.', '', 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
     `<div class="g g2"><div class="pn"><div class="pn-h"><h3>Mês · ${U.fmtYML(ym)}</h3></div><div class="qa"><label for="pm">Foco do mês</label><textarea id="pm" data-bind="plan.month.${ym}" data-fk="pm" placeholder="O que tem de acontecer este mês?">${esc(mp)}</textarea></div>
       <div class="divider"></div><div class="eyebrow" style="margin-bottom:6px">Metas com prazo este mês</div>${goalsM.map(g => { const i = Goal.info(g); return `<div class="bar-row"><span class="l">${esc(g.title)}</span>${UI.bar(i.p, '', i.exp)}<span class="v">${U.fmtDS(g.due)}</span></div>`; }).join('') || '<div class="mut" style="font-size:13px">Nenhuma.</div>'}</div>
      <div class="pn"><div class="pn-h"><h3>Semana de ${U.fmtDS(wk)}</h3></div>${[1, 2, 3].map(i => `<div class="row gap8" style="margin-bottom:8px"><span class="mono mut">${i}</span><input class="field grow" data-bind="plan.week.${wk}.p${i}" data-fk="pw${i}" value="${esc(wp['p' + i] || '')}" placeholder="Prioridade ${i} da semana" aria-label="Prioridade ${i}"></div>`).join('')}<div class="mut" style="font-size:12px">A revisão semanal pode preencher estas prioridades.</div></div></div>
     <section><div class="sech"><h2>Semana dia a dia</h2><span class="mut" style="font-size:12.5px">Arrasta mentalmente; muda o "Fazer em" na tarefa</span></div><div class="kan" style="grid-auto-columns:minmax(170px,1fr)">${days.map(d => { const it = OS.all('tasks').filter(x => x.sched === d || (!x.sched && x.due === d)); return `<div class="kcol"><h4>${U.WDS[U.parse(d).getDay()]} ${+d.slice(8)}<span>${it.filter(x => x.status === 'Feita').length}/${it.length}</span></h4>${it.map(x => `<div class="kcard" data-edit="tasks:${x.id}" style="${x.status === 'Feita' ? 'opacity:.5' : ''}"><b>${esc(x.title)}</b></div>`).join('')}<button class="btn xs ghost" data-new="tasks" data-defs='${JSON.stringify({ sched: d, status: 'Próxima' })}'>${UI.ic('plus')}</button></div>`; }).join('')}</div></section>`;
   }
   const H = OS.all('habits'), days = U.lastN(14), score90 = U.lastN(91);
-  return UI.head('Hábitos & Rotina', 'Hábitos marcados como inegociáveis formam a sequência de dias perfeitos. Alguns marcam-se sozinhos a partir dos teus registos reais.', UI.addBtn('habits', 'Novo hábito'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
+  return UI.head('Hábitos e rotina', 'Hábitos marcados como inegociáveis formam a sequência de dias perfeitos. Alguns marcam-se sozinhos a partir dos teus registos reais.', UI.addBtn('habits', 'Novo hábito'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
   `<div class="kpis">${UI.kpi('Dias perfeitos seguidos', Hab.perfectStreak(), 'todos os inegociáveis cumpridos')}${UI.kpi('Consistência (30 dias)', (() => { const v = U.lastN(30).map(Hab.dayScore).filter(x => x != null); return v.length ? U.pct(U.avg(v)) : '—'; })())}${UI.kpi('Consistência (7 dias)', (() => { const v = U.lastN(7).map(Hab.dayScore).filter(x => x != null); return v.length ? U.pct(U.avg(v)) : '—'; })())}${UI.kpi('Hoje', (() => { const v = Hab.dayScore(t); return v == null ? '—' : U.pct(v); })())}</div>
   <div class="tblw hab-wrap"><table class="tbl hab-tbl"><colgroup><col>${days.map(() => '<col class="c">').join('')}<col style="width:58px"><col style="width:58px"></colgroup><thead><tr><th class="hab-n">Hábito</th>${days.map(d => `<th class="hab-c ${d === t ? 'is-today' : ''}">${U.WDS[U.parse(d).getDay()].slice(0, 1)}<span class="mono">${+d.slice(8)}</span></th>`).join('')}<th class="hab-s">Seq.</th><th class="hab-s">30 d</th></tr></thead><tbody>
   ${H.map(h => `<tr class="${h.active ? '' : 'muted'}"><td class="hab-n"><a href="javascript:void 0" data-edit="habits:${h.id}"><b style="font-weight:520">${esc(h.name)}</b></a> ${h.core ? UI.badge('inegociável', 'acc') : ''}${h.auto ? ' ' + UI.badge('auto', 'out') : ''}</td>${days.map(d => { const due = Hab.due(h, d), dn = Hab.done(h, d), au = h.auto && Hab.autoDone(h, d), isT = d === t;

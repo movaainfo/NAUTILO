@@ -264,8 +264,68 @@ function criarEvento_(p) { const t = String(p.t || '').slice(0, 200), d = String
   const s = new Date(d + 'T' + p.h + ':00'), e = /^\\d\\d:\\d\\d$/.test(p.f || '') ? new Date(d + 'T' + p.f + ':00') : new Date(s.getTime() + 3600000); c.createEvent(t, s, e, { location: String(p.l || '').slice(0, 200) }); return { ok: true }; }
 function buscar_(u) { if (!/^https?:\\/\\/[^\\s]+$/.test(u)) return { ok: false, msg: 'Endereço inválido' }; try { const r = UrlFetchApp.fetch(u, { muteHttpExceptions: true, followRedirects: true, headers: UA_ }); return { ok: true, code: r.getResponseCode(), ct: String(r.getHeaders()['Content-Type'] || ''), t: r.getContentText().slice(0, 1500000) }; } catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 200) }; } }
 `;
-// o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e a parte 3 por baixo
-IB.script = key => IB.core(key) + '\n' + IB.addon();
+// parte 4: Outlook da faculdade (Microsoft 365) e IA sem limites na Siri — também num ficheiro novo
+IB.addon4 = () => `// Oceanum · PARTE 4 — Outlook da faculdade (Microsoft 365) e IA sem limites nas perguntas pela Siri.
+// Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte4), por baixo das outras. Não apagues nada: liga-se às partes 1, 2 e 3.
+// Depois: Implantar → Gerenciar implantações → lápis → Nova versão → Implantar.
+const OL_SCOPE_ = 'offline_access User.Read Mail.Read Mail.Send';
+function olRedirect_() { return 'https://script.google.com/macros/d/' + ScriptApp.getScriptId() + '/usercallback'; }
+function op_olinfo(p) { const P = PropertiesService.getScriptProperties(); return { ok: true, v: 12, redirect: olRedirect_(), cfg: !!P.getProperty('OL_ID'), linked: !!P.getProperty('OL_RT'), user: P.getProperty('OL_USER') || '', err: P.getProperty('OL_ERR') || '' }; }
+function op_olcfg(p) { const id = String(p.id || '').trim(), sec = String(p.sec || '').trim(), ten = String(p.ten || 'organizations').trim();
+  if (!/^[0-9a-fA-F-]{36}$/.test(id) || sec.length < 8 || !/^[A-Za-z0-9.-]{3,80}$/.test(ten)) return { ok: false, msg: 'Dados inválidos: confirma o ID da aplicação, o ID do diretório e o segredo.' };
+  const P = PropertiesService.getScriptProperties(); P.setProperties({ OL_ID: id, OL_SEC: sec, OL_TEN: ten }); P.deleteProperty('OL_RT'); P.deleteProperty('OL_ERR'); CacheService.getScriptCache().remove('OL_AT'); return { ok: true }; }
+function op_olauth(p) { const P = PropertiesService.getScriptProperties(), id = P.getProperty('OL_ID'), ten = P.getProperty('OL_TEN') || 'organizations'; if (!id) return { ok: false, msg: 'Falta configurar a ligação ao Outlook.' };
+  const st = ScriptApp.newStateToken().withMethod('olCallback').withTimeout(1200).createToken();
+  return { ok: true, url: 'https://login.microsoftonline.com/' + ten + '/oauth2/v2.0/authorize?client_id=' + encodeURIComponent(id) + '&response_type=code&response_mode=query&redirect_uri=' + encodeURIComponent(olRedirect_()) + '&scope=' + encodeURIComponent(OL_SCOPE_) + '&state=' + encodeURIComponent(st) + '&prompt=select_account' }; }
+function olPage_(t, m) { const e = function (x) { return String(x || '').replace(/[<>&"]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]; }); };
+  return HtmlService.createHtmlOutput('<meta name="viewport" content="width=device-width,initial-scale=1"><div style="font-family:system-ui,sans-serif;padding:28px;max-width:560px;line-height:1.5"><h2>' + e(t) + '</h2><p>' + e(m) + '</p></div>'); }
+function olCallback(req) { const p = (req && req.parameter) || {}, P = PropertiesService.getScriptProperties();
+  if (p.error) { P.setProperty('OL_ERR', String(p.error_description || p.error).slice(0, 400)); return olPage_('Não foi possível ligar o Outlook', p.error_description || p.error); }
+  const r = olToken_({ grant_type: 'authorization_code', code: p.code, redirect_uri: olRedirect_() });
+  if (!r.ok) { P.setProperty('OL_ERR', r.msg); return olPage_('Não foi possível ligar o Outlook', r.msg); }
+  let user = ''; try { const me = JSON.parse(UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/me?$select=mail,userPrincipalName', { headers: { Authorization: 'Bearer ' + r.at }, muteHttpExceptions: true }).getContentText()); user = me.mail || me.userPrincipalName || ''; } catch (e) { }
+  P.setProperty('OL_USER', user); P.deleteProperty('OL_ERR'); return olPage_('Outlook ligado ✓', (user ? user + ' · ' : '') + 'Podes fechar esta janela e voltar ao Oceanum.'); }
+function olToken_(extra) { const P = PropertiesService.getScriptProperties(), ten = P.getProperty('OL_TEN') || 'organizations';
+  const body = { client_id: P.getProperty('OL_ID'), client_secret: P.getProperty('OL_SEC'), scope: OL_SCOPE_ }; Object.keys(extra).forEach(function (k) { body[k] = extra[k]; });
+  const r = UrlFetchApp.fetch('https://login.microsoftonline.com/' + ten + '/oauth2/v2.0/token', { method: 'post', payload: body, muteHttpExceptions: true });
+  let j = {}; try { j = JSON.parse(r.getContentText()); } catch (e) { }
+  if (!j.access_token) return { ok: false, msg: String(j.error_description || j.error || ('erro ' + r.getResponseCode())).slice(0, 400) };
+  if (j.refresh_token) P.setProperty('OL_RT', j.refresh_token);
+  CacheService.getScriptCache().put('OL_AT', j.access_token, Math.max(60, Math.min(3000, (j.expires_in || 3600) - 120))); return { ok: true, at: j.access_token }; }
+function olAt_() { const c = CacheService.getScriptCache().get('OL_AT'); if (c) return c; const rt = PropertiesService.getScriptProperties().getProperty('OL_RT'); if (!rt) throw new Error('O Outlook não está ligado.');
+  const r = olToken_({ grant_type: 'refresh_token', refresh_token: rt }); if (!r.ok) throw new Error(r.msg); return r.at; }
+function olGraph_(path, opt) { opt = opt || {}; const o = { method: opt.method || 'get', headers: { Authorization: 'Bearer ' + olAt_() }, muteHttpExceptions: true }; if (opt.prefer) o.headers.Prefer = opt.prefer;
+  if (opt.body) { o.contentType = 'application/json'; o.payload = JSON.stringify(opt.body); }
+  const r = UrlFetchApp.fetch('https://graph.microsoft.com/v1.0' + path, o), code = r.getResponseCode(), t = r.getContentText();
+  if (code >= 400) { let m = ''; try { m = JSON.parse(t).error.message; } catch (e) { } throw new Error(m || 'erro ' + code); } return t ? JSON.parse(t) : {}; }
+const olFrom_ = function (x) { const f = (x || {}).emailAddress || {}; return f.name ? f.name + ' <' + (f.address || '') + '>' : f.address || ''; };
+function op_ol(p) { try { const n = Math.min(60, Math.max(5, Number(p.n) || 40)), j = olGraph_('/me/mailFolders/inbox/messages?$top=' + n + '&$orderby=receivedDateTime%20desc&$select=id,subject,from,receivedDateTime,isRead,bodyPreview,importance,hasAttachments');
+    return { ok: true, user: PropertiesService.getScriptProperties().getProperty('OL_USER') || '', items: (j.value || []).map(function (m) { return { id: m.id, s: m.subject || '', f: olFrom_(m.from), d: m.receivedDateTime, u: !m.isRead, sn: String(m.bodyPreview || '').slice(0, 500), imp: m.importance === 'high', at: !!m.hasAttachments }; }) }; }
+  catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 300) }; } }
+function op_olx(p) { try { const id = encodeURIComponent(String(p.id || '')), h = olGraph_('/me/messages/' + id + '?$select=subject,from,toRecipients,receivedDateTime,body,hasAttachments'), t = olGraph_('/me/messages/' + id + '?$select=body', { prefer: 'outlook.body-content-type="text"' });
+    let at = []; if (h.hasAttachments) { try { at = (olGraph_('/me/messages/' + id + '/attachments?$select=name').value || []).map(function (a) { return a.name; }).slice(0, 10); } catch (e) { } }
+    return { ok: true, s: h.subject || '', t: [{ id: String(p.id), f: olFrom_(h.from), to: (h.toRecipients || []).map(function (x) { return (x.emailAddress || {}).address; }).join(', '), d: h.receivedDateTime, s: h.subject || '', b: String((t.body || {}).content || '').slice(0, 60000), h: String((h.body || {}).content || '').slice(0, 150000), at: at }] }; }
+  catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 300) }; } }
+function op_ols(p) { try { if (!p.id || !p.b) return { ok: false, msg: 'Faltam dados' }; olGraph_('/me/messages/' + encodeURIComponent(String(p.id)) + '/reply', { method: 'post', body: { comment: String(p.b).slice(0, 20000) } }); return { ok: true }; }
+  catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 300) }; } }
+function op_oloff(p) { const P = PropertiesService.getScriptProperties(); ['OL_RT', 'OL_USER', 'OL_ERR'].forEach(function (k) { P.deleteProperty(k); }); CacheService.getScriptCache().remove('OL_AT'); return { ok: true }; }
+// ---- IA sem limites na Siri: modelos do Google descobertos sozinhos e, se a cota acabar, IA grátis de reserva ----
+function iaModelos_(gk) { const C = CacheService.getScriptCache(), h = C.get('IA_MS'); if (h) return JSON.parse(h); let ms = [];
+  try { const j = JSON.parse(UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key=' + encodeURIComponent(gk), { muteHttpExceptions: true }).getContentText());
+    ms = (j.models || []).filter(function (m) { return (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0 && /^models\\/gemini/.test(m.name) && !/(tts|image|embed|live|audio|native|robotics|computer|pro)/.test(m.name); }).map(function (m) { return m.name.replace('models/', ''); }); } catch (e) { }
+  const v = function (n) { return /latest/.test(n) ? 99 : parseFloat((n.match(/-(\\d+(?:\\.\\d+)?)/) || [0, 0])[1]) || 0; }; ms.sort(function (a, b) { return v(b) - v(a); }); if (!ms.length) ms = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+  C.put('IA_MS', JSON.stringify(ms.slice(0, 8)), 21600); return ms.slice(0, 8); }
+function iaTexto_(prompt, gk) { if (gk) { const ms = iaModelos_(gk); for (let i = 0; i < ms.length; i++) { try { const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + ms[i] + ':generateContent?key=' + encodeURIComponent(gk), { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } }) });
+      if (r.getResponseCode() !== 200) continue; const t = ((((JSON.parse(r.getContentText()).candidates || [])[0] || {}).content || {}).parts || []).map(function (x) { return x.text || ''; }).join('').trim(); if (t) return t; } catch (e) { } } }
+  try { const r = UrlFetchApp.fetch('https://text.pollinations.ai/openai', { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ model: 'openai', private: true, referrer: 'oceanum', messages: [{ role: 'user', content: prompt }] }) });
+    if (r.getResponseCode() === 200) { const m = ((JSON.parse(r.getContentText()).choices || [])[0] || {}).message || {}; return String(m.content || '').trim(); } } catch (e) { }
+  return ''; }
+function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || ''; if (!q) return resumo_();
+  const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
+  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Oceanum do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
+// o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
+IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4();
 
 /* ---- adivinhar categoria e conta ---- */
 const KW = [[/uber|bolt|taxi|táxi|metro|comboio|autocarro|gasolina|combust|portagem|estaciona|cp |carris/i, ['Transporte', 'Carro']], [/caf[eé]|restaurante|almo[cç]o|jantar|lanche|mercado|continente|pingo|lidl|aldi|mercadona|supermercado|padaria|pizza|burger|mcdonald|kfc|glovo|uber ?eats|bolt ?food|a[cç]a[ií]/i, ['Alimentação', 'Restauração', 'Supermercado']],
@@ -379,9 +439,9 @@ IB.MAXP = 12000;
 // as partes 1 e 2 (o núcleo, igual desde a versão 10) cortam-se ao meio numa linha de topo; a parte 3 é o ficheiro das novidades
 IB.parts = key => { const L = IB.core(key).split('\n'), half = L.join('\n').length / 2, out = []; let cur = [], n = 0, cut = false;
   L.forEach(l => { if (!cut && n > half && /^(function |\/\/ ---- |const )/.test(l)) { out.push(cur); cur = []; cut = true; } cur.push(l); n += l.length + 1; });
-  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon()); };
+  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4()); };
 IB.partsHelp = () => { const n = IB.parts(cfg().key || 'x').length; return { n, files: Array.from({ length: n }, (_, i) => i ? 'Parte' + (i + 1) : 'Código.gs') }; };
-const partsBtns = (cls = 'btn pri', from = 0) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
+const partsBtns = (cls = 'btn pri', from = 0, to = 99) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from || i > to ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
 IB.partsBtns = partsBtns;
 const partsModal = () => { const { n, files } = IB.partsHelp(); UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>Código do script em ${n} partes</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
   <p class="mut" style="margin:0 0 10px">No telemóvel e no tablet o "colar" corta textos muito grandes, por isso o código vai em partes. O Apps Script junta os ficheiros sozinho.</p>

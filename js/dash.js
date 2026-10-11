@@ -1,4 +1,4 @@
-/* OCEANUM — Visão Geral: o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
+/* OCEANUM — Painel (antes Visão Geral + Painel, agora uma só página): o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
    dinheiro, agenda, tarefas, corpo, dieta, estudos e jogo. */
 (() => {
 'use strict';
@@ -20,8 +20,7 @@ V.visao = () => {
   const cats = Fin.byCat(R.a, R.b), bank = safe(() => Fin.cashTotal(), 0), liq = safe(() => Fin.liquid(), 0), nw = safe(() => Fin.netWorth(), 0);
   const dIn = days.map(d => U.sum(tx.filter(x => x.date === d && x.type === 'Receita'), x => x.amount)), dOut = days.map(d => U.sum(tx.filter(x => x.date === d && x.type === 'Despesa'), x => x.amount));
   const cards = Fin.accounts().filter(a => a.type === 'Cartão de crédito').map(a => ({ l: a.name, v: U.sum(tx.filter(x => x.type === 'Despesa' && x.account === a.id), x => x.amount) })).filter(x => x.v > 0);
-  const agenda = Cal.items(t, U.addDays(t, 2)).filter(x => x.src !== 'routine' && x.src !== 'task').slice(0, 5);
-  const tasks = OS.Tasks.open().filter(x => (x.sched && x.sched <= t) || (x.due && x.due <= U.addDays(t, 1)) || x.status === 'Em curso').slice(0, 5), doneP = OS.all('tasks').filter(x => x.doneAt && x.doneAt >= R.a && x.doneAt <= R.b).length;
+    const tasks = OS.Tasks.open().filter(x => (x.sched && x.sched <= t) || (x.due && x.due <= U.addDays(t, 1)) || x.status === 'Em curso').slice(0, 5), doneP = OS.all('tasks').filter(x => x.doneAt && x.doneAt >= R.a && x.doneAt <= R.b).length;
   const wk = OS.all('workouts').filter(w => w.date >= R.a && w.date <= R.b).length, km = OS.Run.kmIn(R.a, R.b), diet = safe(() => OS.Diet.day(t), { kcal: 0, p: 0 }), dg = OS.one('diet');
   const studyH = U.sum(OS.all('sessions').filter(s => s.date >= R.a && s.date <= R.b), s => s.minutes) / 60, habit = safe(() => OS.Hab.dayScore(t), 0);
   const dom = OS.one('dominus'), lvl = safe(() => OS.Dom.sumLv(), 0), rank = (OS.Dom.RANKS || [])[dom.rank || 0] || '';
@@ -35,25 +34,31 @@ V.visao = () => {
   const work = W ? card('Trabalho', `<div class="dc-tiles"><a href="#trabalho"><b class="mono">${U.nf(W.h, 1)}</b><span>horas ${R.per === 'hoje' ? 'hoje' : R.per === 'semana' ? 'na semana' : 'no mês'}</span></a><a href="#trabalho"><b class="mono">${U.eur(W.pay, { dec: 0 })}</b><span>ganhos estimados</span></a><a href="#trabalho.horario"><b class="mono">${W.n}</b><span>turnos</span></a><a href="#trabalho.horario"><b class="mono">${W.offP}</b><span>folgas</span></a></div>
       <div class="dc-wk">${W.week.map(x => `<span class="${x.sh ? 'sh' : x.off ? 'off' : ''} ${x.d === t ? 'today' : ''}" title="${U.fmtDS(x.d)}">${U.WDS[U.parse(x.d).getDay()].slice(0, 1)}</span>`).join('')}</div>
       <div class="dc-rows"><div><span>Próximo turno</span><b>${W.nx ? (W.nx.date === t ? 'hoje' : U.rel(W.nx.date)) + ' ' + esc(W.nx.start || '') + (W.nx.place ? ' · ' + esc(W.nx.place) : '') : '—'}</b></div><div><span>Próxima folga</span><b>${W.off ? (W.off.date === t ? 'hoje' : U.fmtDS(W.off.date)) : '—'}</b></div><div><span>Tarefas · projetos de trabalho</span><b class="mono">${W.tasks} · ${W.proj}</b></div>${W.rate ? `<div><span>Valor por hora</span><b class="mono">${U.eur(W.rate)}</b></div>` : ''}</div>`, { cls: 'span4', act: more('trabalho', 'Trabalho') }) : '';
+  const P = safe(() => OS.PainelParts(), null), part = k => (P && P[k]) || '';
   return `<div class="dash">
-  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1></div>
+  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
     <div class="dash-ctl">${R.per === 'mes' ? `<div class="dash-month"><button class="icon-btn" data-act="dashYM" data-d="-1" aria-label="Mês anterior">${UI.ic('left')}</button><b>${R.label}</b><button class="icon-btn" data-act="dashYM" data-d="1" aria-label="Mês seguinte" ${R.ym >= U.ym(t) ? 'disabled' : ''}>${UI.ic('right')}</button></div>` : `<div class="dash-month"><b>${R.label}</b></div>`}
       <div class="dash-seg" role="group">${per.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="dashPer" data-p="${k}">${l}</button>`).join('')}</div></div></div>
+  ${part('life')}
+  ${part('control')}
+  ${part('next')}
   <div class="dash-grid">
     ${card('Saldo do período', `<div class="dc-big ${net < 0 ? 'neg' : ''}">${U.eur(net)}</div><div class="dc-sub">receitas ${U.eur(inc, { dec: 0 })} · despesas ${U.eur(exp, { dec: 0 })}</div>${UI.spark(cum.length > 1 ? cum : [0, 0], '#7FE3F5', 300, 54)}`, { cls: 'hero h-abyss span4' })}
     ${card('Categorias', C.mount({ type: 'donut', data: cats.slice(0, 6), label: 'Gastos por categoria', centerSub: 'gastos', max: 5, empty: 'Sem despesas neste período.' }, 170), { cls: 'span4', act: more('financas', 'Finanças') })}
     ${card('Fluxo de caixa', `<div class="dc-mid ${acc < 0 ? 'neg' : ''}">${U.eur(acc)}</div>${C.mount({ type: 'line', labels: days.map(d => U.fmtDS(d)), series: [{ name: 'Saldo acumulado', data: cum, color: '#38BDF8' }], fmt: U.eurK, min0: false, empty: 'Sem movimentos.' }, 150)}`, { cls: 'span4' })}
     ${card('Saldo bancário total', `<div class="dc-big">${U.eur(bank)}</div><div class="dc-rows"><div><span>Disponível</span><b class="mono">${U.eur(liq, { dec: 0 })}</b></div><div><span>Patrimônio</span><b class="mono">${U.eur(nw, { dec: 0 })}</b></div></div><div class="dc-acts"><button class="btn sm" data-new="transactions" data-defs='{"type":"Receita"}'>${UI.ic('plus')}Receita</button><button class="btn sm" data-new="transactions" data-defs='{"type":"Despesa"}'>${UI.ic('plus')}Despesa</button></div>`, { cls: 'hero h-tide span4', act: more('financas.contas', 'Contas') })}
     ${card('Movimentação diária', C.mount({ type: 'bar', labels: days.map(d => U.fmtDS(d)), series: [{ name: 'Entradas', data: dIn, color: '#2DD4BF' }, { name: 'Saídas', data: dOut, color: '#3B82F6' }], fmt: U.eurK, empty: 'Sem movimentos neste período.' }, 190), { cls: 'span8' })}
-    ${card('Agenda', agenda.length ? agenda.map(x => `<div class="dc-li" ${x.edit ? `data-edit="${x.edit}"` : ''}><span class="mono">${x.date === t ? (x.start || 'hoje') : U.fmtDS(x.date)}</span><b>${esc(x.title)}</b></div>`).join('') : '<p class="dc-empty">Agenda livre nos próximos dias.</p>', { cls: 'span4', act: more('calendario', 'Calendário') })}
     ${card('Tarefas', `<div class="dc-kp"><b class="mono">${OS.Tasks.open().length}</b><span>abertas</span><b class="mono">${doneP}</b><span>feitas no período</span></div>${tasks.map(x => `<div class="dc-li" data-edit="tasks:${x.id}"><input type="checkbox" class="cbx round" data-act="taskToggle" data-id="${x.id}" aria-label="Concluir ${esc(x.title)}"><b>${esc(x.title)}</b></div>`).join('') || '<p class="dc-empty">Nada para hoje.</p>'}`, { cls: 'span4', act: more('tarefas') })}
     ${card('Corpo', `<div class="dc-tiles"><a href="#treino"><b class="mono">${wk}</b><span>treinos</span></a><a href="#corrida"><b class="mono">${U.nf(km, 1)}</b><span>km</span></a><a href="#dieta"><b class="mono">${U.nf(diet.kcal, 0)}</b><span>kcal hoje</span></a><a href="#dieta"><b class="mono">${U.nf(diet.p, 0)}<small>/${U.num(dg.p) || '—'}</small></b><span>proteína</span></a></div>`, { cls: 'hero h-reef span4', act: more('treino', 'Treino') })}
     ${work}
-    ${card('Estudos', `<div class="dc-big">${U.nf(studyH, 1)} h</div><div class="dc-sub">de estudo no período</div>`, { cls: 'span4', act: more('universidade') })}
     ${card('Hábitos de hoje', `<div class="dc-big">${Math.round(habit * 100)}%</div><div class="dc-bar"><i style="width:${Math.round(habit * 100)}%"></i></div><div class="dc-sub">inegociáveis cumpridos</div>`, { cls: 'span4', act: more('habitos') })}
     ${card('Dominus', `<div class="dc-big">Nível ${lvl}</div><div class="dc-sub">${esc(rank)}${dom.started ? '' : ' · ainda não começaste'}</div>`, { cls: 'hero h-deep span4', act: more('dominus', 'Jogar') })}
     ${cards.length ? card('Gastos por cartão', cards.map(c => `<div class="dc-li"><b>${esc(c.l)}</b><span class="mono">${U.eur(c.v)}</span></div>`).join(''), { cls: 'span4' }) : ''}
-  </div></div>`;
+  </div>
+  ${part('money')}
+  ${part('study')}
+  ${part('goals')}
+  ${part('trends')}</div>`;
 };
 
 /* ================= GASTO RÁPIDO: o "widget" do telemóvel ================= */
@@ -83,7 +88,7 @@ OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 
   UI.toast(`Registado: ${U.eur(amount)}${cat ? ' · ' + cat : ''}`, 'pos'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } };
 A.qgCopy = () => { const url = (() => { try { return window.top.location.href.split('#')[0]; } catch (e) { return ''; } })() || document.referrer || 'https://claude.ai/artifact/AUtUtqFR4x46BWPVcR3kLZ'; const ok = () => UI.toast('Link copiado', 'pos'); try { navigator.clipboard.writeText(url).then(ok, () => UI.toast(url)); } catch (e) { UI.toast(url); } };
 A.ibGo = (b, e) => { e && e.preventDefault(); OS.go('definicoes'); setTimeout(() => { const el = document.getElementById('inboxPn'); el && el.scrollIntoView({ behavior: 'smooth' }); }, 250); };
-A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Oceanum vai abrir no Gasto rápido' : 'Abre normalmente na Visão Geral'); };
+A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Oceanum vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
 A.dashPer = b => OS.setUI('dashPer', b.dataset.p);
 A.dashYM = b => { const cur = OS.ui.dashYM || U.ym(U.today()), n = U.addMonths(cur, +b.dataset.d); OS.setUI('dashYM', n > U.ym(U.today()) ? U.ym(U.today()) : n); };
 })();

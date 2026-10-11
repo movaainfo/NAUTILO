@@ -1,10 +1,12 @@
 {
- "n": 103,
- "hash": "40b1682f8003",
+ "n": 104,
+ "hash": "052858f75fc3",
  "notes": [
-  "Atualização automática a sério: ao abrir, a app vem sempre da internet primeiro (a cópia guardada só é usada sem rede), por isso abre logo na versão mais recente.",
-  "Com a app aberta em segundo plano, ao voltar a ela atualiza-se sozinha em segundos, sem esperar e sem teres de a desinstalar.",
-  "Nunca atualiza a meio de um formulário: espera que acabes. Se algo correr mal, limpa a cópia guardada sozinha (os teus dados ficam)."
+  "IA sem parar: a app descobre sozinha os modelos novos do Google (os antigos foram desligados) e, se a cota grátis acabar, responde uma IA grátis de reserva. Notícias, Spyke, e-mails e investimentos nunca mais ficam sem resposta.",
+  "Painel: a Visão Geral e o Painel são agora uma só página, com tudo junto e sem repetições.",
+  "Próximos passos (na Direção): o plano da tua vida por áreas, do passo pequeno (hoje) ao grande (longo prazo), ligado às metas; o Spyke sugere os que faltam.",
+  "E-mail → Faculdade: o Outlook da universidade dentro da app, separado por matéria (aprende com as tuas escolhas). Liga-se pela Parte 4 do script.",
+  "Nomes todos em português: Estrela-guia, Roteiro da vida, Longo prazo, Centro de decisões, Base de conhecimento, Carreira e contactos."
  ],
  "date": "11/10/2026"
 }

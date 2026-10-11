@@ -10,7 +10,7 @@ const AI = OS.AI = {};
 AI.key = () => OS.one('diet').aiKey || '';
 /* A IA do OCEANUM é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
    universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio (página do Spyke) ou em qualquer cartão abaixo. */
-AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Decision Center)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
+AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Centro de decisões)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
 const STEPS = `<ol class="ai-steps"><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em <b>Ligar</b>.</li></ol>`;
 const FORM = act => `<div class="row gap8 ai-row"><input class="field grow" data-aikey placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Ligar</button></div>`;
 const moved = () => OS.Move && !OS.Move.isOld && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
@@ -21,38 +21,81 @@ AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" ar
 AI.panel = () => { const k = AI.key(), st = U.ls.get('os2aiOk', null);
   return `<div class="pn" id="spyBrain"><div class="pn-h"><h3>Cérebro do Spyke (IA)</h3><span class="bdg ${k ? (st && st.ok === false ? 'neg' : 'pos') : ''}">${k ? (st && st.ok === false ? 'chave com problema' : 'ligado') : 'desligado'}</span></div>
     <p class="mut" style="margin:0 0 8px;font-size:13px">Uma só ligação para a app inteira: ${AI.uses.join(', ')}.</p>
+    <div class="ai-eng"><b>Sem limites e sem pagar:</b> a app usa os modelos mais recentes do Google (descobertos sozinhos: ${esc(MODELS.slice(0, 3).join(', '))}${MODELS.length > 3 ? '…' : ''}) e, quando a cota grátis de um acaba, passa logo ao seguinte. Se todos acabarem, responde a <b>IA grátis de reserva</b> (modelo aberto GPT-OSS, sem chave).${AI.lastEngine ? ` <small class="mut">Última resposta: ${esc(AI.lastEngine === 'reserva' ? 'IA de reserva' : AI.lastEngine)}.</small>` : ''}
+      <label class="ai-free"><input type="checkbox" data-act="aiFreeTg" ${AI.freeOn() ? 'checked' : ''}> Usar a IA grátis de reserva quando o Google não responder <small class="mut">(o texto do pedido vai para a Pollinations; fotos e e-mails só pelo Google)</small></label></div>
     ${k ? `<div class="row gap8" style="flex-wrap:wrap"><code class="ai-k">${'•'.repeat(8) + esc(k.slice(-4))}</code><button class="btn sm" data-act="aiTest">${UI.ic('zap')}Testar</button><button class="btn sm ghost" data-act="aiChange">Mudar a chave</button><button class="btn sm ghost" data-act="dietAiOff">Desligar</button></div>${st && st.ok === false ? `<p class="neg" style="font-size:12.5px;margin:8px 0 0">${esc(st.msg || '')}</p>` : ''}${OS.ui.aiChg ? FORM('') : ''}`
       : `${STEPS}${FORM('')}${moved()}`}</div>`; };
 A.aiChange = () => { OS.ui.aiChg = !OS.ui.aiChg; OS.request(); };
+A.aiFreeTg = b => { OS.setOne('diet', { freeAI: !!b.checked }); UI.toast(b.checked ? 'IA de reserva ligada: a IA nunca fica parada' : 'IA de reserva desligada', b.checked ? 'pos' : ''); };
 AI.test = async () => { const k = AI.key(); if (!k) return { ok: false, msg: 'Sem chave.' };
   try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=5&key=${encodeURIComponent(k)}`), j = await r.json().catch(() => ({}));
     const o = r.ok ? { ok: true } : { ok: false, msg: /API key not valid|API_KEY_INVALID/i.test((j.error && j.error.message) || '') || r.status === 400 ? 'A chave não é válida: volta a copiá-la em aistudio.google.com/apikey.' : 'O Google respondeu com erro ' + r.status + '.' };
-    U.ls.set('os2aiOk', Object.assign({ at: Date.now() }, o)); return o; } catch (e) { return { ok: null, msg: 'Sem internet para testar agora.' }; } };
+    U.ls.set('os2aiOk', Object.assign({ at: Date.now() }, o)); if (o.ok) AI.discover(true); return o; } catch (e) { return { ok: null, msg: 'Sem internet para testar agora.' }; } };
 A.aiTest = async () => { UI.toast('A testar…'); const o = await AI.test(); UI.toast(o.ok ? 'O Spyke está ligado e a funcionar' : o.msg, o.ok ? 'pos' : 'warn'); OS.request(); };
 A.aiKeySave = b => { const box = b.closest('.ai-row') || document, inp = box.querySelector('[data-aikey]') || document.getElementById('aiKeyIn'), v = ((inp || {}).value || '').trim().replace(/^['"]|['"]$/g, '');
   if (v.length < 20) { UI.toast('Esta chave parece incompleta', 'warn'); return; } OS.setOne('diet', { aiKey: v }); OS.ui.aiChg = false; U.ls.del('os2aiOk'); UI.toast('Spyke ligado: a IA já funciona em toda a app', 'pos'); OS.emit('ai:on');
   AI.test().then(o => { if (o.ok === false) UI.toast(o.msg, 'warn'); OS.request(); });
   if (b.dataset.next && A[b.dataset.next]) A[b.dataset.next](b); else OS.request(); };
-/* Limite grátis: o Google dá uma cota por modelo (por minuto e por dia). Quando um modelo esgota, passa-se ao seguinte
-   e fica anotado até ao dia seguinte (a cota diária renova à meia-noite da Califórnia). Assim o uso grátis multiplica-se. */
-const MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemma-3-27b-it', 'gemma-3-12b-it'];
+/* IA sem parar:
+   1) Os modelos do Google mudam (o Google desliga os antigos, ex.: gemini-2.0): a app pergunta ao Google, com a tua chave,
+      que modelos existem hoje e usa os mais recentes. Nunca mais fica presa num modelo desligado.
+   2) Cada modelo tem a sua cota grátis (por minuto e por dia): quando um esgota, passa logo ao seguinte, sem esperar.
+   3) Se todos os do Google estiverem esgotados (ou sem chave), usa uma IA grátis e sem chave (Pollinations, modelo aberto GPT-OSS). */
+const FALLBACK = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemma-3-27b-it', 'gemma-3-12b-it'];
+const MK = 'os2aiModels', QK = 'os2aiQuota';
+let MODELS = (() => { const c = U.ls.get(MK, null); return c && Array.isArray(c.m) && c.m.length ? c.m : FALLBACK; })();
 const ptDay = () => { try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }); } catch (e) { return U.today(); } };
-const QK = 'os2aiQuota';
-AI.blocked = m => { const q = U.ls.get(QK, {}) || {}, x = q[m]; return !!x && (x.d ? x.d === ptDay() : x.until > Date.now()); };
+// ordem: "latest" (o Google aponta sempre para o mais recente) → versões mais novas → flash antes de lite → pro → gemma (cota diária enorme, menos inteligente)
+const rank = n => { const v = +((n.match(/-(\d+(?:\.\d+)?)/) || [])[1] || 0), fam = /^gemma/.test(n) ? 3 : /pro/.test(n) ? 2 : /lite/.test(n) ? 1 : 0;
+  return (/latest/.test(n) ? -1e4 : 0) + fam * 1e3 - v * 10 + (/preview|exp/.test(n) ? 3 : 0) + (/lite/.test(n) ? 1 : 0); };
+AI.discover = async force => { const k = AI.key(); if (!k) return MODELS; const c = U.ls.get(MK, null);
+  if (!force && c && c.k === k.slice(-6) && Date.now() - c.at < 12 * 36e5 && Array.isArray(c.m) && c.m.length) return (MODELS = c.m);
+  try { let names = [], tok = '';
+    for (let i = 0; i < 5; i++) { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=200${tok ? '&pageToken=' + encodeURIComponent(tok) : ''}&key=${encodeURIComponent(k)}`); const j = await r.json().catch(() => ({})); if (!r.ok) break;
+      (j.models || []).forEach(m => { const n = String(m.name || '').replace(/^models\//, ''); if ((m.supportedGenerationMethods || []).includes('generateContent') && /^(gemini|gemma)/.test(n) && !/(tts|image|embed|aqa|live|audio|robotics|computer|veo|imagen|native|banana|nano|learnlm|vision)/i.test(n)) names.push(n); });
+      tok = j.nextPageToken; if (!tok) break; }
+    if (names.length) { MODELS = [...new Set(names)].sort((x, y) => rank(x) - rank(y)).slice(0, 16); U.ls.set(MK, { k: k.slice(-6), at: Date.now(), m: MODELS }); } } catch (e) { }
+  return MODELS; };
+AI.blocked = m => { const q = U.ls.get(QK, {}) || {}, x = q[m]; return !!x && (x.dead ? x.dead > Date.now() : x.d ? x.d === ptDay() : x.until > Date.now()); };
 AI.markLimit = (m, msg) => { const q = U.ls.get(QK, {}) || {}; q[m] = /per ?day|perday|daily|diári/i.test(msg || '') ? { d: ptDay() } : { until: Date.now() + 65000 }; U.ls.set(QK, q); };
+// modelo desligado pelo Google ("no longer available", "not found"): fica de lado 7 dias e a lista é pedida outra vez
+AI.markDead = m => { const q = U.ls.get(QK, {}) || {}; q[m] = { dead: Date.now() + 7 * 864e5 }; U.ls.set(QK, q); U.ls.del(MK); };
+AI.isDead = (status, msg) => status === 404 || (status === 400 && /no longer available|is not found|not supported for generateContent|deprecated|has been shut ?down/i.test(msg || ''));
 AI.models = list => (list || MODELS).filter(m => !AI.blocked(m));
-AI.limitMsg = 'Hoje já se gastou a cota grátis de todos os modelos de IA do Google. Volta a funcionar sozinho amanhã. Para nunca parar: liga o Claude na página do Spyke, ou ativa a faturação na tua chave do Google (paga-se só o que passar da cota grátis).';
-AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); let last = '', limited = 0; const list = AI.models();
-  if (!list.length) throw Object.assign(new Error(AI.limitMsg), { fatal: 1 });
+AI.gemini = () => AI.models(MODELS).filter(m => !/^gemma/.test(m));
+AI.limitMsg = 'A cota grátis dos modelos do Google acabou por hoje e a IA de reserva não respondeu. Tenta daqui a um minuto.';
+// IA grátis de reserva: sem chave e sem limite diário (modelo aberto GPT-OSS na Pollinations). Desliga-se em Definições da IA (freeAI = false).
+AI.freeOn = () => OS.one('diet').freeAI !== false;
+AI.free = async (messages, o = {}) => { if (!AI.freeOn()) throw new Error('A IA de reserva está desligada.');
+  let last = ''; for (let i = 0; i < 3; i++) { const ac = window.AbortController ? new AbortController() : null, to = ac && setTimeout(() => ac.abort(), 45000);
+    try { const r = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ac ? ac.signal : undefined, credentials: 'omit', referrerPolicy: 'no-referrer',
+        body: JSON.stringify(Object.assign({ model: 'openai', messages, temperature: o.temp == null ? .3 : o.temp, private: true, referrer: 'oceanum' }, o.tools ? { tools: o.tools } : {}, o.json ? { response_format: { type: 'json_object' } } : {})) });
+      const j = await r.json().catch(() => ({})); if (r.ok && j.choices && j.choices[0]) { AI.lastEngine = 'reserva'; return j.choices[0].message || {}; }
+      last = (j.error && (j.error.message || j.error)) || 'erro ' + r.status; if (r.status === 429) await new Promise(res => setTimeout(res, 1500 * (i + 1))); else if (r.status < 500) break; }
+    catch (e) { last = e.name === 'AbortError' ? 'demorou demasiado' : (e.message || 'sem rede'); } finally { to && clearTimeout(to); } }
+  throw new Error('IA de reserva: ' + last); };
+const freeJSON = async (parts, temp) => { const txt = parts.filter(p => p.text).map(p => p.text).join('\n'); if (!txt || parts.some(p => p.inline_data)) throw new Error('sem texto');
+  const m = await AI.free([{ role: 'system', content: 'Respondes APENAS com JSON válido, sem texto à volta.' }, { role: 'user', content: txt }], { temp, json: true }), t = String(m.content || '').replace(/```(?:json)?/g, '').trim();
+  try { return JSON.parse(t); } catch (e) { const mm = t.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } };
+AI.json = async (parts, temp = .2) => { const key = AI.key(); if (!key) { if (AI.freeOn()) return freeJSON(parts, temp); throw Object.assign(new Error('A IA não está ligada.'), { fatal: 1 }); }
+  let last = '', limited = 0; await AI.discover(); const list = AI.models();
   for (const m of list) { const gemma = /^gemma/.test(m); try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: gemma ? parts.concat([{ text: '\nResponde APENAS com o JSON pedido, sem texto à volta.' }]) : parts }], generationConfig: gemma ? { temperature: temp } : { responseMimeType: 'application/json', temperature: temp } }) });
-      const j = await r.json().catch(() => ({})); if (r.status === 404) { last = 'modelo indisponível'; continue; }
-      if (!r.ok) { const msg = (j.error && j.error.message) || ''; if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 });
-        if (r.status === 429) { AI.markLimit(m, msg); limited++; last = 'limite'; continue; } last = msg || 'erro ' + r.status; continue; }
+      const j = await r.json().catch(() => ({})), msg = (j.error && j.error.message) || '';
+      if (!r.ok) { if (/API key not valid|API_KEY_INVALID/i.test(msg)) throw Object.assign(new Error('A chave da IA não é válida. Volta a copiá-la em aistudio.google.com/apikey.'), { fatal: 1 });
+        if (r.status === 429) { AI.markLimit(m, msg); limited++; last = 'limite'; continue; } if (AI.isDead(r.status, msg)) { AI.markDead(m); last = 'modelo desligado'; continue; } last = msg || 'erro ' + r.status; continue; }
       const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('').replace(/```(?:json)?/g, '').trim();
-      try { return JSON.parse(txt); } catch (e) { const mm = txt.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } }
+      try { AI.lastEngine = m; return JSON.parse(txt); } catch (e) { const mm = txt.match(/[\[{][\s\S]*[\]}]/); if (mm) return JSON.parse(mm[0]); throw e; } }
     catch (e) { if (e.fatal) throw e; last = e.message; } }
+  // o Google não deu: IA grátis de reserva (só texto; fotos e PDFs precisam do Google)
+  if (AI.freeOn() && !parts.some(p => p.inline_data)) { try { return await freeJSON(parts, temp); } catch (e) { last = e.message; } }
   if (limited && !AI.models().length) throw Object.assign(new Error(AI.limitMsg), { fatal: 1 });
-  throw new Error(last === 'limite' ? 'A IA está ocupada por um minuto (limite por minuto). Tenta já a seguir.' : 'A IA não respondeu (' + last + '). Verifica a internet e tenta de novo.'); };
+  throw new Error('A IA não respondeu (' + last + '). Verifica a internet e tenta de novo.'); };
+// texto simples (resumos, explicações): Google primeiro, reserva grátis depois
+AI.text = async (prompt, o = {}) => { const key = AI.key(); if (key) { await AI.discover(); for (const m of AI.models()) { try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: (o.system ? o.system + '\n\n' : '') + prompt }] }], generationConfig: { temperature: o.temp == null ? .4 : o.temp } }) });
+      const j = await r.json().catch(() => ({})), msg = (j.error && j.error.message) || ''; if (!r.ok) { if (r.status === 429) AI.markLimit(m, msg); else if (AI.isDead(r.status, msg)) AI.markDead(m); continue; }
+      const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('').trim(); if (t) { AI.lastEngine = m; return t; } } catch (e) { } } }
+  const m = await AI.free([o.system ? { role: 'system', content: o.system } : null, { role: 'user', content: prompt }].filter(Boolean), { temp: o.temp }); return String(m.content || '').trim(); };
+OS.on('ready', () => { if (AI.key()) setTimeout(() => AI.discover(), 5000); });
 
 /* ================= ler o exame ================= */
 const FIELDS = { weight: 'peso total em kg', bf: 'percentagem de gordura corporal (PBF, %)', fatKg: 'massa de gordura corporal em kg (Body Fat Mass)', muscleKg: 'massa muscular esquelética em kg (SMM)', leanKg: 'massa livre de gordura / massa magra em kg (FFM, LBM)', water: 'água corporal em % do peso', waterL: 'água corporal total em litros (TBW)', protein: 'proteína em % do peso (se só houver kg, converte para % do peso)', bone: 'minerais / massa óssea em kg', visceral: 'nível de gordura visceral (número)', subq: 'gordura subcutânea em %', bmr: 'taxa metabólica basal em kcal', metAge: 'idade metabólica em anos', lArmL: 'massa magra braço esquerdo kg', lArmR: 'massa magra braço direito kg', lTrunk: 'massa magra tronco kg', lLegL: 'massa magra perna esquerda kg', lLegR: 'massa magra perna direita kg', gArmL: 'gordura braço esquerdo em %', gArmR: 'gordura braço direito em %', gTrunk: 'gordura tronco em %', gLegL: 'gordura perna esquerda em %', gLegR: 'gordura perna direita em %', ecw: 'rácio água extracelular / água total (ECW/TBW, ex. 0.380)', phase: 'ângulo de fase em graus', score: 'pontuação do aparelho (ex. InBody score)', waist: 'perímetro da cintura cm', hip: 'perímetro da anca cm', neck: 'pescoço cm', chest: 'peito cm', abdomen: 'abdómen cm', armLc: 'braço esquerdo cm', armRc: 'braço direito cm', thighL: 'coxa esquerda cm', thighR: 'coxa direita cm', calf: 'gémeo cm' };

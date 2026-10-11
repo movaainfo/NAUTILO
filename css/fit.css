@@ -848,3 +848,23 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .fo-sky.fo-bg-espaco{background:radial-gradient(1.5px 1.5px at 10% 12%,#fff 60%,transparent),radial-gradient(1px 1px at 26% 40%,#fff 60%,transparent),radial-gradient(1.5px 1.5px at 52% 8%,#fff 60%,transparent),radial-gradient(1px 1px at 66% 30%,#cfe3ff 60%,transparent),radial-gradient(1.5px 1.5px at 90% 20%,#fff 60%,transparent),radial-gradient(260px 160px at 30% 30%,rgba(90,70,170,.35),transparent 70%),linear-gradient(180deg,#02030a 0%,#0a0f26 60%,#151b3a 100%)}
 .fo-sky.fo-bg-mar{background:radial-gradient(240px 140px at 50% -10%,rgba(190,240,255,.55),transparent 70%),repeating-linear-gradient(100deg,rgba(255,255,255,.05) 0 18px,transparent 18px 60px),linear-gradient(180deg,#1f8fc4 0%,#0d5f93 55%,#073c63 100%)}
 .fo-stage.fo-bg-noite::before,.fo-stage.fo-bg-magica::before,.fo-stage.fo-bg-vulcao::before,.fo-stage.fo-bg-espaco::before,.fo-stage.fo-bg-mar::before{display:none}
+.ai-eng{font-size:13px;line-height:1.5;border:1px solid var(--line2);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--pn2)}
+.ai-free{display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:13px}.ai-free input{margin-top:3px}
+/* Próximos passos: plano da vida */
+.lp-star{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;align-items:start;border-left:3px solid var(--accent)}
+.lp-star .eyebrow,.lp-star>.more{grid-column:1/-1}.lp-sv small{display:block;color:var(--mut);font-size:11.5px}.lp-sv b{font-weight:520;font-size:14px;line-height:1.4}
+.lp-ai{border-color:var(--line3)}.lp-foco{margin:10px 0 0;font-size:15px;font-weight:520;color:var(--tx)}
+.lp-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+@media (max-width:720px){.lp-g{grid-template-columns:1fr}}
+.lp-lv{margin-top:8px}.lp-lh{display:flex;align-items:baseline;gap:8px;margin:6px 0 2px}.lp-lh span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono);background:var(--pn2);color:var(--accent)}.lp-lh b{font-size:13px}.lp-lh small{color:var(--mut);font-size:11.5px}
+.lp-st{display:flex;gap:10px;align-items:flex-start;padding:7px 0 7px 6px;border-top:1px dashed var(--line)}
+.lp-dot{flex:none;border-radius:50%;background:var(--accent);margin-top:6px}.lv1 .lp-dot{width:6px;height:6px}.lv2 .lp-dot{width:8px;height:8px}.lv3 .lp-dot{width:10px;height:10px}.lv4 .lp-dot{width:12px;height:12px;background:var(--c8)}.lv5 .lp-dot{width:14px;height:14px;background:var(--vio)}
+.lp-st.neg .lp-dot{background:var(--neg)}.lp-st.ai b{color:var(--accent)}
+.lp-tx{flex:1;min-width:0}.lp-tx b{display:block;font-weight:500;font-size:13.5px}.lp-tx small{display:block;color:var(--mut);font-size:12px}.lp-a{flex:none;display:flex;gap:4px}
+/* E-mail da faculdade (Outlook) por matéria */
+.ol-it{position:relative;padding-left:14px}.ol-bar{position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:4px}
+.ol-sel{font:inherit;font-size:12px;padding:3px 6px;border-radius:8px;border:1px solid var(--line2);background:var(--pn2);color:var(--tx2);max-width:150px}
+.ol-copy{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}.ol-copy code{font-size:11.5px;word-break:break-all;background:var(--pn2);padding:4px 6px;border-radius:6px}
+.ol-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:10px}
+.ol-rp{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.ol-dom summary{cursor:pointer;font-size:13.5px}
+.ml-sn{font-size:12.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
