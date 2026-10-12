@@ -3,7 +3,9 @@
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, L = OS.L, esc = U.esc;
 const Fin = OS.Fin, Inv = OS.Inv, I = OS.Intel, A = OS.act;
-const accN = id => (OS.get('accounts', id) || {}).name || '—';
+const accN = id => { const a = OS.get('accounts', id); return a ? L.accLabel(a) : '—'; };
+// ponto com a cor do banco (Revolut azul, Santander vermelho, Nubank roxo…)
+const bankDot = a => { const b = a && L.bank(a.inst); return b ? `<i class="bk-dot" style="background:${b[1]}" aria-hidden="true"></i>` : ''; };
 const money = (v, tone = true) => `<span class="mono ${tone ? (v > 0 ? 'pos' : v < 0 ? '' : 'mut') : ''}">${U.eur(v, { sign: tone })}</span>`;
 const txSign = t => t.type === 'Receita' ? U.num(t.amount) : t.type === 'Despesa' ? -U.num(t.amount) : 0;
 const TABS = [['', 'Visão'], ['transacoes', 'Transações'], ['contas', 'Contas'], ['orcamento', 'Orçamento'], ['recorrentes', 'Recorrentes'], ['dividas', 'Dívidas'], ['inteligencia', 'Inteligência'], ['categorias', 'Categorias']];
@@ -54,7 +56,7 @@ FIN.transacoes = () => {
     ${per === 'custom' ? `<input type="date" value="${a}" data-uiv="txFrom" aria-label="De"><input type="date" value="${b}" data-uiv="txTo" aria-label="Até">` : ''}
     <select data-uif="txf.type" aria-label="Tipo"><option value="">Todos os tipos</option>${['Despesa', 'Receita', 'Transferência'].map(x => `<option${f.type === x ? ' selected' : ''}>${x}</option>`).join('')}</select>
     <select data-uif="txf.cat" aria-label="Categoria"><option value="">Todas as categorias</option>${allCats.map(x => `<option${f.cat === x ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select>
-    <select data-uif="txf.account" aria-label="Conta"><option value="">Todas as contas</option>${OS.all('accounts').map(x => `<option value="${x.id}"${f.account === x.id ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
+    <select data-uif="txf.account" aria-label="Conta"><option value="">Todas as contas</option>${OS.all('accounts').map(x => `<option value="${x.id}"${f.account === x.id ? ' selected' : ''}>${esc(L.accLabel(x))}</option>`).join('')}</select>
     <select data-uif="txf.method" aria-label="Forma de pagamento"><option value="">Todas as formas</option>${L.METHOD.map(x => `<option${f.method === x ? ' selected' : ''}>${x}</option>`).join('')}</select>
     ${tags.length ? `<select data-uif="txf.tag" aria-label="Tag"><option value="">Todas as tags</option>${tags.map(x => `<option${f.tag === x ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select>` : ''}
     <input type="search" placeholder="Procurar…" value="${esc(f.q || '')}" data-uif="txf.q" aria-label="Procurar"></div>
@@ -69,13 +71,18 @@ FIN.transacoes = () => {
     { l: 'Tags', v: x => (x.tags || []).map(g => UI.badge(g, 'out')).join(' ') },
     { l: 'Valor', cls: 'r', v: x => x.type === 'Transferência' ? `<span class="mono mut">${U.eur(x.amount)}</span>` : money(txSign(x)), s: x => txSign(x) }] })}`;
 };
+// juntar uma conta de um banco com um toque (abre o formulário já com o banco e a moeda)
+FIN.banks = (acc, title = 'Juntar conta de um banco') => { const have = new Set((acc || []).map(a => (L.bank(a.inst) || [])[0]).filter(Boolean));
+  return `<div class="pn bk-add"><div class="pn-h"><h3>${title}</h3><span class="mut" style="font-size:12px">ou escreve outro em "Nova conta"</span></div><div class="bk-chips">${L.BANKS.map(([n, c, cur]) => `<button type="button" class="chip ${have.has(n) ? 'on' : ''}" data-new="accounts" data-defs='${esc(JSON.stringify({ inst: n, name: 'Conta à ordem', type: 'Conta à ordem', currency: cur }))}'><i class="bk-dot" style="background:${c}" aria-hidden="true"></i>${esc(n)}</button>`).join('')}</div></div>`; };
+OS.FinBanks = FIN.banks;
 FIN.contas = () => {
   const acc = OS.all('accounts');
   return `<div class="row between"><div class="kpis grow">${UI.kpi('Disponível', U.eur(Fin.liquid()))}${UI.kpi('Reservas', U.eur(Fin.reserve()))}${UI.kpi('Cartões (em dívida)', U.eur(Fin.cardDebt()), '', { tone: Fin.cardDebt() ? 'warn' : '' })}${UI.kpi('Total em contas', U.eur(Fin.cashTotal()))}</div></div>
   <div class="row gap8">${UI.addBtn('accounts', 'Nova conta')}${UI.addBtn('transactions', 'Transferência', { type: 'Transferência' }, '')}</div>
+  ${FIN.banks(acc)}
   ${UI.table({ key: 'acc', coll: 'accounts', rows: acc, cols: [
-    { l: 'Conta', v: a => `<b style="font-weight:530">${esc(a.name)}</b>${a.archived ? ' ' + UI.badge('arquivada') : ''}`, s: a => a.name },
-    { l: 'Tipo', v: a => esc(a.type) }, { l: 'Instituição', v: a => esc(a.inst || '') }, { l: 'Moeda', v: a => a.currency || 'EUR' },
+    { l: 'Conta', v: a => `${bankDot(a)}<b style="font-weight:530">${esc(L.accLabel(a))}</b>${a.archived ? ' ' + UI.badge('arquivada') : ''}`, s: a => L.accLabel(a) },
+    { l: 'Tipo', v: a => esc(a.type) }, { l: 'Banco', v: a => esc(a.inst || '') }, { l: 'Moeda', v: a => a.currency || 'EUR' },
     { l: 'Movimentos', cls: 'r', v: a => `<span class="mono">${OS.all('transactions').filter(t => t.account === a.id || t.toAccount === a.id).length}</span>` },
     { l: 'Saldo', cls: 'r', v: a => { const b = Fin.accBal(a); return a.type === 'Cartão de crédito' ? `<span class="mono ${b < 0 ? 'warn' : ''}">${U.eur(b)}</span>${U.num(a.limit) ? `<div style="width:120px;margin-left:auto;margin-top:4px">${UI.bar(-b / U.num(a.limit), -b / U.num(a.limit) > .8 ? 'neg' : 'warn')}</div>` : ''}` : `<span class="mono ${b < 0 ? 'neg' : ''}">${U.eur(b)}</span>`; }, s: a => Fin.accBal(a) }] })}
   <div class="note">Cartão de crédito: as compras no cartão ficam como despesas na conta do cartão (saldo negativo). Pagar a fatura = transferência da conta à ordem para o cartão. Corretora: compras de ativos em Investimentos debitam a conta escolhida.</div>`;
@@ -117,7 +124,7 @@ FIN.dividas = () => {
   ${D.length ? `<div class="pn">${D.map(d => { const bal = Fin.debtBal(d), paid = U.num(d.principal) - bal, n = payoff(d); return `<div class="gcard"><div class="click" data-edit="debts:${d.id}" style="cursor:pointer"><b>${esc(d.name)}</b><div class="gmeta">${UI.badge(d.kind, 'out')}${d.creditor ? `<span>${esc(d.creditor)}</span>` : ''}${U.num(d.rate) ? `<span>${d.rate}% ao ano</span>` : ''}${U.num(d.installment) ? `<span>prestação ${U.eur(d.installment)}${d.dueDay ? ' · dia ' + d.dueDay : ''}</span>` : ''}${n != null && bal > 0 ? `<span class="est">estimativa</span><span>${n === Infinity ? 'a prestação não cobre os juros' : `liquidada em ~${n} meses`}</span>` : ''}</div></div>
     <div class="gp"><span class="num">${U.eur(bal)} <span class="mut">em dívida</span></span>${UI.bar(U.num(d.principal) ? paid / U.num(d.principal) : 0, 'pos')}${bal > 0 ? `<button class="btn xs" data-act="payDebt" data-id="${d.id}">Registar pagamento</button>` : UI.badge('liquidada', 'pos')}</div></div>`; }).join('')}</div>` : UI.empty('Sem dívidas registadas.')}
   ${instG.length ? `<div class="pn"><div class="pn-h"><h3>Compras parceladas em curso</h3></div>${instG.map(g => { const f = g[0]; return `<div class="li"><div class="li-t"><b>${esc(f.desc || f.cat)}</b><small>${g.length} parcela(s) por pagar · próxima ${U.fmtDS(U.sortBy(g, x => x.date)[0].date)}</small></div><span class="mono">${U.eur(U.sum(g, x => x.amount))}</span></div>`; }).join('')}</div>` : ''}
-  ${cards.length ? `<div class="pn"><div class="pn-h"><h3>Cartões com saldo em dívida</h3></div>${cards.map(a => `<div class="li"><div class="li-t"><b>${esc(a.name)}</b><small>${a.dueDay ? 'pagamento dia ' + a.dueDay : ''}</small></div><span class="mono warn">${U.eur(-Fin.accBal(a))}</span><button class="btn xs" data-new="transactions" data-defs='${esc(JSON.stringify({ type: 'Transferência', toAccount: a.id, amount: U.r2(-Fin.accBal(a)), desc: 'Pagamento ' + a.name }))}'>Pagar fatura</button></div>`).join('')}</div>` : ''}`;
+  ${cards.length ? `<div class="pn"><div class="pn-h"><h3>Cartões com saldo em dívida</h3></div>${cards.map(a => `<div class="li"><div class="li-t"><b>${bankDot(a)}${esc(L.accLabel(a))}</b><small>${a.dueDay ? 'pagamento dia ' + a.dueDay : ''}</small></div><span class="mono warn">${U.eur(-Fin.accBal(a))}</span><button class="btn xs" data-new="transactions" data-defs='${esc(JSON.stringify({ type: 'Transferência', toAccount: a.id, amount: U.r2(-Fin.accBal(a)), desc: 'Pagamento ' + a.name }))}'>Pagar fatura</button></div>`).join('')}</div>` : ''}`;
 };
 A.payDebt = b => { const d = OS.get('debts', b.dataset.id); if (!d) return; UI.openForm('transactions', null, { type: 'Despesa', debt: d.id, amount: U.num(d.installment) || '', desc: 'Prestação · ' + d.name, cat: 'Dívidas', sub: 'Prestação' }); };
 FIN.inteligencia = () => {

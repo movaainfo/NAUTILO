@@ -888,3 +888,19 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .set-h{margin:18px 2px 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
 .set-h:first-child{margin-top:4px}
 .set-page>.pn{margin-bottom:14px}
+/* Hábitos: a coluna dos nomes tem largura própria e fica fixa à esquerda ao deslizar os dias;
+   o nome quebra em duas linhas e as etiquetas (inegociável, auto) ficam por baixo, nunca por cima dos quadrados */
+.hab-tbl{min-width:0}
+.hab-tbl col.n{width:210px}
+.hab-tbl .hab-n{position:sticky;left:0;z-index:2;background:var(--pn);white-space:normal;min-width:0;box-shadow:6px 0 10px -8px rgba(0,0,0,.6)}
+.hab-tbl .hab-n b{display:block;font-weight:520;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hab-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.hab-tags .bdg{font-size:10.5px;padding:1px 6px}
+@media (max-width:600px){.hab-tbl col.n{width:138px}.hab-tbl .hab-n{padding-left:12px;padding-right:8px}.hab-tbl .hab-n b{font-size:13px}}
+.hab-tbl col.s{width:58px}
+.hab-tbl tbody tr:hover td.hab-n{background:var(--pn)}
+.hab-mst{display:none;color:var(--mut);font-size:11px;white-space:nowrap}
+/* no telemóvel: a sequência e os 30 dias passam para baixo do nome, para caberem mais dias à vista */
+@media (max-width:600px){.hab-tbl col.s{width:0}.hab-tbl .hab-s{display:none}.hab-mst{display:block;width:100%}.hab-tbl col.c{width:38px}}
+/* Finanças: bancos */
+.bk-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.bk-chips{display:flex;flex-wrap:wrap;gap:6px}.bk-chips .chip{display:inline-flex;align-items:center}

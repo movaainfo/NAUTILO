@@ -1,8 +1,11 @@
 {
- "n": 107,
- "hash": "92bc46cda6b3",
+ "n": 108,
+ "hash": "5e0e3cf86a74",
  "notes": [
-  "E-mail → LinkedIn: as notificações abrem dentro da app (no leitor), em vez de saírem para o Gmail. Tocar na própria notificação também abre."
+  "\"Ver mais\" e \"Mostrar mais\" voltam a funcionar em toda a app (abrem logo os itens escondidos).",
+  "Hábitos no iPhone: os nomes ficam numa coluna fixa e as etiquetas por baixo, sem tapar os quadrados dos dias; cabem mais dias à vista.",
+  "Horário do trabalho por foto: a lista \"Confirma o que a IA leu\" mostra todos os dias (sem \"Ver mais\").",
+  "Finanças: cada conta tem o banco (BTG, Santander, Revolut, Caixa Geral, Wise, Nubank…). Ao registar um gasto vês \"Revolut · Conta à ordem\"; em Contas e no Gasto rápido crias a conta de um banco com um toque."
  ],
  "date": "12/10/2026"
 }

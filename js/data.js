@@ -16,6 +16,11 @@ L.GCAT = ['Finanças', 'Estudos', 'Academia', 'Corrida', 'Trabalho', 'Empresa', 
 L.PTYPE = ['Acadêmico', 'Financeiro', 'Profissional', 'Empresarial', 'Pessoal', 'Aprendizagem'];
 L.PSTAT = ['Ideia', 'Planejado', 'Em andamento', 'Pausado', 'Concluído', 'Cancelado'];
 L.ACCT = ['Conta à ordem', 'Poupança', 'Reserva', 'Dinheiro', 'Cartão de crédito', 'Corretora', 'Outro'];
+// bancos mais usados (Portugal, Brasil e digitais): nome, cor da marca (para o ponto), moeda habitual
+L.BANKS = [['Caixa Geral de Depósitos', '#0067A6', 'EUR'], ['Millennium BCP', '#D1005D', 'EUR'], ['Santander', '#EC0000', 'EUR'], ['Novo Banco', '#00A3AD', 'EUR'], ['BPI', '#F26C21', 'EUR'], ['ActivoBank', '#7AB800', 'EUR'], ['Crédito Agrícola', '#00843D', 'EUR'], ['Montepio', '#1F5FA8', 'EUR'], ['Banco CTT', '#E30613', 'EUR'], ['Moey!', '#FF5A5F', 'EUR'], ['Revolut', '#3D7BF7', 'EUR'], ['Wise', '#9FE870', 'EUR'], ['N26', '#36A18B', 'EUR'], ['BTG Pactual', '#2B5DA8', 'BRL'], ['Nubank', '#820AD1', 'BRL'], ['Itaú', '#EC7000', 'BRL'], ['Bradesco', '#CC092F', 'BRL'], ['Banco do Brasil', '#F5D90A', 'BRL'], ['Caixa Econômica Federal', '#005CA9', 'BRL'], ['Inter', '#FF7A00', 'BRL'], ['C6 Bank', '#8C8C8C', 'BRL'], ['Mercado Pago', '#00B1EA', 'BRL'], ['PicPay', '#21C25E', 'BRL'], ['XP Investimentos', '#B8B8B8', 'BRL'], ['PayPal', '#2D6FD2', 'EUR'], ['Trading 212', '#00A8E8', 'EUR']];
+L.bank = s => { const n = String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); if (!n) return null; return L.BANKS.find(b => { const k = b[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); return k === n || k.split(' ')[0] === n.split(' ')[0] && n.split(' ')[0].length >= 3 || (n === 'cgd' && k.startsWith('caixa geral')) || (n === 'bb' && k === 'banco do brasil') || (n === 'btg' && k.startsWith('btg')); }) || null; };
+// como uma conta aparece em toda a app: "Banco · nome" (sem repetir o banco se já estiver no nome)
+L.accLabel = a => { if (!a) return ''; const nm = a.name || '', b = String(a.inst || '').trim(); if (!b) return nm; const k = b.toLowerCase().split(' ')[0]; return nm.toLowerCase().includes(k) ? nm : b + ' · ' + nm; };
 L.METHOD = ['Débito', 'Crédito', 'MB WAY', 'Multibanco', 'Transferência', 'Débito direto', 'Dinheiro', 'PayPal'];
 L.CUR = ['EUR', 'USD', 'BRL', 'GBP', 'CHF', 'CAD', 'JPY'];
 L.ACLS = ['Ação', 'ETF', 'FII', 'REIT', 'BDR', 'Fundo', 'PPR', 'Previdência', 'Obrigação', 'Título público', 'Tesouro Direto', 'Certificados de Aforro', 'Certificados do Tesouro', 'Depósito a prazo', 'CDB', 'LCI/LCA', 'LC', 'Debênture', 'CRI/CRA', 'Poupança', 'Cripto', 'Commodity', 'Ouro', 'Imóvel', 'Crowdlending/P2P', 'Opção', 'Futuro', 'CFD', 'Caixa em moeda estrangeira', 'Outro'];
@@ -116,8 +121,8 @@ S.decisions = { label: 'Decisão', title: r => r.title, fields: [
 ], defaults: () => ({ status: 'Em análise', alts: [], alpha: {}, weights: { cost: 3, benefit: 4, risk: 3, time: 2, fin: 3, goals: 5, routine: 2 } }) };
 
 /* ---- Finanças ---- */
-S.accounts = { label: 'Conta', title: r => r.name, fields: [
-  F('name', 'Nome', 'text', { req: 1 }), F('type', 'Tipo', 'sel', { o: L.ACCT, req: 1 }), F('inst', 'Instituição'),
+S.accounts = { label: 'Conta', title: r => L.accLabel(r), fields: [
+  F('inst', 'Banco', 'text', { list: () => L.BANKS.map(b => b[0]), ph: 'Ex.: Revolut, Santander, BTG, Caixa Geral, Wise' }), F('name', 'Nome da conta', 'text', { req: 1, ph: 'Ex.: Conta à ordem, Cartão, Poupança' }), F('type', 'Tipo', 'sel', { o: L.ACCT, req: 1 }),
   F('opening', 'Saldo inicial', 'money'), F('openDate', 'Data do saldo inicial', 'date'), F('currency', 'Moeda', 'sel', { o: L.CUR }),
   F('limit', 'Limite do cartão', 'money', { show: r => r.type === 'Cartão de crédito' }), F('dueDay', 'Dia de pagamento', 'num', { show: r => r.type === 'Cartão de crédito' }),
   F('archived', 'Arquivada', 'bool')

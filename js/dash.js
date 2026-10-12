@@ -2,7 +2,7 @@
    dinheiro, agenda, tarefas, corpo, dieta, estudos e jogo. */
 (() => {
 'use strict';
-const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc;
+const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, L = OS.L, esc = U.esc;
 const Fin = OS.Fin, Cal = OS.Cal;
 const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
@@ -71,7 +71,7 @@ V.gasto = sub => { const pre = U.num(String(sub || '').replace(',', '.')) || '',
     <label class="qg-amt"><span>€</span><input name="amount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0,00" aria-label="Valor" value="${pre}" required autofocus></label>
     <input class="field qg-desc" name="desc" placeholder="O que compraste? (opcional)" list="qg_dl" aria-label="Descrição"><datalist id="qg_dl">${[...new Set(OS.all('transactions').map(t => t.desc).filter(Boolean))].slice(-40).map(d => `<option value="${esc(d)}">`).join('')}</datalist>
     <div class="qg-l">Categoria</div><div class="qg-chips">${cats.map((c, i) => `<label><input type="radio" name="cat" value="${esc(c)}" ${(q.cat ? q.cat === c : i === 0) ? 'checked' : ''}><span>${esc(c)}</span></label>`).join('')}</div>
-    <div class="qg-l">Pago com</div><div class="qg-chips">${accs.map(a => `<label><input type="radio" name="acc" value="${a.id}" ${a.id === acc ? 'checked' : ''}><span>${esc(a.name)}</span></label>`).join('') || '<a class="btn sm" href="#financas.contas">Criar conta primeiro</a>'}</div>
+    <div class="qg-l">Pago com</div><div class="qg-chips">${accs.map(a => `<label><input type="radio" name="acc" value="${a.id}" ${a.id === acc ? 'checked' : ''}><span>${(() => { const b = L.bank(a.inst); return b ? `<i class="bk-dot" style="background:${b[1]}" aria-hidden="true"></i>` : ''; })()}${esc(L.accLabel(a))}</span></label>`).join('') || `<small class="mut" style="display:block;margin-bottom:6px">Ainda não tens contas: toca no teu banco para a criar.</small><div class="bk-chips">${L.BANKS.slice(0, 16).map(([n, c, cur]) => `<button type="button" class="chip" data-new="accounts" data-defs='${esc(JSON.stringify({ inst: n, name: 'Conta à ordem', type: 'Conta à ordem', currency: cur }))}'><i class="bk-dot" style="background:${c}" aria-hidden="true"></i>${esc(n)}</button>`).join('')}</div>`}</div>
     <div class="qg-row"><label class="qg-tg"><input type="checkbox" name="sup"> Supérfluo</label><input class="field" type="date" name="date" value="${today}" aria-label="Data"></div>
     <button class="btn pri qg-go" ${accs.length ? '' : 'disabled'}>${UI.ic('plus')}Registar gasto</button></form>
   ${last.length ? `<div class="qg-last"><div class="qg-l">Últimos</div>${last.map(t => `<div class="li" data-edit="transactions:${t.id}" style="cursor:pointer"><div class="li-t"><b>${esc(t.desc || t.cat || 'Despesa')}</b><small>${U.fmtDS(t.date)} · ${esc(t.cat || '')}</small></div><span class="mono">${U.eur(t.amount)}</span></div>`).join('')}</div>` : ''}

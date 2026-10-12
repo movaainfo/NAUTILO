@@ -1162,6 +1162,28 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Definições → Spyke: sem a Parte 4 o estado leva-te ao botão de copiar', await E(p, () => !!document.querySelector('#spyState a[href="#definicoes.script"]')));
   await E(p, () => location.hash = 'definicoes'); await sleep(600);
   ok('Definições → Geral: mantém perfil, segurança, sincronização e atalho', await E(p, () => !!document.getElementById('syncPn') && !!document.getElementById('inboxPn') && !document.getElementById('spyState') && /Perfil/.test(document.getElementById('view').innerText) && document.querySelectorAll('#view .tabs').length === 1 && document.querySelectorAll('#view h1').length === 1));
+  // "Ver mais": o botão mostra logo o que estava escondido (a página não é redesenhada se não mudou)
+  await E(p, () => { OS.views.zzteste = () => OS.UI.head('Teste', '') + '<div class="pn"><div class="list">' + Array.from({ length: 7 }, (_, i) => '<div class="li"><div class="li-t"><b>Dia ' + (i + 1) + '</b></div></div>').join('') + '</div></div>'; location.hash = 'zzteste'; }); await sleep(600);
+  const vm0 = await E(p, () => { const b = document.querySelector('#view .list .pg-more'); return b ? b.textContent + '|' + document.querySelectorAll('#view .list .pg-hide').length : ''; });
+  await p.click('#view .list .pg-more'); await sleep(300);
+  ok('"Ver mais": tocar mostra os itens escondidos na hora', vm0 === 'Ver mais 2|2' && await E(p, () => !document.querySelector('#view .list .pg-hide') && !document.querySelector('#view .list .pg-more')), vm0);
+  // hábitos no iPhone: os nomes e as etiquetas nunca ficam por cima dos quadrados dos dias
+  await E(p, () => { ['Acordar à hora, sem snooze', '2 blocos de estudo (100 min)'].forEach((n, i) => OS.add('habits', { name: n, core: true, auto: i ? 'estudo' : '', active: true, freq: 'Diário' })); location.hash = 'habitos'; }); await sleep(700);
+  const hb = await E(p, () => { const rows = [...document.querySelectorAll('.hab-tbl tbody tr')]; let over = 0; rows.forEach(r => { const n = r.querySelector('.hab-n'), nr = n.getBoundingClientRect().right; [...n.querySelectorAll('b, .bdg')].forEach(e => { if (e.getBoundingClientRect().right > nr + 1) over++; }); }); const t = document.querySelector('.hab-tbl tbody tr button.hab-b'); return { over, rows: rows.length, today: !!t && t.getBoundingClientRect().right <= innerWidth, page: document.documentElement.scrollWidth <= innerWidth + 1 }; });
+  ok('Hábitos (iPhone): nomes e etiquetas cabem na coluna, o dia de hoje está à vista e a página não sai para o lado', hb.rows >= 2 && !hb.over && hb.today && hb.page, JSON.stringify(hb));
+  // Finanças: cada conta tem o banco (BTG, Santander, Revolut, Caixa Geral, Wise…) e aparece como "Banco · conta"
+  await E(p, () => location.hash = 'financas.contas'); await sleep(600);
+  const bk = await E(p, () => [...document.querySelectorAll('#view .bk-add .chip')].map(c => c.textContent.trim()));
+  ok('Finanças: botões para juntar conta por banco (BTG, Santander, Revolut, Caixa Geral, Wise)', ['BTG Pactual', 'Santander', 'Revolut', 'Caixa Geral de Depósitos', 'Wise'].every(n => bk.includes(n)), bk.slice(0, 8).join(', '));
+  await p.click('#view .bk-add .chip:has-text("Revolut")'); await sleep(500);
+  ok('Finanças: tocar no banco abre a nova conta já com o banco', await E(p, () => { const f = document.querySelector('#osform'); return !!f && f.elements.inst.value === 'Revolut' && f.elements.name.value === 'Conta à ordem'; }));
+  await E(p, () => document.querySelector('#osform').requestSubmit()); await sleep(500);
+  const rv = await E(p, () => { const a = OS.all('accounts').find(x => x.inst === 'Revolut'); return a ? { lab: OS.L.accLabel(a), id: a.id } : null; });
+  ok('Finanças: a conta fica "Revolut · Conta à ordem"', !!rv && rv.lab === 'Revolut · Conta à ordem', JSON.stringify(rv));
+  await E(p, () => OS.UI.openForm('transactions', null, { type: 'Despesa' })); await sleep(400);
+  ok('Finanças: ao registar um gasto, a conta mostra o banco', await E(p, () => [...document.querySelectorAll('#osform [name=account] option')].some(o => o.textContent === 'Revolut · Conta à ordem')));
+  await E(p, () => { OS.UI.closeDrawer && OS.UI.closeDrawer(); OS.UI.closeModal && OS.UI.closeModal(); location.hash = 'gasto'; }); await sleep(500);
+  ok('Gasto rápido: "Pago com" mostra o banco de cada conta', await E(p, () => [...document.querySelectorAll('#view .qg-chips span')].some(s => /Revolut · Conta à ordem/.test(s.textContent))));
   // toda a configuração vive nas Definições: nenhuma página tem passos, chaves ou botões de ligar serviços
   const CFG = '[data-aikey], .ai-steps, .ib-w, .ib-steps, .fb-guide, [data-act=gcalOn], [data-act=gcalOff], [data-act=qgStart], [data-bind="invcfg.fh"], [data-act=olAuth], [data-form=olDom], [data-act=invNotif], [data-act=fbApp], [data-bind="focusblk.sc"], #quotesSet, #alertSet, #runSet';
   const pages = await E(p, () => [...new Set([...document.querySelectorAll('#side a[href^="#"], .tn-dd a[href^="#"]')].map(a => a.getAttribute('href').slice(1)).filter(h => h && !/^definicoes/.test(h)))]);

@@ -57,7 +57,9 @@ function renderTab(cur) {
 }
 A.tnToggle = b => { const g = b.closest('.tn-g'), open = g.classList.contains('open'); document.querySelectorAll('.tn-g.open').forEach(x => x.classList.remove('open')); if (!open) g.classList.add('open'); };
 document.addEventListener('click', e => { if (!e.target.closest('.tn-g')) document.querySelectorAll('.tn-g.open').forEach(x => x.classList.remove('open')); });
-/* ---------- revelação progressiva: poucas secções de cada vez ---------- */
+/* ---------- revelação progressiva: poucas secções de cada vez ----------
+   Os botões "Mostrar mais"/"Ver mais" mostram logo o que estava escondido: o render não redesenha uma página igual,
+   por isso não basta guardar a escolha. */
 const SKIP = ['dominus', 'definicoes', 'explorar'];
 function progressive(cur, raw) {
   if (SKIP.includes(cur)) return; const view = U.$('#view'); let root = view; while (root.children.length === 1 && root.firstElementChild.children.length > 1) root = root.firstElementChild;
@@ -65,8 +67,8 @@ function progressive(cur, raw) {
   // só recolhe o que fica abaixo do primeiro ecrã: cabeçalho, separadores e o conteúdo principal ficam sempre visíveis
   if (!open && kids.length > 3) { const top0 = root.getBoundingClientRect().top, lim = Math.max(900, innerHeight * 1.25);
     const cut = kids.findIndex((el, i) => i >= 3 && !el.matches('.phead,.tabs') && el.getBoundingClientRect().top - top0 > lim);
-    if (cut > 0 && kids.length - cut >= 2) { kids.slice(cut).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more'; b.innerHTML = `Mostrar mais <small>${kids.length - cut}</small>`; b.onclick = () => { OS.setUI(key, true); }; root.appendChild(b); } }
-  view.querySelectorAll('.list').forEach((l, i) => { const items = [...l.children]; if (items.length <= 6 || OS.ui['more_list_' + raw + i]) return; items.slice(5).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more sm'; b.textContent = `Ver mais ${items.length - 5}`; b.onclick = () => OS.setUI('more_list_' + raw + i, true); l.appendChild(b); });
+    if (cut > 0 && kids.length - cut >= 2) { kids.slice(cut).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more'; b.innerHTML = `Mostrar mais <small>${kids.length - cut}</small>`; b.onclick = () => { kids.forEach(el => el.classList.remove('pg-hide')); b.remove(); OS.setUI(key, true); }; root.appendChild(b); } }
+  view.querySelectorAll('.list:not([data-all])').forEach((l, i) => { const items = [...l.children]; if (items.length <= 6 || OS.ui['more_list_' + raw + i]) return; items.slice(5).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more sm'; b.textContent = `Ver mais ${items.length - 5}`; b.onclick = () => { items.forEach(el => el.classList.remove('pg-hide')); b.remove(); OS.setUI('more_list_' + raw + i, true); }; l.appendChild(b); });
 }
 /* ---------- render principal com preservação de foco ---------- */
 let lastRoute = '';
