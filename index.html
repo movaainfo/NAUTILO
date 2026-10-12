@@ -2232,6 +2232,14 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .me-pl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}.me-pi{display:flex;flex-direction:column;gap:4px;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--tx);cursor:pointer}.me-pi small{color:var(--mut)}
 @media (max-width:600px){.me-toc ol{columns:1}}
 .me-psel{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}.me-psel span{font-size:13px;color:var(--mut)}.me-psel select{flex:1;min-width:200px}
+/* ficheiros na nuvem (Universidade e Cursos) */
+.f-up{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:90;background:var(--pn,#16181d);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-width:240px;max-width:min(92vw,420px);box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:4px}
+.f-up b{display:flex;align-items:center;gap:6px;font-size:13px}.f-up small{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f-up i{display:block;height:5px;border-radius:4px;background:var(--line);overflow:hidden}.f-up i span{display:block;height:100%;background:var(--accent);transition:width .3s}
+.f-sum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;font-size:13px;color:var(--mut)}.f-sum>span{display:inline-flex;align-items:center;gap:6px;margin-right:auto}.f-sum b{color:var(--tx)}
+.f-li .f-act{flex-shrink:0}.f-li .li-t{min-width:0}.f-li .li-t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.f-list{margin:4px 0 8px}.cu-f{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.cu-f .tog{width:100%}
+@media (max-width:560px){.f-li .f-act .icon-btn[data-edit]{display:none}}
 
 </style>
 <style>
@@ -2463,7 +2471,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.9", "date": "12/10/2026", "notes": ["Biografia nível livro: a Entrevista passou de 25 para mais de 200 perguntas, organizadas como capítulos (raízes, infância, pai e mãe, escola, adolescência, fé, Brasil, a partida, Portugal, universidade, trabalho, empresa, amigos, amor, dinheiro, corpo, momentos marcantes, quem sou hoje, viagens, sonhos). As tuas respostas antigas ficam.", "Entrevistador: uma pergunta de cada vez, com botão Ditar; depois de cada resposta a IA faz perguntas de seguimento sobre essa história, por isso a entrevista não tem fim.", "O livro é escrito capítulo a capítulo, longo e só com o que contaste (sem inventar), com índice, palavras e páginas. Se a app fechar a meio, \"Continuar a escrever\" segue de onde parou. \"Atualizar\" reescreve só os capítulos com coisas novas.", "Livro para imprimir ou guardar em PDF (formato A5, com índice e capítulos)."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.10", "date": "12/10/2026", "notes": ["Spyke de uma vez por todas: ouve sempre desde que abres a app, sem tocar no microfone, e só responde quando dizes o nome dele, antes ou depois do pedido (\"Spyke, bom dia\" ou \"Bom dia, Spyke\" dão o resumo do dia). Se disseres só \"Spyke\", fica à espera do pedido sem falar.", "Spyke: o microfone descansa enquanto ele fala (acabou o eco, a voz travada e o \"só repete o nome\"), e o pedido é sempre executado.", "Ligações verificadas entre todas as áreas: projetos ↔ tarefas ↔ metas, agenda, finanças, hábitos, treino e universidade. As Metas mostram o projeto ligado e há a medida nova \"% das tarefas e projetos ligados\"; o Hoje mostra o dinheiro gasto no dia; metas com categoria própria (ex.: Pessoal) voltaram a aparecer.", "Ficheiros na nuvem: em Universidade → Materiais e em Cursos guardas PDFs, slides e documentos no TEU Google Drive (pasta \"Oceanum · Ficheiros\", uma subpasta por disciplina e por curso). Depois podes apagá-los do aparelho: abrem-se daqui em qualquer aparelho. Precisa da Parte 5 do script (Definições → Script Google).", "Importar da B3: Investimentos → Movimentos → \"Importar da B3\". Lê os Excel de Negociação, Movimentação e Posição da Área do Investidor e cria ativos e movimentos (compras, vendas, dividendos, JCP, rendimentos de FII, bonificações, desdobramentos, Tesouro) sem duplicar, e confere com a posição da B3."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -3186,7 +3194,7 @@ L.RUNT = ['Regenerativa', 'Rodagem', 'Longa', 'Fartlek', 'Intervalado', 'Tempo /
 L.WEEK = [['1', 'Segunda'], ['2', 'Terça'], ['3', 'Quarta'], ['4', 'Quinta'], ['5', 'Sexta'], ['6', 'Sábado'], ['0', 'Domingo']];
 L.TRACK = ['Conteúdos', 'Estudo', 'Exercícios', 'Projeto', 'Avaliação', 'Domínio'];
 L.SEM = ['1.º Semestre 26/27', '2.º Semestre 26/27', '1.º Semestre 27/28', '2.º Semestre 27/28', '1.º Semestre 28/29', '2.º Semestre 28/29', 'Por definir'];
-L.METRICS = [['manual', 'Manual (atualizo eu)'], ['account', 'Saldo de uma conta'], ['networth', 'Patrimônio líquido'], ['invested', 'Valor da carteira'], ['studyHours', 'Horas de estudo (desde o início)'], ['avgGrade', 'Média ponderada das disciplinas'], ['runKm', 'Km corridos (desde o início)'], ['run5k', 'Melhor tempo em 5 km (min)'], ['workouts', 'Treinos (desde o início)'], ['books', 'Livros concluídos (desde o início)'], ['movaRevenue', 'Receita da Mova (desde o início)'], ['contacts', 'Contactos na rede'], ['certs', 'Certificações concluídas'], ['steps', '% das etapas concluídas']];
+L.METRICS = [['manual', 'Manual (atualizo eu)'], ['account', 'Saldo de uma conta'], ['networth', 'Patrimônio líquido'], ['invested', 'Valor da carteira'], ['studyHours', 'Horas de estudo (desde o início)'], ['avgGrade', 'Média ponderada das disciplinas'], ['runKm', 'Km corridos (desde o início)'], ['run5k', 'Melhor tempo em 5 km (min)'], ['workouts', 'Treinos (desde o início)'], ['books', 'Livros concluídos (desde o início)'], ['movaRevenue', 'Receita da Mova (desde o início)'], ['contacts', 'Contactos na rede'], ['certs', 'Certificações concluídas'], ['steps', '% das etapas concluídas'], ['linked', '% das tarefas e projetos ligados a esta meta']];
 L.QUOTES = ["A dor da disciplina pesa gramas. A dor do arrependimento pesa toneladas.", "Ninguém vem te salvar. Ou você se levanta, ou continua exatamente onde está.", "Não é falta de tempo. É falta de prioridade.", "A prova não é o dia do exame. A prova é cada dia antes dele.", "Quem não revê, esquece. Quem esquece, estudou para nada.", "Quem não controla o dinheiro é controlado por ele.", "Rico não é quem ganha muito. É quem gasta menos do que ganha, durante muito tempo.", "Cada compra por impulso é um voto contra o teu futuro.", "Ninguém se arrepende de um treino. Todos se arrependem de faltar.", "Tu não és o que dizes que vais fazer. És o que fazes quando ninguém está a ver.", "Motivação faz-te começar. Hábito faz-te continuar.", "Um dia ou dia um. Tu decides.", "Tu não sobes ao nível dos teus objetivos; desces ao nível da tua rotina.", "O Ryan de daqui a 5 anos está a ver o que fazes hoje.", "Sê implacável com as tuas desculpas e paciente com o teu progresso.", "Enquanto Deus continuar a te despertar a cada manhã, é porque Ele ainda tem planos para a sua vida.", "Não vos conformeis com este século, mas transformai-vos pela renovação da vossa mente.", "Disciplina ou arrependimento. Escolha a sua dor.", "Consistência supera intensidade.", "Ascensão é obrigatória. Estagnação não é opção."];
 
 /* ================= SINGLETONS ================= */
@@ -3254,7 +3262,7 @@ S.goals = { label: 'Meta', title: r => r.title, fields: [
   F('title', 'Meta', 'text', { req: 1, wide: 1 }), F('cat', 'Categoria', 'sel', { o: L.GCAT, req: 1 }), F('horizon', 'Horizonte', 'sel', { o: L.HORIZON, req: 1 }),
   F('start', 'Início', 'date'), F('due', 'Prazo', 'date'), F('importance', 'Importância', 'rating'),
   F('metric', 'Como medir', 'sel', { o: L.METRICS, req: 1 }), rel('account', 'Conta', 'accounts', { show: r => r.metric === 'account' }),
-  F('target', 'Alvo', 'num', { show: r => r.metric !== 'steps' }), F('base', 'Valor inicial', 'num', { show: r => r.metric === 'manual' || r.metric === 'run5k', h: 'Ponto de partida' }),
+  F('target', 'Alvo', 'num', { show: r => r.metric !== 'steps' && r.metric !== 'linked' }), F('base', 'Valor inicial', 'num', { show: r => r.metric === 'manual' || r.metric === 'run5k', h: 'Ponto de partida' }),
   F('cur', 'Valor atual', 'num', { show: r => r.metric === 'manual' }), F('unit', 'Unidade', 'text', { show: r => r.metric === 'manual', ph: 'ex.: livros, €, kg' }),
   F('status', 'Estado', 'sel', { o: ['Ativa', 'Pausada', 'Concluída', 'Abandonada'] }),
   F('steps', 'Etapas', 'steps'), F('why', 'Porquê', 'area', { rows: 2 })
@@ -3751,11 +3759,14 @@ Goal.value = g => {
     case 'contacts': return OS.all('contacts').length;
     case 'certs': return OS.all('learn').filter(l => l.kind === 'Certificação' && l.status === 'Concluído').length + OS.all('certs').filter(c => c.status === 'Obtida').length;
     case 'steps': { const s = g.steps || []; return s.length ? U.r1(s.filter(x => x.done).length / s.length * 100) : 0; }
+    // progresso pelas tarefas e projetos ligados à meta (tarefas de um projeto já ligado contam dentro do projeto)
+    case 'linked': { const P = OS.all('projects').filter(x => x.goal === g.id && x.status !== 'Cancelado'), inP = new Set(P.map(x => x.id)), T = OS.all('tasks').filter(t => t.goal === g.id && !inP.has(t.project));
+      const v = T.map(t => t.status === 'Feita' ? 1 : 0).concat(P.map(x => x.status === 'Concluído' ? 1 : OS.Proj.info(x).prog)); return v.length ? U.r1(U.avg(v) * 100) : 0; }
     default: return U.num(g.cur);
   }
 };
 Goal.info = g => {
-  const cur = Goal.value(g), tgt = g.metric === 'steps' ? 100 : U.num(g.target);
+  const cur = Goal.value(g), tgt = g.metric === 'steps' || g.metric === 'linked' ? 100 : U.num(g.target);
   let p;
   if (Goal.lower(g)) { const base = U.num(g.base) || (cur != null ? cur * 1.2 : 0); p = cur == null ? 0 : base === tgt ? (cur <= tgt ? 1 : 0) : U.clamp((base - cur) / (base - tgt), 0, 1); }
   else { const base = g.metric === 'manual' ? U.num(g.base) : 0; p = tgt - base ? U.clamp((U.num(cur) - base) / (tgt - base), 0, 1) : 0; }
@@ -3767,7 +3778,7 @@ Goal.info = g => {
   const tasks = OS.all('tasks').filter(t => t.goal === g.id), projects = OS.all('projects').filter(x => x.goal === g.id);
   return { cur, tgt, p, exp, late, behind, st, tasks, projects };
 };
-Goal.fmt = (g, v) => { if (v == null) return '—'; if (['account', 'networth', 'invested', 'movaRevenue'].includes(g.metric)) return U.eur(v, { dec: 0 }); if (g.metric === 'run5k') return U.mmss(v * 60); if (g.metric === 'studyHours') return U.nf(v, 1) + ' h'; if (g.metric === 'runKm') return U.nf(v, 1) + ' km'; if (g.metric === 'steps') return Math.round(v) + '%'; return U.nf(v, v % 1 ? 1 : 0) + (g.unit ? ' ' + g.unit : ''); };
+Goal.fmt = (g, v) => { if (v == null) return '—'; if (['account', 'networth', 'invested', 'movaRevenue'].includes(g.metric)) return U.eur(v, { dec: 0 }); if (g.metric === 'run5k') return U.mmss(v * 60); if (g.metric === 'studyHours') return U.nf(v, 1) + ' h'; if (g.metric === 'runKm') return U.nf(v, 1) + ' km'; if (g.metric === 'steps' || g.metric === 'linked') return Math.round(v) + '%'; return U.nf(v, v % 1 ? 1 : 0) + (g.unit ? ' ' + g.unit : ''); };
 
 /* ---- Projetos ---- */
 const Proj = OS.Proj = {};
@@ -4189,6 +4200,11 @@ V.hoje = () => {
       <div class="list">${study.map(x => `<div class="li"><div class="li-t"><b>${esc(x.title)}</b><small>${esc(x.why)}</small></div><div class="li-r">${x.act ? `<button class="btn xs" ${x.act}>${x.actL}</button>` : ''}<button class="icon-btn" data-act="focusStart" data-subject="${x.subject || ''}" data-label="${esc(x.title)}" aria-label="Começar foco">${UI.ic('play')}</button></div></div>`).join('') || UI.empty('Nada pendente: sem revisões, provas próximas ou atrasos.')}</div></div>
   </div>
   ${shifts.length || OS.Tasks.open().some(x => (x.ctx || []).includes('@Trabalho')) ? `<div class="pn"><div class="pn-h"><h3>${UI.ic('briefcase')}Trabalho</h3><a class="more" href="#trabalho">Turnos ${UI.ic('right')}</a></div><div class="list">${shifts.map(s => `<div class="li"><div class="li-t"><b>Turno ${s.start}–${s.end}</b><small>${esc(s.place || '')} · ${U.nf(OS.Car.shiftHours(s), 1)} h</small></div></div>`).join('')}${OS.Tasks.open().filter(x => (x.ctx || []).includes('@Trabalho')).slice(0, 3).map(x => taskRow(x)).join('')}</div></div>` : ''}
+  ${(() => { const tx = Fin.tx(t, t).filter(x => x.type === 'Despesa' || x.type === 'Receita'); const out = U.sum(tx.filter(x => x.type === 'Despesa'), x => x.amount), inc = U.sum(tx.filter(x => x.type === 'Receita'), x => x.amount);
+    // o dinheiro do dia: o que gastaste hoje (de qualquer sítio: gasto rápido, atalho, finanças) e o que entrou
+    return `<div class="pn"><div class="pn-h"><h3>${UI.ic('wallet')}Dinheiro hoje</h3><a class="more" href="#financas.transacoes">Finanças ${UI.ic('right')}</a></div>
+      <div class="row gap16" style="flex-wrap:wrap;margin-bottom:6px"><span>Gastos <b class="mono ${out ? 'neg' : ''}">${U.eur(out)}</b></span>${inc ? `<span>Entradas <b class="mono pos">${U.eur(inc)}</b></span>` : ''}</div>
+      ${tx.length ? `<div class="list">${tx.slice(-5).reverse().map(x => `<div class="li" data-edit="transactions:${x.id}" style="cursor:pointer"><div class="li-t"><b>${esc(x.desc || x.cat || x.type)}</b><small>${esc([x.cat, (OS.get('accounts', x.account) ? OS.L.accLabel(OS.get('accounts', x.account)) : '')].filter(Boolean).join(' · '))}</small></div><span class="mono ${x.type === 'Despesa' ? '' : 'pos'}">${x.type === 'Despesa' ? '−' : '+'}${U.eur(x.amount)}</span></div>`).join('')}</div>` : `<p class="mut" style="margin:0">Ainda não registaste gastos hoje. <a class="acc" href="#gasto">Gasto rápido</a></p>`}</div>`; })()}
   </div>`;
 };
 
@@ -4474,12 +4490,12 @@ OS.S.projects.detail = p => { const i = Proj.info(p); return `<div class="pn tin
 /* ================= METAS ================= */
 V.metas = () => {
   const f = OS.ui.gf || '', G = OS.all('goals').filter(g => f ? g.cat === f : g.status !== 'Abandonada');
-  const by = U.groupBy(G, g => g.cat);
+  const by = U.groupBy(G, g => g.cat || 'Outros'), CATS = L.GCAT.concat(Object.keys(by).filter(c => !L.GCAT.includes(c)));
   const act = OS.all('goals').filter(g => g.status === 'Ativa').map(Goal.info);
   return UI.head('Metas', 'Cada meta mede-se sozinha quando está ligada a dados reais (saldo, horas de estudo, km, média…). A marca na barra é onde devias estar hoje para chegar ao prazo.', UI.addBtn('goals', 'Nova meta'), 'Execução') +
   `<div class="kpis">${UI.kpi('Ativas', act.length)}${UI.kpi('No ritmo', act.filter(i => !i.late && !i.behind).length, '', { tone: 'pos' })}${UI.kpi('Atrás do ritmo', act.filter(i => i.behind).length, '', { tone: act.some(i => i.behind) ? 'warn' : '' })}${UI.kpi('Atrasadas', act.filter(i => i.late).length, '', { tone: act.some(i => i.late) ? 'neg' : '' })}${UI.kpi('Concluídas', OS.all('goals').filter(g => g.status === 'Concluída').length)}</div>
-  <div class="row gap8">${UI.chip('Todas', 'gfCat', !f, 'data-v=""')}${L.GCAT.map(c => UI.chip(c, 'gfCat', f === c, `data-v="${c}"`)).join('')}</div>
-  ${Object.keys(by).length ? L.GCAT.filter(c => by[c]).map(c => `<section><div class="sech"><h2>${c}</h2></div><div class="pn" style="padding-block:4px">${by[c].map(g => { const i = Goal.info(g), eta = OS.Intel.goalETA(g); return `<div class="gcard"><div class="click" data-edit="goals:${g.id}" style="cursor:pointer"><b>${esc(g.title)}</b><div class="gmeta">${UI.badge(i.st[0], i.st[1])}${UI.badge(g.horizon, 'out')}${g.due ? `<span>prazo ${U.fmtD(g.due)}</span>` : ''}${(g.steps || []).length ? `<span>${g.steps.filter(s => s.done).length}/${g.steps.length} etapas</span>` : ''}${i.tasks.length ? `<span>${i.tasks.filter(t2 => t2.status !== 'Feita').length} tarefas abertas</span>` : ''}${eta && eta.months != null && i.p < 1 ? `<span class="est">estimativa</span><span>alvo em ~${eta.months} ${eta.months === 1 ? 'mês' : 'meses'} ao ritmo atual</span>` : ''}</div></div>
+  <div class="row gap8">${UI.chip('Todas', 'gfCat', !f, 'data-v=""')}${L.GCAT.concat([...new Set(OS.all('goals').map(g => g.cat).filter(c => c && !L.GCAT.includes(c)))]).map(c => UI.chip(c, 'gfCat', f === c, `data-v="${c}"`)).join('')}</div>
+  ${Object.keys(by).length ? CATS.filter(c => by[c]).map(c => `<section><div class="sech"><h2>${c}</h2></div><div class="pn" style="padding-block:4px">${by[c].map(g => { const i = Goal.info(g), eta = OS.Intel.goalETA(g); return `<div class="gcard"><div class="click" data-edit="goals:${g.id}" style="cursor:pointer"><b>${esc(g.title)}</b><div class="gmeta">${UI.badge(i.st[0], i.st[1])}${UI.badge(g.horizon, 'out')}${g.due ? `<span>prazo ${U.fmtD(g.due)}</span>` : ''}${(g.steps || []).length ? `<span>${g.steps.filter(s => s.done).length}/${g.steps.length} etapas</span>` : ''}${i.projects.length ? `<span>${i.projects.length === 1 ? 'projeto: ' + esc(i.projects[0].name) : i.projects.length + ' projetos'}</span>` : ''}${i.tasks.length ? `<span>${i.tasks.filter(t2 => t2.status !== 'Feita').length} tarefas abertas</span>` : ''}${eta && eta.months != null && i.p < 1 ? `<span class="est">estimativa</span><span>alvo em ~${eta.months} ${eta.months === 1 ? 'mês' : 'meses'} ao ritmo atual</span>` : ''}</div></div>
     <div class="gp"><span class="num">${Goal.fmt(g, i.cur)} <span class="mut">/ ${Goal.fmt(g, i.tgt)}</span></span>${UI.bar(i.p, i.p >= 1 ? 'pos' : i.late ? 'neg' : i.behind ? 'warn' : '', i.exp)}</div></div>`; }).join('')}</div></section>`).join('') : UI.empty('Sem metas. Cria a primeira e liga-a a um indicador real.', UI.addBtn('goals', 'Criar meta', null, ''))}`;
 };
 A.gfCat = b => OS.setUI('gf', b.dataset.v);
@@ -5490,7 +5506,7 @@ const alerts = S => { const out = [], val = S.val || 1;
 const TYPES = [['Ação, ETF, FII, BDR, fundo', null, 'search'], ['CDB, LCI/LCA, debênture (BR)', { cls: 'CDB', idx: '% do CDI', rate: 100, currency: 'BRL', liq: 'Diária' }], ['Tesouro Direto', 'td'], ['Depósito a prazo / Certificados (PT)', { cls: 'Depósito a prazo', idx: 'Pré-fixado', rate: 2, currency: 'EUR' }], ['Obrigação (cotada em % do nominal)', { cls: 'Obrigação', mult: .01, currency: 'EUR' }], ['PPR / previdência', { cls: 'PPR', currency: 'EUR' }], ['Cripto', null, 'search'], ['Ouro / commodity', { cls: 'Ouro', sym: 'GC=F', currency: 'USD' }], ['Opção', { cls: 'Opção', mult: 100, currency: 'USD', optType: 'Call (compra)' }], ['Futuro / CFD (alavancado)', { cls: 'CFD', alav: 5, mult: 1, currency: 'EUR' }], ['Caixa em moeda estrangeira', { cls: 'Caixa em moeda estrangeira', name: 'Dólares na corretora', currency: 'USD' }], ['Imóvel', { cls: 'Imóvel', currency: 'EUR' }], ['Crowdlending / P2P', { cls: 'Crowdlending/P2P', idx: 'Pré-fixado', rate: 8, currency: 'EUR' }], ['Outro', { cls: 'Outro' }]];
 const addTypes = () => `<div class="inv-types">${TYPES.map(([l, d, k]) => k === 'search' ? `<a class="chip" href="#investimentos.mercado">${esc(l)}</a>` : d === 'td' ? `<a class="chip" href="#investimentos.cotacoes">${esc(l)}</a>` : `<button class="chip" data-new="assets" data-defs='${esc(JSON.stringify(d))}'>${esc(l)}</button>`).join('')}</div>`;
 const onboarding = () => `<div class="pn inv-on"><h3>Começa a tua carteira</h3><p class="mut">Pesquisa um ativo (ex.: <i>VWCE</i>, <i>Apple</i>, <i>PETR4</i>, <i>Bitcoin</i>) e adiciona-o, ou regista renda fixa (Tesouro, CDB, Certificados de Aforro, depósito a prazo) com a taxa: o Oceanum calcula o rendimento dia a dia.</p>
-  <div class="row gap8" style="flex-wrap:wrap"><a class="btn pri" href="#investimentos.mercado">${UI.ic('search')}Pesquisar ativo</a><a class="btn ghost" href="#investimentos.movimentos">Importar CSV da corretora</a></div><b style="font-size:13px">Ou escolhe o tipo:</b>${addTypes()}
+  <div class="row gap8" style="flex-wrap:wrap"><a class="btn pri" href="#investimentos.mercado">${UI.ic('search')}Pesquisar ativo</a><a class="btn ghost" href="#investimentos.movimentos">Importar CSV da corretora</a><a class="btn ghost" href="#investimentos.movimentos" data-act="b3Open">Importar da B3</a></div><b style="font-size:13px">Ou escolhe o tipo:</b>${addTypes()}
   ${IX.hasScript() ? '' : `<div class="note" style="margin-top:12px">Para cotações em tempo real de todas as bolsas, liga-as em <a class="acc" href="#definicoes.ligacoes">Definições → Ligações</a>. A cripto já atualiza sem nada.</div>`}</div>`;
 
 /* ================= saúde da carteira (regras objetivas, sem IA) ================= */
@@ -5703,8 +5719,8 @@ A.invAskAsset = b => { OS.setUI('invAIq', 'Analisa o ativo ' + b.dataset.s + ' p
 
 /* ================= MOVIMENTOS + importação CSV ================= */
 let IMP = null;
-T.movimentos = () => `<div class="row gap8" style="flex-wrap:wrap;margin-bottom:10px">${UI.addBtn('invtx', 'Registar movimento', null, 'pri')}<button class="btn" data-act="invImp">${UI.ic('arrowUp')}Importar CSV / extrato</button><button class="btn ghost" data-act="invExp">Exportar CSV</button></div>
-  ${IMP ? impPanel() : ''}
+T.movimentos = () => `<div class="row gap8" style="flex-wrap:wrap;margin-bottom:10px">${UI.addBtn('invtx', 'Registar movimento', null, 'pri')}${OS.B3 ? OS.B3.btn() : ''}<button class="btn" data-act="invImp">${UI.ic('arrowUp')}Importar CSV / extrato</button><button class="btn ghost" data-act="invExp">Exportar CSV</button></div>
+  ${OS.B3 ? OS.B3.panel() : ''}${IMP ? impPanel() : ''}
   ${UI.table({ key: 'invtx', coll: 'invtx', rows: U.sortBy(OS.all('invtx'), t => t.date, -1), limit: 100, empty: 'Sem movimentos.', emptyAct: UI.addBtn('invtx', 'Registar compra', null, ''), cols: [
   { l: 'Data', v: t => `<span class="mono">${U.fmtD(t.date)}</span>`, s: t => t.date }, { l: 'Ativo', v: t => { const a = OS.get('assets', t.asset) || {}; return esc(a.ticker || a.name || '—'); } },
   { l: 'Tipo', v: t => UI.badge(t.type, t.type === 'Compra' || t.type === 'Subscrição' ? 'acc' : t.type === 'Venda' ? 'vio' : t.type === 'Taxa' ? 'neg' : IX.INC.has(t.type) ? 'pos' : '') }, { l: 'Qtd.', cls: 'r', v: t => t.qty ? `<span class="mono">${U.nf(t.qty, 4)}</span>` : '' },
@@ -6234,6 +6250,138 @@ OS.forms.invCmpAdd = async (f, v) => { const q = String(v('q') || '').trim(); if
   if (/^[A-Z0-9.^=\-]{1,15}$/.test(q) && (!IX.hasScript() || IX.q(q))) { A.invCmpPick({ dataset: { s: q } }); return; }
   try { const j = IX.hasScript() ? await IX.search(q) : { q: [] }; CRES = (j.q || []).slice(0, 6); if (!CRES.length) { A.invCmpPick({ dataset: { s: q.toUpperCase() } }); return; } } catch (e) { A.invCmpPick({ dataset: { s: q.toUpperCase() } }); return; } OS.request(); };
 A.invCmpAI = () => { const sel = OS.ui.invCmp || IX.positions().filter(p => p.a.sym).sort((x, y) => y.value - x.value).slice(0, 3).map(p => p.a.sym); OS.setUI('invAIq', `Compara ${sel.join(', ')}: qual faz mais sentido para a minha carteira e perfil, com que peso, e porquê? Considera risco, custos, dividendos, avaliação e o que diriam os mestres.`); location.hash = 'investimentos.ia'; };
+})();
+
+</script>
+<script>
+/* OCEANUM — Importador da B3 (Área do Investidor): lê os ficheiros Excel (ou CSV) que descarregas em investidor.b3.com.br
+   · Extratos → Negociação: compras e vendas na data do negócio
+   · Extratos → Movimentação: dividendos, JCP, rendimentos de FII, juros, amortizações, bonificações, desdobramentos, resgates do Tesouro
+     (e as liquidações de compras/vendas, quando não juntas o ficheiro de Negociação)
+   · Posição: confere se as quantidades da app batem com as da B3
+   Nada se duplica: o que já existe é ignorado. Os ativos novos são criados com o símbolo da cotação (.SA) e a classe certa. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act, L = OS.L, esc = U.esc, IX = OS.InvX;
+const B3 = OS.B3 = {};
+const XLSX_URL = 'vendor/xlsx.full.min.js'; // SheetJS 0.18.5 (só é descarregado quando importas um Excel)
+let ST = null; // { files:[], rows:[], pos:[], skip:{}, err:'', busy:false }
+const n = v => U.num(v) || 0;
+const norm = s => String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+
+/* ---------- leitura dos ficheiros ---------- */
+let xlsxP = null;
+const loadX = () => window.XLSX ? Promise.resolve(window.XLSX) : (xlsxP = xlsxP || new Promise((res, rej) => { const s = document.createElement('script'); s.src = XLSX_URL; s.async = true; s.onload = () => window.XLSX ? res(window.XLSX) : rej(new Error('leitor de Excel indisponível')); s.onerror = () => { xlsxP = null; rej(new Error('Sem internet para abrir o Excel. Tenta de novo com ligação, ou exporta em CSV.')); }; document.head.appendChild(s); }));
+const num = v => { if (typeof v === 'number') return v; let s = String(v == null ? '' : v).replace(/[^\d,.\-]/g, ''); if (!s || s === '-') return 0; if (s.includes(',') && s.includes('.')) s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, ''); else if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.'); return +s || 0; };
+const date = v => { if (v instanceof Date && !isNaN(v)) return U.iso(v); if (typeof v === 'number' && v > 20000 && v < 80000) { const X = window.XLSX; if (X && X.SSF) { const d = X.SSF.parse_date_code(v); if (d) return `${d.y}-${U.pad(d.m)}-${U.pad(d.d)}`; } const d = new Date(Math.round((v - 25569) * 864e5)); return d.toISOString().slice(0, 10); }
+  const s = String(v || '').trim(); let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return m[0]; m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if (m) return `${m[3].length === 2 ? '20' + m[3] : m[3]}-${U.pad(+m[2])}-${U.pad(+m[1])}`; return ''; };
+const csvRows = txt => { const lines = String(txt).replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim()); if (!lines.length) return []; const sep = [';', '\t', ','].map(c => [c, lines[0].split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+  return lines.map(l => { const out = []; let cur = '', q = false; for (const ch of l) { if (ch === '"') q = !q; else if (ch === sep && !q) { out.push(cur); cur = ''; } else cur += ch; } out.push(cur); return out.map(x => x.trim()); }); };
+// cada folha → { kind: 'neg' | 'mov' | 'pos', H: {coluna: índice}, rows: [[…]] }
+const COLS = { d: /^data( do negocio)?$|^data$/, dn: /data do negocio/, es: /entrada\/saida|entrada e saida|^entrada/, mv: /^movimentacao$/, tm: /tipo de movimentacao/, prod: /^produto$/, cod: /codigo de negociacao/, inst: /instituicao/, q: /^quantidade$/, p: /^preco( unitario)?$|preco unitario/, v: /valor da operacao|^valor$/, mk: /^mercado$/, pf: /preco de fechamento/, va: /valor atualizado/, tipo: /^tipo$/ };
+const sheetOf = (name, rows) => { for (let i = 0; i < Math.min(rows.length, 12); i++) { const hdr = (rows[i] || []).map(norm), H = {}; Object.entries(COLS).forEach(([k, re]) => { const j = hdr.findIndex(h => re.test(h)); if (j >= 0) H[k] = j; });
+    const kind = H.mv != null && H.prod != null ? 'mov' : H.tm != null && H.cod != null ? 'neg' : (H.q != null && (H.pf != null || H.va != null) && (H.cod != null || H.prod != null)) ? 'pos' : null;
+    if (kind) return { name, kind, H, rows: rows.slice(i + 1).filter(r => r && r.some(c => String(c == null ? '' : c).trim())) }; } return null; };
+const readFile = async f => { if (/\.(xlsx|xls)$/i.test(f.name)) { const X = await loadX(), buf = await f.arrayBuffer(), wb = X.read(new Uint8Array(buf), { type: 'array' });
+    return wb.SheetNames.map(sn => sheetOf(sn, X.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' }))).filter(Boolean); }
+  const txt = await f.text(); const s = sheetOf(f.name, csvRows(txt)); return s ? [s] : []; };
+
+/* ---------- ativo a partir do nome da B3 ---------- */
+const tkOf = (prod, cod) => { let t = String(cod || '').trim().toUpperCase(); if (!t) { const m = String(prod || '').trim().match(/^([A-Z]{4}\d{1,2}[A-Z]?)\b/); t = m ? m[1] : ''; } if (/^[A-Z]{4}\d{1,2}F$/.test(t)) t = t.slice(0, -1); return t; };
+const nameOf = prod => { const s = String(prod || '').trim(), i = s.indexOf(' - '); return i > 0 ? s.slice(i + 3).trim() : s; };
+const clsOf = (tk, prod, mk, tipo) => { const p = norm(prod + ' ' + (tipo || '')), m = norm(mk);
+  if (/^tesouro/.test(norm(prod))) return 'Tesouro Direto'; if (/^cdb\b/.test(norm(prod))) return 'CDB'; if (/^(lci|lca)\b/.test(norm(prod))) return 'LCI/LCA'; if (/^(cri|cra)\b/.test(norm(prod))) return 'CRI/CRA'; if (/debenture/.test(p)) return 'Debênture'; if (/^lc\b/.test(norm(prod))) return 'LC';
+  if (/opcao/.test(m)) return 'Opção'; if (/termo|futuro/.test(m)) return 'Futuro';
+  if (/\d{2}$/.test(tk) && /3[2-9]$/.test(tk)) return 'BDR';
+  if (/11$/.test(tk)) { if (/imobiliar|\bfii\b|fdo inv imob|fundo de investimento imob|fiagro/.test(p)) return 'FII'; if (/indice|\betf\b|ishares|it now|trend/.test(p)) return 'ETF';
+    if (ETF11.has(tk)) return 'ETF'; if (UNIT11.has(tk)) return 'Ação'; if (/fundo|fdo|fic\b/.test(p)) return 'FII'; return p.replace(norm(tk), '').trim() ? 'Ação' : 'FII'; }
+  return 'Ação'; };
+// ETFs e units mais negociados na B3 (terminam em 11 como os FII)
+const ETF11 = new Set('BOVA11 BOVV11 BOVB11 BOVX11 XBOV11 IVVB11 SPXI11 SPXB11 SMAL11 SMAC11 HASH11 QBTC11 QETH11 ETHE11 BITH11 CRPT11 DEFI11 META11 WEB311 NASD11 TECK11 GOLD11 DIVO11 NDIV11 BDIV11 XINA11 ACWI11 WRLD11 EURP11 FIXA11 IMAB11 IRFM11 B5P211 IB5M11 ECOO11 ISUS11 BBSD11 PIBB11 BRAX11 USDB11 GOVE11 MATB11 UTIL11 FIND11 AGRI11 HTEK11 REVE11 SHOT11 ALUG11 BOVS11 DNAI11 JOGO11 ESGB11 5GTK11 LVOL11 SMAB11 TRIG11 BITI11 NSDV11 USAL11'.split(' '));
+const UNIT11 = new Set('TAEE11 KLBN11 SANB11 ALUP11 BPAC11 SAPR11 ENGI11 IGTI11 RNEW11 SULA11 BIDI11 ITUB11 AESB11 CPLE11 STBP11 PPLA11 TIET11 BRBI11 BBDC11 ITSA11 GGPS11 CXSE11'.split(' '));
+const brokerOf = inst => { const s = String(inst || '').trim(); if (!s) return ''; const b = L.bank && L.bank(s); if (b) return b[0]; return s.replace(/\s+(S\.?A\.?|LTDA\.?|CTVM|DTVM|CCTVM|CORRETORA.*)$/i, '').replace(/\s+(S\.?A\.?|CTVM|DTVM)\b.*$/i, '').trim().toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); };
+const findA = (tk, prod) => { const T = String(tk || '').toUpperCase(), sym = T ? T + '.SA' : ''; const nm = norm(prod);
+  return OS.all('assets').find(a => (T && [a.ticker, a.sym].some(x => x && (x.toUpperCase() === T || x.toUpperCase() === sym))) || (!T && nm && (norm(a.td) === nm || norm(a.name) === nm))); };
+
+/* ---------- interpretação ---------- */
+const MOV = [[/^dividendo/, 'Dividendo'], [/juros sobre capital/, 'JCP'], [/^rendimento/, 'Rendimento'], [/^juros/, 'Juros'], [/^amortizacao/, 'Amortização'], [/^bonificacao em ativos|^bonificacao/, 'Bonificação'], [/^desdobro|^desdobramento/, 'Desdobro'], [/^grupamento/, 'Grupamento'],
+  [/^transferencia - liquidacao|^liquidacao/, 'Liq'], [/^resgate|^vencimento/, 'Resgate'], [/^leilao de fracao/, 'Leilão']];
+const parse = sheets => { const out = [], skip = {}, pos = [], hasNeg = sheets.some(s => s.kind === 'neg');
+  const negKeys = new Set();
+  sheets.filter(s => s.kind === 'neg').forEach(s => s.rows.forEach(r => { const H = s.H, d = date(r[H.dn != null ? H.dn : H.d]), tm = norm(r[H.tm]), tk = tkOf('', r[H.cod]), q = Math.abs(num(r[H.q])), p = Math.abs(num(r[H.p])), v = Math.abs(num(r[H.v]));
+    if (!d || !tk || !q || !/compra|venda/.test(tm)) { skip['linha de negociação sem dados'] = (skip['linha de negociação sem dados'] || 0) + 1; return; }
+    const mk = H.mk != null ? r[H.mk] : ''; out.push({ src: 'Negociação', date: d, tk, prod: tk, type: /venda/.test(tm) ? 'Venda' : 'Compra', qty: q, price: p || (v && q ? v / q : 0), cls: clsOf(tk, '', mk), broker: brokerOf(r[H.inst]) }); negKeys.add(tk); }));
+  sheets.filter(s => s.kind === 'mov').forEach(s => s.rows.forEach(r => { const H = s.H, d = date(r[H.d]), mvRaw = String(r[H.mv] || '').trim(), mv = norm(mvRaw), prod = String(r[H.prod] || '').trim(), es = norm(H.es != null ? r[H.es] : ''), q = Math.abs(num(r[H.q])), p = Math.abs(num(r[H.p])), v = Math.abs(num(r[H.v])), tk = tkOf(prod, '');
+    const hit = MOV.find(([re]) => re.test(mv)); if (!d || !prod || !hit) { skip[mvRaw || 'sem tipo'] = (skip[mvRaw || 'sem tipo'] || 0) + 1; return; }
+    const kind = hit[1], cls = clsOf(tk, prod), base = { src: 'Movimentação', date: d, tk, prod, cls, broker: brokerOf(r[H.inst]), name: nameOf(prod) };
+    if (['Dividendo', 'Rendimento', 'Juros', 'Amortização'].includes(kind)) { if (!v) { skip[mvRaw + ' sem valor'] = (skip[mvRaw + ' sem valor'] || 0) + 1; return; } out.push(Object.assign(base, { type: kind, amount: v })); }
+    else if (kind === 'JCP') { if (!v) return; const gross = U.r2(v / .85); out.push(Object.assign(base, { type: 'JCP', amount: gross, tax: U.r2(gross - v), note: 'Importado da B3 · bruto calculado (15% retido na fonte)' })); }
+    else if (kind === 'Bonificação') { if (!q) return; out.push(Object.assign(base, { type: 'Bonificação', qty: q, price: p })); }
+    else if (kind === 'Desdobro' || kind === 'Grupamento') { if (!q) return; out.push(Object.assign(base, { type: 'Split', qty: q, sign: kind === 'Grupamento' || /debito|saida/.test(es) ? -1 : 1 })); }
+    else if (kind === 'Liq') { if (hasNeg && negKeys.has(tk)) { skip['liquidação (já vem na Negociação)'] = (skip['liquidação (já vem na Negociação)'] || 0) + 1; return; } if (!q) return; out.push(Object.assign(base, { type: /debito|saida/.test(es) ? 'Venda' : 'Compra', qty: q, price: p || (v && q ? v / q : 0), liq: 1 })); }
+    else if (kind === 'Resgate') { if (!q && !v) return; out.push(Object.assign(base, q ? { type: 'Venda', qty: q, price: p || (v / q) } : { type: 'Amortização', amount: v })); }
+    else if (kind === 'Leilão') { if (!q || !v) { skip[mvRaw] = (skip[mvRaw] || 0) + 1; return; } out.push(Object.assign(base, { type: 'Venda', qty: q, price: v / q, note: 'Leilão de frações (B3)' })); } }));
+  sheets.filter(s => s.kind === 'pos').forEach(s => s.rows.forEach(r => { const H = s.H, prod = String(H.prod != null ? r[H.prod] : '').trim(), tk = tkOf(prod, H.cod != null ? r[H.cod] : ''), q = num(r[H.q]); if (!tk && !prod) return; if (!q && !num(r[H.va])) return;
+    pos.push({ tk, prod: prod || tk, q, px: H.pf != null ? num(r[H.pf]) : 0, val: H.va != null ? num(r[H.va]) : 0, sheet: s.name }); }));
+  // o extrato de Negociação só traz o código: a classe e o nome vêm da Movimentação/Posição quando existem
+  const hint = {}, names = {}; out.filter(r => r.src === 'Movimentação').forEach(r => { if (r.tk) { hint[r.tk] = r.cls; if (r.name) names[r.tk] = r.name; } });
+  pos.forEach(p => { if (!p.tk) return; const sn = norm(p.sheet), c = /etf/.test(sn) ? 'ETF' : /bdr/.test(sn) ? 'BDR' : /fundo|fii|imobili/.test(sn) ? 'FII' : /acoe|acao/.test(sn) ? 'Ação' : clsOf(p.tk, p.prod); if (!hint[p.tk]) hint[p.tk] = c; if (!names[p.tk] && p.prod && p.prod !== p.tk) names[p.tk] = nameOf(p.prod); });
+  out.forEach(r => { if (r.src === 'Negociação' && r.tk && hint[r.tk] && !['Opção', 'Futuro'].includes(r.cls)) r.cls = hint[r.tk]; if (r.tk && !r.name && names[r.tk]) r.name = names[r.tk]; });
+  return { rows: U.sortBy(out, x => x.date + (x.type === 'Split' ? '1' : '0')), skip, pos }; };
+
+/* ---------- duplicados e quantidades ---------- */
+const sameTx = (a, r) => OS.all('invtx').some(t => t.asset === a.id && t.type === r.type && (L.QTX.includes(r.type) ? Math.abs(n(t.qty) - r.qty) < 1e-6 && (t.date === r.date || (r.liq && Math.abs(U.diff(t.date, r.date)) <= 5)) && (!r.price || !n(t.price) || Math.abs(n(t.price) - r.price) < Math.max(.011, r.price * .002)) : t.date === r.date && Math.abs(n(t.amount) - n(r.amount)) < .05));
+const dupSplit = (a, r) => OS.all('invtx').some(t => t.asset === a.id && t.type === 'Desdobramento/Grupamento' && t.date === r.date);
+const heldAt = (aid, d) => { let q = 0; U.sortBy(OS.all('invtx').filter(t => t.asset === aid && t.date <= d), t => t.date).forEach(t => { if (['Compra', 'Bonificação', 'Subscrição', 'Transferência (entrada)'].includes(t.type)) q += n(t.qty); else if (['Venda', 'Transferência (saída)'].includes(t.type)) q -= n(t.qty); else if (t.type === 'Desdobramento/Grupamento' && n(t.ratio)) q *= n(t.ratio); }); return q; };
+const review = () => { if (!ST || !ST.rows) return; let dup = 0; const fresh = [];
+  ST.rows.forEach(r => { const a = findA(r.tk, r.prod); if (a && (r.type === 'Split' ? dupSplit(a, r) : sameTx(a, r))) { dup++; return; } fresh.push(r); });
+  ST.fresh = fresh; ST.dup = dup; ST.newA = [...new Set(fresh.filter(r => !findA(r.tk, r.prod)).map(r => r.tk || r.prod))];
+  ST.byType = U.groupBy(fresh, r => r.type === 'Split' ? 'Desdobramento/Grupamento' : r.type); };
+
+/* ---------- importar ---------- */
+const mkAsset = r => { const isRF = L.RFC.includes(r.cls) || r.cls === 'Tesouro Direto', tk = r.tk;
+  const o = { name: r.name && r.name !== tk ? r.name.slice(0, 80) : tk || r.prod, ticker: tk || '', cls: r.cls, currency: 'BRL', country: 'Brasil', broker: r.broker || '', notes: 'Criado pelo importador da B3' };
+  if (!isRF && tk) o.sym = tk + '.SA'; if (r.cls === 'Tesouro Direto') { o.td = r.prod; o.name = r.prod; o.ticker = ''; } if (isRF && r.cls !== 'Tesouro Direto') { o.name = r.prod.slice(0, 80); o.ticker = ''; o.idx = '% do CDI'; o.rate = 100; o.notes += ' · confirma a taxa e o vencimento'; }
+  if (r.cls === 'Opção') o.mult = 1; return OS.add('assets', o, { silent: true }); };
+A.b3Go = () => { if (!ST || !ST.fresh || !ST.fresh.length) return; let nA = 0, nT = 0, warn = 0;
+  ST.fresh.forEach(r => { let a = findA(r.tk, r.prod); if (!a) { a = mkAsset(r); nA++; }
+    if (r.type === 'Split') { const h = heldAt(a.id, U.addDays(r.date, -1)); if (!(h > 0)) { warn++; return; } const ratio = (h + r.sign * r.qty) / h; if (!(ratio > 0)) { warn++; return; } OS.add('invtx', { asset: a.id, type: 'Desdobramento/Grupamento', date: r.date, ratio: Math.round(ratio * 1e6) / 1e6, note: 'Importado da B3' }, { silent: true }); nT++; return; }
+    const base = { asset: a.id, type: r.type, date: r.date, note: r.note || 'Importado da B3' + (r.liq ? ' (data de liquidação)' : '') };
+    OS.add('invtx', Object.assign(base, L.QTX.includes(r.type) ? { qty: r.qty, price: Math.round(r.price * 1e4) / 1e4 } : { amount: U.r2(r.amount), tax: r.tax || '' }), { silent: true }); nT++; });
+  UI.toast(`${nT} movimento(s) importado(s) da B3${nA ? ` · ${nA} ativo(s) novo(s)` : ''}${warn ? ` · ${warn} desdobramento(s) por rever` : ''}`, 'pos');
+  ST = null; OS.touch && OS.touch('invtx'); OS.request(); if (IX && IX.tick) IX.tick(true); };
+
+/* ---------- conferência com a posição da B3 ---------- */
+const recon = () => (ST.pos || []).map(p => { const a = findA(p.tk, p.prod), mine = a ? (OS.Inv.pos(a).qty || 0) : 0; return Object.assign({}, p, { a, mine, ok: a && Math.abs(mine - p.q) < 1e-6 }); });
+
+/* ---------- ecrã ---------- */
+A.b3Open = () => { ST = ST ? null : { files: [], rows: null }; OS.request(); setTimeout(() => { const el = document.getElementById('b3Panel'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 80); };
+A.b3Pick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true; inp.accept = '.xlsx,.xls,.csv,.txt'; inp.style.display = 'none'; inp.onchange = () => { B3.read([...(inp.files || [])]); inp.remove(); }; document.body.appendChild(inp); inp.click(); };
+B3.read = async files => { if (!files.length) return; ST = ST || { files: [] }; ST.busy = true; ST.err = ''; OS.request();
+  try { const sheets = []; for (const f of files) { const s = await readFile(f); if (!s.length) ST.err = (ST.err ? ST.err + ' ' : '') + `"${f.name}" não parece um extrato da B3.`; sheets.push(...s); ST.files.push(f.name); }
+    ST.sheets = (ST.sheets || []).concat(sheets); const p = parse(ST.sheets); ST.rows = p.rows; ST.skip = p.skip; ST.pos = p.pos; review(); }
+  catch (e) { ST.err = e.message || String(e); }
+  ST.busy = false; OS.request(); };
+B3.parse = parse; B3.sheetOf = sheetOf; B3.state = () => ST;
+B3.btn = (cls = 'btn') => `<button class="${cls}" data-act="b3Open">${UI.ic('arrowUp')}Importar da B3</button>`;
+const TY = { Compra: 'acc', Venda: 'vio', Dividendo: 'pos', JCP: 'pos', Rendimento: 'pos', Juros: 'pos', 'Amortização': '', 'Bonificação': '', 'Desdobramento/Grupamento': '' };
+B3.panel = () => { if (!ST) return ''; const R = ST.fresh || [], P = ST.pos && ST.pos.length ? recon() : [];
+  return `<div class="pn b3" id="b3Panel"><div class="pn-h"><h3>${UI.ic('arrowUp')}Importar da B3 (Área do Investidor)</h3><button class="icon-btn" data-act="b3Open" aria-label="Fechar">${UI.ic('x')}</button></div>
+  <ol class="ai-steps b3-steps"><li>Entra em <a class="acc" href="https://www.investidor.b3.com.br" target="_blank" rel="noopener">investidor.b3.com.br</a> com a tua conta gov.br.</li>
+    <li><b>Extratos → Negociação</b>: escolhe o período (podes ir até ao início) → <b>Baixar → Excel</b>.</li>
+    <li><b>Extratos → Movimentação</b>: o mesmo período → <b>Baixar → Excel</b> (traz dividendos, JCP, rendimentos, bonificações e desdobramentos).</li>
+    <li>Opcional: <b>Posição → Baixar</b>, para conferir se tudo bate.</li>
+    <li>Escolhe os ficheiros aqui (podes escolher vários de uma vez). Todos os meses basta repetir: o que já foi importado é ignorado.</li></ol>
+  <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="b3Pick">${ST.busy ? 'A ler…' : 'Escolher ficheiros da B3'}</button>${ST.files && ST.files.length ? `<span class="mut" style="font-size:12.5px">${ST.files.map(esc).join(' · ')}</span>` : ''}</div>
+  ${ST.err ? `<p class="neg">${esc(ST.err)}</p>` : ''}
+  ${ST.rows ? `<div class="note" style="margin-top:10px"><b>${R.length}</b> movimento(s) novo(s) para importar${ST.dup ? ` · ${ST.dup} já existiam (ignorados)` : ''}${ST.newA && ST.newA.length ? ` · <b>${ST.newA.length}</b> ativo(s) novo(s): ${ST.newA.slice(0, 10).map(esc).join(', ')}${ST.newA.length > 10 ? '…' : ''}` : ''}.</div>
+    ${Object.keys(ST.byType || {}).length ? `<div class="row gap6" style="flex-wrap:wrap;margin:8px 0">${Object.entries(ST.byType).map(([k, v]) => UI.badge(`${k}: ${v.length}`, TY[k] || '')).join('')}</div>` : ''}
+    ${R.length ? `<div class="tblw" style="max-height:260px;overflow:auto"><table class="tbl"><thead><tr><th>Data</th><th>Ativo</th><th>Tipo</th><th class="r">Qtd.</th><th class="r">Preço</th><th class="r">Valor</th></tr></thead><tbody>${R.slice(0, 120).map(r => `<tr><td class="mono">${U.fmtD(r.date)}</td><td><b>${esc(r.tk || '')}</b> <span class="mut" style="font-size:11.5px">${esc(r.cls)}</span>${r.tk ? '' : `<div class="mut" style="font-size:11.5px">${esc(r.prod)}</div>`}</td><td>${r.type === 'Split' ? (r.sign > 0 ? 'Desdobramento' : 'Grupamento') : esc(r.type)}${r.liq ? ' <span class="mut" style="font-size:11px">(liquidação)</span>' : ''}</td><td class="r mono">${r.qty ? U.nf(r.qty, r.qty % 1 ? 4 : 0) : ''}</td><td class="r mono">${r.price ? U.nf(r.price, 2) : ''}</td><td class="r mono">${r.amount ? U.nf(r.amount, 2) : r.qty && r.price ? U.nf(r.qty * r.price, 2) : ''}</td></tr>`).join('')}</tbody></table></div>${R.length > 120 ? `<p class="mut" style="font-size:12px">… e mais ${R.length - 120}.</p>` : ''}
+      <button class="btn pri" data-act="b3Go" style="margin-top:8px">Importar ${R.length} movimento(s)</button>` : ''}
+    ${Object.keys(ST.skip || {}).length ? UI.toggle(`Linhas que não entram (${U.sum(Object.values(ST.skip), x => x)})`, `<div class="list">${Object.entries(ST.skip).map(([k, v]) => `<div class="li"><div class="li-t"><b>${esc(k)}</b></div><span class="mono mut">${v}</span></div>`).join('')}</div><p class="mut" style="font-size:12px">Atualizações, transferências entre corretoras, empréstimos e direitos de subscrição não mexem no teu preço médio. Se precisares de algum, regista-o à mão em Movimentos.</p>`, 'b3skip') : ''}
+    <p class="mut" style="font-size:12px;margin-top:8px">JCP: a B3 mostra o valor líquido; guardo o bruto e os 15% retidos (para os impostos). Compras e vendas usam a data do negócio quando juntas o extrato de Negociação. Todos os movimentos ficam com a nota "Importado da B3" e podes editá-los.</p>` : ''}
+  ${P.length ? `<div class="pn-h" style="margin-top:12px"><h3>Conferência com a posição da B3</h3><span class="${P.every(p => p.ok) ? 'pos' : 'warn'}" style="font-size:12.5px">${P.filter(p => p.ok).length} de ${P.length} batem${ST.fresh && ST.fresh.length ? ' (antes de importar)' : ''}</span></div>
+    <div class="tblw"><table class="tbl"><thead><tr><th>Ativo</th><th class="r">B3</th><th class="r">Na app</th><th></th></tr></thead><tbody>${P.map(p => `<tr><td><b>${esc(p.tk || p.prod)}</b>${p.val ? `<div class="mut" style="font-size:11.5px">${IX && IX.Mc ? IX.Mc(p.val, 'BRL') : U.nf(p.val, 2)}</div>` : ''}</td><td class="r mono">${U.nf(p.q, p.q % 1 ? 4 : 0)}</td><td class="r mono">${p.a ? U.nf(p.mine, p.mine % 1 ? 4 : 0) : '—'}</td><td>${p.ok ? '<span class="pos">✓</span>' : `<span class="warn">${p.a ? 'diferente' : 'não existe na app'}</span>`}</td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; };
 })();
 
 </script>
@@ -7164,9 +7312,11 @@ V.cursos = sub => { const L = OS.all('learn').filter(isCourse), f = OS.ui.cuf ||
   const hrs = U.sum(L.filter(l => l.status === 'Concluído'), l => +l.hours || 0);
   const card = l => { const p = +l.total ? Math.min(1, (+l.done || 0) / +l.total) : l.status === 'Concluído' ? 1 : 0;
     return `<div class="pn cu-c"><div class="row between gap8"><div class="click grow" data-edit="learn:${l.id}" style="cursor:pointer;min-width:0"><span class="eyebrow">${esc(l.kind || 'Curso')}${l.cat ? ' · ' + esc(l.cat) : ''}</span><b class="cu-t">${esc(l.title)}</b><small class="mut">${esc([l.author, l.hours ? l.hours + ' h' : '', l.start ? 'desde ' + U.fmtDS(l.start) : '', l.end && l.status === 'Concluído' ? 'concluído ' + U.fmtDS(l.end) : ''].filter(Boolean).join(' · '))}</small></div>${UI.badge(l.status || 'Na fila', l.status === 'Concluído' ? 'pos' : l.status === 'Em curso' ? 'acc' : '')}</div>
-      ${UI.bar(p, p >= 1 ? 'pos' : '')}<div class="row between gap8" style="margin-top:6px"><small class="mut">${+l.total ? `${+l.done || 0} de ${l.total} ${esc(l.unit || 'aulas')} · ${U.pct(p)}` : 'Define o total de aulas/módulos para ver o progresso'}</small><span class="row gap6">${l.status !== 'Concluído' && +l.total ? `<button class="btn xs" data-act="cuStep" data-id="${l.id}">+1 ${esc((l.unit || 'aulas').replace(/s$/, ''))}</button>` : ''}${l.status === 'Na fila' ? `<button class="btn xs ghost" data-act="cuSet" data-id="${l.id}" data-v="Em curso">Começar</button>` : ''}${l.status === 'Em curso' ? `<button class="btn xs ghost" data-act="cuSet" data-id="${l.id}" data-v="Concluído">Concluir</button>` : ''}${l.url ? `<a class="btn xs ghost" href="${esc(l.url)}" target="_blank" rel="noopener">Abrir</a>` : ''}${l.certUrl ? `<a class="btn xs ghost" href="${esc(l.certUrl)}" target="_blank" rel="noopener">Certificado</a>` : ''}</span></div></div>`; };
+      ${UI.bar(p, p >= 1 ? 'pos' : '')}<div class="row between gap8" style="margin-top:6px"><small class="mut">${+l.total ? `${+l.done || 0} de ${l.total} ${esc(l.unit || 'aulas')} · ${U.pct(p)}` : 'Define o total de aulas/módulos para ver o progresso'}</small><span class="row gap6">${l.status !== 'Concluído' && +l.total ? `<button class="btn xs" data-act="cuStep" data-id="${l.id}">+1 ${esc((l.unit || 'aulas').replace(/s$/, ''))}</button>` : ''}${l.status === 'Na fila' ? `<button class="btn xs ghost" data-act="cuSet" data-id="${l.id}" data-v="Em curso">Começar</button>` : ''}${l.status === 'Em curso' ? `<button class="btn xs ghost" data-act="cuSet" data-id="${l.id}" data-v="Concluído">Concluir</button>` : ''}${l.url ? `<a class="btn xs ghost" href="${esc(l.url)}" target="_blank" rel="noopener">Abrir</a>` : ''}${l.certUrl ? `<a class="btn xs ghost" href="${esc(l.certUrl)}" target="_blank" rel="noopener">Certificado</a>` : ''}</span></div>
+      ${OS.Files ? (() => { const fs = OS.Files.of('curso', l.id); return `<div class="cu-f">${fs.length ? UI.toggle(`Ficheiros do curso (${fs.length})`, OS.Files.list('curso', l.id), 'cuF' + l.id, 'note') : ''}${OS.Files.btn('curso', l.id, fs.length ? 'Guardar mais' : 'Guardar PDFs / ficheiros', 'btn xs ghost')}</div>`; })() : ''}</div>`; };
   return UI.head('Cursos', 'Todos os cursos que estás a fazer ou queres fazer: progresso por aula ou módulo, carga horária, plataforma e certificado.', UI.addBtn('learn', 'Novo curso', { kind: 'Curso', status: 'Em curso', unit: 'aulas', start: today() }), 'Estudos') +
     `<div class="kpis">${UI.kpi('Em curso', L.filter(l => l.status === 'Em curso').length)}${UI.kpi('Na fila', L.filter(l => l.status === 'Na fila').length)}${UI.kpi('Concluídos', L.filter(l => l.status === 'Concluído').length, hrs ? U.nf(hrs) + ' h de formação' : '')}${UI.kpi('Este ano', L.filter(l => l.status === 'Concluído' && (l.end || '').startsWith(today().slice(0, 4))).length, 'cursos concluídos')}</div>
+    ${OS.Files && OS.all('files').some(x => x.area === 'curso') ? OS.Files.summary('curso') : ''}
     <div class="row gap6" style="flex-wrap:wrap;margin-bottom:10px">${UI.chip('Todos', 'cuF', !f, 'data-v=""')}${st.map(s => UI.chip(`${s} (${L.filter(l => l.status === s).length})`, 'cuF', f === s, `data-v="${s}"`)).join('')}</div>
     ${it.length ? `<div class="g g2">${it.map(card).join('')}</div>` : UI.empty('Ainda não tens cursos aqui. Junta os cursos online, formações, bootcamps e workshops que estás a fazer.', UI.addBtn('learn', 'Adicionar curso', { kind: 'Curso', status: 'Em curso', unit: 'aulas', start: today() }, ''))}`; };
 A.cuF = b => OS.setUI('cuf', b.dataset.v);
@@ -8343,8 +8493,11 @@ A.tuCards = b => { const m = TU.log[+b.dataset.i]; if (!m) return; location.hash
 /* ================= MATERIAIS ================= */
 const KIC = { Slides: 'layers', 'Sebenta / apontamentos': 'note', Livro: 'book', Exercícios: 'edit', 'Exames antigos': 'checksq', Vídeo: 'play', Artigo: 'news', 'Site / link': 'link', Outro: 'link' };
 UNI.materiais = () => { const S = OS.all('subjects').filter(s => s.status === 'Em curso' || OS.all('materials').some(m => m.subject === s.id)), M = OS.all('materials');
-  return `<div class="row gap8" style="margin-bottom:10px">${UI.addBtn('materials', 'Material')}<span class="mut" style="font-size:12.5px">Slides, sebentas, exames antigos, vídeos e links do Moodle — tudo à mão, por disciplina.</span></div>
-  ${S.length ? `<div class="g g2">${S.map(s => { const ms = M.filter(m => m.subject === s.id); return `<div class="pn"><div class="pn-h"><h3>${esc(s.name)}</h3>${s.moodle ? `<a class="btn xs ghost" href="${esc(s.moodle)}" target="_blank" rel="noopener">Moodle ↗</a>` : ''}${UI.addBtn('materials', '', { subject: s.id }, 'xs ghost')}</div>${ms.length ? `<div class="list">${ms.map(m => `<div class="li"><span class="un-mi">${UI.ic(KIC[m.kind] || 'link')}</span><div class="li-t click" data-edit="materials:${m.id}"><b>${esc(m.title)}</b><small>${esc(m.kind || '')}${m.notes ? ' · ' + esc(m.notes.slice(0, 60)) : ''}</small></div>${m.url ? `<a class="btn xs" href="${esc(m.url)}" target="_blank" rel="noopener">Abrir</a>` : ''}</div>`).join('')}</div>` : '<p class="mut" style="font-size:13px">Sem materiais.</p>'}</div>`; }).join('')}</div>` : UI.empty('Sem disciplinas em curso.')}`; };
+  const FL = OS.Files;
+  return `<div class="row gap8" style="margin-bottom:10px;flex-wrap:wrap">${UI.addBtn('materials', 'Material')}${FL ? FL.btn('uni', '', 'Guardar ficheiros', 'btn') : ''}<span class="mut" style="font-size:12.5px">Slides, sebentas, exames antigos, vídeos e links do Moodle — tudo à mão, por disciplina. Os PDFs ficam no teu Google Drive: depois de guardados podes apagá-los do aparelho.</span></div>
+  ${FL ? FL.summary('uni') : ''}
+  ${S.length ? `<div class="g g2">${S.map(s => { const ms = M.filter(m => m.subject === s.id); return `<div class="pn"><div class="pn-h"><h3>${esc(s.name)}</h3>${s.moodle ? `<a class="btn xs ghost" href="${esc(s.moodle)}" target="_blank" rel="noopener">Moodle ↗</a>` : ''}${FL ? FL.btn('uni', s.id, 'PDF', 'btn xs ghost') : ''}${UI.addBtn('materials', '', { subject: s.id }, 'xs ghost')}</div>${FL ? FL.list('uni', s.id) : ''}${ms.length ? `<div class="list">${ms.map(m => `<div class="li"><span class="un-mi">${UI.ic(KIC[m.kind] || 'link')}</span><div class="li-t click" data-edit="materials:${m.id}"><b>${esc(m.title)}</b><small>${esc(m.kind || '')}${m.notes ? ' · ' + esc(m.notes.slice(0, 60)) : ''}</small></div>${m.url ? `<a class="btn xs" href="${esc(m.url)}" target="_blank" rel="noopener">Abrir</a>` : ''}</div>`).join('')}</div>` : (FL && FL.of('uni', s.id).length ? '' : '<p class="mut" style="font-size:13px">Sem materiais.</p>')}</div>`; }).join('')}</div>` : UI.empty('Sem disciplinas em curso.')}
+  ${FL && FL.of('uni').some(f => !f.ref || !OS.get('subjects', f.ref)) ? `<div class="pn"><div class="pn-h"><h3>Ficheiros sem disciplina</h3></div><div class="list f-list">${FL.of('uni').filter(f => !f.ref || !OS.get('subjects', f.ref)).map(FL.row).join('')}</div></div>` : ''}`; };
 
 /* ================= PRESENÇAS ================= */
 UNI.presencas = () => { const S = cur();
@@ -9397,7 +9550,7 @@ OS.on('ready', () => { if (!navigator.webdriver) setTimeout(() => W.get(), 3000)
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
-OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: true, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false };
+OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false };
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
@@ -9405,7 +9558,13 @@ const S = OS.Spyke = {};
 OS.S.spymem = { label: 'Memória do Spyke', title: r => String(r.text || '').slice(0, 60), fields: [{ k: 'text', l: 'O que o Spyke sabe', t: 'area', req: 1, rows: 3 }, { k: 'date', l: 'Desde', t: 'date' }] , defaults: () => ({ date: U.today(), src: 'manual' }) };
 OS.S.spyroutines = { label: 'Rotina de voz', title: r => r.phrase || 'Rotina', fields: [{ k: 'phrase', l: 'Quando eu disser', t: 'text', req: 1, ph: 'ex.: modo leitura' }, { k: 'steps', l: 'O Spyke faz (um comando por linha)', t: 'area', rows: 5, req: 1, ph: 'abre as Leituras\nclima\nnotícias' }, { k: 'reply', l: 'E diz no fim (opcional)', t: 'text' }] };
 const N = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w\s€.,:%-]/g, ' ').replace(/\s+/g, ' ').trim();
-const WAKE = /\b(e?sp[aey]i?[ck]+e?|spike|spyke|spaik|spaiki|espaique|espaike|espique|spaique)\b/;
+// o nome dele como o ditado do iPhone o escreve: Spyke, Spike, Spaik, Espaique, Spike's, Speak…
+const WAKE = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|espa[iy]\w*|espi[ck]\w*|speak|spai|spy)\b/;
+const WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
+const FILLW = new Set(['ei', 'hey', 'oi', 'ola', 'ok', 'okay', 'e', 'ai', 'eai', 'fala', 'o', 'ah', 'eh']);
+// tira o nome (e o "ei", "olá", "e aí" logo antes) e devolve o resto, com acentos: "Bom dia, Spike" → "Bom dia"; "Spike" → ""; sem nome → null
+const wakeSplit = raw => { const T = String(raw || '').split(/\s+/).filter(Boolean), w = x => N(x).replace(/[^\w]/g, ''), k = T.findIndex(x => WAKET.test(w(x))); if (k < 0) return null;
+  let a = k; while (a > 0 && FILLW.has(w(T[a - 1]))) a--; return T.slice(0, a).concat(T.slice(k + 1)).join(' ').replace(/^[\s,.:;!?-]+|[\s,;:-]+$/g, '').trim(); };
 const name = () => OS.one('profile').short || 'Ryan';
 const eurS = v => { const n = Math.abs(U.num(v)); return (Math.abs(n - Math.round(n)) < .005 ? Math.round(n) : n.toFixed(2).replace('.', ',')) + ' euros'; };
 const listS = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1];
@@ -9564,18 +9723,21 @@ S.listen = async (lo = {}) => { if (!SR) { open(); setSt('idle'); cap('spyke', '
 let earConf = 1, ear = null, appIn = false, earStopped = false, earBlock = 0, earTaps = 0, earErr = '', earFull = '', earBase = '', earT = 0, earFails = 0, earAt = 0, curSay = '', sayEnd = 0, bgPaused = 0;
 const SAYSTOP = /^(?:e?sp\w*\s+)?(?:para|pare|parar|chega|cala|silencio|stop)\b/;
 const EARSTOP = /\b(para|pare|parar|deixa|deixe|desliga|desligue|desativa|desative)\s+(?:de\s+)?(ouvir|escutar|o microfone|a escuta|microfone)\b|\b(vai|pode ir) dormir\b/;
-const earWanted = () => !!SR && appIn && !earStopped && !earBlock && !document.hidden && !bgPaused && !!cfg().always && (!navigator.webdriver || !!window.__spyEar);
+let hush = false; // true enquanto o Spyke prepara a resposta e fala (o microfone descansa)
+const earWanted = () => !!SR && appIn && !earStopped && !earBlock && !hush && !document.hidden && !bgPaused && !!cfg().always && (!navigator.webdriver || !!window.__spyEar);
 const earMark = () => { clearTimeout(earT); earBase = earFull; };
 const cut = full => { if (full.startsWith(earBase)) return full.slice(earBase.length); let i = 0; const m = Math.min(full.length, earBase.length); while (i < m && full[i] === earBase[i]) i++; return full.slice(i); };
 // o que o Spyke acabou de dizer e o microfone apanhou não conta como pedido teu
 const echo = n => { if (!curSay || Date.now() - sayEnd > 3500 && st !== 'speaking') return false; const w = n.split(' ').filter(x => x.length > 2); return w.length > 0 && w.filter(x => curSay.includes(x)).length / w.length >= .7; };
-const rawAfterWake = s => { const m = s.match(/^.*?\b(e?sp[aeiy]+[ck]+[eiy]?|spike|spyke|spaik\w*|espa[iy]\w*|espique)\b[\s,.:!?]*/i); return m ? s.slice(m[0].length).trim() : ''; };
+let armed = 0; // depois de ouvir só "Spyke", a frase seguinte (até 10 s) é o comando
 const earPhrase = s => { const n = N(s); if (!n || echo(n)) return; if (earConf > 0 && earConf < .3 && !WAKE.test(n)) return; // barulho mal reconhecido
-  if (EARSTOP.test(n)) { push('user', s); return earQuit(true); }
-  const m = n.match(WAKE), inConv = st === 'listening' || (cfg().cont && convOn());
-  if (m) { const cmd = n.slice(m.index + m[0].length).replace(/^[\s,.:]+/, ''); S.wakeFx(); convGo(); clearTimeout(lsT);
-    if (cmd.length > 2) { S.handle(rawAfterWake(s) || cmd); } else { push('user', s); S.say(pickR(['Sim, ' + name() + '?', 'Às ordens.', 'Diz.', 'Estou a ouvir.']), { listen: true }); } return; }
-  if (inConv) { convGo(); clearTimeout(lsT); S.handle(s); } };
+  if (EARSTOP.test(n) && (WAKE.test(n) || armed > Date.now() || st === 'listening')) { push('user', s); armed = 0; return earQuit(true); }
+  const cmd = wakeSplit(s), inConv = st === 'listening' || armed > Date.now() || (cfg().cont && convOn());
+  if (cmd !== null) { S.wakeFx(); convGo(); clearTimeout(lsT);
+    if (N(cmd).length > 1) { armed = 0; S.handle(cmd); return; }
+    // só o nome: um som curto e fica à espera do pedido (sem falar)
+    armed = Date.now() + 10000; setSt('listening'); const l = el && el.querySelector('.spy-st'); if (l) l.textContent = 'Diz o que precisas…'; lsT = setTimeout(() => { if (st === 'listening' && armed <= Date.now()) setSt('idle'); }, 10500); return; }
+  if (inConv) { armed = 0; convGo(); clearTimeout(lsT); S.handle(s); } };
 const earTake = () => { clearTimeout(earT); const s = cut(earFull).trim(); earBase = earFull; const n0 = msgs.length; if (s && st !== 'speaking' && st !== 'thinking') earPhrase(s); if (live && msgs.length === n0) { live = ''; renderChat(); } };
 const earStart = () => { if (ear || !earWanted()) return; let r; try { r = new SR(); } catch (e) { return; }
   r.lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1; earFull = earBase = ''; let got = false;
@@ -9583,7 +9745,7 @@ const earStart = () => { if (ear || !earWanted()) return; let r; try { r = new S
     if (st === 'speaking' || st === 'thinking') { const n = N(fresh); if (!cfg().barge || echo(n)) return;
       if (WAKE.test(n)) { earMark(); S.stop(); convGo(); push('spyke', 'Sim?'); S.listen({ follow: true }); } else if (SAYSTOP.test(n)) { earMark(); S.stop(); } return; }
     if ((st === 'listening' || convOn()) && el && !el.hidden && !echo(N(fresh))) cap('user', fresh);
-    clearTimeout(earT); if (e.results[e.results.length - 1].isFinal) earTake(); else earT = setTimeout(earTake, 1200); };
+    clearTimeout(earT); if (e.results[e.results.length - 1].isFinal) earTake(); else earT = setTimeout(earTake, 1500); };
   r.onerror = e => { earErr = e.error || ''; if (earErr === 'not-allowed' || earErr === 'service-not-allowed') { earBlock = Date.now(); earNeedTap(earErr); } };
   r.onend = () => { if (ear !== r) return; ear = null; if (earT) earTake(); setEarCls(); const quick = !got && Date.now() - earAt < 2500; earFails = quick ? earFails + 1 : 0;
     if (earWanted()) setTimeout(earStart, quick ? Math.min(15000, 400 * Math.pow(2, earFails)) : 250); else outSession(); };
@@ -9633,6 +9795,13 @@ const bgSync = () => { if (document.hidden) { earOff(); stopClap(); return; } if
 S._bgSync = () => bgSync();
 document.addEventListener('visibilitychange', () => setTimeout(bgSync, document.hidden ? 0 : 500));
 OS.on('one:spyke', () => setTimeout(bgSync, 100));
+// vigia: se uma resposta encravar (rede, IA, voz), o microfone nunca fica desligado — ao fim de 75 s volta a ouvir sozinho
+let stAt = Date.now(), stWas = '';
+setInterval(() => { if (st !== stWas) { stWas = st; stAt = Date.now(); }
+  if (hush && st !== 'speaking' && st !== 'thinking') { hush = false; bgSync(); }
+  else if ((st === 'thinking' || st === 'speaking') && Date.now() - stAt > 75000 && !(st === 'speaking' && (playing || (window.speechSynthesis && window.speechSynthesis.speaking)))) { try { S.stop(); } catch (e) { } setSt('idle'); } }, 3000);
+// uma vez: escuta sempre ligada, só responde ao nome e sem "interromper falando" (no iPhone ele ouvia a própria voz e interrompia-se)
+OS.on('ready', () => { const c = OS.one('spyke'); if (c.fix3 !== 1) OS.setOne('spyke', { always: true, convWin: -1, barge: false, fix3: 1 }); });
 // ao entrar (depois do Face ID ou do código) começa logo a ouvir: podes falar sem tocar em nada
 OS.on('unlock', () => { appIn = true; earStopped = false; earBlock = 0; earTaps = 0; if (cfg().always && SR && !strict() && (!navigator.webdriver || window.__spyEar)) convGo(Math.max(60000, win())); bgSync(); });
 
@@ -9765,7 +9934,9 @@ const bargeOn = () => { if (ear || !cfg().barge || !SR || barge || st !== 'speak
   r.onresult = e => { for (let i = e.resultIndex; i < e.results.length; i++) { if (WAKE.test(N(e.results[i][0].transcript))) { bargeOff(); S.stop(); convGo(); push('spyke', 'Sim?'); setTimeout(() => S.listen({ follow: true }), 200); return; } } };
   r.onerror = () => { }; r.onend = () => { if (barge === r) { barge = null; if (st === 'speaking') setTimeout(bargeOn, 250); } }; barge = r; try { r.start(); } catch (e) { barge = null; } };
 const idleTxt = () => ear ? (convOn() ? 'A ouvir. Fala à vontade.' : 'A ouvir. Diz "Spyke" para chamar.') : earStopped ? 'Microfone desligado. Toca no microfone para falar.' : 'Toca no microfone e fala';
-const setSt = s => { if ((st === 'speaking') !== (s === 'speaking')) { earMark(); if (st === 'speaking') sayEnd = Date.now(); } st = s; if (s === 'speaking') setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
+const setSt = s => { if ((st === 'speaking') !== (s === 'speaking')) { earMark(); if (st === 'speaking') sayEnd = Date.now(); }
+  const talk = s === 'speaking' || s === 'thinking'; if (talk && !hush && !cfg().barge) { hush = true; earOff(); } else if (!talk && hush) { hush = false; setTimeout(bgSync, 350); }
+  st = s; if (s === 'speaking') setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
 const bubbles = () => msgs.map(m => `<div class="spy-m ${m.r}"><div class="spy-bb">${esc(m.t)}${m.tap ? `<button class="btn xs pri spy-tap" data-act="spyTap">${UI.ic('play')}Ouvir</button>` : ''}</div></div>`).join('') + (live ? `<div class="spy-m user live"><div class="spy-bb">${esc(live)}</div></div>` : '');
 const renderChat = () => { if (!el) return; const c = el.querySelector('.spy-chat'); if (!c) return; c.innerHTML = bubbles() || `<div class="spy-empty">Diz "Bom dia", pede uma tarefa ou pergunta qualquer coisa.</div>`; c.scrollTop = c.scrollHeight; if (st === 'speaking') setSt('speaking'); };
 const push = (r, t) => { live = ''; msgs.push({ r, t: String(t) }); if (msgs.length > 40) msgs = msgs.slice(-40); renderChat(); };
@@ -9900,7 +10071,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     ${SR ? '' : '<p class="neg" style="font-size:12.5px;margin:8px 0 0">Este navegador não tem reconhecimento de voz: usa o Safari no iPhone ou o Chrome.</p>'}</div>
   <div class="pn"><div class="pn-h"><h3>Conversa</h3></div>
     <label class="switch"><input type="checkbox" data-bind="spyke.cont" ${c.cont ? 'checked' : ''}><span></span>Conversa contínua: depois de responder continua a ouvir sem dizeres o nome outra vez</label>
-    <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.barge" ${c.barge ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Interromper: diz "Spyke" enquanto ele fala e ele para e ouve-te</label>
+    <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.barge" ${c.barge ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Interromper por voz: diz "Spyke, para" enquanto ele fala (no iPhone pode ouvir a própria voz e interromper-se; deixa desligado se isso acontecer — podes sempre tocar no ecrã para o parar)</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.alerts" ${c.alerts ? 'checked' : ''}><span></span>Avisos falados: 30 e 10 min antes dos compromissos, contas do dia, tarefas às 18h, prova amanhã, inegociáveis às 21h (nunca entre as 23h e as 8h)</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.newsBrief" ${c.newsBrief ? 'checked' : ''}><span></span>Três notícias no resumo do dia</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.jarvisStart" ${c.jarvisStart ? 'checked' : ''}><span></span>Abrir o modo Jarvis quando abro a app</label></div>
@@ -14212,7 +14383,7 @@ function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = 
   const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Oceanum do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
 // o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
-IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4();
+IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4() + (IB.addon5 ? '\n' + IB.addon5() : '');
 
 /* ---- adivinhar categoria e conta ---- */
 const KW = [[/uber|bolt|taxi|táxi|metro|comboio|autocarro|gasolina|combust|portagem|estaciona|cp |carris/i, ['Transporte', 'Carro']], [/caf[eé]|restaurante|almo[cç]o|jantar|lanche|mercado|continente|pingo|lidl|aldi|mercadona|supermercado|padaria|pizza|burger|mcdonald|kfc|glovo|uber ?eats|bolt ?food|a[cç]a[ií]/i, ['Alimentação', 'Restauração', 'Supermercado']],
@@ -14326,7 +14497,7 @@ IB.MAXP = 12000;
 // as partes 1 e 2 (o núcleo, igual desde a versão 10) cortam-se ao meio numa linha de topo; a parte 3 é o ficheiro das novidades
 IB.parts = key => { const L = IB.core(key).split('\n'), half = L.join('\n').length / 2, out = []; let cur = [], n = 0, cut = false;
   L.forEach(l => { if (!cut && n > half && /^(function |\/\/ ---- |const )/.test(l)) { out.push(cur); cur = []; cut = true; } cur.push(l); n += l.length + 1; });
-  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4()); };
+  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4(), IB.addon5 ? IB.addon5() : []); };
 IB.partsHelp = () => { const n = IB.parts(cfg().key || 'x').length; return { n, files: Array.from({ length: n }, (_, i) => i ? 'Parte' + (i + 1) : 'Código.gs') }; };
 const partsBtns = (cls = 'btn pri', from = 0, to = 99) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from || i > to ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
 IB.partsBtns = partsBtns;
@@ -14339,26 +14510,30 @@ const partsModal = () => { const { n, files } = IB.partsHelp(); UI.modal(`<div s
 // Definições → Script Google: as 4 partes num só sítio, com o que cada uma faz e se já está no teu script
 IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.key), UM = OS.UniMail, I = UM && UM.info ? UM.info() : null;
   if (on && !I && UM && UM.check && !IB._p4) { IB._p4 = 1; setTimeout(() => UM.check().then(() => { IB._p4 = 0; }), 30); }
+  if (on && OS.Files && !OS.Files.has5() && !IB._p5) { IB._p5 = 1; setTimeout(() => OS.Files.check().then(() => { IB._p5d = 1; OS.request(); }), 60); }
   const has4 = !!(I && I.has4), tail = esc(String(c.url || '').slice(-16));
   const st = (ok, wait) => `<span class="bdg ${ok ? 'pos' : wait ? '' : 'warn'}">${ok ? '✓ instalada' : wait ? 'a verificar…' : 'falta'}</span>`;
   const P = [[0, 'Parte 1 · Código.gs', 'O núcleo: atalho de gastos, sincronização entre aparelhos, notícias e a Siri.', on && v >= 10],
     [1, 'Parte 2 · ficheiro Parte2', 'O resto do núcleo (o "colar" do telemóvel corta textos grandes, por isso vai em dois).', on && v >= 10],
     [2, 'Parte 3 · ficheiro Parte3', 'E-mail completo dentro da app, Agenda Google e leitor de notícias.', on && v >= 11],
-    [3, 'Parte 4 · ficheiro Parte4', 'Outlook da faculdade (separado por matéria) e IA sem limites nas perguntas pela Siri.', has4]];
-  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${has4 ? '✓ A Parte 4 já está no teu script' : 'Parte 4 · copiar e colar (3 minutos)'}</h3>${on ? st(has4, !I) : ''}</div>
+    [3, 'Parte 4 · ficheiro Parte4', 'Outlook da faculdade (separado por matéria) e IA sem limites nas perguntas pela Siri.', has4],
+    [4, 'Parte 5 · ficheiro Parte5', 'Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos guardados no teu Google Drive.', !!(OS.Files && OS.Files.has5())]];
+  const has5 = !!(OS.Files && OS.Files.has5()), nx = !has4 ? 4 : !has5 ? 5 : 4, done = nx === 4 ? has4 : has5;
+  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ As partes 4 e 5 já estão no teu script' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : !IB._p5d) : ''}</div>
     ${!on ? `<p class="mut" style="margin:0 0 8px">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ''}
-    <p class="mut" style="margin:0 0 8px">A Parte 4 é um <b>ficheiro novo</b> no mesmo projeto: não apagas nada das partes 1, 2 e 3.</p>
-    <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', 3, 3)}</div></li>
+    ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nada das outras partes.${nx === 5 ? ' Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive.' : ''}</p>
+    <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', nx - 1, nx - 1)}</div></li>
       <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Oceanum (no iPhone: <b>aA → Pedir site para computador</b>).</li>
-      <li><b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte4</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte4 já existir, abre-a e substitui o conteúdo.</li>
-      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}</li>
-      <li>Volta aqui e toca em <b>Verificar</b>. Se continuar a dizer "falta", a Parte4 tem de ficar <b>por baixo</b> da Parte3 na lista de ficheiros (⋮ → Mover para baixo) e repete o passo 4.</li></ol>
-    <div class="row gap8" style="flex-wrap:wrap"><button class="btn sm" data-act="scVer" ${on ? '' : 'disabled'}>${UI.ic('sync')}Verificar</button>${has4 ? '<a class="btn sm ghost" href="#email.faculdade">Ligar o Outlook da faculdade</a>' : ''}</div></div>
-  <div class="pn"><div class="pn-h"><h3>Todas as partes do script</h3>${on ? `<span class="mut" style="font-size:12px">versão ${v || '?'}${has4 ? ' + Parte 4' : ''}</span>` : ''}</div>
+      <li><b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte${nx}</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte${nx} já existir, abre-a e substitui o conteúdo.</li>
+      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}${nx === 5 ? ' Se pedir, autoriza o acesso ao Google Drive.' : ''}</li>
+      <li>Volta aqui e toca em <b>Verificar</b>. Se continuar a dizer "falta", a Parte${nx} tem de ficar <b>por baixo</b> da Parte${nx - 1} na lista de ficheiros (⋮ → Mover para baixo) e repete o passo 4.</li></ol>`}
+    <div class="row gap8" style="flex-wrap:wrap"><button class="btn sm" data-act="scVer" ${on ? '' : 'disabled'}>${UI.ic('sync')}Verificar</button>${has4 ? '<a class="btn sm ghost" href="#email.faculdade">Ligar o Outlook da faculdade</a>' : ''}${has5 ? '<a class="btn sm ghost" href="#universidade.materiais">Guardar ficheiros da Universidade</a>' : ''}</div></div>
+  <div class="pn"><div class="pn-h"><h3>Todas as partes do script</h3>${on ? `<span class="mut" style="font-size:12px">versão ${v || '?'}${has4 ? ' + Parte 4' : ''}${has5 ? ' + Parte 5' : ''}</span>` : ''}</div>
     <p class="mut" style="margin:0 0 10px">Cada parte fica no seu ficheiro, no mesmo projeto do Apps Script, por esta ordem. Só precisas de copiar outra vez uma parte quando aqui disser "falta".</p>
-    <div class="list sc-parts">${P.map(([i, t, d, ok]) => `<div class="li"><div class="li-t"><b>${t}</b><small>${d}</small></div><div class="li-r row gap8">${on ? st(ok, i === 3 && !I) : ''}${partsBtns('btn sm', i, i).replace(/Copiar parte \d+ \([^)]*\)/, 'Copiar')}</div></div>`).join('')}</div>
+    <div class="list sc-parts">${P.map(([i, t, d, ok]) => `<div class="li"><div class="li-t"><b>${t}</b><small>${d}</small></div><div class="li-r row gap8">${on ? st(ok, (i === 3 && !I) || (i === 4 && !ok && !IB._p5d)) : ''}${partsBtns('btn sm', i, i).replace(/Copiar parte \d+ \([^)]*\)/, 'Copiar')}</div></div>`).join('')}</div>
     <small class="mut">O endereço e a chave nunca mudam: os outros aparelhos continuam ligados sem fazer nada.</small></div>`; };
-A.scVer = async () => { UI.toast('A verificar…'); try { await IB.check(); } catch (e) { } const UM = OS.UniMail, i = UM && UM.check ? await UM.check() : null; OS.request();
+A.scVer = async () => { UI.toast('A verificar…'); try { await IB.check(); } catch (e) { } const UM = OS.UniMail, i = UM && UM.check ? await UM.check() : null; if (OS.Files) await OS.Files.check(); OS.request();
+  const f5 = OS.Files && OS.Files.has5(); if (i && i.has4 && f5) return UI.toast('Partes 4 e 5 instaladas ✓', 'pos'); if (i && i.has4 && !f5) return UI.toast('Parte 4 ✓ · ainda não vejo a Parte 5: confirma a "Nova versão" ao implantar.', 'warn');
   UI.toast(i && i.has4 ? 'Parte 4 instalada ✓' : (+(cfg().ver || 0) < 11 ? 'Falta atualizar o script (versão ' + (cfg().ver || 'antiga') + ').' : 'Ainda não vejo a Parte 4: confirma a "Nova versão" ao implantar.'), i && i.has4 ? 'pos' : 'warn'); };
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   if (b.dataset.t === 'code') return partsModal();
@@ -14378,6 +14553,125 @@ OS.on('ready', () => { try { OS.all('transactions').filter(t => (t.tags || []).i
 OS.on('ready', () => { setTimeout(() => { IB.pull(false); if (cfg().url && cfg().key) IB.check().then(() => OS.request()); }, 1500); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) IB.pull(false); });
 setInterval(() => { if (!document.hidden) IB.pull(false); }, 90000);
+})();
+
+</script>
+<script>
+/* OCEANUM — Ficheiros na nuvem: PDFs, slides, exames e documentos da Universidade e dos Cursos guardados no TEU Google Drive
+   (pasta "Oceanum · Ficheiros", uma subpasta por disciplina e por curso). Depois de enviados, podes apagá-los do aparelho:
+   ficam no Drive e abrem-se daqui em qualquer aparelho. Precisa da Parte 5 do script Google (Definições → Script Google). */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc, IB = OS.Inbox;
+const FL = OS.Files = {};
+const CH = 3000000, MAX = 40 * 1048576;
+OS.S.files = { label: 'Ficheiro', title: r => r.name, fields: [
+  { k: 'name', l: 'Nome', t: 'text', req: 1 }, { k: 'kind', l: 'Tipo', t: 'sel', o: ['PDF', 'Slides', 'Sebenta / apontamentos', 'Exercícios', 'Exames antigos', 'Livro', 'Certificado', 'Imagem', 'Documento', 'Outro'] },
+  { k: 'notes', l: 'Notas', t: 'area', rows: 2 }], defaults: () => ({ kind: 'PDF' }) };
+
+/* ---------- Parte 5 do script ---------- */
+IB.addon5 = () => `// Oceanum · PARTE 5 — Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos guardados no TEU Google Drive
+// (pasta "Oceanum · Ficheiros"). Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Não apagues as outras partes.
+function fRaiz_() { const P = PropertiesService.getScriptProperties(); let f = null; const id = P.getProperty('F_ROOT');
+  if (id) { try { f = DriveApp.getFolderById(id); if (f.isTrashed()) f = null; } catch (e) { f = null; } }
+  if (!f) { const it = DriveApp.getFoldersByName('Oceanum · Ficheiros'); f = it.hasNext() ? it.next() : DriveApp.createFolder('Oceanum · Ficheiros'); P.setProperty('F_ROOT', f.getId()); }
+  return f; }
+function fPasta_(c) { let f = fRaiz_(); String(c || '').split('/').map(function (x) { return x.replace(/[\\\\:*?"<>|]/g, ' ').trim().slice(0, 80); }).filter(String).forEach(function (n) { const it = f.getFoldersByName(n); f = it.hasNext() ? it.next() : f.createFolder(n); }); return f; }
+function fTmp_() { const r = fRaiz_(), it = r.getFoldersByName('_envios'); return it.hasNext() ? it.next() : r.createFolder('_envios'); }
+function op_fping(p) { const r = fRaiz_(); return { ok: true, v: 5, pasta: r.getUrl() }; }
+// envio por partes: up = id do envio, i = número da parte, n = total de partes, d = pedaço em base64
+function op_fup(p) { const up = String(p.up || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 40), i = Number(p.i || 0), n = Number(p.n || 1);
+  if (!up || !(n >= 1) || !(i >= 0) || i >= n) return { ok: false, msg: 'Pedido inválido' };
+  let b64 = String(p.d || '');
+  if (n > 1) { const tmp = fTmp_(), nm = function (k) { return up + '.' + ('000' + k).slice(-4); };
+    tmp.createFile(nm(i), b64, MimeType.PLAIN_TEXT); if (i < n - 1) return { ok: true, i: i };
+    const fs = []; for (let k = 0; k < n; k++) { const it = tmp.getFilesByName(nm(k)); if (!it.hasNext()) return { ok: false, msg: 'Falta a parte ' + (k + 1) }; fs.push(it.next()); }
+    b64 = fs.map(function (f) { return f.getBlob().getDataAsString(); }).join(''); fs.forEach(function (f) { f.setTrashed(true); });
+    const velho = Date.now() - 864e5, it2 = tmp.getFiles(); while (it2.hasNext()) { const f = it2.next(); if (f.getDateCreated().getTime() < velho) f.setTrashed(true); } }
+  const blob = Utilities.newBlob(Utilities.base64Decode(b64), String(p.mime || 'application/octet-stream'), String(p.nome || 'ficheiro').slice(0, 180));
+  const f = fPasta_(p.pasta).createFile(blob); if (p.desc) f.setDescription(String(p.desc).slice(0, 500));
+  return { ok: true, id: f.getId(), url: f.getUrl(), size: f.getSize() }; }
+// descarregar por partes (para abrir dentro da app ou guardar no aparelho)
+function op_fdl(p) { const f = DriveApp.getFileById(String(p.id || '')), b = Utilities.base64Encode(f.getBlob().getBytes()), c = 3000000, i = Number(p.i || 0);
+  return { ok: true, n: Math.max(1, Math.ceil(b.length / c)), d: b.slice(i * c, (i + 1) * c), mime: f.getMimeType(), nome: f.getName() }; }
+function op_frm(p) { try { DriveApp.getFileById(String(p.id || '')).setTrashed(true); return { ok: true }; } catch (e) { return { ok: false, msg: String(e.message || e) }; } }
+// lista tudo o que está na pasta (para recuperar a lista noutro aparelho)
+function op_fls(p) { const out = []; (function anda(f, cam) { const fs = f.getFiles(); while (fs.hasNext() && out.length < 3000) { const x = fs.next(); if (!x.isTrashed()) out.push({ id: x.getId(), n: x.getName(), s: x.getSize(), m: x.getMimeType(), u: x.getUrl(), p: cam, t: x.getDateCreated().getTime() }); }
+  const ds = f.getFolders(); while (ds.hasNext()) { const d = ds.next(); if (d.getName() !== '_envios') anda(d, cam ? cam + '/' + d.getName() : d.getName()); } })(fRaiz_(), ''); return { ok: true, f: out }; }
+`;
+
+/* ---------- estado ---------- */
+const st = () => OS.one('inbox') || {};
+FL.ready = () => !!(st().url && st().key);
+FL.has5 = () => !!(st().f5);
+FL.check = async () => { if (!FL.ready()) return false; try { const j = await IB.post({ op: 'fping' }); const ok = !!(j && j.ok && j.v >= 5); const c = st(); if (!!c.f5 !== ok || (ok && j.pasta && c.f5url !== j.pasta)) { c.f5 = ok ? 1 : 0; if (j.pasta) c.f5url = j.pasta; OS.touch('inbox'); } return ok; } catch (e) { return false; } };
+OS.on('ready', () => setTimeout(() => { if (FL.ready() && !FL.has5()) FL.check(); }, 5000));
+
+const ext = n => (String(n).match(/\.([a-z0-9]{1,5})$/i) || [, ''])[1].toLowerCase();
+const kindOf = (n, m) => { const e = ext(n); return e === 'pdf' ? 'PDF' : /^(ppt|pptx|key|odp)$/.test(e) ? 'Slides' : /^(png|jpe?g|heic|webp|gif)$/.test(e) || /^image\//.test(m || '') ? 'Imagem' : /^(doc|docx|odt|pages|txt|rtf|md)$/.test(e) ? 'Documento' : /^(xls|xlsx|csv|numbers|ods)$/.test(e) ? 'Documento' : 'Outro'; };
+const ICON = { PDF: 'note', Slides: 'grid', Imagem: 'eye', Documento: 'note', 'Exames antigos': 'checksq', 'Exercícios': 'checksq', Livro: 'book', Certificado: 'shield' };
+FL.size = b => { b = +b || 0; return b >= 1048576 ? U.nf(b / 1048576, 1) + ' MB' : b >= 1024 ? U.nf(b / 1024, 0) + ' KB' : b + ' B'; };
+FL.of = (area, ref) => U.sortBy(OS.all('files').filter(f => f.area === area && (!ref || f.ref === ref)), f => -(f.at || 0));
+const folderFor = (area, ref) => { if (area === 'uni') { const s = OS.get('subjects', ref); return 'Universidade/' + (s ? s.name : 'Geral'); } if (area === 'curso') { const l = OS.get('learn', ref); return 'Cursos/' + (l ? l.title : 'Geral'); } return 'Outros'; };
+
+/* ---------- envio ---------- */
+const UP = FL.up = { q: [], cur: null, done: 0, total: 0 };
+const pill = () => { let el = document.getElementById('fUp'); const c = UP.cur; if (!c && !UP.q.length) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'fUp'; el.className = 'f-up'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  const p = c ? Math.round(c.p * 100) : 0; el.innerHTML = `<b>${UI.ic('arrowUp')}A guardar na nuvem${UP.total > 1 ? ` · ${UP.done + 1} de ${UP.total}` : ''}</b><small>${esc(c ? c.name : '')}</small><i><span style="width:${p}%"></span></i>`; };
+const b64 = file => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).replace(/^data:[^,]*,/, '')); r.onerror = () => rej(r.error || new Error('Não consegui ler o ficheiro')); r.readAsDataURL(file); });
+const post = async (o, tries = 3) => { let e; for (let t = 0; t < tries; t++) { try { const j = await IB.post(o); if (j && j.ok) return j; e = new Error((j && j.msg) || 'sem resposta'); if (j && /Valor inválido|Pedido inválido/.test(j.msg || '')) break; } catch (x) { e = x; } await new Promise(r => setTimeout(r, 1200 * (t + 1))); } throw e; };
+const sendOne = async it => { const f = it.file; UP.cur = { name: f.name, p: 0 }; pill();
+  const d = await b64(f), n = Math.max(1, Math.ceil(d.length / CH)), up = U.uid ? U.uid().replace(/[^a-z0-9]/gi, '') : String(Date.now()) + Math.random().toString(36).slice(2, 8);
+  let r = null; for (let i = 0; i < n; i++) { r = await post({ op: 'fup', up, i, n, d: d.slice(i * CH, (i + 1) * CH), nome: f.name, mime: f.type || 'application/octet-stream', pasta: folderFor(it.area, it.ref) }); UP.cur.p = (i + 1) / n; pill(); }
+  if (!r || !r.id) throw new Error('O Drive não confirmou o ficheiro');
+  OS.add('files', { name: f.name.replace(/\.[a-z0-9]{1,5}$/i, ''), file: f.name, area: it.area, ref: it.ref, kind: kindOf(f.name, f.type), size: r.size || f.size, mime: f.type || '', fid: r.id, url: r.url, at: Date.now() }); };
+const run = async () => { if (UP.cur) return; let ok = 0, bad = [];
+  while (UP.q.length) { const it = UP.q.shift(); try { await sendOne(it); ok++; } catch (e) { bad.push(it.file.name + ': ' + (e.message || e)); } UP.done++; UP.cur = null; pill(); }
+  UP.cur = null; UP.done = 0; UP.total = 0; pill(); OS.request();
+  if (ok) UI.toast(ok === 1 ? 'Guardado no teu Google Drive ✓ Já o podes apagar do aparelho.' : `${ok} ficheiros guardados no teu Google Drive ✓`, 'pos');
+  if (bad.length) UI.toast('Não consegui guardar: ' + bad.slice(0, 2).join(' · '), 'neg'); };
+FL.send = (files, area, ref) => { const L = [...files], big = L.filter(f => f.size > MAX); if (big.length) UI.toast(`${big.map(f => f.name).slice(0, 2).join(', ')}: maior que 40 MB (divide o PDF ou guarda o link do Drive).`, 'warn');
+  L.filter(f => f.size <= MAX).forEach(file => UP.q.push({ file, area, ref })); UP.total = UP.q.length + (UP.cur ? 1 : 0); if (UP.q.length) run(); };
+
+/* ---------- ações ---------- */
+const needPart5 = () => UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>${UI.ic('arrowUp')}Guardar ficheiros na nuvem</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+  ${FL.ready() ? `<p style="margin:0 0 10px">Os ficheiros vão para o <b>teu Google Drive</b> (pasta <b>Oceanum · Ficheiros</b>, uma subpasta por disciplina e por curso). Para isso o teu script precisa da <b>Parte 5</b> (um ficheiro novo, 2 minutos):</p>
+  <ol class="ai-steps"><li><button class="btn pri" data-act="ibCopy" data-t="p${IB.partsHelp().n}">${UI.ic('link')}Copiar a Parte 5</button></li>
+  <li>Em <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o projeto do Oceanum → <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte5</b> → apaga o que vier → cola → <b>Guardar</b>.</li>
+  <li><b>Implantar → Gerenciar implantações</b> → lápis → Versão: <b>Nova versão</b> → <b>Implantar</b>. Se pedir, autoriza o Google Drive.</li>
+  <li>Volta aqui e toca em <b>Verificar</b>.</li></ol>
+  <div class="row gap8"><button class="btn sm" data-act="fVer">${UI.ic('sync')}Verificar</button><a class="btn sm ghost" href="#definicoes.script" data-mclose>Ver todas as partes</a></div>`
+  : `<p>Primeiro liga o script Google em <a class="acc" href="#definicoes" data-mclose>Definições → Geral</a>. É ele que guarda os ficheiros no teu Google Drive.</p>`}</div>`);
+A.fVer = async () => { UI.toast('A verificar…'); const ok = await FL.check(); OS.request(); UI.toast(ok ? 'Parte 5 instalada ✓ Já podes guardar ficheiros.' : 'Ainda não vejo a Parte 5: confirma "Nova versão" ao implantar.', ok ? 'pos' : 'warn'); if (ok) UI.closeModal && UI.closeModal(); };
+A.fPick = async b => { if (!FL.has5()) { if (FL.ready() && await FL.check()) { /* instalada entretanto */ } else return needPart5(); }
+  const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true; inp.accept = b.dataset.acc || '.pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt,.md,.zip,image/*'; inp.style.display = 'none';
+  inp.onchange = () => { if (inp.files && inp.files.length) FL.send(inp.files, b.dataset.area, b.dataset.ref); inp.remove(); }; document.body.appendChild(inp); inp.click(); };
+A.fOpen = b => { const f = OS.get('files', b.dataset.id); if (f && f.url) window.open(f.url, '_blank', 'noopener'); };
+const fetchBlob = async f => { const parts = []; let n = 1; for (let i = 0; i < n; i++) { const j = await post({ op: 'fdl', id: f.fid, i }); n = j.n || 1; parts.push(j.d || ''); }
+  const bin = atob(parts.join('')), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i); return new Blob([arr], { type: f.mime || 'application/octet-stream' }); };
+FL.blob = fetchBlob;
+A.fDown = async b => { const f = OS.get('files', b.dataset.id); if (!f) return; UI.toast('A descarregar do Drive…');
+  try { const bl = await fetchBlob(f), name = f.file || f.name, fl = typeof File === 'function' ? new File([bl], name, { type: bl.type }) : null;
+    if (fl && navigator.canShare && navigator.canShare({ files: [fl] })) { await navigator.share({ files: [fl], title: name }); return; }
+    const u = URL.createObjectURL(bl), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 4000); }
+  catch (e) { if (e && e.name === 'AbortError') return; UI.toast('Não consegui descarregar: ' + (e.message || e), 'neg'); } };
+A.fDel = b => { const f = OS.get('files', b.dataset.id); if (!f) return; UI.ask('Apagar este ficheiro?', `"${f.name}" vai para o lixo do teu Google Drive (podes recuperá-lo lá durante 30 dias).`, 'Apagar', async () => {
+  try { if (f.fid && FL.ready()) await post({ op: 'frm', id: f.fid }, 2); } catch (e) { } OS.del('files', f.id); UI.toast('Ficheiro apagado'); }); };
+A.fSync = async () => { if (!FL.has5()) return needPart5(); UI.toast('A ler a pasta do Drive…');
+  try { const j = await post({ op: 'fls' }), have = new Set(OS.all('files').map(f => f.fid)); let n = 0;
+    (j.f || []).forEach(x => { if (have.has(x.id)) return; const [top, sub] = String(x.p || '').split('/'); let area = 'outro', ref = '';
+      if (top === 'Universidade') { const s = OS.all('subjects').find(s => s.name === sub); area = 'uni'; ref = s ? s.id : ''; } else if (top === 'Cursos') { const l = OS.all('learn').find(l => l.title === sub); area = 'curso'; ref = l ? l.id : ''; }
+      OS.add('files', { name: x.n.replace(/\.[a-z0-9]{1,5}$/i, ''), file: x.n, area, ref, kind: kindOf(x.n, x.m), size: x.s, mime: x.m, fid: x.id, url: x.u, at: x.t || Date.now() }); n++; });
+    UI.toast(n ? `${n} ficheiro(s) recuperado(s) do Drive` : 'A lista já está igual ao Drive ✓', 'pos'); } catch (e) { UI.toast('Não consegui ler o Drive: ' + (e.message || e), 'neg'); } };
+
+/* ---------- blocos de ecrã ---------- */
+FL.btn = (area, ref, label = 'Guardar ficheiros', cls = 'btn xs') => `<button class="${cls}" data-act="fPick" data-area="${area}" data-ref="${esc(ref || '')}" title="Guardar PDFs e documentos no teu Google Drive">${UI.ic('arrowUp')}${esc(label)}</button>`;
+FL.row = f => `<div class="li f-li"><span class="un-mi">${UI.ic(ICON[f.kind] || 'note')}</span><div class="li-t click" data-act="fOpen" data-id="${f.id}" title="Abrir no Google Drive"><b>${esc(f.name)}</b><small>${esc(f.kind || '')} · ${FL.size(f.size)} · ${U.fmtDS ? U.fmtDS(U.iso(new Date(f.at || Date.now()))) : ''} · no Drive</small></div>
+  <span class="row gap6 f-act"><button class="btn xs" data-act="fOpen" data-id="${f.id}">Abrir</button><button class="icon-btn" data-act="fDown" data-id="${f.id}" aria-label="Descarregar para o aparelho" title="Descarregar">${UI.ic('arrowDown')}</button><button class="icon-btn" data-edit="files:${f.id}" aria-label="Renomear" title="Renomear">${UI.ic('edit')}</button><button class="icon-btn" data-act="fDel" data-id="${f.id}" aria-label="Apagar" title="Apagar">${UI.ic('trash')}</button></span></div>`;
+FL.list = (area, ref, empty = '') => { const L = FL.of(area, ref); return L.length ? `<div class="list f-list">${L.map(FL.row).join('')}</div>` : (empty ? `<p class="mut" style="font-size:13px;margin:6px 0">${empty}</p>` : ''); };
+FL.summary = area => { const L = OS.all('files').filter(f => !area || f.area === area), sz = U.sum(L, f => +f.size || 0);
+  return `<div class="f-sum"><span>${UI.ic('arrowUp')}<b>${L.length}</b> ficheiro(s) na nuvem · ${FL.size(sz)}</span>${FL.has5() ? `${st().f5url ? `<a class="btn xs ghost" href="${esc(st().f5url)}" target="_blank" rel="noopener">Abrir pasta no Drive ↗</a>` : ''}<button class="btn xs ghost" data-act="fSync" title="Ir buscar ao Drive ficheiros guardados noutro aparelho">${UI.ic('sync')}Atualizar lista</button>` : `<button class="btn xs ghost" data-act="fPick" data-area="${area || 'outro'}" data-ref="">Ativar ficheiros na nuvem</button>`}</div>`; };
 })();
 
 </script>
