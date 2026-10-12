@@ -380,7 +380,7 @@ IB.check = async () => { const u = base(), c = cfg();
   try { let j = null; try { j = await getJSON(q('&op=ping&_=' + Date.now())); } catch (e) { }
     if (!j) return IB.st = { ok: false, m: 'O Google respondeu com uma página em vez dos dados. Na implementação, "Quem tem acesso" tem de ser "Qualquer pessoa".' };
     if (j.msg === 'Chave errada') return IB.st = { ok: false, m: 'Chave errada: o código no Apps Script não é o atual. Cola-o outra vez, guarda e faz Implementar → Gerir implementações → ✏️ → Nova versão.' };
-    if (!j.ok && /Valor inv/i.test(j.msg || '')) { cfg().ver = 1; OS.touch('inbox'); return IB.st = { ok: false, m: 'O script Google é uma versão antiga: atualiza-o (página do Spyke → Estado do Spyke → passo a passo).' }; }
+    if (!j.ok && /Valor inv/i.test(j.msg || '')) { cfg().ver = 1; OS.touch('inbox'); return IB.st = { ok: false, m: 'O script Google é uma versão antiga: atualiza-o (Definições → Script Google).' }; }
     if (!j.ok) return IB.st = { ok: false, m: 'O script respondeu com erro: ' + (j.msg || '?') };
     cfg().ver = j.v || 2; OS.touch('inbox');
     if ((j.v || 2) >= 3) { // testa também a gravação no Google Drive (precisa de autorização dada no editor)
@@ -449,6 +449,30 @@ const partsModal = () => { const { n, files } = IB.partsHelp(); UI.modal(`<div s
   <li>Cada parte seguinte vai num ficheiro seu (${files.slice(1).join(', ')}): <b>Arquivos → +</b> → <b>Script</b> → o nome → apaga o que vier → cola → <b>Guardar</b>. Se o ficheiro já existir, substitui o conteúdo.</li>
   <li>Confirma que nenhuma parte ficou cortada: cada uma acaba numa linha com <code>}</code>.</li></ol>
   <div class="row gap8" style="flex-wrap:wrap">${partsBtns()}</div></div>`, 'tall'); };
+// Definições → Script Google: as 4 partes num só sítio, com o que cada uma faz e se já está no teu script
+IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.key), UM = OS.UniMail, I = UM && UM.info ? UM.info() : null;
+  if (on && !I && UM && UM.check && !IB._p4) { IB._p4 = 1; setTimeout(() => UM.check().then(() => { IB._p4 = 0; }), 30); }
+  const has4 = !!(I && I.has4), tail = esc(String(c.url || '').slice(-16));
+  const st = (ok, wait) => `<span class="bdg ${ok ? 'pos' : wait ? '' : 'warn'}">${ok ? '✓ instalada' : wait ? 'a verificar…' : 'falta'}</span>`;
+  const P = [[0, 'Parte 1 · Código.gs', 'O núcleo: atalho de gastos, sincronização entre aparelhos, notícias e a Siri.', on && v >= 10],
+    [1, 'Parte 2 · ficheiro Parte2', 'O resto do núcleo (o "colar" do telemóvel corta textos grandes, por isso vai em dois).', on && v >= 10],
+    [2, 'Parte 3 · ficheiro Parte3', 'E-mail completo dentro da app, Agenda Google e leitor de notícias.', on && v >= 11],
+    [3, 'Parte 4 · ficheiro Parte4', 'Outlook da faculdade (separado por matéria) e IA sem limites nas perguntas pela Siri.', has4]];
+  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${has4 ? '✓ A Parte 4 já está no teu script' : 'Parte 4 · copiar e colar (3 minutos)'}</h3>${on ? st(has4, !I) : ''}</div>
+    ${!on ? `<p class="mut" style="margin:0 0 8px">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ''}
+    <p class="mut" style="margin:0 0 8px">A Parte 4 é um <b>ficheiro novo</b> no mesmo projeto: não apagas nada das partes 1, 2 e 3.</p>
+    <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', 3, 3)}</div></li>
+      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Oceanum (no iPhone: <b>aA → Pedir site para computador</b>).</li>
+      <li><b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte4</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte4 já existir, abre-a e substitui o conteúdo.</li>
+      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}</li>
+      <li>Volta aqui e toca em <b>Verificar</b>. Se continuar a dizer "falta", a Parte4 tem de ficar <b>por baixo</b> da Parte3 na lista de ficheiros (⋮ → Mover para baixo) e repete o passo 4.</li></ol>
+    <div class="row gap8" style="flex-wrap:wrap"><button class="btn sm" data-act="scVer" ${on ? '' : 'disabled'}>${UI.ic('sync')}Verificar</button>${has4 ? '<a class="btn sm ghost" href="#email.faculdade">Ligar o Outlook da faculdade</a>' : ''}</div></div>
+  <div class="pn"><div class="pn-h"><h3>Todas as partes do script</h3>${on ? `<span class="mut" style="font-size:12px">versão ${v || '?'}${has4 ? ' + Parte 4' : ''}</span>` : ''}</div>
+    <p class="mut" style="margin:0 0 10px">Cada parte fica no seu ficheiro, no mesmo projeto do Apps Script, por esta ordem. Só precisas de copiar outra vez uma parte quando aqui disser "falta".</p>
+    <div class="list sc-parts">${P.map(([i, t, d, ok]) => `<div class="li"><div class="li-t"><b>${t}</b><small>${d}</small></div><div class="li-r row gap8">${on ? st(ok, i === 3 && !I) : ''}${partsBtns('btn sm', i, i).replace(/Copiar parte \d+ \([^)]*\)/, 'Copiar')}</div></div>`).join('')}</div>
+    <small class="mut">O endereço e a chave nunca mudam: os outros aparelhos continuam ligados sem fazer nada.</small></div>`; };
+A.scVer = async () => { UI.toast('A verificar…'); try { await IB.check(); } catch (e) { } const UM = OS.UniMail, i = UM && UM.check ? await UM.check() : null; OS.request();
+  UI.toast(i && i.has4 ? 'Parte 4 instalada ✓' : (+(cfg().ver || 0) < 11 ? 'Falta atualizar o script (versão ' + (cfg().ver || 'antiga') + ').' : 'Ainda não vejo a Parte 4: confirma a "Nova versão" ao implantar.'), i && i.has4 ? 'pos' : 'warn'); };
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   if (b.dataset.t === 'code') return partsModal();
   const pi = /^p(\d+)$/.test(b.dataset.t || '') ? +b.dataset.t.slice(1) - 1 : -1, P = pi >= 0 ? IB.parts(c.key) : null;

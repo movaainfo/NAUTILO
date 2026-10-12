@@ -298,11 +298,11 @@ OS.on('ready', () => setTimeout(newsTick, 6000)); setInterval(newsTick, 30 * 60e
 /* ================= comandos ================= */
 const hist = [];
 const pickR = a => a[Math.floor(Math.random() * a.length)];
-const routes = () => { const out = []; document.querySelectorAll('.tn-dd a[href^="#"], #side a[href^="#"]').forEach(a => { const k = a.getAttribute('href').slice(1), l = (a.querySelector('b') || a.querySelector('span') || a).textContent.trim(); if (k && l && !out.some(x => x[0] === k)) out.push([k, l]); }); return out.concat([['definicoes', 'Definições'], ['visao', 'Visão geral'], ['visao', 'Painel'], ['visao', 'Control Room'], ['visao', 'Centro de controlo'], ['spyke', 'Spyke'], ['email', 'E-mail']]); };
+const routes = () => { const out = []; document.querySelectorAll('.tn-dd a[href^="#"], #side a[href^="#"]').forEach(a => { const k = a.getAttribute('href').slice(1), l = (a.querySelector('b') || a.querySelector('span') || a).textContent.trim(); if (k && l && !out.some(x => x[0] === k)) out.push([k, l]); }); return out.concat([['definicoes', 'Definições'], ['visao', 'Visão geral'], ['visao', 'Painel'], ['visao', 'Control Room'], ['visao', 'Centro de controlo'], ['definicoes.spyke', 'Spyke'], ['definicoes.script', 'Script Google'], ['definicoes.script', 'Parte 4'], ['email', 'E-mail']]); };
 const findRoute = q => { const n = N(q).replace(/^(o|a|os|as|aba|pagina|separador)\s+/, '').replace(/^(aba|pagina)\s+(de|do|da)?\s*/, ''); if (!n) return null; const R = routes(); return R.find(([k, l]) => N(l) === n || k === n) || R.find(([k, l]) => N(l).startsWith(n) || n.startsWith(N(l))) || R.find(([k, l]) => N(l).includes(n) || n.includes(N(l).split(' ')[0])); };
 S.handle = async (raw, ho = {}) => { const t = N(raw); if (!ho.quiet) push('user', raw); hist.push({ r: 'ryan', t: raw }); let m;
   if (EARSTOP.test(t)) return earQuit(true);
-  if (/^(liga|ativa|volta a) (o microfone|a escuta|ouvir)|^(comeca|volta) a (ouvir|escutar)/.test(t)) { earStopped = false; earBlock = 0; bgSync(); return S.say(SR && cfg().always ? 'Estou a ouvir.' : 'Liga "Ouvir sempre" na página do Spyke.'); }
+  if (/^(liga|ativa|volta a) (o microfone|a escuta|ouvir)|^(comeca|volta) a (ouvir|escutar)/.test(t)) { earStopped = false; earBlock = 0; bgSync(); return S.say(SR && cfg().always ? 'Estou a ouvir.' : 'Liga "Ouvir sempre" em Definições, no separador Spyke.'); }
   if (/^(para|parar|pare|chega|silencio|cala|obrigad|valeu|cancela|e tudo|era so isso)/.test(t)) { conv = false; S.stop(); return S.say(pickR(['Às ordens.', 'Com certeza.', 'Fico por aqui.'])); }
   // rotinas (as tuas primeiro)
   const R = OS.all('spyroutines').find(r => r.phrase && (t === N(r.phrase) || t.startsWith(N(r.phrase)))); if (R && !ho.inRoutine) return runRoutine(R);
@@ -351,7 +351,7 @@ S.addExpense = (v, desc) => { const d = String(desc || '').trim() || 'Gasto por 
   return { ok: true, text: `${eurS(v)} em ${d}${g.cat ? ', categoria ' + g.cat : ''}` }; };
 S.findRoute = q => findRoute(q);
 
-const askAI = async raw => { if (!OS.Brain || !OS.Brain.which()) return S.say('Para conversas livres preciso do meu cérebro ligado: na página do Spyke, cola a chave grátis do Google. Os comandos rápidos funcionam sem ela.');
+const askAI = async raw => { if (!OS.Brain || !OS.Brain.which()) return S.say('Para conversas livres preciso do meu cérebro ligado: em Definições, no separador Spyke, cola a chave grátis do Google. Os comandos rápidos funcionam sem ela.');
   setSt('thinking'); const r = await OS.Brain.ask(raw);
   if (r.did && r.did.length) { msgs.push({ r: 'act', t: r.did.join(' · ') }); renderChat(); }
   if (!r.text) return S.say('Não consegui pensar agora: ' + (r.err || 'erro') + '.');
@@ -410,7 +410,7 @@ function orb() { if (!el || el.hidden) return; const c = el.querySelector('.spy-
   raf = requestAnimationFrame(frame); }
 A.spyOpen = () => { const was = !el || el.hidden; open(); if (was && st === 'idle' && !msgs.length) push('spyke', pickR([`Olá, ${name()}. Em que posso ajudar?`, 'Às ordens.', `Diz, ${name()}.`])); if (was) { wakeAt = performance.now(); orb(); } };
 A.spyClose = () => close();
-A.spyCfg = () => { close(); OS.go('spyke'); setTimeout(() => window.scrollTo(0, 0), 50); };
+A.spyCfg = () => { close(); OS.go('definicoes.spyke'); setTimeout(() => window.scrollTo(0, 0), 50); };
 A.spyListen = () => S.listen();
 A.spyStop = () => S.stop();
 A.spyClapTest = () => { if (!cfg().clap) OS.setOne('spyke', { clap: true }); try { const c = ac(); c && c.state !== 'running' && c.resume().catch(() => { }); } catch (e) { } stopClap(); setTimeout(bgSync, 50); const n0 = S._clap.n;
@@ -441,7 +441,8 @@ A.spyBrainTest = async () => { UI.toast('A testar…'); const r = await OS.Brain
 const SCRV = 11; let chkBusy = false;
 const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url && c.key), ai = !!(OS.AI && OS.AI.key()), aiSt = U.ls.get('os2aiOk', null), mail = OS.Mail && OS.Mail.counts ? OS.Mail.counts() : {};
   const row = (ok, t, d) => `<div class="spy-chk ${ok === true ? 'ok' : ok === false ? 'bad' : 'wait'}"><i>${ok === true ? '✓' : ok === false ? '✗' : '!'}</i><div><b>${t}</b><small>${d}</small></div></div>`;
-  const oldScr = hasScr && v < SCRV;
+  const oldScr = hasScr && v < SCRV, UMI = OS.UniMail && OS.UniMail.info ? OS.UniMail.info() : null, p4 = !!(UMI && UMI.has4);
+  if (hasScr && v >= SCRV && !UMI && OS.UniMail && OS.UniMail.check && !statePanel._p4) { statePanel._p4 = 1; setTimeout(() => OS.UniMail.check().then(() => { statePanel._p4 = 0; }), 40); }
   return `<div class="pn" id="spyState"><div class="pn-h"><h3>Estado do Spyke</h3><button class="btn sm" data-act="spyCheckAll" ${chkBusy ? 'disabled' : ''}>${UI.ic('sync')}${chkBusy ? 'A verificar…' : 'Verificar tudo'}</button></div>
     <div class="spy-chks">
     ${row(ai ? (aiSt && aiSt.ok === false ? false : true) : false, 'Cérebro (IA)', ai ? (aiSt && aiSt.ok === false ? esc(aiSt.msg || 'a chave não funciona') : 'ligado: conversa, decisões, resumos, e-mails, fotos') : 'desligado: cola a chave em "Cérebro do Spyke", aqui em baixo')}
@@ -450,10 +451,11 @@ const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url 
     ${row(hasScr && v >= SCRV ? (OS.News && OS.News.old ? false : true) : false, 'Notícias', hasScr && v >= SCRV ? 'prontas no Jornal e no resumo do dia' : 'precisam do script Google atualizado')}
     ${row(hasScr && v >= SCRV ? (OS.one('integ').gcal ? true : null) : false, 'Agenda Google', hasScr && v >= SCRV ? (OS.one('integ').gcal ? 'ligada: os teus eventos aparecem no Calendário' : 'pronta: liga-a no Calendário') : 'precisa do script Google atualizado')}
     ${row(hasScr && v >= SCRV ? (mail.at ? true : null) : false, 'E-mail', hasScr && v >= SCRV ? (mail.at ? 'ligado' : 'falta ligar o Gmail: página E-mail → Atualizar') : 'precisa do script Google atualizado')}
+    ${row(hasScr && v >= SCRV ? (p4 ? true : UMI ? false : null) : false, 'Parte 4 do script', p4 ? 'instalada: Outlook da faculdade e IA sem limites na Siri' : hasScr && v >= SCRV && !UMI ? 'a verificar…' : 'falta: <a class="acc" href="#definicoes.script">copiar a Parte 4</a> (Definições → Script Google)')}
     </div>
-    ${oldScr ? `<div class="spy-upd">${v >= 10 ? `<b>Atualizar o script do Google · só falta a Parte 3 (uns 3 minutos)</b>
+    ${oldScr ? `<div class="spy-upd">${v >= 10 ? `<b>Atualizar o script do Google · só faltam as Partes 3 e 4 (uns 5 minutos)</b>
       <ol><li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> e entra no <b>teu projeto do Oceanum</b> (o que já tem o Código.gs e a Parte2). No iPhone usa <b>aA → Pedir site para computador</b>. <b>Não apagues nada</b>: as partes 1 e 2 ficam como estão.</li>
-      <li>Toca no botão para copiar a Parte 3 → no projeto: <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte3</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte3 já existir, abre-a e substitui o conteúdo.<div class="row gap8" style="margin-top:6px;flex-wrap:wrap">${OS.Inbox && OS.Inbox.partsBtns ? OS.Inbox.partsBtns('btn sm pri', 2, 2) : ''}</div></li>
+      <li>Toca no botão para copiar a Parte 3 → no projeto: <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte3</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte3 já existir, abre-a e substitui o conteúdo. Faz o mesmo com a <b>Parte 4</b> (ficheiro <b>Parte4</b>, por baixo da Parte3).<div class="row gap8" style="margin-top:6px;flex-wrap:wrap">${OS.Inbox && OS.Inbox.partsBtns ? OS.Inbox.partsBtns('btn sm pri', 2, 3) : ''}</div></li>
       <li>Na lista de funções ao lado de <b>▶ Executar</b>, escolhe <b>autorizar</b> → <b>▶ Executar</b> → <b>Rever permissões</b> → a tua conta → <b>Avançado</b> → <b>Aceder</b> → <b>Permitir</b> (Gmail, Agenda e páginas de uma vez). É o teu próprio script: o aviso do Google é normal.</li>
       <li><b>Implantar</b> → <b>Gerenciar implantações</b> → lápis (<b>Editar</b>) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>. Se houver mais de uma implantação, edita a que tem o endereço que termina em <code>…${esc(String(c.url || '').slice(-16))}</code>.</li>
       <li>Volta aqui e toca em <b>Verificar tudo</b>. Se ainda disser versão 10, a Parte3 tem de ficar <b>por baixo</b> das outras na lista de ficheiros (⋮ ao lado do nome → Mover para baixo) e repete o passo 4.</li></ol>
@@ -465,14 +467,14 @@ const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url 
       <li>Volta aqui e toca em <b>Verificar tudo</b>.</li></ol>
       <small class="mut">O endereço e a chave ficam iguais: os outros aparelhos continuam ligados sem fazer nada. Daqui para a frente as novidades chegam num ficheiro novo, sem apagar os anteriores.</small>`}</div>` : ''}</div>`; };
 A.spyCheckAll = async () => { if (chkBusy) return; chkBusy = true; OS.request();
-  try { if (OS.AI && OS.AI.key() && OS.AI.test) await OS.AI.test(); if (OS.Inbox && OS.Inbox.check && ib().url) await OS.Inbox.check();
+  try { if (OS.AI && OS.AI.key() && OS.AI.test) await OS.AI.test(); if (OS.Inbox && OS.Inbox.check && ib().url) await OS.Inbox.check(); if (OS.UniMail && OS.UniMail.check && ib().url) await OS.UniMail.check();
     if (OS.News && +(ib().ver || 0) >= SCRV) { OS.News.old = false; try { await OS.News.headlines(3); } catch (e) { } } } catch (e) { }
   chkBusy = false; OS.request(); const c = ib(), v = +(c.ver || 0), aiSt = U.ls.get('os2aiOk', null);
   UI.toast(!c.url ? 'O script Google não está ligado neste aparelho.' : v < SCRV ? 'Falta atualizar o script Google (versão ' + (v || 'antiga') + ').' : aiSt && aiSt.ok === false ? 'O script está bem, mas a chave da IA não funciona.' : 'Tudo verificado.', v >= SCRV && !(aiSt && aiSt.ok === false) ? 'pos' : 'warn'); };
 
 /* ================= página do Spyke ================= */
 V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key ? ibc.url.trim() + (ibc.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(ibc.key) + '&op=' + op : '';
-  if (sub === 'bomdia') { try { history.replaceState(null, '', '#spyke'); } catch (e) { } setTimeout(() => { open(); S.say(S.brief()); }, 300); }
+  if (sub === 'bomdia') { try { history.replaceState(null, '', '#definicoes.spyke'); } catch (e) { } setTimeout(() => { open(); S.say(S.brief()); }, 300); }
   return UI.head('Spyke', 'O teu assistente de voz: fala contigo, resume o dia e faz coisas por ti.', `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>`) + `<div class="spy-page">${statePanel()}${OS.AI && OS.AI.panel ? OS.AI.panel() : ''}${brainPanel(c)}
   <div class="pn"><div class="pn-h"><h3>Voz do Spyke</h3><small class="mut">${esc(engine ? 'última: ' + engine : '')}</small></div>
     <div class="spy-eng">${[['auto', 'Automática', 'a melhor que estiver ligada'], ['azure', 'Microsoft', 'humana, grátis ~9 h/mês'], ['eleven', 'ElevenLabs', 'a mais humana, 10 min/mês'], ['gemini', 'IA Gemini', 'com a tua chave da IA'], ['device', 'Aparelho', 'sem internet, mais robótica']].map(([v, l, d]) => `<button type="button" class="spy-ec ${(c.eng || 'auto') === v ? 'on' : ''}" data-act="spyEng" data-v="${v}"><b>${l}</b><small>${d}</small></button>`).join('')}</div>
@@ -546,7 +548,7 @@ A.spyCopy = async b => { const c = ib(), u = c.url.trim() + (c.url.includes('?')
 
 /* resumo da manhã: primeira abertura do dia entre as 5h e as 12h */
 OS.on('ready', () => { setTimeout(bgSync, 1500); const h = new Date().getHours(), t = U.today();
-  if (navigator.webdriver || !cfg().morning || h < 5 || h >= 12 || U.ls.get('os2spMorning', '') === t || /^#spyke/.test(location.hash)) return; U.ls.set('os2spMorning', t);
+  if (navigator.webdriver || !cfg().morning || h < 5 || h >= 12 || U.ls.get('os2spMorning', '') === t || /^#(definicoes\.)?spyke/.test(location.hash)) return; U.ls.set('os2spMorning', t);
   setTimeout(() => { if (OS.FocusBlock && OS.FocusBlock.state()) return; S.morning(); }, 1800); });
 // aviso discreto (não tapa a app): o toque também desbloqueia o som no iPhone
 S.morning = () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'spy-morn'; b.innerHTML = `<i>${UI.ic('mic')}</i><span><b>${new Date().getHours() < 12 ? 'Bom dia' : 'Olá'}, ${esc(name())}</b><small>Toca para o Spyke te dar o resumo do dia</small></span><em aria-hidden="true">×</em>`;

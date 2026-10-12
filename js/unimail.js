@@ -116,6 +116,6 @@ OS.forms.olCfg = async (f, v) => { const id = String(v('id') || '').trim(), ten 
 OS.forms.olDom = (f, v) => { OS.setOne('unimail', { dom: String(v('dom') || '').trim().toLowerCase().replace(/^@/, '') }); UI.toast('Guardado', 'pos'); };
 // atualiza sozinho de 10 em 10 minutos com a app aberta (se estiver ligado)
 OS.on('ready', () => setInterval(() => { if (!document.hidden && INFO && INFO.linked) refresh(false); }, 10 * 60e3));
-OS.UniMail = { view, items: () => all(), get, subjOf, subjName, refresh, info: () => INFO, _set: (o, i) => { if (o) { L = Object.assign({ ai: {} }, o); saveL(); } if (i) INFO = i; },
+OS.UniMail = { view, items: () => all(), get, subjOf, subjName, refresh, info: () => INFO, check: info, _set: (o, i) => { if (o) { L = Object.assign({ ai: {} }, o); saveL(); } if (i) INFO = i; },
   summary: () => all().slice(0, 20).map(it => ({ materia: subjName(subjOf(it)), de: it.f, assunto: it.s, nao_lido: !!it.u, trecho: String(it.sn || '').slice(0, 140) })) };
 })();

@@ -238,7 +238,7 @@ OS.gcalStart = async () => {
   if (gscr()) { gcalScript(true); if (!gcalTimer) gcalTimer = setInterval(() => { if (!document.hidden && OS.one('integ').gcal) gcalScript(true); }, 15 * 60 * 1000); return; }
   if (gcalUnsub) return; let mcp = null;
   try { mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { }
-  if (!mcp) { OS.gcalState = OS.one('inbox').url ? 'Para ver a tua agenda Google aqui, atualiza o script Google (página do Spyke → Estado do Spyke → só falta a Parte 3).' : 'Para ver a tua agenda Google aqui, liga o script Google (Definições → Sincronizar aparelhos).'; OS.request(); return; }
+  if (!mcp) { OS.gcalState = OS.one('inbox').url ? 'Para ver a tua agenda Google aqui, atualiza o script Google (Definições → Script Google → Parte 3).' : 'Para ver a tua agenda Google aqui, liga o script Google (Definições → Sincronizar aparelhos).'; OS.request(); return; }
   const from = new Date(); from.setDate(from.getDate() - 14); const to = new Date(); to.setDate(to.getDate() + 60);
   gcalUnsub = mcp.watchTool('Google Calendar', 'list_events', { startTime: from.toISOString(), endTime: to.toISOString(), pageSize: 250, orderBy: 'startTime', timeZone: 'Europe/Lisbon' }, ev => {
     if (ev.type === 'error') { const c = ev.error && ev.error.code;

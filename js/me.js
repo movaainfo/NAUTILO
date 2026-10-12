@@ -100,7 +100,7 @@ const draft = () => { const m = me(), p = P(), n = first(), ppl = OS.all('people
 let BUSY = '', ERR = '';
 const snap = (label) => { const b = me().bio; if (!b) return; const v = OS.one('mever').v; v.unshift({ at: Date.now(), label, bio: JSON.parse(JSON.stringify(b)) }); v.splice(6); OS.touch('mever'); };
 A.meBioAI = async b => { if (BUSY) return; const upd = b && b.dataset.mode === 'upd' && me().bio, pov = me().pov || '3', F = facts();
-  if (!OS.AI || !OS.AI.key()) { UI.toast('Liga o Spyke (IA) na página do Spyke, ou usa o rascunho automático', 'neg'); return; }
+  if (!OS.AI || !OS.AI.key()) { UI.toast('Liga o Spyke (IA) em Definições → Spyke, ou usa o rascunho automático', 'neg'); return; }
   BUSY = upd ? 'A atualizar a tua biografia…' : 'A escrever a tua biografia…'; ERR = ''; OS.request();
   const cur = upd ? me().bio.ch.map(c => ({ id: c.id, titulo: c.t, texto: c.txt, editado_por_ele: !!c.lock })) : null;
   try { const o = await OS.AI.json([{ text: `És um biógrafo talentoso e rigoroso. Escreve a biografia de ${F.nome} (trata-o por ${F.tratamento}) em português${/^Brasil/i.test(me().nationality || 'Brasileira') ? ' (ele é brasileiro e vive em Portugal; usa um português natural e caloroso, sem regionalismos forçados)' : ''}, ${pov === '1' ? 'na PRIMEIRA pessoa ("eu"), como se fosse ele a contar' : 'na TERCEIRA pessoa'}.

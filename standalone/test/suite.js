@@ -1024,7 +1024,7 @@ async function newFeatureTests(b) {
     await ctx.route(/script\.google\.com/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, v: 10, items: [], docs: {} }) }));
     await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 10 }); location.hash = 'spyke'; }); await sleep(600);
     const g = await E(p, () => { const u = document.querySelector('#spyState .spy-upd'); return u ? { t: u.innerText, btns: [...u.querySelectorAll('[data-act=ibCopy]')].map(x => x.dataset.t) } : null; });
-    ok('script v10: o guia pede só a Parte 3 num ficheiro novo (não apagar as partes 1 e 2)', g && /só falta a Parte 3/.test(g.t) && /Não apagues nada/.test(g.t) && g.btns.length === 1 && g.btns[0] === 'p3', JSON.stringify(g && g.btns));
+    ok('script v10: o guia pede só as Partes 3 e 4, em ficheiros novos (não apagar as partes 1 e 2)', g && /só faltam as Partes 3 e 4/.test(g.t) && /Não apagues nada/.test(g.t) && g.btns.join() === 'p3,p4', JSON.stringify(g && g.btns));
     await p.evaluate(() => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
     await p.click('#spyState .spy-upd [data-act=ibCopy]'); await sleep(300);
     ok('script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)', await E(p, () => /PARTE 3/.test(window.__clip) && /function doGet/.test(window.__clip) && !/const KEY/.test(window.__clip)));
@@ -1118,6 +1118,25 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Outlook: abre o e-mail inteiro dentro da app', await E(p, () => /Texto completo do e-mail da professora/.test((document.querySelector('#modal .ml-rd') || {}).innerText || '') && /slides\.pdf/.test(document.querySelector('#modal .ml-rd').innerText)));
   await p.fill('#olRpT', 'Obrigado, professora.'); await p.click('#modal [data-act=olSend]'); await sleep(700);
   ok('Outlook: responder vai pelo Outlook da faculdade', posts.some(x => x.op === 'ols' && x.id === 'o2' && /Obrigado/.test(x.b)));
+  await E(p, () => OS.UI.closeModal && OS.UI.closeModal()); await sleep(200);
+  // Spyke dentro de Definições + Parte 4 fácil de copiar
+  ok('Definições: o Spyke saiu do menu principal', !(await E(p, () => [...document.querySelectorAll('#side a, .tn-dd a')].some(a => a.getAttribute('href') === '#spyke'))));
+  await E(p, () => location.hash = 'spyke'); await sleep(700);
+  const sp = await E(p, () => ({ h: location.hash, tabs: [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()), st: !!document.getElementById('spyState'), h1: (document.querySelector('#view h1') || {}).textContent, side: !!document.querySelector('#side .side-set.on') }));
+  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|Spyke (assistente)|Script Google' && sp.side, JSON.stringify(sp));
+  ok('Definições → Spyke: o estado mostra a Parte 4 instalada', await E(p, () => /Parte 4 do script[\s\S]*instalada/.test(document.getElementById('spyState').innerText)));
+  await E(p, () => location.hash = 'definicoes.script'); await sleep(700);
+  const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].map(x => x.dataset.t) }));
+  ok('Definições → Script Google: as 4 partes com botão de copiar e a Parte 4 em destaque', /Parte 4/.test(sc.t) && ['p1', 'p2', 'p3', 'p4'].every(x => sc.b.includes(x)) && sc.b[0] === 'p4' && /já está no teu script/.test(sc.t), JSON.stringify(sc.b));
+  await E(p, () => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
+  await p.click('#parte4 [data-act=ibCopy]'); await sleep(300);
+  ok('Definições → Script Google: "Copiar parte 4" copia a Parte 4 (Outlook), sem mexer nas outras', await E(p, () => /function op_olinfo/.test(window.__clip) && !/function doGet/.test(window.__clip)));
+  await E(p, () => { OS.UniMail._set(null, { has4: false }); OS.request(); }); await sleep(500);
+  ok('Definições → Script Google: sem a Parte 4 diz "falta" e mostra os passos', await E(p, () => { const t = document.getElementById('parte4').innerText; return /copiar e colar/.test(t) && /falta/.test(t) && /Parte4/.test(t) && /Nova versão/.test(t); }));
+  await E(p, () => location.hash = 'definicoes.spyke'); await sleep(500);
+  ok('Definições → Spyke: sem a Parte 4 o estado leva-te ao botão de copiar', await E(p, () => !!document.querySelector('#spyState a[href="#definicoes.script"]')));
+  await E(p, () => location.hash = 'definicoes'); await sleep(600);
+  ok('Definições → Geral: mantém perfil, segurança, sincronização e atalho', await E(p, () => !!document.getElementById('syncPn') && !!document.getElementById('inboxPn') && !document.getElementById('spyState') && /Perfil/.test(document.getElementById('view').innerText) && document.querySelectorAll('#view .tabs').length === 1 && document.querySelectorAll('#view h1').length === 1));
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (novos)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
 /* ================= IA SEM LIMITES: modelos descobertos sozinhos + reserva grátis ================= */

@@ -3,7 +3,7 @@
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc;
 const NAV = [
-  ['Visão geral', [['visao', 'Painel', 'grid', () => { const n = OS.Intel.alerts().filter(a => a.lvl === 'urgent').length; return n ? [n, 'neg'] : null; }], ['hoje', 'Hoje', 'sun'], ['jornal', 'Jornal', 'news', () => { const n = OS.News && OS.News.unread(); return n ? [n, ''] : null; }], ['spyke', 'Spyke (assistente)', 'mic'], ['email', 'E-mail e LinkedIn', 'mail', () => { const c = OS.Mail && OS.Mail.counts(); return c && c.urg ? [c.urg, 'neg'] : null; }], ['calendario', 'Calendário', 'cal']]],
+  ['Visão geral', [['visao', 'Painel', 'grid', () => { const n = OS.Intel.alerts().filter(a => a.lvl === 'urgent').length; return n ? [n, 'neg'] : null; }], ['hoje', 'Hoje', 'sun'], ['jornal', 'Jornal', 'news', () => { const n = OS.News && OS.News.unread(); return n ? [n, ''] : null; }], ['email', 'E-mail e LinkedIn', 'mail', () => { const c = OS.Mail && OS.Mail.counts(); return c && c.urg ? [c.urg, 'neg'] : null; }], ['calendario', 'Calendário', 'cal']]],
   ['Execução', [['tarefas', 'Tarefas', 'checksq', () => { const n = OS.Tasks.open().filter(OS.Tasks.late).length; return n ? [n, 'neg'] : [OS.Tasks.open().length, '']; }], ['habitos', 'Hábitos e rotina', 'repeat'], ['foco', 'Bloco de foco', 'focus', () => { const b = OS.FocusBlock && OS.FocusBlock.state(); return b && b.phase !== 'end' ? ['●', 'pos'] : null; }], ['projetos', 'Projetos', 'folder'], ['metas', 'Metas', 'target']]],
   ['Eu', [['eu', 'Quem sou eu', 'user']]],
   ['Fé', [['fe', 'Fé & Devoção', 'cross']]],
@@ -73,14 +73,17 @@ let lastRoute = '';
 const FOCUS_ATTRS = ['data-fk', 'data-uif', 'data-bind', 'data-sim', 'data-uiv', 'id'];
 function render() {
   if (!OS.Lock.unlocked()) return;
-  const r = OS.route(), cur = V[r.base] ? r.base : 'visao';
+  let r = OS.route();
+  // o Spyke vive dentro de Definições: os links antigos (#spyke, #spyke.bomdia, atalhos da Siri) continuam a funcionar
+  if (r.base === 'spyke') { try { history.replaceState(null, '', '#definicoes.spyke' + (r.sub ? '.' + r.sub : '')); } catch (e) { } r = { base: 'definicoes', sub: 'spyke' + (r.sub ? '.' + r.sub : ''), raw: 'definicoes.spyke' + (r.sub ? '.' + r.sub : '') }; }
+  const cur = V[r.base] ? r.base : 'visao';
   unlock(cur);
   document.body.classList.toggle('dom-mode', cur === 'dominus');
   const a = document.activeElement; let fsel = null, caret = null;
   if (a && a !== document.body && U.$('#view').contains(a)) { for (const at of FOCUS_ATTRS) { const v = a.getAttribute(at); if (v) { fsel = `[${at}="${CSS.escape(v)}"]`; break; } } try { caret = a.selectionStart; } catch (e) { } }
   try { renderSide(cur); renderTop(cur); renderTab(cur); } catch (e) { console.error(e); }
   C.reset(); let html;
-  try { html = V[cur](r.sub); } catch (e) { console.error(e); html = `<div class="pn"><b>Não foi possível mostrar esta página.</b><p class="mut">${esc(e.message)}</p></div>`; }
+  try { html = cur === 'definicoes' && OS.settingsView ? OS.settingsView(r.sub) : V[cur](r.sub); } catch (e) { console.error(e); html = `<div class="pn"><b>Não foi possível mostrar esta página.</b><p class="mut">${esc(e.message)}</p></div>`; }
   if (!html || !String(html).trim()) html = `<div class="pn"><b>Esta página ainda está vazia.</b><p class="mut"><a href="#hoje">Voltar ao Hoje</a></p></div>`;
   // se nada mudou na página, não a substitui (evita piscar, perder o toque e redesenhar gráficos à toa)
   const sig = r.raw + '|' + String(html).replace(/ id="ch\d+"/g, ''), view = U.$('#view');
@@ -106,7 +109,7 @@ A.cmdOpen = () => { UI.modal(`<input id="cmdIn" placeholder="Ir para uma página
 function cmdItems(q) {
   q = q.toLowerCase().trim(); const out = [];
   NAV.forEach(([g, items]) => items.forEach(([k, l, ic]) => out.push({ l, s: g, ic, run: () => OS.go(k) })));
-  out.push({ l: 'Dominus', s: 'Jogo', ic: 'crown', run: () => OS.go('dominus') }, { l: 'Definições', s: 'Sistema', ic: 'settings', run: () => OS.go('definicoes') }, { l: 'Modo foco', s: 'Ação', ic: 'focus', run: () => A.focusStart({ dataset: {} }) });
+  out.push({ l: 'Dominus', s: 'Jogo', ic: 'crown', run: () => OS.go('dominus') }, { l: 'Definições', s: 'Sistema', ic: 'settings', run: () => OS.go('definicoes') }, { l: 'Spyke (assistente)', s: 'Definições', ic: 'mic', run: () => OS.go('definicoes.spyke') }, { l: 'Script Google (Parte 4)', s: 'Definições', ic: 'link', run: () => OS.go('definicoes.script') }, { l: 'Modo foco', s: 'Ação', ic: 'focus', run: () => A.focusStart({ dataset: {} }) });
   QA.forEach(([c, l, ic, d]) => out.push({ l: 'Novo: ' + l, s: 'Criar', ic: 'plus', run: () => UI.openForm(c, null, d) }));
   if (q.length >= 2) [['tasks', 'title', 'Tarefa'], ['goals', 'title', 'Meta'], ['projects', 'name', 'Projeto'], ['notes', 'title', 'Nota'], ['contacts', 'name', 'Contacto'], ['transactions', 'desc', 'Movimento'], ['opps', 'name', 'Oportunidade'], ['subjects', 'name', 'Disciplina'], ['assessments', 'title', 'Avaliação']].forEach(([c, f, lab]) => OS.all(c).filter(r => String(r[f] || '').toLowerCase().includes(q)).slice(0, 5).forEach(r => out.push({ l: r[f], s: lab + (r.date ? ' · ' + U.fmtD(r.date) : ''), ic: 'search', run: () => UI.openForm(c, r.id) })));
   return q ? out.filter(x => (x.l + ' ' + x.s).toLowerCase().includes(q) || x.s !== 'Criar' && x.ic === 'search').slice(0, 30) : out.slice(0, 30);
@@ -172,6 +175,14 @@ document.addEventListener('submit', e => {
   A.updCheck = () => { if (window.OceanumCheckUpdate) window.OceanumCheckUpdate(true); else location.reload(); };
   A.liteSet = b => { const v = b.dataset.v; try { if (v === 'auto') localStorage.removeItem('os2lite'); else localStorage.setItem('os2lite', v); } catch (e) { } location.reload(); };
 })();
+/* ---------- Definições com separadores: Geral · Spyke (assistente) · Script Google ---------- */
+OS.SETT = [['', 'Geral'], ['spyke', 'Spyke (assistente)'], ['script', 'Script Google']];
+OS.settingsView = sub => { const s = String(sub || ''), k = s === 'script' ? 'script' : /^spyke(\.|$)/.test(s) ? 'spyke' : '';
+  const sp = k === 'spyke' ? `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>` : '';
+  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : 'O teu perfil alimenta cálculos em todo o sistema.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
+  if (k === 'spyke') return head + String(V.spyke ? V.spyke(s.slice(6)) : '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
+  if (k === 'script') return head + (OS.Inbox && OS.Inbox.scriptTab ? OS.Inbox.scriptTab() : '');
+  return String(V.definicoes(s)).replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, head); };
 /* ---------- com um painel aberto, só o painel rola (no iPhone o overflow:hidden não chega) ---------- */
 (() => { let locked = false, y = 0, h0 = '';
   const want = () => document.body.classList.contains('nav-open') || document.body.classList.contains('noscroll') || !U.$('#modal').hidden || !!document.querySelector('.ceremony');
