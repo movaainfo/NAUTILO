@@ -1,4 +1,4 @@
-"Ver mais" e "Mostrar mais" voltam a funcionar em toda a app (abrem logo os itens escondidos).
-Hábitos no iPhone: os nomes ficam numa coluna fixa e as etiquetas por baixo, sem tapar os quadrados dos dias; cabem mais dias à vista.
-Horário do trabalho por foto: a lista "Confirma o que a IA leu" mostra todos os dias (sem "Ver mais").
-Finanças: cada conta tem o banco (BTG, Santander, Revolut, Caixa Geral, Wise, Nubank…). Ao registar um gasto vês "Revolut · Conta à ordem"; em Contas e no Gasto rápido crias a conta de um banco com um toque.
+Biografia nível livro: a Entrevista passou de 25 para mais de 200 perguntas, organizadas como capítulos (raízes, infância, pai e mãe, escola, adolescência, fé, Brasil, a partida, Portugal, universidade, trabalho, empresa, amigos, amor, dinheiro, corpo, momentos marcantes, quem sou hoje, viagens, sonhos). As tuas respostas antigas ficam.
+Entrevistador: uma pergunta de cada vez, com botão Ditar; depois de cada resposta a IA faz perguntas de seguimento sobre essa história, por isso a entrevista não tem fim.
+O livro é escrito capítulo a capítulo, longo e só com o que contaste (sem inventar), com índice, palavras e páginas. Se a app fechar a meio, "Continuar a escrever" segue de onde parou. "Atualizar" reescreve só os capítulos com coisas novas.
+Livro para imprimir ou guardar em PDF (formato A5, com índice e capítulos).

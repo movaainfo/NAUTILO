@@ -578,19 +578,34 @@ async function sharedTests(b) {
     await E(p, () => { location.hash = 'tarefas.projetos'; }); await sleep(400);
     ok('tarefas: vista por projeto', await E(p, () => [...document.querySelectorAll('#view .tp-sec h2')].some(h => /Curso Teste Python/.test(h.textContent)) && document.documentElement.scrollWidth <= innerWidth + 1));
     await E(p, () => { OS.setUI('tf', {}); }); await sleep(100);
-    // QUEM SOU EU
+    // QUEM SOU EU: entrevista (com perguntas de seguimento) e livro escrito capítulo a capítulo
     let meP = [];
-    await ctx.route(/generativelanguage/, rt => { const b = rt.request().postData() || ''; if (!/biógrafo/.test(b)) return rt.fallback(); const tx = JSON.parse(b).contents[0].parts[0].text; meP.push(tx); const upd = /MODO ATUALIZAR/.test(tx), cur = upd ? JSON.parse(tx.match(/BIOGRAFIA ATUAL: (\[.*?\])\n/)[1]) : [];
-      const ans = { titulo: 'Ryan — a história', subtitulo: 'x', resumo: 'Estudante em Aveiro.', capitulos: upd ? cur.map(c => ({ id: c.id, titulo: c.titulo, texto: c.editado_por_ele ? 'IA MUDOU' : c.texto + ' Atualizado.' })) : [{ titulo: 'Origens', texto: 'Nasceu em Teste Cidade.' }, { titulo: 'Fé', texto: 'Fé.' }], faltam: ['Pergunta da IA de teste?'] };
-      rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(ans) }] } }] }) }); });
-    await E(p, () => { OS.setOne('me', { birthplace: 'Teste Cidade', birth: '2005-03-10' }); OS.add('people', { name: 'Pessoa Teste Mãe', rel: 'Mãe', close: 5, birthday: '1978' + OS.U.addDays(OS.U.today(), 2).slice(4) }); OS.add('lifeev', { title: 'Momento teste', date: '2024-09-01', cat: 'Mudança', imp: 5 }); location.hash = 'eu'; }); await sleep(400);
+    await ctx.route(/generativelanguage/, rt => { const b = rt.request().postData() || ''; if (!/biógrafo|editor do livro/.test(b)) return rt.fallback(); const tx = JSON.parse(b).contents[0].parts[0].text; meP.push(tx);
+      const T = t => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: t }] } }] }) });
+      if (/perguntas de seguimento/.test(tx)) return T(JSON.stringify({ q: ['Quem estava contigo nesse dia de teste?', 'O que sentiste nesse momento de teste?'] }));
+      if (/editor do livro/.test(tx)) return T(JSON.stringify({ titulo: 'Ryan — a história', subtitulo: 'x', resumo: 'Estudante em Aveiro.', faltam: ['Pergunta da IA de teste?'] }));
+      const ch = (tx.match(/capítulo \d+ — "([^"]+)"/) || [])[1] || '?', v2 = /NOVA RESPOSTA TESTE/.test(tx) ? ' Versão atualizada.' : '';
+      return T(`Capítulo ${ch} escrito com o material.${v2} ` + 'Frase longa de teste para o capítulo ter corpo suficiente e parecer um livro a sério. '.repeat(8)); });
+    await E(p, () => { OS.setOne('me', { birthplace: 'Teste Cidade', birth: '2005-03-10', qa: { ori0: 'Cresci em Teste Cidade, na casa da minha avó, com um quintal enorme.' } }); OS.add('people', { name: 'Pessoa Teste Mãe', rel: 'Mãe', close: 5, birthday: '1978' + OS.U.addDays(OS.U.today(), 2).slice(4) }); OS.add('lifeev', { title: 'Momento teste', date: '2024-09-01', cat: 'Mudança', imp: 5 }); location.hash = 'eu'; }); await sleep(400);
     ok('eu: retrato com idade, origem e aniversário próximo', await E(p, () => { const v = document.querySelector('#view').textContent; return !!document.querySelector('a[href="#eu"]') && /Teste Cidade/.test(v) && /Pessoa Teste Mãe/.test(v) && /daqui a 2 dias/.test(v); }));
     await E(p, () => { location.hash = 'eu.historia'; }); await sleep(300);
     ok('eu: linha do tempo por anos', await E(p, () => /Momento teste/.test(document.querySelector('#view .me-tl').textContent) && /Nasci em Teste Cidade/.test(document.querySelector('#view .me-tl').textContent)));
-    await E(p, () => { location.hash = 'eu.bio'; }); await sleep(300); await p.click('#view [data-act=meBioAI][data-mode=new]'); await sleep(900);
-    ok('eu: biografia escrita pela IA só com factos registados', await E(p, () => OS.one('me').bio && OS.one('me').bio.ch.length === 2 && /Teste Cidade/.test(document.querySelector('#view .me-book').textContent)) && /NUNCA inventes/.test(meP[0]) && /Pessoa Teste Mãe/.test(meP[0]) && /Momento teste/.test(meP[0]));
-    await p.click('#view .me-ch >> nth=0 >> .me-tx'); await sleep(250); await p.fill('#view .me-ta', 'Texto escrito por mim.'); await p.click('#view [data-act=meChDone]'); await sleep(300); await p.click('#view [data-act=meBioAI][data-mode=upd]'); await sleep(900);
-    ok('eu: editar a biografia e a IA respeita o que escrevi', await E(p, () => { const b = OS.one('me').bio; return b.ch[0].txt === 'Texto escrito por mim.' && b.ch[0].lock && /Atualizado/.test(b.ch[1].txt) && OS.one('mever').v.length >= 1; }));
+    await E(p, () => { location.hash = 'eu.entrevista'; }); await sleep(400);
+    const iv = await E(p, () => ({ n: OS.Me.qList().length, q: (document.querySelector('#view .me-ivq') || {}).textContent || '' }));
+    ok('eu: entrevista com mais de 200 perguntas, uma de cada vez (as respostas antigas mantêm-se)', iv.n >= 200 && !!iv.q && await E(p, () => OS.one('me').qa.ori0.length > 10), JSON.stringify(iv));
+    await p.fill('#meqCur', 'A minha avó contava histórias da família todas as noites, à luz do candeeiro.'); await p.click('#view [data-act=meQSave]'); await sleep(900);
+    ok('eu: depois de responder, a IA faz perguntas de seguimento sobre essa história', await E(p, () => /Quem estava contigo nesse dia de teste/.test(document.querySelector('#view .me-ivq').textContent) && (OS.one('me').fu || []).length === 2) && meP.some(t => /perguntas de seguimento/.test(t) && /candeeiro/.test(t)));
+    await p.click('#view [data-act=meQSkip]'); await sleep(300);
+    ok('eu: "Saltar" passa à pergunta seguinte', await E(p, () => /O que sentiste nesse momento de teste/.test(document.querySelector('#view .me-ivq').textContent)));
+    meP = []; await E(p, () => { location.hash = 'eu.bio'; }); await sleep(300); await p.click('#view [data-act=meBioAI][data-mode=new]'); await sleep(2500);
+    const bk = await E(p, () => { const b = OS.one('me').bio; return { book: b.book, ch: b.ch.map(c => c.t), todo: b.ch.filter(c => c.todo).length, stats: (document.querySelector('#view .me-stats') || {}).textContent || '' }; });
+    const chP = meP.filter(t => /LIVRO da vida/.test(t)), pOf = n => chP.find(t => t.includes('"' + n + '"')) || '';
+    ok('eu: o livro é escrito capítulo a capítulo, só com as partes que têm material', bk.book === 1 && bk.ch.join('|') === 'Raízes|Os primeiros anos|Uma nova vida em Portugal' && !bk.todo && chP.length === 3 && /3 capítulos/.test(bk.stats), JSON.stringify(bk));
+    ok('eu: cada capítulo recebe só o seu material e a regra de não inventar', chP.every(t => /NUNCA inventes/.test(t)) && /Teste Cidade/.test(pOf('Os primeiros anos')) && !/Momento teste/.test(pOf('Os primeiros anos')) && /Momento teste/.test(pOf('Uma nova vida em Portugal')) && /candeeiro/.test(pOf('Raízes')));
+    await p.click('#view .me-ch >> nth=0 >> .me-tx'); await sleep(250); await p.fill('#view .me-ta', 'Texto escrito por mim.'); await p.click('#view [data-act=meChDone]'); await sleep(300);
+    await E(p, () => { const qa = OS.one('me').qa, q = OS.Me.qList().find(x => x.g === 'Portugal' && !qa[x.id]); qa[q.id] = 'NOVA RESPOSTA TESTE sobre a chegada.'; OS.touch('me'); }); meP = [];
+    await p.click('#view [data-act=meBioAI][data-mode=upd]'); await sleep(2000);
+    ok('eu: atualizar reescreve só o capítulo que mudou e respeita o que escrevi', await E(p, () => { const b = OS.one('me').bio; return b.ch[0].txt === 'Texto escrito por mim.' && b.ch[0].lock && /Versão atualizada/.test(b.ch[2].txt) && !/Versão atualizada/.test(b.ch[1].txt) && OS.one('mever').v.length >= 1; }) && meP.filter(t => /LIVRO da vida/.test(t)).length === 1);
     // ESTUDOS: CURSOS, CERTIFICAÇÕES, LEITURAS
     await ctx.route(/googleapis\.com\/books/, rt => rt.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ items: [{ id: 'g1', volumeInfo: { title: 'O Pequeno Príncipe', authors: ['Antoine de Saint-Exupéry'], publishedDate: '2015', pageCount: 96, categories: ['Juvenile Fiction'], description: 'Um piloto.' } }] }) }));
     await ctx.route(/openlibrary\.org\/search/, rt => rt.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ docs: [{ key: '/w/2', title: 'Dom Casmurro', author_name: ['Machado de Assis'], number_of_pages_median: 256 }] }) }));
