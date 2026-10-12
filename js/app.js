@@ -75,6 +75,8 @@ function render() {
   if (!OS.Lock.unlocked()) return;
   let r = OS.route();
   // o Spyke vive dentro de Definições: os links antigos (#spyke, #spyke.bomdia, atalhos da Siri) continuam a funcionar
+  if (r.raw === 'foco.apps') { try { history.replaceState(null, '', '#definicoes.atalhos'); } catch (e) { } r = { base: 'definicoes', sub: 'atalhos', raw: 'definicoes.atalhos' }; }
+  if (r.raw === 'email.contas') { try { history.replaceState(null, '', '#definicoes.email'); } catch (e) { } r = { base: 'definicoes', sub: 'email', raw: 'definicoes.email' }; }
   if (r.base === 'spyke') { try { history.replaceState(null, '', '#definicoes.spyke' + (r.sub ? '.' + r.sub : '')); } catch (e) { } r = { base: 'definicoes', sub: 'spyke' + (r.sub ? '.' + r.sub : ''), raw: 'definicoes.spyke' + (r.sub ? '.' + r.sub : '') }; }
   const cur = V[r.base] ? r.base : 'visao';
   unlock(cur);
@@ -109,7 +111,7 @@ A.cmdOpen = () => { UI.modal(`<input id="cmdIn" placeholder="Ir para uma página
 function cmdItems(q) {
   q = q.toLowerCase().trim(); const out = [];
   NAV.forEach(([g, items]) => items.forEach(([k, l, ic]) => out.push({ l, s: g, ic, run: () => OS.go(k) })));
-  out.push({ l: 'Dominus', s: 'Jogo', ic: 'crown', run: () => OS.go('dominus') }, { l: 'Definições', s: 'Sistema', ic: 'settings', run: () => OS.go('definicoes') }, { l: 'Spyke (assistente)', s: 'Definições', ic: 'mic', run: () => OS.go('definicoes.spyke') }, { l: 'Script Google (Parte 4)', s: 'Definições', ic: 'link', run: () => OS.go('definicoes.script') }, { l: 'Modo foco', s: 'Ação', ic: 'focus', run: () => A.focusStart({ dataset: {} }) });
+  out.push({ l: 'Dominus', s: 'Jogo', ic: 'crown', run: () => OS.go('dominus') }, { l: 'Definições', s: 'Sistema', ic: 'settings', run: () => OS.go('definicoes') }, { l: 'Spyke (assistente)', s: 'Definições', ic: 'mic', run: () => OS.go('definicoes.spyke') }, { l: 'Script Google (Parte 4)', s: 'Definições', ic: 'link', run: () => OS.go('definicoes.script') }, { l: 'Configurar e-mail', s: 'Definições', ic: 'mail', run: () => OS.go('definicoes.email') }, { l: 'Ligações (agenda, cotações)', s: 'Definições', ic: 'link', run: () => OS.go('definicoes.ligacoes') }, { l: 'Atalhos do iPhone', s: 'Definições', ic: 'bolt', run: () => OS.go('definicoes.atalhos') }, { l: 'Modo foco', s: 'Ação', ic: 'focus', run: () => A.focusStart({ dataset: {} }) });
   QA.forEach(([c, l, ic, d]) => out.push({ l: 'Novo: ' + l, s: 'Criar', ic: 'plus', run: () => UI.openForm(c, null, d) }));
   if (q.length >= 2) [['tasks', 'title', 'Tarefa'], ['goals', 'title', 'Meta'], ['projects', 'name', 'Projeto'], ['notes', 'title', 'Nota'], ['contacts', 'name', 'Contacto'], ['transactions', 'desc', 'Movimento'], ['opps', 'name', 'Oportunidade'], ['subjects', 'name', 'Disciplina'], ['assessments', 'title', 'Avaliação']].forEach(([c, f, lab]) => OS.all(c).filter(r => String(r[f] || '').toLowerCase().includes(q)).slice(0, 5).forEach(r => out.push({ l: r[f], s: lab + (r.date ? ' · ' + U.fmtD(r.date) : ''), ic: 'search', run: () => UI.openForm(c, r.id) })));
   return q ? out.filter(x => (x.l + ' ' + x.s).toLowerCase().includes(q) || x.s !== 'Criar' && x.ic === 'search').slice(0, 30) : out.slice(0, 30);
@@ -176,12 +178,16 @@ document.addEventListener('submit', e => {
   A.liteSet = b => { const v = b.dataset.v; try { if (v === 'auto') localStorage.removeItem('os2lite'); else localStorage.setItem('os2lite', v); } catch (e) { } location.reload(); };
 })();
 /* ---------- Definições com separadores: Geral · Spyke (assistente) · Script Google ---------- */
-OS.SETT = [['', 'Geral'], ['spyke', 'Spyke (assistente)'], ['script', 'Script Google']];
-OS.settingsView = sub => { const s = String(sub || ''), k = s === 'script' ? 'script' : /^spyke(\.|$)/.test(s) ? 'spyke' : '';
+OS.SETT = [['', 'Geral'], ['email', 'E-mail'], ['ligacoes', 'Ligações'], ['atalhos', 'Atalhos do iPhone'], ['spyke', 'Spyke (assistente)'], ['script', 'Script Google']];
+OS.settingsView = sub => { const s = String(sub || ''), k = ['script', 'email', 'ligacoes', 'atalhos'].includes(s) ? s : /^spyke(\.|$)/.test(s) ? 'spyke' : '';
   const sp = k === 'spyke' ? `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>` : '';
-  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : 'O teu perfil alimenta cálculos em todo o sistema.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
+  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Oceanum: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Oceanum: agenda Google, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, relógio da corrida e bloquear apps no bloco de foco.' : 'O teu perfil alimenta cálculos em todo o sistema.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
   if (k === 'spyke') return head + String(V.spyke ? V.spyke(s.slice(6)) : '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
   if (k === 'script') return head + (OS.Inbox && OS.Inbox.scriptTab ? OS.Inbox.scriptTab() : '');
+  const sec = (t, h) => h ? `<h4 class="set-h">${t}</h4>${h}` : '';
+  if (k === 'ligacoes') return head + `<div class="set-page">${sec('Agenda', OS.gcalPanel ? OS.gcalPanel() : '')}${sec('Investimentos', (OS.InvX && OS.InvX.quotesSettings ? OS.InvX.quotesSettings() : '') + (OS.InvX && OS.InvX.alertSettings ? OS.InvX.alertSettings() : ''))}${sec('Notícias, e-mail e IA', `<div class="pn"><div class="list"><a class="li" href="#definicoes.script"><div class="li-t"><b>Notícias (Jornal)</b><small>Chegam pelo teu script Google: vê o estado em Script Google.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.email"><div class="li-t"><b>E-mail e faculdade</b><small>Gmail, Outlook da faculdade e outras contas.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.spyke"><div class="li-t"><b>IA (Spyke)</b><small>Uma só ligação para tudo o que usa IA.</small></div><span class="mut">›</span></a></div></div>`)}</div>`;
+  if (k === 'atalhos') return head + `<div class="set-page">${OS.quickSettings ? OS.quickSettings() : ''}${OS.RunLink && OS.RunLink.panel ? `<div class="pn" id="runSet"><div class="pn-h"><h3>Relógio → Corrida</h3></div>${OS.RunLink.panel()}</div>` : ''}${OS.FocusBlock && OS.FocusBlock.settings ? OS.FocusBlock.settings() : ''}</div>`;
+  if (k === 'email') return head + `<div class="ml-page set-mail">${OS.Mail && OS.Mail.settings ? OS.Mail.settings() : ''}</div>`;
   return String(V.definicoes(s)).replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, head); };
 /* ---------- com um painel aberto, só o painel rola (no iPhone o overflow:hidden não chega) ---------- */
 (() => { let locked = false, y = 0, h0 = '';

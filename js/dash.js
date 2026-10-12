@@ -75,9 +75,13 @@ V.gasto = sub => { const pre = U.num(String(sub || '').replace(',', '.')) || '',
     <div class="qg-row"><label class="qg-tg"><input type="checkbox" name="sup"> Supérfluo</label><input class="field" type="date" name="date" value="${today}" aria-label="Data"></div>
     <button class="btn pri qg-go" ${accs.length ? '' : 'disabled'}>${UI.ic('plus')}Registar gasto</button></form>
   ${last.length ? `<div class="qg-last"><div class="qg-l">Últimos</div>${last.map(t => `<div class="li" data-edit="transactions:${t.id}" style="cursor:pointer"><div class="li-t"><b>${esc(t.desc || t.cat || 'Despesa')}</b><small>${U.fmtDS(t.date)} · ${esc(t.cat || '')}</small></div><span class="mono">${U.eur(t.amount)}</span></div>`).join('')}</div>` : ''}
-  <div class="qg-home"><label class="qg-tg"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}> Abrir o Oceanum sempre aqui neste telemóvel</label>
-    <details open><summary>Registar sem abrir a app (Centro de Controlo)</summary><p>Cria um atalho do iPhone que pede o valor e a descrição e grava direto, como no Notion. Os gastos entram aqui sozinhos.</p><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></details>
-    <details><summary>Android</summary><p>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</p></details></div></div>`; };
+</div>`; };
+// Definições → Atalhos do iPhone: abrir sempre no Gasto rápido e registar sem abrir a app (o Gasto rápido só regista)
+OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
+  return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3></div>
+    <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Oceanum sempre no Gasto rápido neste aparelho</label>
+    <div class="list" style="margin-top:10px"><div class="li"><div class="li-t"><b>iPhone: registar sem abrir a app</b><small>Um atalho no Centro de Controlo pede o valor e a descrição e grava direto. Os gastos entram sozinhos.</small></div><div class="li-r"><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></div></div>
+    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>`; };
 OS.forms = OS.forms || {};
 OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 0)) { UI.toast('Escreve o valor', 'warn'); return; }
   const cat = (f.querySelector('input[name=cat]:checked') || {}).value || '', account = (f.querySelector('input[name=acc]:checked') || {}).value || '';

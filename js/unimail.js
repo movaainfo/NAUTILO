@@ -4,7 +4,7 @@
    Matéria de cada e-mail: 1) a que escolheste à mão; 2) a que aprendeu com esse remetente; 3) nome da cadeira, palavras
    dos e-mails e professor(a) (definidos em cada disciplina); 4) a IA; senão, "Geral".
    Se a universidade não deixar ligar apps, reencaminha o Outlook para o Gmail e escolhe o domínio (ex.: ua.pt): esses e-mails
-   aparecem aqui na mesma. */
+   aparecem aqui na mesma. A configuração vive em Definições → E-mail; a aba Faculdade só mostra os e-mails. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
@@ -23,10 +23,13 @@ const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ
 /* ---------- matérias ---------- */
 const subs = () => U.sortBy(OS.all('subjects'), s => (s.status === 'Em curso' ? '0' : '1') + (s.name || ''));
 const PAL = ['#38BDF8', '#A78BFA', '#34D399', '#F59E0B', '#F472B6', '#FB7185', '#2DD4BF', '#FACC15', '#818CF8', '#F97316'];
-const col = id => PAL[U.hash(id || 'geral') % PAL.length];
+const col = id => !id || id === 'geral' ? '#94A3B8' : PAL[U.hash(id) % PAL.length];
 const keysOf = s => [s.name].concat(String(s.mail || '').split(/[,;]+/), [s.prof]).map(x => norm(x).trim()).filter(x => x.length >= 3);
+// cada palavra-chave tem de aparecer inteira: a sigla "EST" não pode casar dentro de "prestação"
+const reEsc = k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), RX = {};
+const hasKey = (txt, k) => (RX[k] = RX[k] || new RegExp('(^|[^a-z0-9])' + reEsc(k) + '($|[^a-z0-9])')).test(txt);
 const byRule = it => { const txt = norm(it.s + ' ' + it.f + ' ' + it.sn); let best = '', bs = 0;
-  subs().forEach(s => { let sc = 0; keysOf(s).forEach((k, i) => { if (txt.includes(k)) sc += i === 0 ? 3 : 2; }); norm(s.name).split(' ').filter(w => w.length > 5).forEach(w => { if (txt.includes(w)) sc += .6; }); if (sc > bs) { bs = sc; best = s.id; } });
+  subs().forEach(s => { let sc = 0; keysOf(s).forEach((k, i) => { if (hasKey(txt, k)) sc += i === 0 ? 3 : 2; }); norm(s.name).split(' ').filter(w => w.length > 5).forEach(w => { if (txt.includes(w)) sc += .6; }); if (sc > bs) { bs = sc; best = s.id; } });
   return bs >= 1.8 ? best : ''; };
 const subjOf = it => { const c = C(), m = c.map[it.id] || c.snd[addr(it.f)] || byRule(it) || L.ai[it.id] || 'geral'; return m === 'geral' || OS.get('subjects', m) ? m : 'geral'; };
 const subjName = id => id === 'geral' ? 'Geral' : (OS.get('subjects', id) || {}).name || 'Geral';
@@ -44,7 +47,7 @@ const info = async () => { try { const j = await getJ('&op=olinfo'); if (j && j.
 const gmailUni = () => { const d = String(C().dom || '').trim().toLowerCase().replace(/^@/, ''); if (!d || !OS.Mail) return []; return OS.Mail.items().filter(m => (addr(m.f) + ' ' + String(m.to || '')).toLowerCase().includes('@' + d) || addr(m.f).endsWith('.' + d)).map(m => Object.assign({}, m, { gm: 1 })); };
 const refresh = async manual => { if (busy || !ready()) return; busy = 'ol'; err = ''; OS.request();
   try { if (!INFO || !INFO.linked) await info(); if (INFO && INFO.linked) { const j = await getJ('&op=ol&n=40'); if (!j.ok) throw new Error(j.msg || 'o Outlook não respondeu'); L = Object.assign(L, { at: Date.now(), items: j.items || [], user: j.user || L.user }); saveL(); aiSort(); }
-    else if (manual && !gmailUni().length) UI.toast('Liga primeiro o Outlook (passos abaixo)', 'warn'); }
+    else if (manual && !gmailUni().length) UI.toast('Configura o e-mail da faculdade em Definições → E-mail', 'warn'); }
   catch (e) { err = 'Não consegui ler o Outlook: ' + (e.message || 'erro') + '.'; } busy = ''; OS.request(); };
 const all = () => U.sortBy(L.items.concat(gmailUni()), x => x.d || '').reverse();
 
@@ -56,32 +59,45 @@ const STEPS_AZ = red => `<ol class="ai-steps">
   <li><b>Certificados e segredos</b> → <b>Novo segredo de cliente</b> → validade 24 meses → <b>Adicionar</b> → copia o <b>Valor</b> (só aparece uma vez).</li>
   <li><b>Permissões de API</b> → <b>Adicionar uma permissão</b> → <b>Microsoft Graph</b> → <b>Permissões delegadas</b> → marca <b>Mail.Read</b>, <b>Mail.Send</b>, <b>User.Read</b> e <b>offline_access</b> → <b>Adicionar</b>.</li>
   <li>Cola os três valores aqui em baixo e toca em <b>Guardar</b>. Depois <b>Entrar com a conta da faculdade</b>.</li></ol>`;
-const setup = () => { if (!ready()) return `<div class="pn"><b>Primeiro liga o script Google</b><p class="mut">O Outlook liga-se através do teu script (o mesmo do Gmail e da sincronização).</p><a class="btn sm pri" href="#email.contas">Ver os passos</a></div>`;
-  if (!INFO) { if (!busy) setTimeout(info, 30); return `<div class="pn"><div class="sai-busy"><div class="fd-spin"></div><span>A verificar a ligação ao Outlook…</span></div></div>`; }
-  if (!INFO.has4) return `<div class="pn ol-setup"><div class="pn-h"><h3>1 · Junta a Parte 4 ao teu script Google</h3></div><p class="mut" style="margin:0 0 8px">A Parte 4 liga o Outlook da faculdade (e põe a IA sem limites nas perguntas pela Siri). É um ficheiro novo: não apagas nada.</p>
-    <ol class="ai-steps"><li>Toca para copiar: <span class="row gap8" style="display:inline-flex;flex-wrap:wrap">${OS.Inbox.partsBtns('btn sm pri', 3, 3)}</span></li><li>Em <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a>, no teu projeto: <b>Arquivos → + → Script</b> → nome <b>Parte4</b> → apaga o que vier → cola → <b>Guardar</b>.</li><li><b>Implantar → Gerenciar implantações → lápis → Nova versão → Implantar</b>.</li><li>Volta aqui e toca em <b>Verificar</b>.</li></ol>
-    <button class="btn sm" data-act="olInfo">${UI.ic('sync')}Verificar</button></div>`;
+// ligação direta ao Outlook (Parte 4 + registo da app na Microsoft): só funciona se a universidade deixar
+const direct = () => { if (!ready()) return `<p class="mut">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a>.</p>`;
+  if (!INFO) { if (!busy) setTimeout(info, 30); return `<div class="sai-busy"><div class="fd-spin"></div><span>A verificar a ligação ao Outlook…</span></div>`; }
+  if (!INFO.has4) return `<p class="mut">Precisa da Parte 4 do script Google: copia-a em <a class="acc" href="#definicoes.script">Definições → Script Google</a> e volta aqui.</p><button class="btn sm" data-act="olInfo">${UI.ic('sync')}Verificar</button>`;
   const admin = /AADSTS65001|AADSTS90094|admin|administrador|consent/i.test(INFO.err || '');
-  return `<div class="pn ol-setup"><div class="pn-h"><h3>Ligar o Outlook da faculdade</h3><span class="bdg ${INFO.cfg ? 'pos' : ''}">${INFO.cfg ? 'aplicação guardada' : 'por configurar'}</span></div>
-    ${INFO.err ? `<div class="ib-st bad">Na última tentativa: ${esc(INFO.err)}</div>${admin ? `<p class="mut" style="font-size:13px">A tua universidade exige autorização do administrador para apps que leem o e-mail. Duas saídas: (1) pedir ao apoio informático (ex.: <b>sti@ua.pt</b>) para aprovar a app "Oceanum"; ou (2) no Outlook, <b>Definições → Correio → Reencaminhamento</b> para o teu Gmail e escrever o domínio da faculdade em baixo: os e-mails aparecem aqui na mesma, separados por matéria.</p>` : ''}` : ''}
+  return `${INFO.err ? `<div class="ib-st bad">Na última tentativa: ${esc(INFO.err)}</div>${admin ? `<p class="mut" style="font-size:13px">A tua universidade exige autorização do administrador. Pede ao apoio informático (ex.: <b>sti@ua.pt</b>) para aprovar a app "Oceanum", ou usa o reencaminhamento pelo Gmail (acima).</p>` : ''}` : ''}
     ${STEPS_AZ(INFO.redirect)}
     <form class="ol-f" data-form="olCfg" autocomplete="off"><input class="field" name="id" placeholder="ID da Aplicação (cliente)" aria-label="ID da Aplicação (cliente)" spellcheck="false" autocapitalize="none"><input class="field" name="ten" placeholder="ID do Diretório (inquilino)" aria-label="ID do Diretório (inquilino)" spellcheck="false" autocapitalize="none"><input class="field" name="sec" type="password" placeholder="Valor do segredo do cliente" aria-label="Segredo do cliente" autocomplete="new-password"><button class="btn sm pri">Guardar no meu script</button></form>
     <div class="row gap8" style="margin-top:10px;flex-wrap:wrap"><button class="btn pri" data-act="olAuth" ${INFO.cfg ? '' : 'disabled'}>${UI.ic('user')}Entrar com a conta da faculdade</button><button class="btn sm ghost" data-act="olInfo">${UI.ic('sync')}Verificar</button></div>
-    <small class="mut">O segredo fica guardado só no teu script Google. Podes desligar a qualquer momento.</small></div>`; };
+    <small class="mut">O segredo fica guardado só no teu script Google. Podes desligar a qualquer momento.</small>`; };
+const STEPS_FW = `<ol class="ai-steps"><li>Abre <a class="acc" href="https://outlook.office.com/mail/options/mail/rules" target="_blank" rel="noopener">outlook.office.com → Definições → Correio → Regras</a> com a conta da faculdade.</li>
+  <li><b>+ Adicionar nova regra</b> → nome "Para o Gmail" → condição <b>Aplicar a todas as mensagens</b> → ação <b>Redirecionar para</b> → o teu Gmail → <b>Guardar</b>.</li>
+  <li>Usa <b>Redirecionar</b> (não "Reencaminhar"): assim o professor continua a ser o remetente e a matéria acerta sozinha.</li>
+  <li>Escreve aqui em cima o domínio do teu e-mail da faculdade (ex.: <b>ua.pt</b>) e toca em Guardar.</li></ol>`;
+// Definições → E-mail: tudo o que é configurar o e-mail da faculdade fica aqui (a aba Faculdade só mostra os e-mails)
+const settings = () => { const d = C().dom || '', linked = !!(INFO && INFO.linked), n = gmailUni().length;
+  if (ready() && !INFO && !busy) setTimeout(info, 30);
+  const openDirect = !linked && (!d || !!(INFO && (INFO.cfg || INFO.err)));
+  return `<div class="pn ol-set" id="uniSet"><div class="pn-h"><h3>E-mail da faculdade</h3><span class="bdg ${linked || d ? 'pos' : ''}">${linked ? 'Outlook ligado' : d ? 'pelo Gmail' : 'por configurar'}</span></div>
+    <p class="mut" style="margin:0 0 12px">Os e-mails aparecem em <a class="acc" href="#email.faculdade">E-mail → Faculdade</a>, separados por matéria.</p>
+    ${linked ? `<div class="li"><div class="li-t"><b>Outlook ligado diretamente</b><small>${esc(INFO.user || L.user || '')}</small></div><div class="li-r"><button class="btn sm ghost" data-act="olOff">Desligar</button></div></div>` : ''}
+    <h4 class="ol-h4">Pelo Gmail (reencaminhamento)</h4>
+    ${d ? `<div class="ib-st ${n ? 'ok' : ''}">${n ? `✓ A funcionar: ${n} e-mail${n === 1 ? '' : 's'} de @${esc(d)} no Gmail.` : `À espera do primeiro e-mail de @${esc(d)} (depois de chegar, toca em Atualizar na página E-mail).`}</div>` : ''}
+    <form class="row gap8" data-form="olDom" style="margin:8px 0"><input class="field grow" name="dom" placeholder="domínio, ex.: ua.pt" value="${esc(d)}" aria-label="Domínio do e-mail da faculdade" autocapitalize="none" spellcheck="false"><button class="btn sm">Guardar</button></form>
+    <details class="ol-d" ${d ? '' : 'open'}><summary>Como reencaminhar o Outlook para o Gmail</summary>${STEPS_FW}</details>
+    ${linked ? '' : `<details class="ol-d" ${openDirect ? 'open' : ''}><summary>Ligação direta ao Outlook (precisa de autorização da universidade)</summary>${direct()}</details>`}</div>`; };
 const row = it => { const sid = subjOf(it), S = subs();
   return `<div class="ml-it ol-it ${it.u ? 'unread' : ''}"><div class="ol-bar" style="background:${col(sid)}"></div><div class="ml-t click" data-act="${it.gm ? 'mlRead' : 'olRead'}" data-id="${esc(it.id)}" role="button" tabindex="0"><div class="ml-h"><b>${esc(nm(it.f))}</b><small>${it.d ? U.fmtDS(String(it.d).slice(0, 10)) + ' ' + new Date(it.d).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : ''}</small></div><div class="ml-s">${esc(it.s || '(sem assunto)')}</div><div class="ml-sn">${esc(String(it.sn || '').slice(0, 160))}</div></div>
-    <div class="ml-a"><span class="bdg" style="border-color:${col(sid)};color:${col(sid)}">${esc(subjName(sid))}</span><select class="ol-sel" data-id="${esc(it.id)}" data-f="${esc(addr(it.f))}" aria-label="Mudar a matéria"><option value="">Mudar matéria…</option>${S.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}<option value="geral">Geral</option></select>${it.gm ? '<small class="mut">via Gmail</small>' : ''}</div></div>`; };
-const view = () => { const items = all(), linked = INFO && INFO.linked, f = OS.ui.olF || '', S = subs(), cnt = id => items.filter(x => subjOf(x) === id).length, list = f ? items.filter(x => subjOf(x) === f) : items;
+    <div class="ml-a"><span class="bdg" style="border-color:${col(sid)};color:${col(sid)}">${esc(subjName(sid))}</span><select class="ol-sel" data-id="${esc(it.id)}" data-f="${esc(addr(it.f))}" aria-label="Mudar a matéria"><option value="">Mudar matéria…</option>${S.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}<option value="geral">Geral</option></select></div></div>`; };
+const view = () => { const items = all(), linked = !!(INFO && INFO.linked), on = linked || !!C().dom, f = OS.ui.olF || '', S = subs(), cnt = id => items.filter(x => subjOf(x) === id).length, list = f ? items.filter(x => subjOf(x) === f) : items;
   if (ready() && !INFO && !busy) setTimeout(info, 30);
   if (linked && !L.at && !busy) setTimeout(() => refresh(false), 30);
-  const head = `<div class="row between gap8" style="flex-wrap:wrap;margin-bottom:10px"><div><b>${linked ? 'Outlook ligado' : 'Faculdade'}</b>${linked ? `<small class="mut" style="display:block">${esc(INFO.user || L.user || '')}${L.at ? ' · atualizado ' + new Date(L.at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : ''}</small>` : ''}</div>
-    <div class="row gap8">${linked ? `<button class="btn sm" data-act="olRefresh" ${busy ? 'disabled' : ''}>${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button><button class="btn sm ghost" data-act="olOff">Desligar</button>` : ''}</div></div>`;
-  return `${err ? `<div class="ib-st bad" style="margin-bottom:10px">${esc(err)}</div>` : ''}${linked ? '' : setup()}
-    ${linked || items.length ? `<div class="pn">${head}
-      ${S.length ? '' : `<p class="mut">Para separar por matéria, cria as tuas disciplinas em <a class="acc" href="#universidade">Universidade</a> (e, em cada uma, as palavras dos e-mails: sigla, código ou e-mail do professor).</p>`}
-      <div class="ml-f">${UI.chip('Todas · ' + items.length, 'olF', !f, 'data-v=""')}${S.filter(s => cnt(s.id)).map(s => UI.chip(esc(s.name) + ' · ' + cnt(s.id), 'olF', f === s.id, `data-v="${s.id}"`)).join('')}${cnt('geral') ? UI.chip('Geral · ' + cnt('geral'), 'olF', f === 'geral', 'data-v="geral"') : ''}${aiBusy ? '<small class="mut">a separar com a IA…</small>' : ''}</div>
-      <div class="ml-list">${list.map(row).join('') || UI.empty(L.at ? 'Nada aqui.' : 'Toca em Atualizar.')}</div></div>` : ''}
-    <details class="pn ol-dom"><summary>Reencaminhas o Outlook para o Gmail?</summary><p class="mut" style="font-size:13px">Escreve o domínio do teu e-mail da faculdade e os e-mails dele que chegam ao Gmail aparecem aqui, separados por matéria.</p><form class="row gap8" data-form="olDom"><input class="field grow" name="dom" placeholder="ex.: ua.pt" value="${esc(C().dom || '')}" aria-label="Domínio da faculdade" autocapitalize="none"><button class="btn sm">Guardar</button></form></details>`; };
+  if (!items.length && !on) return `<div class="pn ol-none">${UI.empty('Ainda não há e-mails da faculdade aqui.', `<a class="btn sm" href="#definicoes.email">${UI.ic('settings')}Configurar em Definições → E-mail</a>`)}</div>`;
+  const when = linked ? 'Outlook' + (L.at ? ' · atualizado ' + new Date(L.at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '') : 'pelo Gmail';
+  return `${err ? `<div class="ib-st bad" style="margin-bottom:10px">${esc(err)}</div>` : ''}<div class="pn ol-list">
+    <div class="row between gap8" style="flex-wrap:wrap;margin-bottom:8px"><small class="mut">${items.length} e-mail${items.length === 1 ? '' : 's'} · ${when}</small>${linked ? `<button class="btn sm" data-act="olRefresh" ${busy ? 'disabled' : ''}>${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button>` : ''}</div>
+    ${S.length ? '' : `<p class="mut">Para separar por matéria, cria as tuas disciplinas em <a class="acc" href="#universidade">Universidade</a>.</p>`}
+    <div class="ml-f">${UI.chip('Todas · ' + items.length, 'olF', !f, 'data-v=""')}${S.filter(s => cnt(s.id)).map(s => UI.chip(esc(s.name) + ' · ' + cnt(s.id), 'olF', f === s.id, `data-v="${s.id}"`)).join('')}${cnt('geral') ? UI.chip('Geral · ' + cnt('geral'), 'olF', f === 'geral', 'data-v="geral"') : ''}${aiBusy ? '<small class="mut">a separar com a IA…</small>' : ''}</div>
+    <div class="ml-list">${list.map(row).join('') || UI.empty(items.length ? 'Nada nesta matéria.' : 'Ainda sem e-mails da faculdade: chegam aqui sozinhos.')}</div></div>`; };
 
 /* ---------- ler e responder ---------- */
 const readerHTML = (it, r) => `<div class="ml-rd"><div class="pn-h"><h3>${esc((r && r.s) || it.s || '(sem assunto)')}</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
@@ -116,6 +132,6 @@ OS.forms.olCfg = async (f, v) => { const id = String(v('id') || '').trim(), ten 
 OS.forms.olDom = (f, v) => { OS.setOne('unimail', { dom: String(v('dom') || '').trim().toLowerCase().replace(/^@/, '') }); UI.toast('Guardado', 'pos'); };
 // atualiza sozinho de 10 em 10 minutos com a app aberta (se estiver ligado)
 OS.on('ready', () => setInterval(() => { if (!document.hidden && INFO && INFO.linked) refresh(false); }, 10 * 60e3));
-OS.UniMail = { view, items: () => all(), get, subjOf, subjName, refresh, info: () => INFO, check: info, _set: (o, i) => { if (o) { L = Object.assign({ ai: {} }, o); saveL(); } if (i) INFO = i; },
+OS.UniMail = { view, settings, items: () => all(), get, subjOf, subjName, refresh, info: () => INFO, check: info, _set: (o, i) => { if (o) { L = Object.assign({ ai: {} }, o); saveL(); } if (i) INFO = i; },
   summary: () => all().slice(0, 20).map(it => ({ materia: subjName(subjOf(it)), de: it.f, assunto: it.s, nao_lido: !!it.u, trecho: String(it.sn || '').slice(0, 140) })) };
 })();

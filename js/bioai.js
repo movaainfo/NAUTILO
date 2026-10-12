@@ -9,15 +9,17 @@ const n = v => U.num(v) || 0;
 const AI = OS.AI = {};
 AI.key = () => OS.one('diet').aiKey || '';
 /* A IA do OCEANUM é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
-   universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio (página do Spyke) ou em qualquer cartão abaixo. */
+   universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio: Definições → Spyke. */
 AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Centro de decisões)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
 const STEPS = `<ol class="ai-steps"><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em <b>Ligar</b>.</li></ol>`;
 const FORM = act => `<div class="row gap8 ai-row"><input class="field grow" data-aikey placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Ligar</button></div>`;
 const moved = () => OS.Move && !OS.Move.isOld && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
-// cartão pequeno onde uma função precisa da IA: o mesmo em toda a app
-AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" aria-hidden="true"></span><div><b>Esta função usa o Spyke, a IA do OCEANUM</b><small>Liga o Spyke uma vez e tudo o que usa IA passa a funcionar na app inteira.</small></div></div>
-  <details class="ai-d"><summary class="btn pri sm">Ligar o Spyke (grátis, 2 minutos)</summary>${STEPS}${FORM(act)}<small class="mut">A chave fica só na tua conta OCEANUM e no teu Google Drive pela sincronização. Não a partilhes.</small></details>${moved()}<a class="acc ai-more" href="#spyke">Ver tudo o que o Spyke faz</a></div>`;
-// secção central (página do Spyke)
+// cartão pequeno onde uma função precisa da IA: o mesmo em toda a app. A configuração (chave, passos) vive só em Definições → Spyke.
+AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" aria-hidden="true"></span><div><b>Esta função usa o Spyke, a IA do OCEANUM</b><small>Liga a IA uma vez em Definições e tudo o que usa IA passa a funcionar na app inteira.</small></div></div>
+  <a class="btn pri sm ai-go" href="#definicoes.spyke">${UI.ic('settings')}Ligar em Definições → Spyke</a></div>`;
+// dentro de uma janela, o botão leva às Definições e fecha a janela logo a seguir (depois de navegar)
+document.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('#modal .ai-go')) setTimeout(() => UI.closeModal(), 0); });
+// secção central (Definições → Spyke)
 AI.panel = () => { const k = AI.key(), st = U.ls.get('os2aiOk', null);
   return `<div class="pn" id="spyBrain"><div class="pn-h"><h3>Cérebro do Spyke (IA)</h3><span class="bdg ${k ? (st && st.ok === false ? 'neg' : 'pos') : ''}">${k ? (st && st.ok === false ? 'chave com problema' : 'ligado') : 'desligado'}</span></div>
     <p class="mut" style="margin:0 0 8px;font-size:13px">Uma só ligação para a app inteira: ${AI.uses.join(', ')}.</p>

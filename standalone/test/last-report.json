@@ -51,7 +51,7 @@
   "p": "Novidades",
   "name": "Spyke: com o nome responde logo",
   "pass": true,
-  "info": "São 05:47."
+  "info": "São 07:07."
  },
  {
   "p": "Novidades",
@@ -229,7 +229,7 @@
  },
  {
   "p": "Novidades",
-  "name": "script antigo: o Jornal explica que o script é antigo e leva ao passo a passo",
+  "name": "script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google",
   "pass": true,
   "info": ""
  },
@@ -279,7 +279,7 @@
   "p": "Novidades",
   "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
   "pass": true,
-  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 12/10, 05:48\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 12/10, 07:07\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
  },
  {
   "p": "Novidades",
@@ -336,168 +336,6 @@
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "iPhone: app instalada (a funcionar com a cópia guardada)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "iPhone: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "iPhone: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "iPhone: sem erros de JavaScript (atualização)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Android tel: app instalada (a funcionar com a cópia guardada)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Android tel: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Android tel: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "Android tel: sem erros de JavaScript (atualização)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Tablet horiz: app instalada (a funcionar com a cópia guardada)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Tablet horiz: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet horiz: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "2.2 s"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet horiz: sem erros de JavaScript (atualização)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Tablet vert: app instalada (a funcionar com a cópia guardada)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Tablet vert: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet vert: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet vert: sem erros de JavaScript (atualização)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Computador: app instalada (a funcionar com a cópia guardada)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "Computador: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Computador: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "Computador: sem erros de JavaScript (atualização)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "atualização: mesmo com um ficheiro da instalação a falhar, a versão nova entra",
-  "pass": true,
-  "info": "ficou 9.3"
- },
- {
-  "p": "Atualização",
-  "name": "atualização: se recarregar não chegar, limpa a cópia guardada e entra a nova",
-  "pass": true,
-  "info": "ficou 9.4"
- },
- {
-  "p": "Atualização",
-  "name": "atualização: os dados ficam depois de atualizar",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "atualização: com um formulário a meio, espera (não perde o que escreves)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "atualização: depois de fechar o formulário, atualiza sozinha",
-  "pass": true,
-  "info": "ficou 9.5"
- },
- {
-  "p": "Atualização",
-  "name": "atualização: com rede muito lenta, abre em menos de 5 s com a cópia guardada",
-  "pass": true,
-  "info": "4.4 s"
- },
- {
-  "p": "Atualização",
-  "name": "atualização: sem internet a app abre na mesma",
-  "pass": true,
-  "info": ""
- },
- {
   "p": "Novos",
   "name": "Painel: Visão Geral e Painel são uma só página \"Painel\" (o endereço antigo leva lá)",
   "pass": true,
@@ -535,6 +373,24 @@
  },
  {
   "p": "Novos",
+  "name": "Faculdade: sem nada configurado, não há passos de configuração (só o botão para Definições → E-mail)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "E-mail: o separador \"Ligar contas\" saiu da página E-mail",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "E-mail: o endereço antigo \"Ligar contas\" abre Definições → E-mail",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
   "name": "Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar",
   "pass": true,
   "info": ""
@@ -548,6 +404,18 @@
  {
   "p": "Novos",
   "name": "Outlook: \"Entrar com a conta da faculdade\" abre o login da Microsoft",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Definições → E-mail: mostra \"Outlook ligado\" com o botão Desligar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Faculdade: ligada, só e-mails e matérias (nenhum passo de configuração)",
   "pass": true,
   "info": ""
  },
@@ -589,6 +457,30 @@
  },
  {
   "p": "Novos",
+  "name": "Definições → E-mail: guarda o domínio e mostra que o reencaminhamento funciona",
+  "pass": true,
+  "info": "E-mail da faculdade\nOutlook ligado\n\nOs e-mails aparecem em E-mail → Faculdade, separados por matéria.\n\nOutlook ligado diretamente\nryan@ua.pt\nDesligar\nPelo Gmail (reencaminhamento)\n✓ A funcionar: 1 e-mail de @ua.pt no Gmail.\nGuardar\nComo reencaminhar o Outlook para o Gmail"
+ },
+ {
+  "p": "Novos",
+  "name": "Faculdade: uma sigla curta (EST) só conta como palavra inteira, não dentro de \"prestação\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Faculdade: a linha do e-mail mostra o remetente e o assunto com a largura toda",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Faculdade: o e-mail reencaminhado pelo Gmail aparece na matéria certa",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
   "name": "Definições: o Spyke saiu do menu principal",
   "pass": true,
   "info": ""
@@ -597,7 +489,7 @@
   "p": "Novos",
   "name": "Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)",
   "pass": true,
-  "info": "{\"h\":\"#definicoes.spyke\",\"tabs\":[\"Geral\",\"Spyke (assistente)\",\"Script Google\"],\"st\":true,\"h1\":\"Definições\",\"side\":true}"
+  "info": "{\"h\":\"#definicoes.spyke\",\"tabs\":[\"Geral\",\"E-mail\",\"Ligações\",\"Atalhos do iPhone\",\"Spyke (assistente)\",\"Script Google\"],\"st\":true,\"h1\":\"Definições\",\"side\":true}"
  },
  {
   "p": "Novos",
@@ -632,6 +524,30 @@
  {
   "p": "Novos",
   "name": "Definições → Geral: mantém perfil, segurança, sincronização e atalho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Definições: nenhuma página fora das Definições tem passos de configuração (40 páginas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Definições → Atalhos do iPhone: bloquear apps, gasto rápido e relógio (o endereço antigo do Bloco de foco leva lá)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Definições → Ligações: agenda Google, cotações (com a chave Finnhub e o câmbio) e alertas de preço",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novos",
+  "name": "Definições → Geral: sem o painel antigo \"Integrações\"",
   "pass": true,
   "info": ""
  },

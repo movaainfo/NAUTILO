@@ -355,8 +355,8 @@ async function sharedTests(b) {
       if (/fotos do corpo/.test(b)) return rt.fulfill(GEM({ bf: 17, confianca: 'media', musculo: 'bom', fortes: ['peito'], fracas: ['pernas'], gordura_local: 'abdómen', postura: null, foto_valida: true }));
       return rt.fulfill(GEM({ itens: [{ nome: 'Arroz branco cozido', gramas: 150, kcal: 195, proteina: 4, hidratos: 42, gordura: .5, fibra: 1 }, { nome: 'Bife grelhado', gramas: 120, kcal: 260, proteina: 34, hidratos: 0, gordura: 13 }], nota: 'Prato de almoço' })); });
     await E(p, () => location.hash = 'dieta'); await sleep(300); await E(p, () => OS.act.dietAdd({ dataset: { tab: 'foto' } })); await sleep(300);
-    ok('foto: explica como ligar a IA (grátis)', await E(p, () => /aistudio\.google\.com/.test(document.querySelector('#fdAdd').innerHTML)));
-    await E(p, () => { const d = document.querySelector('#fdAdd .ai-d'); if (d) d.open = true; }); await p.fill('#fdAdd [data-aikey]', 'AIzaTESTE_chave_de_teste_1234567890'); await p.click('#fdAdd [data-act=aiKeySave]'); await sleep(300);
+    ok('foto: sem IA mostra só o botão para Definições → Spyke (sem passos nem chave aqui)', await E(p, () => !!document.querySelector('#fdAdd a[href="#definicoes.spyke"]') && !document.querySelector('#fdAdd [data-aikey]') && !/aistudio/.test(document.querySelector('#fdAdd').innerHTML)));
+    await E(p, () => { OS.setOne('diet', { aiKey: 'AIzaTESTE_chave_de_teste_1234567890' }); OS.emit('ai:on'); }); await sleep(300);
     const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
     await p.setInputFiles('#fdCam', { name: 'prato.png', mimeType: 'image/png', buffer: png }); await sleep(1500);
     ok('foto: a IA identifica os alimentos', await E(p, () => document.querySelectorAll('#fdAdd .fd-phl>div').length === 2));
@@ -475,7 +475,7 @@ async function sharedTests(b) {
     await E(p, () => { OS.setOne('diet', { aiKey: '' }); location.hash = 'simuladores.emprestimo'; }); await sleep(400);
     ok('IA nos simuladores: painel do assistente com sugestões', await E(p, () => /Assistente de decisão/.test(document.querySelector('#view .sim-ai').textContent) && document.querySelectorAll('#view .sai-chips .chip').length >= 2));
     await p.click('#view .sai-chips .chip'); await sleep(300);
-    ok('IA nos simuladores: sem chave mostra o cartão único do Spyke (IA)', await E(p, () => /Ligar o Spyke/.test(document.querySelector('#view .sim-ai').textContent) && !!document.querySelector('#view .sim-ai .ai-off')));
+    ok('IA nos simuladores: sem chave mostra o cartão único do Spyke (IA)', await E(p, () => /Definições → Spyke/.test(document.querySelector('#view .sim-ai').textContent) && !!document.querySelector('#view .sim-ai .ai-off a[href="#definicoes.spyke"]')));
     await E(p, () => OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' })); await sleep(200);
     await p.click('#view .sai-chips .chip'); await sleep(900);
     ok('IA nos simuladores: responde com veredicto, riscos e passos', await E(p, () => { const t = document.querySelector('#view .sim-ai').textContent; return /Completa primeiro a reserva/.test(t) && /Riscos/.test(t) && /Comparar 3 bancos/.test(t) && /Prazo \(meses\): 36/.test(t); }));
@@ -773,7 +773,9 @@ async function sharedTests(b) {
     ok('relógio: corrida guardada com ritmo 5:58 /km', await E(p, () => { const r = OS.all('runs').find(x => x.date === '2025-01-10' && x.km == 5.2); return r && r.time === 1860 && OS.RunLink.pace(r) === '5:58 /km'; }));
     await E(p, () => { location.hash = 'corrida-add?km=5,2&seg=1860&data=2025-01-10'; }); await sleep(900);
     ok('relógio: não regista a mesma corrida duas vezes', await E(p, () => OS.all('runs').filter(x => x.date === '2025-01-10').length === 1 && !document.querySelector('#osform')));
-    ok('relógio: instruções na Corrida', await E(p, () => /Ligar o relógio/.test(document.querySelector('#view').textContent)));
+    ok('relógio: a Corrida só mostra as corridas (o guia do relógio saiu)', await E(p, () => !/Ligar o relógio/.test(document.querySelector('#view').textContent)));
+    await E(p, () => location.hash = 'definicoes.atalhos'); await sleep(400);
+    ok('relógio: instruções em Definições → Atalhos do iPhone', await E(p, () => /Ligar o relógio/.test(document.querySelector('#view').textContent) && !!document.getElementById('runSet')));
     // alongamentos
     await E(p, () => location.hash = 'corrida.alongamentos'); await sleep(400);
     ok('alongamentos com fotos', await E(p, () => document.querySelectorAll('#view .st-c .exi img').length >= 10));
@@ -1009,7 +1011,7 @@ async function newFeatureTests(b) {
       if (op === 'ping') return J({ ok: true, v: 11 }); if (op === 'put') return J({ ok: true }); if (op === 'nw') return J({ ok: true, nw: { 'PT:WORLD': [{ t: 'Notícia de teste - Público', s: 'Público', l: 'https://x.pt', d: Date.now() }], 'BR:WORLD': [], 'PT:TOP': [], 'W:TOP': [] } }); return J({ ok: true, items: [], docs: {} }); });
     await ctx.route(/generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [] }) }));
     await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 1 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
-    ok('script antigo: o Jornal explica que o script é antigo e leva ao passo a passo', await E(p, () => /versão antiga/.test(document.getElementById('view').innerText) && !!document.querySelector('#view a[href="#spyke"]')));
+    ok('script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google', await E(p, () => /versão antiga/.test(document.getElementById('view').innerText) && !!document.querySelector('#view a[href="#definicoes.script"]')));
     await E(p, () => location.hash = 'spyke'); await sleep(400);
     const st = await E(p, () => ({ bad: document.querySelectorAll('#spyState .spy-chk.bad').length, guide: !!document.querySelector('#spyState .spy-upd [data-act=ibCopy]'), tail: /TESTE123\/exec/.test(document.querySelector('#spyState .spy-upd').innerText) }));
     ok('estado do Spyke: mostra o que falta (script, notícias, e-mail) com o passo a passo e a implantação certa', st.bad >= 3 && st.guide && st.tail, JSON.stringify(st));
@@ -1100,13 +1102,20 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   await p.click('#view [data-act=lpAI]'); await sleep(1500);
   ok('Próximos passos: o Spyke faz o plano com novos passos ligados às metas', await E(p, () => /Resolver 10 exercícios de Contabilidade/.test(document.getElementById('view').innerText) && /Fechar o semestre/.test(document.getElementById('view').innerText)));
   await E(p, () => location.hash = 'next.agora'); await sleep(400); ok('Próximos passos: a aba "Agora" mantém a próxima ação de sempre', await E(p, () => !!document.querySelector('#view .na') || /Nada encaixa/.test(document.getElementById('view').innerText)));
-  // Outlook da faculdade
+  // Outlook da faculdade: a aba Faculdade só mostra e-mails; a configuração está em Definições → E-mail
   await E(p, () => location.hash = 'email.faculdade'); await sleep(1200);
+  ok('Faculdade: sem nada configurado, não há passos de configuração (só o botão para Definições → E-mail)', await E(p, () => !document.querySelector('#view .ol-f, #view [data-act=olAuth], #view [data-form=olDom], #view .ol-set') && !!document.querySelector('#view a[href="#definicoes.email"]')));
+  ok('E-mail: o separador "Ligar contas" saiu da página E-mail', await E(p, () => ![...document.querySelectorAll('#view .tabs a')].some(a => /Ligar contas/.test(a.textContent))));
+  await E(p, () => location.hash = 'email.contas'); await sleep(900);
+  ok('E-mail: o endereço antigo "Ligar contas" abre Definições → E-mail', await E(p, () => location.hash === '#definicoes.email' && /Gmail principal/.test(document.getElementById('view').innerText) && !!document.getElementById('uniSet') && [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()).join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Script Google'));
   ok('Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar', await E(p, () => /usercallback/.test(document.getElementById('view').innerText) && /Registos de aplicações/.test(document.getElementById('view').innerText)));
   await p.fill('#view .ol-f [name=id]', '11111111-2222-3333-4444-555555555555'); await p.fill('#view .ol-f [name=ten]', '22222222-3333-4444-5555-666666666666'); await p.fill('#view .ol-f [name=sec]', 'segredo-de-teste-123'); await p.click('#view .ol-f button'); await sleep(800);
   ok('Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)', posts.some(x => x.op === 'olcfg' && x.sec === 'segredo-de-teste-123' && x.id.length === 36));
   await p.click('#view [data-act=olAuth]'); await sleep(600); ok('Outlook: "Entrar com a conta da faculdade" abre o login da Microsoft', /login\.microsoftonline\.com/.test(await E(p, () => window.__opened || '')));
-  linked = true; await p.click('#view [data-act=olInfo]'); await sleep(1800);
+  linked = true; await p.click('#view [data-act=olInfo]'); await sleep(1200);
+  ok('Definições → E-mail: mostra "Outlook ligado" com o botão Desligar', await E(p, () => /Outlook ligado/.test(document.getElementById('uniSet').innerText) && !!document.querySelector('#uniSet [data-act=olOff]')));
+  await E(p, () => location.hash = 'email.faculdade'); await sleep(1500);
+  ok('Faculdade: ligada, só e-mails e matérias (nenhum passo de configuração)', await E(p, () => !!document.querySelector('#view .ol-list') && !document.querySelector('#view .ol-f, #view [data-act=olAuth], #view [data-act=olOff], #view [data-form=olDom], #view details')));
   const om = await E(p, () => ({ n: document.querySelectorAll('#view .ol-it').length, chips: [...document.querySelectorAll('#view .ml-f .chip')].map(c => c.textContent.trim()), m: Object.fromEntries(OS.UniMail.items().map(it => [it.id, OS.UniMail.subjName(OS.UniMail.subjOf(it))])) }));
   ok('Outlook: ligado, lê os e-mails da faculdade', om.n === 4, JSON.stringify(om.chips));
   ok('Outlook: separa por matéria (código da cadeira, professor, IA e Geral)', om.m.o1 === 'Contabilidade' && om.m.o2 === 'Contabilidade' && om.m.o3 === 'Marketing' && om.m.o4 === 'Geral' && om.chips.some(c => /Contabilidade · 2/.test(c)) && om.chips.some(c => /Marketing · 1/.test(c)), JSON.stringify(om.m));
@@ -1119,11 +1128,20 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   await p.fill('#olRpT', 'Obrigado, professora.'); await p.click('#modal [data-act=olSend]'); await sleep(700);
   ok('Outlook: responder vai pelo Outlook da faculdade', posts.some(x => x.op === 'ols' && x.id === 'o2' && /Obrigado/.test(x.b)));
   await E(p, () => OS.UI.closeModal && OS.UI.closeModal()); await sleep(200);
+  // pelo Gmail (reencaminhamento): o domínio fica em Definições → E-mail e os e-mails aparecem na Faculdade, separados por matéria
+  await E(p, () => { OS.add('subjects', { name: 'Estatística', status: 'Em curso', mail: 'EST' }); OS.Mail._set({ at: Date.now(), items: [{ id: 'g1', s: 'CONT1 - notas do teste', f: 'Prof. Rui <rui@ua.pt>', to: 'ryan@ua.pt', d: new Date().toISOString(), u: true, sn: 'Notas publicadas.' }] }); });
+  await E(p, () => location.hash = 'definicoes.email'); await sleep(600);
+  await p.fill('#uniSet [name=dom]', 'ua.pt'); await p.click('#uniSet [data-form=olDom] button'); await sleep(600);
+  ok('Definições → E-mail: guarda o domínio e mostra que o reencaminhamento funciona', await E(p, () => OS.one('unimail').dom === 'ua.pt' && /A funcionar: 1 e-mail de @ua\.pt/.test(document.getElementById('uniSet').innerText)), await E(p, () => (document.getElementById('uniSet') || {}).innerText || 'sem cartão'));
+  await E(p, () => location.hash = 'email.faculdade'); await sleep(700);
+  ok('Faculdade: uma sigla curta (EST) só conta como palavra inteira, não dentro de "prestação"', await E(p, () => { const f = { id: 'gx', s: 'Propinas: prazo da 2.ª prestação', f: 'Serviços Académicos <sa@ua.pt>', sn: 'O prazo termina a 31.' }, g = { id: 'gy', s: 'EST - exame de recurso', f: 'Prof. Eva <eva@ua.pt>', sn: '' }; return OS.UniMail.subjName(OS.UniMail.subjOf(f)) !== 'Estatística' && OS.UniMail.subjName(OS.UniMail.subjOf(g)) === 'Estatística'; }));
+  ok('Faculdade: a linha do e-mail mostra o remetente e o assunto com a largura toda', await E(p, () => { const t = document.querySelector('#view .ol-it .ml-t'); return !!t && t.getBoundingClientRect().width > 200 && /Prof\. Rui/.test(t.innerText) && /notas do teste/.test(t.innerText); }));
+  ok('Faculdade: o e-mail reencaminhado pelo Gmail aparece na matéria certa', await E(p, () => { const it = OS.UniMail.items().find(x => x.id === 'g1'); return !!it && OS.UniMail.subjName(OS.UniMail.subjOf(it)) === 'Contabilidade' && !!document.querySelector('#view .ml-t[data-id="g1"]'); }));
   // Spyke dentro de Definições + Parte 4 fácil de copiar
   ok('Definições: o Spyke saiu do menu principal', !(await E(p, () => [...document.querySelectorAll('#side a, .tn-dd a')].some(a => a.getAttribute('href') === '#spyke'))));
   await E(p, () => location.hash = 'spyke'); await sleep(700);
   const sp = await E(p, () => ({ h: location.hash, tabs: [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()), st: !!document.getElementById('spyState'), h1: (document.querySelector('#view h1') || {}).textContent, side: !!document.querySelector('#side .side-set.on') }));
-  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|Spyke (assistente)|Script Google' && sp.side, JSON.stringify(sp));
+  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Script Google' && sp.side, JSON.stringify(sp));
   ok('Definições → Spyke: o estado mostra a Parte 4 instalada', await E(p, () => /Parte 4 do script[\s\S]*instalada/.test(document.getElementById('spyState').innerText)));
   await E(p, () => location.hash = 'definicoes.script'); await sleep(700);
   const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].map(x => x.dataset.t) }));
@@ -1137,6 +1155,18 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Definições → Spyke: sem a Parte 4 o estado leva-te ao botão de copiar', await E(p, () => !!document.querySelector('#spyState a[href="#definicoes.script"]')));
   await E(p, () => location.hash = 'definicoes'); await sleep(600);
   ok('Definições → Geral: mantém perfil, segurança, sincronização e atalho', await E(p, () => !!document.getElementById('syncPn') && !!document.getElementById('inboxPn') && !document.getElementById('spyState') && /Perfil/.test(document.getElementById('view').innerText) && document.querySelectorAll('#view .tabs').length === 1 && document.querySelectorAll('#view h1').length === 1));
+  // toda a configuração vive nas Definições: nenhuma página tem passos, chaves ou botões de ligar serviços
+  const CFG = '[data-aikey], .ai-steps, .ib-w, .ib-steps, .fb-guide, [data-act=gcalOn], [data-act=gcalOff], [data-act=qgStart], [data-bind="invcfg.fh"], [data-act=olAuth], [data-form=olDom], [data-act=invNotif], [data-act=fbApp], [data-bind="focusblk.sc"], #quotesSet, #alertSet, #runSet';
+  const pages = await E(p, () => [...new Set([...document.querySelectorAll('#side a[href^="#"], .tn-dd a[href^="#"]')].map(a => a.getAttribute('href').slice(1)).filter(h => h && !/^definicoes/.test(h)))]);
+  const bad = [];
+  for (const r of pages.concat(['investimentos.cotacoes', 'investimentos.proventos', 'foco', 'gasto', 'calendario', 'corrida', 'dieta.metas', 'email', 'email.faculdade', 'email.caixa', 'jornal', 'simuladores', 'universidade', 'trabalho', 'trabalho.foto', 'fe', 'eu'])) { await E(p, r => location.hash = r, r); await sleep(120); const n = await E(p, q => [...document.querySelectorAll('#view ' + q.split(', ').join(', #view '))].map(e => e.className || e.id || e.getAttribute('data-act') || e.tagName).slice(0, 3), CFG); if (n.length) bad.push(r + ': ' + n.join('/')); }
+  ok('Definições: nenhuma página fora das Definições tem passos de configuração (' + pages.length + ' páginas)', !bad.length, bad.slice(0, 6).join(' | '));
+  await E(p, () => location.hash = 'foco.apps'); await sleep(500);
+  ok('Definições → Atalhos do iPhone: bloquear apps, gasto rápido e relógio (o endereço antigo do Bloco de foco leva lá)', await E(p, () => location.hash === '#definicoes.atalhos' && !!document.querySelector('#fbSet [data-act=fbApp]') && !!document.querySelector('#qgSet [data-act=qgStart]') && !!document.getElementById('runSet')));
+  await E(p, () => location.hash = 'definicoes.ligacoes'); await sleep(500);
+  ok('Definições → Ligações: agenda Google, cotações (com a chave Finnhub e o câmbio) e alertas de preço', await E(p, () => !!document.querySelector('#gcalSet [data-act=gcalOn], #gcalSet [data-act=gcalOff]') && !!document.querySelector('#quotesSet [data-bind="invcfg.fh"]') && /Câmbio manual/.test(document.getElementById('view').innerText) && !!document.getElementById('alertSet')));
+  await E(p, () => location.hash = 'definicoes'); await sleep(500);
+  ok('Definições → Geral: sem o painel antigo "Integrações"', await E(p, () => !/Integrações/.test(document.getElementById('view').innerText)));
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (novos)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
 /* ================= IA SEM LIMITES: modelos descobertos sozinhos + reserva grátis ================= */

@@ -29,7 +29,7 @@ addEventListener('hashchange', handle);
 OS.on('ready', () => { handle(); const t = setInterval(() => { if (!todo) return clearInterval(t); handle(); }, 800); });
 if (/^#corrida-add/.test(location.hash)) { todo = pending(); }
 
-/* ---------- painel na Corrida: ligar o relógio ---------- */
+/* ---------- Definições → Atalhos do iPhone: ligar o relógio ---------- */
 const step = (i, t, b) => `<div class="ib-s"><i>${i}</i><div><b>${t}</b>${b}</div></div>`;
 RL.panel = () => { const ex = BASE() + '#corrida-add?km=5,2&seg=1860&bpm=152&kcal=410';
   return UI.toggle('Ligar o relógio (Aurea Fit → Saúde → Oceanum)', `<div class="ib-steps">
@@ -45,5 +45,5 @@ RL.panel = () => { const ex = BASE() + '#corrida-add?km=5,2&seg=1860&bpm=152&kca
     ${step(4, 'Testar já', `<p>Abre este endereço de teste (corrida de 5,2 km em 31 min):</p><div class="row gap8"><a class="btn sm" href="${U.esc(ex)}">Abrir teste</a><button class="btn ghost sm" data-act="rlCopy">Copiar endereço base</button></div>`)}
   </div>`, 'rlink', 'run'); };
 A.rlCopy = () => { const t = BASE() + '#corrida-add?km='; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => UI.toast('Endereço copiado', 'pos')).catch(() => UI.toast(t, '')); };
-OS.on('ready', () => { const base = V.corrida; if (!base || base._rl) return; V.corrida = sub => { const h = base(sub); return !sub || sub === 'visao' ? h + RL.panel() : h; }; V.corrida._rl = 1; });
+// o guia de ligar o relógio vive em Definições → Atalhos do iPhone (RL.panel); a Corrida só mostra as corridas
 })();

@@ -42,7 +42,8 @@ const isSel = (x, i) => DR.sel[x.k] != null ? DR.sel[x.k] : i < cfg().n;
 const picked = () => list().filter(isSel).map(x => Object.assign({}, x, { mins: clamp(DR.mins[x.k] || x.mins) }));
 
 /* ---------- página ---------- */
-const TB = [['', 'Começar'], ['apps', 'Bloquear apps (iPhone)'], ['hist', 'Histórico']];
+// bloquear as apps do iPhone (Foco + Atalhos) configura-se em Definições → Atalhos do iPhone (OS.FocusBlock.settings)
+const TB = [['', 'Começar'], ['hist', 'Histórico']];
 V.foco = sub => { const k = TB.some(t => t[0] === (sub || '')) ? (sub || '') : '';
   return UI.head('Bloco de foco', 'Resolve as tuas pendências, uma de cada vez. Sem fugir até acabar.', B ? `<button class="btn pri" data-act="fbShow">${UI.ic('focus')}Voltar ao bloco</button>` : '') + UI.tabs('foco', TB, k) + `<div class="fb-page">${P[k]()}</div>`; };
 const P = {};
@@ -54,11 +55,8 @@ P[''] = () => { if (B) return `<div class="pn"><b>Tens um bloco em curso.</b><p 
   <div class="pn"><div class="pn-h"><h3>2 · Pendências e tempo de cada uma</h3><span class="mut">${sel.length} escolhidas · ${U.hours(tot)}</span></div>
     <div class="fb-list">${L.map((x, i) => `<label class="fb-it ${isSel(x, i) ? 'on' : ''}"><input type="checkbox" data-fbk="${esc(x.k)}" ${isSel(x, i) ? 'checked' : ''}><span class="fb-n">${i + 1}</span><span class="fb-t"><b>${esc(x.title)}</b><small>${esc([x.kind, x.area, x.why].filter(Boolean).join(' · '))}</small></span><span class="fb-m"><input type="number" min="5" max="120" step="5" inputmode="numeric" data-fbm="${esc(x.k)}" value="${clamp(DR.mins[x.k] || x.mins)}" aria-label="Minutos"><small>min</small></span></label>`).join('') || UI.empty('Sem pendências neste tema. Escolhe outro ou acrescenta uma abaixo.')}</div>
     <form class="fb-add" data-form="fbAdd"><input class="field" name="t" placeholder="Acrescentar pendência (ex.: responder ao e-mail da Joana)" required><input class="field" name="m" type="number" min="5" max="120" step="5" value="15" aria-label="Minutos"><button class="btn">${UI.ic('plus')}Juntar</button></form></div>
-  <div class="pn"><div class="pn-h"><h3>3 · Apps a bloquear</h3><a class="btn xs ghost" href="#foco.apps">Como bloquear?</a></div>
-    <div class="fb-apps">${APPS.map(a => `<button type="button" class="chip ${c.apps.includes(a) ? 'on' : ''}" data-act="fbApp" data-a="${esc(a)}">${esc(a)}</button>`).join('')}</div>
-    <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="focusblk.sc" ${c.sc ? 'checked' : ''}><span></span>Ligar o modo Foco do iPhone com o Atalho "${esc(c.scOn)}" ao começar</label></div>
-  <div class="fb-go"><div><b>${sel.length} pendência(s) · ${U.hours(tot)}</b><small>Para sair antes do fim: Face ID ou código.</small></div><button class="btn pri lg" data-act="fbGo" ${sel.length ? '' : 'disabled'}>${UI.ic('focus')}Começar bloco</button></div>`; };
-P.apps = () => { const c = cfg(), ap = c.apps.length ? c.apps.join(', ') : '(escolhe as apps na aba Começar)';
+  <div class="fb-go"><div><b>${sel.length} pendência(s) · ${U.hours(tot)}</b><small>Para sair antes do fim: Face ID ou código.${c.sc ? ' As apps do iPhone ficam bloqueadas pelo modo Foco.' : ''} <a class="acc" href="#definicoes.atalhos">Bloquear apps</a></small></div><button class="btn pri lg" data-act="fbGo" ${sel.length ? '' : 'disabled'}>${UI.ic('focus')}Começar bloco</button></div>`; };
+P.apps = () => { const c = cfg(), ap = c.apps.length ? c.apps.join(', ') : '(escolhe as apps acima)';
   return `<div class="pn"><p style="margin:0 0 8px"><b>A verdade:</b> o iPhone não deixa nenhuma app web (nem o Safari) fechar ou bloquear outras apps. O que o Oceanum faz sozinho: ecrã fechado até acabares, saída só com Face ID ou código, e conta cada vez que sais da app. Para bloquear as outras apps de verdade usa o <b>modo Foco</b> + <b>Atalhos</b> (5 minutos, uma vez só):</p></div>
   <div class="pn fb-guide"><h3>1 · Criar o modo Foco "OCEANUM"</h3><ol><li>Ajustes → Foco → <b>+</b> → Personalizado → nome <b>OCEANUM</b>.</li><li>Notificações → Pessoas: só favoritos. Apps: permite só as essenciais (Telefone, Oceanum).</li><li>Ecrãs → Ecrã principal → escolhe uma página só com o Oceanum. Com o Foco ligado as outras apps desaparecem do ecrã.</li></ol></div>
   <div class="pn fb-guide"><h3>2 · Atalho "${esc(c.scOn)}" (o Oceanum chama-o ao começar)</h3><ol><li>App Atalhos → <b>+</b> → nome <b>${esc(c.scOn)}</b>.</li><li>Ação <b>Adicionar à data</b>: Data atual + <i>Entrada do atalho</i> minutos.</li><li>Ação <b>Guardar ficheiro</b>: guarda essa data em <code>Atalhos/oceanum-foco.txt</code> (substituir: sim, perguntar: não).</li><li>Ação <b>Definir Foco</b>: Oceanum → Ligado → até essa data.</li></ol></div>
@@ -168,5 +166,8 @@ OS.on('ready', () => { draw(); if (B && B.phase !== 'end') wake(); });
 
 /* ---------- entradas ---------- */
 OS.on('ready', () => { const h = V.hoje; if (h && !h._fb) { V.hoje = s => h(s).replace(/(<a class="btn ghost sm" href="#next">[\s\S]*?<\/a>)/, `<div class="row gap6" style="flex-wrap:wrap;justify-content:flex-end"><a class="btn sm pri fb-hb" href="#foco">${UI.ic('lock')}Bloco de foco</a>$1</div>`); V.hoje._fb = 1; } });
-OS.FocusBlock = { preset: th => { DR = { th, sel: {}, mins: {}, extra: [] }; OS.request(); }, cands, state: () => B, finish: e => B && finish(e), _set: v => { B = v; save(); draw(); } };
+// Definições → Atalhos do iPhone: que apps bloquear e como (modo Foco + Atalhos)
+const fbSettings = () => { const c = cfg(); return `<div class="pn" id="fbSet"><div class="pn-h"><h3>Bloquear apps no iPhone (Bloco de foco)</h3><span class="bdg ${c.sc ? 'pos' : ''}">${c.sc ? 'ligado' : 'desligado'}</span></div>
+  <p class="mut" style="margin:0 0 8px">Apps a bloquear durante um bloco de foco:</p><div class="fb-apps">${APPS.map(a => `<button type="button" class="chip ${c.apps.includes(a) ? 'on' : ''}" data-act="fbApp" data-a="${esc(a)}">${esc(a)}</button>`).join('')}</div></div>${P.apps()}`; };
+OS.FocusBlock = { settings: fbSettings, preset: th => { DR = { th, sel: {}, mins: {}, extra: [] }; OS.request(); }, cands, state: () => B, finish: e => B && finish(e), _set: v => { B = v; save(); draw(); } };
 })();

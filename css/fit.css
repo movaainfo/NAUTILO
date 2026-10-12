@@ -872,3 +872,19 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 /* Definições → Script Google: as partes leem-se inteiras no telemóvel */
 .sc-parts .li-t b,.sc-parts .li-t small{white-space:normal}
 .sc-parts .li-r{flex-shrink:0}
+/* Definições → E-mail: cartão do e-mail da faculdade */
+.ol-h4{margin:14px 0 6px;font-size:14px;font-weight:600}
+.ol-d{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.ol-d summary{cursor:pointer;font-size:13.5px;font-weight:520;color:var(--accent)}
+.ol-d[open] summary{margin-bottom:8px}
+.ol-none .empty{padding:18px 8px}
+/* linha do e-mail da faculdade: a barra de cor fica de fora da grelha, por isso o texto ocupa a largura toda */
+.ml-it.ol-it{grid-template-columns:minmax(0,1fr);padding-left:16px}
+.ol-it .ml-a{margin-top:6px}
+.set-mail>.pn{margin-bottom:14px}
+/* aviso curto onde falta a IA: o botão leva a Definições → Spyke */
+.ai-off a.btn.pri{color:#fff}.ai-off .ai-go{margin-top:8px}
+/* Definições: secções dos separadores Ligações e Atalhos */
+.set-h{margin:18px 2px 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.set-h:first-child{margin-top:4px}
+.set-page>.pn{margin-bottom:14px}

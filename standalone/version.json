@@ -1,10 +1,12 @@
 {
- "n": 105,
- "hash": "f237156518c3",
+ "n": 106,
+ "hash": "9fde9e81cc79",
  "notes": [
-  "Spyke dentro das Definições: o menu fica mais limpo e o assistente está em Definições → Spyke (os atalhos da Siri e os links antigos continuam a funcionar).",
-  "Definições → Script Google: as 4 partes do script num só sítio, com o que cada uma faz, se já estão instaladas e o botão para copiar. A Parte 4 aparece em destaque com o passo a passo.",
-  "Estado do Spyke mostra também a Parte 4 e leva-te direto ao botão de copiar quando falta."
+  "Toda a configuração passou para as Definições: as páginas mostram só o conteúdo. Novos separadores \"Ligações\" (agenda Google, cotações, alertas de preço) e \"Atalhos do iPhone\" (gasto rápido, relógio da corrida, bloquear apps).",
+  "Onde falta a IA, aparece só um aviso com o botão \"Ligar em Definições → Spyke\" (sem passos nem chaves no meio das páginas).",
+  "E-mail → Faculdade mais limpa: só os e-mails da faculdade, separados por matéria; a configuração do e-mail está em Definições → E-mail.",
+  "Separação por matéria mais certeira: uma sigla curta (ex.: EST) já não se confunde com palavras que a contêm (ex.: \"prestação\").",
+  "Investimentos: o separador \"Cotações\" passou a \"Preços\" (Tesouro Direto e preços manuais)."
  ],
  "date": "12/10/2026"
 }

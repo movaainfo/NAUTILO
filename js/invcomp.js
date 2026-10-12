@@ -14,7 +14,7 @@ const tone = x => x == null ? '' : x > 0 ? 'pos' : x < 0 ? 'neg' : '';
 const ST = { q: '', busy: false, res: null, err: '' }, CO = {}, TR = {}, REP = U.ls.get('oc_corep', {}) || {};
 
 /* ---------- dados ---------- */
-const load = s => { if (CO[s]) return CO[s]; CO[s] = { busy: true }; IX.fund(s).then(f => { CO[s] = { f }; OS.request(); }).catch(e => { CO[s] = { err: IX.st.script === 'old' ? 'O teu script Google precisa da versão nova (Cotações → Copiar código novo).' : 'Não consegui obter os dados: ' + e.message }; OS.request(); }); return CO[s]; };
+const load = s => { if (CO[s]) return CO[s]; CO[s] = { busy: true }; IX.fund(s).then(f => { CO[s] = { f }; OS.request(); }).catch(e => { CO[s] = { err: IX.st.script === 'old' ? 'O teu script Google precisa da versão nova (Definições → Ligações → Cotações).' : 'Não consegui obter os dados: ' + e.message }; OS.request(); }); return CO[s]; };
 const years = (f, key, n = 5) => { const a = (f.ts['annual' + key] || []).slice(-n); return a; };
 const series = (f, key) => { const m = {}; (f.ts['annual' + key] || []).forEach(([d, x]) => m[d.slice(0, 4)] = x); return m; };
 IX.coModel = f => { const S = f.sum || {}, ap = S.assetProfile || {}, sd = S.summaryDetail || {}, fd = S.financialData || {}, ks = S.defaultKeyStatistics || {}, pr = S.price || {};
@@ -51,12 +51,12 @@ IX.coModel = f => { const S = f.sum || {}, ap = S.assetProfile || {}, sd = S.sum
 /* ---------- ecrã ---------- */
 A.invCo = b => { OS.setUI('invCo', b.dataset.s); location.hash = 'investimentos.empresas'; };
 OS.forms.invCoSearch = async (f, val) => { const q = String(val('q') || '').trim(); if (!q) return; ST.q = q; ST.busy = true; ST.err = ''; ST.res = null; OS.request();
-  try { const j = await IX.search(q); ST.res = (j.q || []).filter(x => /EQUITY|ETF|MUTUALFUND/i.test(x.t || '')); if (ST.res.length === 1) { OS.setUI('invCo', ST.res[0].s); ST.res = null; } } catch (e) { ST.err = IX.st.script === 'old' ? 'O teu script Google precisa da versão nova (Cotações).' : !IX.hasScript() ? 'Liga primeiro o script Google em Cotações.' : 'A pesquisa falhou: ' + e.message; }
+  try { const j = await IX.search(q); ST.res = (j.q || []).filter(x => /EQUITY|ETF|MUTUALFUND/i.test(x.t || '')); if (ST.res.length === 1) { OS.setUI('invCo', ST.res[0].s); ST.res = null; } } catch (e) { ST.err = IX.st.script === 'old' ? 'O teu script Google precisa da versão nova (Definições → Ligações → Cotações).' : !IX.hasScript() ? 'Liga primeiro o script Google em Cotações.' : 'A pesquisa falhou: ' + e.message; }
   ST.busy = false; OS.request(); };
 const head = () => `<div class="pn"><div class="pn-h"><h3>${UI.ic('search')}Analisar uma empresa</h3><span class="mut" style="font-size:12px">ações de todas as bolsas: EUA, Brasil, Portugal, Europa…</span></div>
   <form class="row gap8" data-form="invCoSearch"><input class="field grow" name="q" id="invCoQ" value="${esc(ST.q)}" placeholder="Nome ou ticker: Apple, Petrobras, EDP, Itaúsa, Nvidia, Galp…" autocomplete="off" aria-label="Empresa"><button class="btn pri">${ST.busy ? 'A procurar…' : 'Analisar'}</button></form>
   ${ST.err ? `<p class="neg">${esc(ST.err)}</p>` : ''}${ST.res ? (ST.res.length ? `<div class="list" style="margin-top:8px">${ST.res.map(r => `<div class="li click" data-act="invCo" data-s="${esc(r.s)}"><div class="li-t"><b>${esc(r.n)}</b><small>${esc(r.s)} · ${esc(r.ty || r.t || '')} · ${esc(r.ex || '')}</small></div><span class="acc">analisar →</span></div>`).join('')}</div>` : '<p class="mut">Nenhuma empresa encontrada.</p>') : ''}
-  ${!IX.hasScript() ? `<div class="note" style="margin-top:8px">Precisa do script Google ligado (em <a class="acc" href="#investimentos.cotacoes">Cotações</a>): é ele que vai buscar os dados da empresa.</div>` : ''}</div>`;
+  ${!IX.hasScript() ? `<div class="note" style="margin-top:8px">Precisa do script Google ligado (em <a class="acc" href="#definicoes.ligacoes">Definições → Ligações</a>): é ele que vai buscar os dados da empresa.</div>` : ''}</div>`;
 T.empresas = () => { const s = OS.ui.invCo; if (!s) return head() + `<div class="pn"><p class="mut">Exemplos: ${['AAPL', 'MSFT', 'PETR4.SA', 'ITSA4.SA', 'EDP.LS', 'GALP.LS', 'ASML.AS', 'KO'].map(x => `<button class="chip" data-act="invCo" data-s="${x}">${x}</button>`).join(' ')}</p></div>`;
   IX.extra.add(s); const st = load(s); if (st.busy) return head() + `<div class="pn"><div class="sai-busy"><div class="fd-spin"></div><span>A recolher o perfil, os donos e as demonstrações financeiras de ${esc(s)}…</span></div></div>`;
   if (st.err) return head() + `<div class="pn"><p class="neg">${esc(st.err)}</p></div>`;

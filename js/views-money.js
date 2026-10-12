@@ -161,7 +161,7 @@ OS.forms.subAdd = (f, v) => { const s = v('s'); if (!s) return; const fin = OS.o
 V.investimentos = sub => {
   const head = UI.head('Investimentos', 'Carteira: ações, ETFs, fundos, obrigações, títulos, depósitos, CDB, REITs, cripto e commodities. Preço médio, rentabilidade, dividendos e exposição calculados a partir dos movimentos.', `${UI.addBtn('invtx', 'Movimento')}${UI.addBtn('assets', 'Ativo', null, '')}`, 'Dinheiro') + UI.tabs('investimentos', [['', 'Visão'], ['ativos', 'Ativos'], ['movimentos', 'Movimentos'], ['cotacoes', 'Cotações']], sub);
   const miss = Inv.fxMissing();
-  const fxNote = miss.length ? `<div class="note"><b>Câmbio em falta:</b> ${miss.join(', ')}. Define a taxa em Cotações para converter para euros; até lá esses ativos contam 1:1.</div>` : '';
+  const fxNote = miss.length ? `<div class="note"><b>Câmbio em falta:</b> ${miss.join(', ')}. Define a taxa em Definições → Ligações (câmbio manual) para converter para euros; até lá esses ativos contam 1:1.</div>` : '';
   return head + fxNote + (INV[sub || 'visao'] || INV.visao)();
 };
 const INV = {};

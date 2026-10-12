@@ -264,9 +264,11 @@ A.dietAddFood = b => { Diet.add({}); const id = b.dataset.id; if (!findX(id) && 
 const prevMetas = T.metas;
 T.metas = () => prevMetas() + `<div class="pn"><div class="pn-h"><h3>Mais</h3></div><div class="form-grid"><div class="fld"><label for="dg_fib">Fibra</label><div class="inp-wrap"><input id="dg_fib" type="number" inputmode="decimal" data-bind="diet.fib" value="${esc(OS.one('diet').fib ?? 30)}"><span>g</span></div></div></div>
   <div class="fld" style="margin-top:10px"><label class="switch"><input type="checkbox" data-bind="diet.adapt"${OS.one('diet').adapt === false ? '' : ' checked'}><span></span>Ajustar as calorias de cada dia ao treino e à corrida</label></div>
-  <div class="fld" style="margin-top:10px"><label>Foto com IA</label>${OS.one('diet').aiKey ? `<div class="row gap8"><span class="bdg pos">ligada</span><button class="btn ghost sm" data-act="dietAiOff">Remover chave</button></div>` : `<small class="mut">Desligada. <a class="acc" href="#spyke">Liga o Spyke (IA)</a>.</small>`}</div></div>`;
+</div>`;
 A.dietAiOff = () => UI.ask('Desligar o Spyke (IA)?', 'Tudo o que usa IA na app deixa de funcionar (fotos da comida, exames, e-mails, decisões, conversa) até voltares a colar uma chave.', 'Desligar', () => OS.setOne('diet', { aiKey: '' }));
 OS.on('ai:on', () => { if (FS && !fh().hidden) fDraw(); });
+// o botão "Ligar em Definições" (sem IA) leva às Definições: fecha a folha da refeição para não ficar por cima
+document.addEventListener('click', e => { if (FS && e.target && e.target.closest && e.target.closest('#fdAdd .ai-go')) setTimeout(fClose, 0); });
 S.meals.fields.splice(4, 0, F('g', 'Gramas', 'num', { unit: 'g', h: 'opcional' }));
 S.foods.fields.push(F('fib', 'Fibra', 'num', { unit: 'g' }));
 })();

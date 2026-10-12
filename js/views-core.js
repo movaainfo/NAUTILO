@@ -211,8 +211,7 @@ V.calendario = sub => {
   `<div class="row between gap12"><div class="row gap8"><button class="icon-btn" data-act="calMove" data-v="-1" aria-label="Anterior">${UI.ic('left')}</button><button class="btn sm" data-act="calToday">Hoje</button><button class="icon-btn" data-act="calMove" data-v="1" aria-label="Seguinte">${UI.ic('right')}</button><b style="font-size:15px;margin-left:6px">${title}</b></div>
    <div class="seg">${[['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([k, l]) => `<button class="${view === k ? 'on' : ''}" data-act="calView" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="src-chips">${Object.entries(Cal.src).filter(([k]) => k !== 'gcal' || integ.gcal).map(([k, [l, c]]) => `<button class="chip ${off[k] ? '' : 'on'}" data-act="calSrc" data-v="${k}"><i style="background:${c}"></i>${l}</button>`).join('')}</div>
-  ${body}
-  <div class="pn"><div class="row between gap12"><div class="row gap12">${UI.ic('link')}<div><b>Google Calendar</b><div class="mut" style="font-size:12.5px">${integ.gcal ? (OS.gcalState || 'A carregar os teus eventos…') : 'Mostrar aqui os eventos da tua agenda Google (todas as agendas), pelo teu script Google.'}</div></div></div>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div></div>`;
+  ${body}`;
 };
 A.calView = b => { OS.setUI('calView', b.dataset.v); OS.go('calendario.' + b.dataset.v); };
 A.calToday = () => OS.setUI('calDate', U.today());
@@ -257,6 +256,9 @@ OS.gcalStart = async () => {
 OS.gcalAdd = async ev => { const c = gscr(); if (!c) return { ok: false, msg: 'o script Google ainda não tem a Parte 3' };
   const u = c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=ce&t=' + encodeURIComponent(ev.title || '') + '&d=' + encodeURIComponent(ev.date || '') + (ev.start ? '&h=' + ev.start : '') + (ev.end ? '&f=' + ev.end : '') + (ev.loc ? '&l=' + encodeURIComponent(ev.loc) : '');
   try { const j = await OS.Inbox.getJSON(u, 2); if (j && j.ok) setTimeout(() => gcalScript(true), 1500); return j || { ok: false }; } catch (e) { return { ok: false, msg: e.message }; } };
+// Definições → Ligações: a agenda Google (pelo script) liga-se e desliga-se aqui; o Calendário só mostra os eventos
+OS.gcalPanel = () => { const integ = OS.one('integ');
+  return `<div class="pn" id="gcalSet"><div class="row between gap12"><div class="row gap12">${UI.ic('link')}<div><b>Agenda Google (Calendário)</b><div class="mut" style="font-size:12.5px">${integ.gcal ? (OS.gcalState || 'A carregar os teus eventos…') : 'Mostra no Calendário, em Hoje e no Painel os eventos da tua agenda Google (todas as agendas), pelo teu script Google.'}</div></div></div>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div></div>`; };
 A.gcalOn = () => { OS.setOne('integ', { gcal: true }); OS.gcalStart(); };
 A.gcalOff = () => { OS.setOne('integ', { gcal: false }); if (gcalUnsub) { gcalUnsub(); gcalUnsub = null; } clearInterval(gcalTimer); gcalTimer = 0; Cal.gcal = []; OS.gcalState = ''; U.ls.del ? U.ls.del('os2gcal') : U.ls.set('os2gcal', null); };
 A.gcalRefresh = async () => { if (gscr()) return gcalScript(false); try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
