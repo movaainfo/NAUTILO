@@ -1052,6 +1052,13 @@ async function newFeatureTests(b) {
     ok('e-mail: nada abre fora da app', ctx.pages().length === 1);
     await p.click('#modal [data-act=mlFmt]'); await sleep(800);
     ok('e-mail formatado: num quadro isolado, sem scripts (o código malicioso de um e-mail não corre)', await E(p, () => { const f = document.querySelector('#modal iframe.ml-fr'); return !!f && !/allow-scripts|allow-same-origin/.test(f.getAttribute('sandbox')) && window.__x === undefined; }));
+    // LinkedIn: as notificações abrem no leitor dentro da app, nunca no Gmail
+    await E(p, () => { OS.UI.closeModal(); OS.Mail._set({ li: { at: Date.now(), items: [{ id: 'li1', s: 'Nova mensagem de Joana Silva', f: 'LinkedIn <messages-noreply@linkedin.com>', d: new Date().toISOString(), u: true, sn: 'Olá Ryan, vi o teu perfil…' }], sum: { resumo: 'Uma mensagem nova.', mensagens: [{ id: 'li1', de: 'Joana Silva', texto: 'Olá Ryan, vi o teu perfil…' }], convites: [], vagas: [], publicacoes: [] } } }); location.hash = 'email.linkedin'; }); await sleep(500);
+    ok('LinkedIn: nenhum botão leva ao Gmail', await E(p, () => !document.querySelector('#view a[href*="mail.google.com"]') && !!document.querySelector('#view [data-act=mlRead][data-id="li1"]')));
+    await p.click('#view button[data-act=mlRead][data-id="li1"]'); await sleep(800);
+    ok('LinkedIn: "Abrir" abre o e-mail dentro da app (sem Responder nem Gmail)', await E(p, () => { const m = document.querySelector('#modal .ml-rd'); return !!m && /proposta completa/.test(m.innerText) && !m.querySelector('[data-act=mlReply]') && !m.querySelector('a[href*="mail.google.com"]'); }) && ctx.pages().length === 1);
+    await E(p, () => OS.UI.closeModal()); await p.click('#view .li-t[data-act=mlRead][data-id="li1"]'); await sleep(600);
+    ok('LinkedIn: tocar na própria notificação também abre o leitor', await E(p, () => !!document.querySelector('#modal .ml-rd')));
     await E(p, () => { OS.UI.closeModal(); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
     await p.click('#view .nw-c .nw-a'); await sleep(1200);
     const n1 = await E(p, () => { const m = document.querySelector('#modal .nw-rd'); return m ? m.innerText : ''; });

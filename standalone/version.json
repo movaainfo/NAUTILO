@@ -1,12 +1,8 @@
 {
- "n": 106,
- "hash": "9fde9e81cc79",
+ "n": 107,
+ "hash": "92bc46cda6b3",
  "notes": [
-  "Toda a configuração passou para as Definições: as páginas mostram só o conteúdo. Novos separadores \"Ligações\" (agenda Google, cotações, alertas de preço) e \"Atalhos do iPhone\" (gasto rápido, relógio da corrida, bloquear apps).",
-  "Onde falta a IA, aparece só um aviso com o botão \"Ligar em Definições → Spyke\" (sem passos nem chaves no meio das páginas).",
-  "E-mail → Faculdade mais limpa: só os e-mails da faculdade, separados por matéria; a configuração do e-mail está em Definições → E-mail.",
-  "Separação por matéria mais certeira: uma sigla curta (ex.: EST) já não se confunde com palavras que a contêm (ex.: \"prestação\").",
-  "Investimentos: o separador \"Cotações\" passou a \"Preços\" (Tesouro Direto e preços manuais)."
+  "E-mail → LinkedIn: as notificações abrem dentro da app (no leitor), em vez de saírem para o Gmail. Tocar na própria notificação também abre."
  ],
  "date": "12/10/2026"
 }
