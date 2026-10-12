@@ -2204,6 +2204,22 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .set-h{margin:18px 2px 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
 .set-h:first-child{margin-top:4px}
 .set-page>.pn{margin-bottom:14px}
+/* Hábitos: a coluna dos nomes tem largura própria e fica fixa à esquerda ao deslizar os dias;
+   o nome quebra em duas linhas e as etiquetas (inegociável, auto) ficam por baixo, nunca por cima dos quadrados */
+.hab-tbl{min-width:0}
+.hab-tbl col.n{width:210px}
+.hab-tbl .hab-n{position:sticky;left:0;z-index:2;background:var(--pn);white-space:normal;min-width:0;box-shadow:6px 0 10px -8px rgba(0,0,0,.6)}
+.hab-tbl .hab-n b{display:block;font-weight:520;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hab-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.hab-tags .bdg{font-size:10.5px;padding:1px 6px}
+@media (max-width:600px){.hab-tbl col.n{width:138px}.hab-tbl .hab-n{padding-left:12px;padding-right:8px}.hab-tbl .hab-n b{font-size:13px}}
+.hab-tbl col.s{width:58px}
+.hab-tbl tbody tr:hover td.hab-n{background:var(--pn)}
+.hab-mst{display:none;color:var(--mut);font-size:11px;white-space:nowrap}
+/* no telemóvel: a sequência e os 30 dias passam para baixo do nome, para caberem mais dias à vista */
+@media (max-width:600px){.hab-tbl col.s{width:0}.hab-tbl .hab-s{display:none}.hab-mst{display:block;width:100%}.hab-tbl col.c{width:38px}}
+/* Finanças: bancos */
+.bk-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.bk-chips{display:flex;flex-wrap:wrap;gap:6px}.bk-chips .chip{display:inline-flex;align-items:center}
 
 </style>
 <style>
@@ -2435,7 +2451,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.7", "date": "12/10/2026", "notes": ["E-mail → LinkedIn: as notificações abrem dentro da app (no leitor), em vez de saírem para o Gmail. Tocar na própria notificação também abre."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.8", "date": "12/10/2026", "notes": ["\"Ver mais\" e \"Mostrar mais\" voltam a funcionar em toda a app (abrem logo os itens escondidos).", "Hábitos no iPhone: os nomes ficam numa coluna fixa e as etiquetas por baixo, sem tapar os quadrados dos dias; cabem mais dias à vista.", "Horário do trabalho por foto: a lista \"Confirma o que a IA leu\" mostra todos os dias (sem \"Ver mais\").", "Finanças: cada conta tem o banco (BTG, Santander, Revolut, Caixa Geral, Wise, Nubank…). Ao registar um gasto vês \"Revolut · Conta à ordem\"; em Contas e no Gasto rápido crias a conta de um banco com um toque."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -3144,6 +3160,11 @@ L.GCAT = ['Finanças', 'Estudos', 'Academia', 'Corrida', 'Trabalho', 'Empresa', 
 L.PTYPE = ['Acadêmico', 'Financeiro', 'Profissional', 'Empresarial', 'Pessoal', 'Aprendizagem'];
 L.PSTAT = ['Ideia', 'Planejado', 'Em andamento', 'Pausado', 'Concluído', 'Cancelado'];
 L.ACCT = ['Conta à ordem', 'Poupança', 'Reserva', 'Dinheiro', 'Cartão de crédito', 'Corretora', 'Outro'];
+// bancos mais usados (Portugal, Brasil e digitais): nome, cor da marca (para o ponto), moeda habitual
+L.BANKS = [['Caixa Geral de Depósitos', '#0067A6', 'EUR'], ['Millennium BCP', '#D1005D', 'EUR'], ['Santander', '#EC0000', 'EUR'], ['Novo Banco', '#00A3AD', 'EUR'], ['BPI', '#F26C21', 'EUR'], ['ActivoBank', '#7AB800', 'EUR'], ['Crédito Agrícola', '#00843D', 'EUR'], ['Montepio', '#1F5FA8', 'EUR'], ['Banco CTT', '#E30613', 'EUR'], ['Moey!', '#FF5A5F', 'EUR'], ['Revolut', '#3D7BF7', 'EUR'], ['Wise', '#9FE870', 'EUR'], ['N26', '#36A18B', 'EUR'], ['BTG Pactual', '#2B5DA8', 'BRL'], ['Nubank', '#820AD1', 'BRL'], ['Itaú', '#EC7000', 'BRL'], ['Bradesco', '#CC092F', 'BRL'], ['Banco do Brasil', '#F5D90A', 'BRL'], ['Caixa Econômica Federal', '#005CA9', 'BRL'], ['Inter', '#FF7A00', 'BRL'], ['C6 Bank', '#8C8C8C', 'BRL'], ['Mercado Pago', '#00B1EA', 'BRL'], ['PicPay', '#21C25E', 'BRL'], ['XP Investimentos', '#B8B8B8', 'BRL'], ['PayPal', '#2D6FD2', 'EUR'], ['Trading 212', '#00A8E8', 'EUR']];
+L.bank = s => { const n = String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); if (!n) return null; return L.BANKS.find(b => { const k = b[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); return k === n || k.split(' ')[0] === n.split(' ')[0] && n.split(' ')[0].length >= 3 || (n === 'cgd' && k.startsWith('caixa geral')) || (n === 'bb' && k === 'banco do brasil') || (n === 'btg' && k.startsWith('btg')); }) || null; };
+// como uma conta aparece em toda a app: "Banco · nome" (sem repetir o banco se já estiver no nome)
+L.accLabel = a => { if (!a) return ''; const nm = a.name || '', b = String(a.inst || '').trim(); if (!b) return nm; const k = b.toLowerCase().split(' ')[0]; return nm.toLowerCase().includes(k) ? nm : b + ' · ' + nm; };
 L.METHOD = ['Débito', 'Crédito', 'MB WAY', 'Multibanco', 'Transferência', 'Débito direto', 'Dinheiro', 'PayPal'];
 L.CUR = ['EUR', 'USD', 'BRL', 'GBP', 'CHF', 'CAD', 'JPY'];
 L.ACLS = ['Ação', 'ETF', 'FII', 'REIT', 'BDR', 'Fundo', 'PPR', 'Previdência', 'Obrigação', 'Título público', 'Tesouro Direto', 'Certificados de Aforro', 'Certificados do Tesouro', 'Depósito a prazo', 'CDB', 'LCI/LCA', 'LC', 'Debênture', 'CRI/CRA', 'Poupança', 'Cripto', 'Commodity', 'Ouro', 'Imóvel', 'Crowdlending/P2P', 'Opção', 'Futuro', 'CFD', 'Caixa em moeda estrangeira', 'Outro'];
@@ -3244,8 +3265,8 @@ S.decisions = { label: 'Decisão', title: r => r.title, fields: [
 ], defaults: () => ({ status: 'Em análise', alts: [], alpha: {}, weights: { cost: 3, benefit: 4, risk: 3, time: 2, fin: 3, goals: 5, routine: 2 } }) };
 
 /* ---- Finanças ---- */
-S.accounts = { label: 'Conta', title: r => r.name, fields: [
-  F('name', 'Nome', 'text', { req: 1 }), F('type', 'Tipo', 'sel', { o: L.ACCT, req: 1 }), F('inst', 'Instituição'),
+S.accounts = { label: 'Conta', title: r => L.accLabel(r), fields: [
+  F('inst', 'Banco', 'text', { list: () => L.BANKS.map(b => b[0]), ph: 'Ex.: Revolut, Santander, BTG, Caixa Geral, Wise' }), F('name', 'Nome da conta', 'text', { req: 1, ph: 'Ex.: Conta à ordem, Cartão, Poupança' }), F('type', 'Tipo', 'sel', { o: L.ACCT, req: 1 }),
   F('opening', 'Saldo inicial', 'money'), F('openDate', 'Data do saldo inicial', 'date'), F('currency', 'Moeda', 'sel', { o: L.CUR }),
   F('limit', 'Limite do cartão', 'money', { show: r => r.type === 'Cartão de crédito' }), F('dueDay', 'Dia de pagamento', 'num', { show: r => r.type === 'Cartão de crédito' }),
   F('archived', 'Arquivada', 'bool')
@@ -4416,8 +4437,8 @@ V.habitos = sub => {
   const H = OS.all('habits'), days = U.lastN(14), score90 = U.lastN(91);
   return UI.head('Hábitos e rotina', 'Hábitos marcados como inegociáveis formam a sequência de dias perfeitos. Alguns marcam-se sozinhos a partir dos teus registos reais.', UI.addBtn('habits', 'Novo hábito'), 'Execução') + UI.tabs('habitos', [['', 'Hábitos'], ['rotina', 'Rotina'], ['plano', 'Planeamento']], sub) +
   `<div class="kpis">${UI.kpi('Dias perfeitos seguidos', Hab.perfectStreak(), 'todos os inegociáveis cumpridos')}${UI.kpi('Consistência (30 dias)', (() => { const v = U.lastN(30).map(Hab.dayScore).filter(x => x != null); return v.length ? U.pct(U.avg(v)) : '—'; })())}${UI.kpi('Consistência (7 dias)', (() => { const v = U.lastN(7).map(Hab.dayScore).filter(x => x != null); return v.length ? U.pct(U.avg(v)) : '—'; })())}${UI.kpi('Hoje', (() => { const v = Hab.dayScore(t); return v == null ? '—' : U.pct(v); })())}</div>
-  <div class="tblw hab-wrap"><table class="tbl hab-tbl"><colgroup><col>${days.map(() => '<col class="c">').join('')}<col style="width:58px"><col style="width:58px"></colgroup><thead><tr><th class="hab-n">Hábito</th>${days.map(d => `<th class="hab-c ${d === t ? 'is-today' : ''}">${U.WDS[U.parse(d).getDay()].slice(0, 1)}<span class="mono">${+d.slice(8)}</span></th>`).join('')}<th class="hab-s">Seq.</th><th class="hab-s">30 d</th></tr></thead><tbody>
-  ${H.map(h => `<tr class="${h.active ? '' : 'muted'}"><td class="hab-n"><a href="javascript:void 0" data-edit="habits:${h.id}"><b style="font-weight:520">${esc(h.name)}</b></a> ${h.core ? UI.badge('inegociável', 'acc') : ''}${h.auto ? ' ' + UI.badge('auto', 'out') : ''}</td>${days.map(d => { const due = Hab.due(h, d), dn = Hab.done(h, d), au = h.auto && Hab.autoDone(h, d), isT = d === t;
+  <div class="tblw hab-wrap"><table class="tbl hab-tbl"><colgroup><col class="n">${days.map(() => '<col class="c">').join('')}<col class="s"><col class="s"></colgroup><thead><tr><th class="hab-n">Hábito</th>${days.map(d => `<th class="hab-c ${d === t ? 'is-today' : ''}">${U.WDS[U.parse(d).getDay()].slice(0, 1)}<span class="mono">${+d.slice(8)}</span></th>`).join('')}<th class="hab-s">Seq.</th><th class="hab-s">30 d</th></tr></thead><tbody>
+  ${H.map(h => `<tr class="${h.active ? '' : 'muted'}"><td class="hab-n"><a href="javascript:void 0" data-edit="habits:${h.id}"><b>${esc(h.name)}</b></a><div class="hab-tags">${h.core ? UI.badge('inegociável', 'acc') : ''}${h.auto ? UI.badge('auto', 'out') : ''}<small class="hab-mst" title="Sequência atual · cumprimento nos últimos 30 dias">seq. ${Hab.streak(h)}d · ${U.pct(Hab.rate(h, 30))} (30 d)</small></div></td>${days.map(d => { const due = Hab.due(h, d), dn = Hab.done(h, d), au = h.auto && Hab.autoDone(h, d), isT = d === t;
     const born = h._c ? U.iso(new Date(h._c)) : '', st = dn ? 'done' : !due || (born && d < born) ? 'off' : d < t ? 'miss' : 'todo'; return `<td class="hab-c ${isT ? 'is-today' : ''}">${isT && due && !au ? `<button type="button" class="hab-b ${st}" data-act="habit" data-id="${h.id}" data-d="${d}" aria-pressed="${dn}" aria-label="${esc(h.name)} hoje">${dn ? UI.ic('check') : ''}</button>` : `<span class="hab-b ${st} ro" title="${U.fmtD(d)}${st === 'miss' ? ' · falhou' : st === 'off' ? ' · não era dia' : ''}" aria-label="${esc(h.name)} ${U.fmtD(d)} ${st === 'done' ? 'feito' : st === 'miss' ? 'falhou' : ''}">${dn ? UI.ic('check') : ''}</span>`}</td>`; }).join('')}<td class="hab-s mono">${Hab.streak(h)}d</td><td class="hab-s mono">${U.pct(Hab.rate(h, 30))}</td></tr>`).join('')}</tbody></table></div>
   <p class="mut" style="font-size:12px;margin:6px 2px 14px">Só podes marcar o dia de hoje. Os dias anteriores ficam como estão (✓ feito · ✕ falhou · traço = não era dia).</p>
   <div class="pn"><div class="pn-h"><h3>Consistência diária · 13 semanas</h3></div>${UI.heat(score90, d => { const v = Hab.dayScore(d); return v == null ? 0 : Math.round(v * 100); }, 100)}</div>`;
@@ -4514,7 +4535,9 @@ OS.on('ready', renderFocus);
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, L = OS.L, esc = U.esc;
 const Fin = OS.Fin, Inv = OS.Inv, I = OS.Intel, A = OS.act;
-const accN = id => (OS.get('accounts', id) || {}).name || '—';
+const accN = id => { const a = OS.get('accounts', id); return a ? L.accLabel(a) : '—'; };
+// ponto com a cor do banco (Revolut azul, Santander vermelho, Nubank roxo…)
+const bankDot = a => { const b = a && L.bank(a.inst); return b ? `<i class="bk-dot" style="background:${b[1]}" aria-hidden="true"></i>` : ''; };
 const money = (v, tone = true) => `<span class="mono ${tone ? (v > 0 ? 'pos' : v < 0 ? '' : 'mut') : ''}">${U.eur(v, { sign: tone })}</span>`;
 const txSign = t => t.type === 'Receita' ? U.num(t.amount) : t.type === 'Despesa' ? -U.num(t.amount) : 0;
 const TABS = [['', 'Visão'], ['transacoes', 'Transações'], ['contas', 'Contas'], ['orcamento', 'Orçamento'], ['recorrentes', 'Recorrentes'], ['dividas', 'Dívidas'], ['inteligencia', 'Inteligência'], ['categorias', 'Categorias']];
@@ -4565,7 +4588,7 @@ FIN.transacoes = () => {
     ${per === 'custom' ? `<input type="date" value="${a}" data-uiv="txFrom" aria-label="De"><input type="date" value="${b}" data-uiv="txTo" aria-label="Até">` : ''}
     <select data-uif="txf.type" aria-label="Tipo"><option value="">Todos os tipos</option>${['Despesa', 'Receita', 'Transferência'].map(x => `<option${f.type === x ? ' selected' : ''}>${x}</option>`).join('')}</select>
     <select data-uif="txf.cat" aria-label="Categoria"><option value="">Todas as categorias</option>${allCats.map(x => `<option${f.cat === x ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select>
-    <select data-uif="txf.account" aria-label="Conta"><option value="">Todas as contas</option>${OS.all('accounts').map(x => `<option value="${x.id}"${f.account === x.id ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
+    <select data-uif="txf.account" aria-label="Conta"><option value="">Todas as contas</option>${OS.all('accounts').map(x => `<option value="${x.id}"${f.account === x.id ? ' selected' : ''}>${esc(L.accLabel(x))}</option>`).join('')}</select>
     <select data-uif="txf.method" aria-label="Forma de pagamento"><option value="">Todas as formas</option>${L.METHOD.map(x => `<option${f.method === x ? ' selected' : ''}>${x}</option>`).join('')}</select>
     ${tags.length ? `<select data-uif="txf.tag" aria-label="Tag"><option value="">Todas as tags</option>${tags.map(x => `<option${f.tag === x ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select>` : ''}
     <input type="search" placeholder="Procurar…" value="${esc(f.q || '')}" data-uif="txf.q" aria-label="Procurar"></div>
@@ -4580,13 +4603,18 @@ FIN.transacoes = () => {
     { l: 'Tags', v: x => (x.tags || []).map(g => UI.badge(g, 'out')).join(' ') },
     { l: 'Valor', cls: 'r', v: x => x.type === 'Transferência' ? `<span class="mono mut">${U.eur(x.amount)}</span>` : money(txSign(x)), s: x => txSign(x) }] })}`;
 };
+// juntar uma conta de um banco com um toque (abre o formulário já com o banco e a moeda)
+FIN.banks = (acc, title = 'Juntar conta de um banco') => { const have = new Set((acc || []).map(a => (L.bank(a.inst) || [])[0]).filter(Boolean));
+  return `<div class="pn bk-add"><div class="pn-h"><h3>${title}</h3><span class="mut" style="font-size:12px">ou escreve outro em "Nova conta"</span></div><div class="bk-chips">${L.BANKS.map(([n, c, cur]) => `<button type="button" class="chip ${have.has(n) ? 'on' : ''}" data-new="accounts" data-defs='${esc(JSON.stringify({ inst: n, name: 'Conta à ordem', type: 'Conta à ordem', currency: cur }))}'><i class="bk-dot" style="background:${c}" aria-hidden="true"></i>${esc(n)}</button>`).join('')}</div></div>`; };
+OS.FinBanks = FIN.banks;
 FIN.contas = () => {
   const acc = OS.all('accounts');
   return `<div class="row between"><div class="kpis grow">${UI.kpi('Disponível', U.eur(Fin.liquid()))}${UI.kpi('Reservas', U.eur(Fin.reserve()))}${UI.kpi('Cartões (em dívida)', U.eur(Fin.cardDebt()), '', { tone: Fin.cardDebt() ? 'warn' : '' })}${UI.kpi('Total em contas', U.eur(Fin.cashTotal()))}</div></div>
   <div class="row gap8">${UI.addBtn('accounts', 'Nova conta')}${UI.addBtn('transactions', 'Transferência', { type: 'Transferência' }, '')}</div>
+  ${FIN.banks(acc)}
   ${UI.table({ key: 'acc', coll: 'accounts', rows: acc, cols: [
-    { l: 'Conta', v: a => `<b style="font-weight:530">${esc(a.name)}</b>${a.archived ? ' ' + UI.badge('arquivada') : ''}`, s: a => a.name },
-    { l: 'Tipo', v: a => esc(a.type) }, { l: 'Instituição', v: a => esc(a.inst || '') }, { l: 'Moeda', v: a => a.currency || 'EUR' },
+    { l: 'Conta', v: a => `${bankDot(a)}<b style="font-weight:530">${esc(L.accLabel(a))}</b>${a.archived ? ' ' + UI.badge('arquivada') : ''}`, s: a => L.accLabel(a) },
+    { l: 'Tipo', v: a => esc(a.type) }, { l: 'Banco', v: a => esc(a.inst || '') }, { l: 'Moeda', v: a => a.currency || 'EUR' },
     { l: 'Movimentos', cls: 'r', v: a => `<span class="mono">${OS.all('transactions').filter(t => t.account === a.id || t.toAccount === a.id).length}</span>` },
     { l: 'Saldo', cls: 'r', v: a => { const b = Fin.accBal(a); return a.type === 'Cartão de crédito' ? `<span class="mono ${b < 0 ? 'warn' : ''}">${U.eur(b)}</span>${U.num(a.limit) ? `<div style="width:120px;margin-left:auto;margin-top:4px">${UI.bar(-b / U.num(a.limit), -b / U.num(a.limit) > .8 ? 'neg' : 'warn')}</div>` : ''}` : `<span class="mono ${b < 0 ? 'neg' : ''}">${U.eur(b)}</span>`; }, s: a => Fin.accBal(a) }] })}
   <div class="note">Cartão de crédito: as compras no cartão ficam como despesas na conta do cartão (saldo negativo). Pagar a fatura = transferência da conta à ordem para o cartão. Corretora: compras de ativos em Investimentos debitam a conta escolhida.</div>`;
@@ -4628,7 +4656,7 @@ FIN.dividas = () => {
   ${D.length ? `<div class="pn">${D.map(d => { const bal = Fin.debtBal(d), paid = U.num(d.principal) - bal, n = payoff(d); return `<div class="gcard"><div class="click" data-edit="debts:${d.id}" style="cursor:pointer"><b>${esc(d.name)}</b><div class="gmeta">${UI.badge(d.kind, 'out')}${d.creditor ? `<span>${esc(d.creditor)}</span>` : ''}${U.num(d.rate) ? `<span>${d.rate}% ao ano</span>` : ''}${U.num(d.installment) ? `<span>prestação ${U.eur(d.installment)}${d.dueDay ? ' · dia ' + d.dueDay : ''}</span>` : ''}${n != null && bal > 0 ? `<span class="est">estimativa</span><span>${n === Infinity ? 'a prestação não cobre os juros' : `liquidada em ~${n} meses`}</span>` : ''}</div></div>
     <div class="gp"><span class="num">${U.eur(bal)} <span class="mut">em dívida</span></span>${UI.bar(U.num(d.principal) ? paid / U.num(d.principal) : 0, 'pos')}${bal > 0 ? `<button class="btn xs" data-act="payDebt" data-id="${d.id}">Registar pagamento</button>` : UI.badge('liquidada', 'pos')}</div></div>`; }).join('')}</div>` : UI.empty('Sem dívidas registadas.')}
   ${instG.length ? `<div class="pn"><div class="pn-h"><h3>Compras parceladas em curso</h3></div>${instG.map(g => { const f = g[0]; return `<div class="li"><div class="li-t"><b>${esc(f.desc || f.cat)}</b><small>${g.length} parcela(s) por pagar · próxima ${U.fmtDS(U.sortBy(g, x => x.date)[0].date)}</small></div><span class="mono">${U.eur(U.sum(g, x => x.amount))}</span></div>`; }).join('')}</div>` : ''}
-  ${cards.length ? `<div class="pn"><div class="pn-h"><h3>Cartões com saldo em dívida</h3></div>${cards.map(a => `<div class="li"><div class="li-t"><b>${esc(a.name)}</b><small>${a.dueDay ? 'pagamento dia ' + a.dueDay : ''}</small></div><span class="mono warn">${U.eur(-Fin.accBal(a))}</span><button class="btn xs" data-new="transactions" data-defs='${esc(JSON.stringify({ type: 'Transferência', toAccount: a.id, amount: U.r2(-Fin.accBal(a)), desc: 'Pagamento ' + a.name }))}'>Pagar fatura</button></div>`).join('')}</div>` : ''}`;
+  ${cards.length ? `<div class="pn"><div class="pn-h"><h3>Cartões com saldo em dívida</h3></div>${cards.map(a => `<div class="li"><div class="li-t"><b>${bankDot(a)}${esc(L.accLabel(a))}</b><small>${a.dueDay ? 'pagamento dia ' + a.dueDay : ''}</small></div><span class="mono warn">${U.eur(-Fin.accBal(a))}</span><button class="btn xs" data-new="transactions" data-defs='${esc(JSON.stringify({ type: 'Transferência', toAccount: a.id, amount: U.r2(-Fin.accBal(a)), desc: 'Pagamento ' + a.name }))}'>Pagar fatura</button></div>`).join('')}</div>` : ''}`;
 };
 A.payDebt = b => { const d = OS.get('debts', b.dataset.id); if (!d) return; UI.openForm('transactions', null, { type: 'Despesa', debt: d.id, amount: U.num(d.installment) || '', desc: 'Prestação · ' + d.name, cat: 'Dívidas', sub: 'Prestação' }); };
 FIN.inteligencia = () => {
@@ -8589,7 +8617,7 @@ W.foto = () => { const p = OS.one('profile'), hasAI = OS.AI && OS.AI.key && OS.A
       <label>Local (opcional)<input class="field" data-bind="profile.schedPlace" value="${esc(p.schedPlace || '')}" placeholder="ex.: Loja Aveiro"></label></div>
     <div class="row gap8" style="flex-wrap:wrap;margin-top:10px"><label class="btn">Escolher foto(s)<input type="file" accept="image/*" multiple id="wsFile" hidden></label><label class="btn ghost">Tirar foto<input type="file" accept="image/*" capture="environment" id="wsCam" hidden></label>${IM.files.length ? `<button class="btn pri" data-act="wsRead" ${IM.busy || !hasAI ? 'disabled' : ''}>${IM.busy ? 'A ler a escala…' : 'Ler escala com IA'}</button><button class="btn ghost" data-act="wsClear">Limpar</button>` : ''}</div>
     ${IM.files.length ? `<div class="ws-thumbs">${IM.files.map(f => `<img src="${f.url}" alt="escala">`).join('')}</div>` : ''}${IM.err ? `<p class="neg">${esc(IM.err)}</p>` : ''}</div>
-  ${IM.res ? (() => { const R = IM.res.filter(x => x.date >= from && x.date <= to && x.date >= t); return `<div class="pn"><div class="pn-h"><h3>Confirma o que a IA leu (${R.length} dias)</h3></div>${R.length ? `<div class="list">${R.map((x, i) => `<div class="li"><span class="when">${U.WDS[U.parse(x.date).getDay()]} ${U.fmtDS(x.date)}</span><div class="li-t"><b>${x.off ? '' + esc(x.kind || 'Folga') : esc(x.start + '–' + x.end)}</b><small>${esc([x.place, x.note].filter(Boolean).join(' · '))}${dayInfo(x.date).sh.length || dayInfo(x.date).off ? ' · substitui o que lá está' : ''}</small></div></div>`).join('')}</div><div class="row gap8" style="margin-top:10px"><button class="btn pri" data-act="wsApply">Atualizar a minha semana</button><button class="btn ghost" data-act="wsClear">Cancelar</button></div>` : '<p class="mut">Nada dentro do período escolhido (ou só dias que já passaram).</p>'}${IM.skipped ? `<small class="mut">${IM.skipped} dia(s) fora do período ou já passados foram ignorados.</small>` : ''}</div>`; })() : ''}`; };
+  ${IM.res ? (() => { const R = IM.res.filter(x => x.date >= from && x.date <= to && x.date >= t); return `<div class="pn"><div class="pn-h"><h3>Confirma o que a IA leu (${R.length} dias)</h3></div>${R.length ? `<div class="list" data-all>${R.map((x, i) => `<div class="li"><span class="when">${U.WDS[U.parse(x.date).getDay()]} ${U.fmtDS(x.date)}</span><div class="li-t"><b>${x.off ? '' + esc(x.kind || 'Folga') : esc(x.start + '–' + x.end)}</b><small>${esc([x.place, x.note].filter(Boolean).join(' · '))}${dayInfo(x.date).sh.length || dayInfo(x.date).off ? ' · substitui o que lá está' : ''}</small></div></div>`).join('')}</div><div class="row gap8" style="margin-top:10px"><button class="btn pri" data-act="wsApply">Atualizar a minha semana</button><button class="btn ghost" data-act="wsClear">Cancelar</button></div>` : '<p class="mut">Nada dentro do período escolhido (ou só dias que já passaram).</p>'}${IM.skipped ? `<small class="mut">${IM.skipped} dia(s) fora do período ou já passados foram ignorados.</small>` : ''}</div>`; })() : ''}`; };
 document.addEventListener('change', async e => { if (e.target.id !== 'wsFile' && e.target.id !== 'wsCam') return; const fs = [...e.target.files].slice(0, 4); try { IM.files = IM.files.concat(await Promise.all(fs.map(shrink))).slice(0, 4); IM.err = ''; IM.res = null; } catch (er) { IM.err = 'Não consegui abrir a imagem.'; } OS.request(); });
 A.wsClear = () => { IM = { files: [], busy: false, err: '', res: null }; OS.request(); };
 A.wsRead = async () => { if (IM.busy || !IM.files.length) return; const p = OS.one('profile'), t = today(), from = OS.ui.wsFrom || t, to = OS.ui.wsTo || U.addDays(t, 13); IM.busy = true; IM.err = ''; OS.request();
@@ -12734,7 +12762,7 @@ S.foods.fields.push(F('fib', 'Fibra', 'num', { unit: 'g' }));
    dinheiro, agenda, tarefas, corpo, dieta, estudos e jogo. */
 (() => {
 'use strict';
-const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc;
+const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, L = OS.L, esc = U.esc;
 const Fin = OS.Fin, Cal = OS.Cal;
 const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
@@ -12803,7 +12831,7 @@ V.gasto = sub => { const pre = U.num(String(sub || '').replace(',', '.')) || '',
     <label class="qg-amt"><span>€</span><input name="amount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0,00" aria-label="Valor" value="${pre}" required autofocus></label>
     <input class="field qg-desc" name="desc" placeholder="O que compraste? (opcional)" list="qg_dl" aria-label="Descrição"><datalist id="qg_dl">${[...new Set(OS.all('transactions').map(t => t.desc).filter(Boolean))].slice(-40).map(d => `<option value="${esc(d)}">`).join('')}</datalist>
     <div class="qg-l">Categoria</div><div class="qg-chips">${cats.map((c, i) => `<label><input type="radio" name="cat" value="${esc(c)}" ${(q.cat ? q.cat === c : i === 0) ? 'checked' : ''}><span>${esc(c)}</span></label>`).join('')}</div>
-    <div class="qg-l">Pago com</div><div class="qg-chips">${accs.map(a => `<label><input type="radio" name="acc" value="${a.id}" ${a.id === acc ? 'checked' : ''}><span>${esc(a.name)}</span></label>`).join('') || '<a class="btn sm" href="#financas.contas">Criar conta primeiro</a>'}</div>
+    <div class="qg-l">Pago com</div><div class="qg-chips">${accs.map(a => `<label><input type="radio" name="acc" value="${a.id}" ${a.id === acc ? 'checked' : ''}><span>${(() => { const b = L.bank(a.inst); return b ? `<i class="bk-dot" style="background:${b[1]}" aria-hidden="true"></i>` : ''; })()}${esc(L.accLabel(a))}</span></label>`).join('') || `<small class="mut" style="display:block;margin-bottom:6px">Ainda não tens contas: toca no teu banco para a criar.</small><div class="bk-chips">${L.BANKS.slice(0, 16).map(([n, c, cur]) => `<button type="button" class="chip" data-new="accounts" data-defs='${esc(JSON.stringify({ inst: n, name: 'Conta à ordem', type: 'Conta à ordem', currency: cur }))}'><i class="bk-dot" style="background:${c}" aria-hidden="true"></i>${esc(n)}</button>`).join('')}</div>`}</div>
     <div class="qg-row"><label class="qg-tg"><input type="checkbox" name="sup"> Supérfluo</label><input class="field" type="date" name="date" value="${today}" aria-label="Data"></div>
     <button class="btn pri qg-go" ${accs.length ? '' : 'disabled'}>${UI.ic('plus')}Registar gasto</button></form>
   ${last.length ? `<div class="qg-last"><div class="qg-l">Últimos</div>${last.map(t => `<div class="li" data-edit="transactions:${t.id}" style="cursor:pointer"><div class="li-t"><b>${esc(t.desc || t.cat || 'Despesa')}</b><small>${U.fmtDS(t.date)} · ${esc(t.cat || '')}</small></div><span class="mono">${U.eur(t.amount)}</span></div>`).join('')}</div>` : ''}
@@ -14505,7 +14533,9 @@ function renderTab(cur) {
 }
 A.tnToggle = b => { const g = b.closest('.tn-g'), open = g.classList.contains('open'); document.querySelectorAll('.tn-g.open').forEach(x => x.classList.remove('open')); if (!open) g.classList.add('open'); };
 document.addEventListener('click', e => { if (!e.target.closest('.tn-g')) document.querySelectorAll('.tn-g.open').forEach(x => x.classList.remove('open')); });
-/* ---------- revelação progressiva: poucas secções de cada vez ---------- */
+/* ---------- revelação progressiva: poucas secções de cada vez ----------
+   Os botões "Mostrar mais"/"Ver mais" mostram logo o que estava escondido: o render não redesenha uma página igual,
+   por isso não basta guardar a escolha. */
 const SKIP = ['dominus', 'definicoes', 'explorar'];
 function progressive(cur, raw) {
   if (SKIP.includes(cur)) return; const view = U.$('#view'); let root = view; while (root.children.length === 1 && root.firstElementChild.children.length > 1) root = root.firstElementChild;
@@ -14513,8 +14543,8 @@ function progressive(cur, raw) {
   // só recolhe o que fica abaixo do primeiro ecrã: cabeçalho, separadores e o conteúdo principal ficam sempre visíveis
   if (!open && kids.length > 3) { const top0 = root.getBoundingClientRect().top, lim = Math.max(900, innerHeight * 1.25);
     const cut = kids.findIndex((el, i) => i >= 3 && !el.matches('.phead,.tabs') && el.getBoundingClientRect().top - top0 > lim);
-    if (cut > 0 && kids.length - cut >= 2) { kids.slice(cut).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more'; b.innerHTML = `Mostrar mais <small>${kids.length - cut}</small>`; b.onclick = () => { OS.setUI(key, true); }; root.appendChild(b); } }
-  view.querySelectorAll('.list').forEach((l, i) => { const items = [...l.children]; if (items.length <= 6 || OS.ui['more_list_' + raw + i]) return; items.slice(5).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more sm'; b.textContent = `Ver mais ${items.length - 5}`; b.onclick = () => OS.setUI('more_list_' + raw + i, true); l.appendChild(b); });
+    if (cut > 0 && kids.length - cut >= 2) { kids.slice(cut).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more'; b.innerHTML = `Mostrar mais <small>${kids.length - cut}</small>`; b.onclick = () => { kids.forEach(el => el.classList.remove('pg-hide')); b.remove(); OS.setUI(key, true); }; root.appendChild(b); } }
+  view.querySelectorAll('.list:not([data-all])').forEach((l, i) => { const items = [...l.children]; if (items.length <= 6 || OS.ui['more_list_' + raw + i]) return; items.slice(5).forEach(el => el.classList.add('pg-hide')); const b = document.createElement('button'); b.className = 'pg-more sm'; b.textContent = `Ver mais ${items.length - 5}`; b.onclick = () => { items.forEach(el => el.classList.remove('pg-hide')); b.remove(); OS.setUI('more_list_' + raw + i, true); }; l.appendChild(b); });
 }
 /* ---------- render principal com preservação de foco ---------- */
 let lastRoute = '';
