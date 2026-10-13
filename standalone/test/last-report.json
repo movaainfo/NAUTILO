@@ -3,13 +3,13 @@
   "p": "iPhone",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "486 ms"
+  "info": "939 ms"
  },
  {
   "p": "iPhone",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.17"
+  "info": "MIND CONTROL · v2.18"
  },
  {
   "p": "iPhone",
@@ -69,7 +69,7 @@
   "p": "iPhone",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 116 ms"
+  "info": "máx 169 ms"
  },
  {
   "p": "iPhone",
@@ -99,7 +99,7 @@
   "p": "iPhone",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1479 elementos"
+  "info": "heap +0 MB · 1480 elementos"
  },
  {
   "p": "iPhone",
@@ -111,13 +111,13 @@
   "p": "Android tel",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "490 ms"
+  "info": "438 ms"
  },
  {
   "p": "Android tel",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.17"
+  "info": "MIND CONTROL · v2.18"
  },
  {
   "p": "Android tel",
@@ -177,7 +177,7 @@
   "p": "Android tel",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 160 ms"
+  "info": "máx 170 ms"
  },
  {
   "p": "Android tel",
@@ -207,7 +207,7 @@
   "p": "Android tel",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1479 elementos"
+  "info": "heap +0 MB · 1480 elementos"
  },
  {
   "p": "Android tel",
@@ -219,13 +219,13 @@
   "p": "Tablet horiz",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "3202 ms"
+  "info": "3044 ms"
  },
  {
   "p": "Tablet horiz",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.17"
+  "info": "MIND CONTROL · v2.18"
  },
  {
   "p": "Tablet horiz",
@@ -271,7 +271,7 @@
  },
  {
   "p": "Tablet horiz",
-  "name": "165 páginas abrem com conteúdo",
+  "name": "164 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -285,11 +285,11 @@
   "p": "Tablet horiz",
   "name": "páginas rápidas (processador 6× mais lento)",
   "pass": true,
-  "info": "máx 680 ms"
+  "info": "máx 636 ms"
  },
  {
   "p": "Tablet horiz",
-  "name": "574 botões carregados sem erro",
+  "name": "565 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -315,7 +315,7 @@
   "p": "Tablet horiz",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1061 elementos"
+  "info": "heap +0 MB · 1045 elementos"
  },
  {
   "p": "Tablet horiz",
@@ -327,13 +327,13 @@
   "p": "Tablet vert",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "385 ms"
+  "info": "472 ms"
  },
  {
   "p": "Tablet vert",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.17"
+  "info": "MIND CONTROL · v2.18"
  },
  {
   "p": "Tablet vert",
@@ -393,7 +393,7 @@
   "p": "Tablet vert",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 188 ms"
+  "info": "máx 180 ms"
  },
  {
   "p": "Tablet vert",
@@ -423,7 +423,7 @@
   "p": "Tablet vert",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1479 elementos"
+  "info": "heap +0 MB · 1480 elementos"
  },
  {
   "p": "Tablet vert",
@@ -435,13 +435,13 @@
   "p": "Computador",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "484 ms"
+  "info": "454 ms"
  },
  {
   "p": "Computador",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.17"
+  "info": "MIND CONTROL · v2.18"
  },
  {
   "p": "Computador",
@@ -501,7 +501,7 @@
   "p": "Computador",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 194 ms"
+  "info": "máx 200 ms"
  },
  {
   "p": "Computador",
@@ -525,7 +525,7 @@
   "p": "Computador",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1479 elementos"
+  "info": "heap +0 MB · 1480 elementos"
  },
  {
   "p": "Computador",
@@ -621,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 13/10/2026 · Check-up completo da app: as 146 páginas "
+  "info": "Atualizado · versão 9.9 · 13/10/2026 · Spyke sem barulho de microfone: deixou de"
  },
  {
   "p": "Geral",
@@ -981,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"wbn2rcvxn7k\",\"_c\":1791908297408,\"_u\":1791908297408,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"khxjvr0vqa3\",\"_c\":1791916606155,\"_u\":1791916606155,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1131,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"btcllevy3ym\",\"_c\":1791908319118,\"_u\":1791908319118,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"ix57sd0w6zw\",\"_c\":1791916627820,\"_u\":1791916627820,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -2337,7 +2337,7 @@
   "p": "Novidades",
   "name": "Spyke: com o nome responde logo",
   "pass": true,
-  "info": "São 16:21."
+  "info": "São 18:40."
  },
  {
   "p": "Novidades",
@@ -2367,7 +2367,7 @@
   "p": "Novidades",
   "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
   "pass": true,
-  "info": "São 16:21."
+  "info": "São 18:40."
  },
  {
   "p": "Novidades",
@@ -2607,7 +2607,7 @@
   "p": "Novidades",
   "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
   "pass": true,
-  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 13/10, 16:22\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 13/10, 18:41\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
  },
  {
   "p": "Novidades",
@@ -2781,7 +2781,7 @@
   "p": "Atualização",
   "name": "Tablet horiz: ao voltar à app, atualiza-se sozinha em poucos segundos",
   "pass": true,
-  "info": "2.3 s"
+  "info": "2.2 s"
  },
  {
   "p": "Atualização",
@@ -3153,7 +3153,7 @@
   "p": "Novos",
   "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
   "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"d66ioaw6ybb\"}"
+  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"3rfrr514v6g\"}"
  },
  {
   "p": "Novos",
@@ -3609,7 +3609,7 @@
   "p": "Extras",
   "name": "Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi",
   "pass": true,
-  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"s14hcow7xyy\"}"
+  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"eltkf715ujb\"}"
  },
  {
   "p": "Extras",
@@ -3633,13 +3633,13 @@
   "p": "Voz",
   "name": "Voz Gemini: a língua vai na configuração da voz (pt-BR) e a voz é a mesma",
   "pass": true,
-  "info": "{\"at\":40,\"text\":\"Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
+  "info": "{\"at\":49,\"text\":\"Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
  },
  {
   "p": "Voz",
   "name": "Resumo: o 1.º pedaço é só a saudação (começa a falar em segundos) e o resto é pedido logo a seguir, em paralelo",
   "pass": true,
-  "info": "[[40,51],[43,218]]"
+  "info": "[[49,51],[49,218]]"
  },
  {
   "p": "Voz",
@@ -3650,6 +3650,78 @@
  {
   "p": "Voz",
   "name": "sem erros de JavaScript (voz)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Ouvido",
+  "name": "Ouvido silencioso: ao entrar abre o microfone sem o ditado do iPhone (sem o som de microfone)",
+  "pass": true,
+  "info": "{\"silent\":true,\"on\":true,\"gum\":1,\"sr\":0}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Fala → espera que acabes (pausa de ~1,2 s) → transcreve a frase inteira → responde",
+  "pass": true,
+  "info": "{\"n\":1,\"espera\":1254}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Transcrição pelo modelo mais rápido (lite)",
+  "pass": true,
+  "info": "{\"at\":1791917086019,\"model\":\"gemini-3.5-flash-lite\"}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Pausas curtas a meio do que dizes não cortam a frase (uma só transcrição)",
+  "pass": true,
+  "info": "{\"n\":1}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Interromper falando: assim que começas a falar ele pára a voz (logo, sem esperar que acabes)",
+  "pass": true,
+  "info": "{\"pz0\":1,\"pzNow\":2}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Interromper falando: ouve o que disseste e responde a isso (continua a conversa daí)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Ouvido",
+  "name": "Eco: se o que ouviu era a própria voz dele, continua a falar de onde estava",
+  "pass": true,
+  "info": "{\"ec\":{\"st\":\"speaking\",\"plays\":8,\"last\":{\"r\":\"spyke\",\"t\":\"Hoje tens três compromissos importantes na agenda e duas tarefas com prazo. Começa pela mais difícil.\"}},\"pl0\":7}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Sair e voltar à app: pára de ouvir enquanto estás fora e volta sozinho, com o mesmo microfone (sem som, sem pedir outra vez)",
+  "pass": true,
+  "info": "{\"offW\":false,\"back\":{\"on\":true,\"gum\":1,\"sr\":0},\"g0\":1}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Spyke sabe tudo: procura em TODA a app (ex.: uma nota) e lê qualquer área (ex.: livros)",
+  "pass": true,
+  "info": "[{\"area\":\"Nota\",\"titulo\":\"Ideia do restaurante\",\"Conteúdo\":\"Abrir um food truck de açaí em Aveiro\"}]"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Chat escrito: perguntas qualquer coisa e ele responde no chat",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Ouvido",
+  "name": "Cérebro: leva o resumo completo da tua vida (não cortado), pode pesquisar na internet e procurar em toda a app",
+  "pass": true,
+  "info": "6544 carateres"
+ },
+ {
+  "p": "Ouvido",
+  "name": "sem erros de JavaScript (ouvido)",
   "pass": true,
   "info": ""
  },
@@ -3687,7 +3759,7 @@
   "p": "Agenda",
   "name": "Trabalho de noite (22:00–06:00) acaba no dia seguinte; aula com hora e sala; folga e prova sem hora ficam \"dia inteiro\"",
   "pass": true,
-  "info": "{\"sh\":{\"id\":\"shifts:meklc0w815v@2026-10-13\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-13T22:00:00.000Z\",\"e\":\"2026-10-14T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:ua5appw815w@2026-10-14\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-14\",\"e\":\"2026-10-14\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:7nnlbtw815w@2026-10-16\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-16\",\"e\":\"2026-10-16\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:5pqh4cw815w@2026-10-07\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-07T09:00:00.000Z\",\"e\":\"2026-10-07T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
+  "info": "{\"sh\":{\"id\":\"shifts:f3o57316doz@2026-10-13\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-13T22:00:00.000Z\",\"e\":\"2026-10-14T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:88y4zo16dp0@2026-10-14\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-14\",\"e\":\"2026-10-14\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:fb9nv316dp0@2026-10-16\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-16\",\"e\":\"2026-10-16\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:jan50616dp0@2026-10-07\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-07T09:00:00.000Z\",\"e\":\"2026-10-07T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
  },
  {
   "p": "Agenda",
@@ -3717,7 +3789,7 @@
   "p": "Agenda",
   "name": "Uma folga nova vai sozinha para fora, poucos segundos depois de a registar",
   "pass": true,
-  "info": "[{\"up\":[{\"id\":\"dayoffs:dmdpb6w8759@2026-10-22\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-22\",\"e\":\"2026-10-22\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
+  "info": "[{\"up\":[{\"id\":\"dayoffs:c71qrj16jny@2026-10-22\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-22\",\"e\":\"2026-10-22\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
  },
  {
   "p": "Agenda",
@@ -3807,7 +3879,7 @@
   "p": "Direção",
   "name": "Spyke e Centro de decisões sabem tudo: património, investimentos, estudo, projetos, desporto, dieta, Fé, leitura, tendências e aniversários certos",
   "pass": true,
-  "info": "Agora: terça-feira, 13 de outubro às 16:26 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Costas & Bíceps; amanhã Pernas\nAlertas: Treino: 6 dias sem treinar (Último "
+  "info": "Agora: terça-feira, 13 de outubro às 18:45 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Costas & Bíceps; amanhã Pernas\nAlertas: Treino: 6 dias sem treinar (Último "
  },
  {
   "p": "Direção",
@@ -3883,7 +3955,7 @@
  },
  {
   "p": "Check-up Computador",
-  "name": "Check-up: nenhuma página recarrega a app sozinha",
+  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
   "pass": true,
   "info": ""
  },
@@ -3913,13 +3985,13 @@
  },
  {
   "p": "Check-up iPhone",
-  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (146 visitadas)",
+  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (141 visitadas)",
   "pass": true,
   "info": ""
  },
  {
   "p": "Check-up iPhone",
-  "name": "Check-up: nenhuma página recarrega a app sozinha",
+  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
   "pass": true,
   "info": ""
  },
@@ -4371,13 +4443,13 @@
   "p": "Stress",
   "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
   "pass": true,
-  "info": "máx 2388 ms"
+  "info": "máx 2263 ms"
  },
  {
   "p": "Stress",
   "name": "guardar tudo é rápido",
   "pass": true,
-  "info": "140 ms"
+  "info": "122 ms"
  },
  {
   "p": "Stress",

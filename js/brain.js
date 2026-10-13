@@ -46,6 +46,24 @@ const consult = async area => { const t = today(), F = OS.Fin;
     default: return 'Área desconhecida. Usa uma destas: ' + AREAS.join(', ');
   } };
 
+/* ---------- procurar em toda a app ---------- */
+const nrm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const SKIPK = new Set(['id', '_c', '_u', '_s', 'pic', 'cover', 'img', 'photo', 'data', 'b64']);
+const brief1 = (c, r) => { const S = OS.S[c] || {}, o = { area: S.label || c }; try { o.titulo = S.title ? String(S.title(r)).slice(0, 120) : r.title || r.name || ''; } catch (e) { o.titulo = r.title || r.name || ''; }
+  Object.keys(r).forEach(k => { if (SKIPK.has(k) || k === 'title' || k === 'name') return; const v = r[k]; if (v == null || v === '' || (Array.isArray(v) && !v.length)) return; if (typeof v === 'object' && !Array.isArray(v)) return;
+    const f = (S.fields || []).find(x => x.k === k); let val = Array.isArray(v) ? v.slice(0, 8).join(', ') : v; if (f && f.t === 'rel' && typeof v === 'string') { const t = OS.get(f.c, v); if (t) val = t.name || t.title || v; } else if (typeof v === 'string' && /^[a-z0-9]{8,14}$/.test(v) && !/\d{4}-/.test(v)) { const hit = ['subjects', 'projects', 'goals', 'accounts', 'assets', 'sports', 'people'].map(cc => OS.get(cc, v)).find(Boolean); if (hit) val = hit.name || hit.title || v; }
+    o[(f && f.l) || k] = String(val).slice(0, 300); }); return o; };
+const findAll = q => { const w = nrm(q).split(/\s+/).filter(x => x.length > 1); if (!w.length) return 'Diz o que procurar.'; const out = [];
+  Object.keys(OS.D || {}).forEach(c => { if (!Array.isArray(OS.D[c]) || /^(snapshots|reports|files)$/.test(c)) return; OS.D[c].forEach(r => { if (!r || typeof r !== 'object') return; const txt = nrm(Object.keys(r).filter(k => !SKIPK.has(k)).map(k => typeof r[k] === 'object' ? JSON.stringify(r[k]).slice(0, 400) : r[k]).join(' '));
+    const hit = w.filter(x => txt.includes(x)).length; if (hit === w.length || (w.length > 2 && hit >= w.length - 1)) out.push([hit, r.date || r.due || r.doneAt || '', c, r]); }); });
+  try { const m = OS.one('me') || {}, Q = {}; try { (OS.Me && OS.Me.qList ? OS.Me.qList() : []).forEach(q => { Q[q.id] = q.q || q.t || q.text; }); } catch (e) { } Object.entries(m.qa || {}).forEach(([k, v]) => { const t = nrm(v) + ' ' + nrm(Q[k]); if (w.every(x => t.includes(x))) out.push([w.length, '', 'biografia', { pergunta: Q[k] || k, resposta: String(v).slice(0, 600) }]); }); } catch (e) { }
+  if (!out.length) return 'Não encontrei nada na app com "' + q + '".';
+  return JSON.stringify(out.sort((a, b) => b[0] - a[0] || String(b[1]).localeCompare(String(a[1]))).slice(0, 30).map(([, , c, r]) => c === 'biografia' ? Object.assign({ area: 'Biografia (entrevista)' }, r) : brief1(c, r))); };
+const readArea = (c, n) => { const k = Object.keys(OS.D || {}).find(x => x === c) || Object.keys(OS.S).find(x => nrm((OS.S[x] || {}).label) === nrm(c)); if (!k || !Array.isArray(OS.D[k])) return 'Área desconhecida. Existem: ' + Object.keys(OS.D || {}).filter(x => Array.isArray(OS.D[x]) && OS.D[x].length).join(', ');
+  const L = U.sortBy(OS.D[k], r => r.date || r.due || r.doneAt || (r._c ? new Date(r._c).toISOString() : ''), -1).slice(0, Math.min(60, Math.max(1, n)));
+  return JSON.stringify({ area: (OS.S[k] || {}).label || k, total: OS.D[k].length, registos: L.map(r => brief1(k, r)) }); };
+B.findAll = findAll; B.readArea = readArea;
+
 /* ---------- ferramentas (as mesmas para os dois cérebros) ---------- */
 const did = [];   // o que o Spyke fez nesta resposta (aparece no ecrã)
 const T = [
@@ -67,6 +85,10 @@ const T = [
     run: a => { const ok = OS.Spyke && OS.Spyke.memAdd ? OS.Spyke.memAdd(String(a.facto).slice(0, 300), 'ia') : false; if (ok) did.push('Memória: ' + a.facto); return ok ? 'Guardado.' : 'Já sabia isso.'; } },
   { name: 'responder_email', description: 'Escreve uma resposta a um e-mail recebido e guarda-a como rascunho no Gmail dele (não envia).', props: { pessoa: { type: 'string', description: 'nome ou e-mail de quem escreveu' }, instrucao: { type: 'string', description: 'o que ele quer responder' } }, req: ['pessoa', 'instrucao'],
     run: async a => { if (!OS.Mail || !OS.Mail.replyByName) return 'O e-mail não está ligado.'; const r = await OS.Mail.replyByName(String(a.pessoa), String(a.instrucao)); if (r.ok) did.push('Rascunho para ' + r.to); return r.ok ? 'Rascunho guardado no Gmail para ' + r.to + ': ' + String(r.body).slice(0, 300) : r.msg; } },
+  { name: 'procurar_na_app', description: 'Procura um texto em TODA a app (tarefas, notas, metas, projetos, pessoas, livros, decisões, movimentos, investimentos, universidade, trabalho, biografia, memória…). Usa quando ele pergunta por algo que não está no resumo.', props: { texto: { type: 'string', description: 'palavras a procurar' } }, req: ['texto'],
+    run: a => cut(findAll(String(a.texto || '')), 6000) },
+  { name: 'ler_area', description: 'Lê os registos mais recentes de qualquer área da app pelo nome da coleção (ex.: notes, books, people, decisions, transactions, assets, invtx, subjects, assessments, sessions, workouts, runs, sportlog, meals, body, shifts, dayoffs, projects, goals, milestones, habits, devos, prayers, trees, opps, applications, contacts, skills, lifeev, reviews_w, reviews_m).', props: { area: { type: 'string', description: 'nome da coleção' }, quantos: { type: 'integer', description: 'quantos registos (até 60)' } }, req: ['area'],
+    run: a => cut(readArea(String(a.area || ''), +a.quantos || 30), 7000) },
   { name: 'abrir_pagina', description: 'Abre uma página da app quando ele pede para ver/abrir algo.', props: { pagina: { type: 'string', description: 'nome da página, ex.: finanças, floresta, universidade, e-mail, jornal, investimentos' } }, req: ['pagina'],
     run: a => { const r = OS.Spyke && OS.Spyke.findRoute ? OS.Spyke.findRoute(a.pagina) : null; if (!r) return 'Não encontrei essa página.'; location.hash = r[0]; return 'Abri ' + r[1] + '.'; } }];
 
@@ -74,12 +96,12 @@ const T = [
 const system = () => `És o Spyke, o assistente pessoal do ${who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco. Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.
 Regras:
 - Responde SEMPRE em português do Brasil, para ser dito em voz alta: no máximo 3 ou 4 frases curtas, sem listas, sem markdown, sem emojis. Nunca digas o teu próprio nome.
-- Antes de responder sobre a vida dele, usa "consultar" para ler os dados certos (podes consultar várias áreas). Não inventes números nem factos.
+- Recebes um resumo atual com quase tudo da vida dele: se o resumo chega, responde logo (é mais rápido). Para detalhes que não estão lá, usa "consultar" (por área), "procurar_na_app" (procura em toda a app) ou "ler_area". Não inventes números nem factos.
 - Para perguntas sobre o mundo (notícias, factos, preços, como fazer algo), pesquisa na internet antes de responder.
 - Age quando ele pedir (criar tarefa, compromisso, gasto, marcar hábito, memorizar, abrir página) e confirma numa frase o que fizeste. Não faças ações que ele não pediu.
 - Se não tiveres a informação, diz isso com honestidade e sugere o que ele pode fazer.
 - Hoje é ${new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}, ${new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })} (hora de Portugal). As datas vão no formato AAAA-MM-DD.`;
-const brief = () => { try { return OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx().slice(0, 3500) : ''; } catch (e) { return ''; } };
+const brief = () => { try { return OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx().slice(0, 12000) : ''; } catch (e) { return ''; } };
 
 /* ---------- Gemini (grátis) ---------- */
 // os modelos vêm da lista que a app descobre com a tua chave (o Google desliga os antigos); gemma não serve aqui (não usa ferramentas nem pesquisa)

@@ -7,7 +7,7 @@
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
-OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false };
+OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false, ear: 'auto', pausa: 1.2, bargeS: true };
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
@@ -157,7 +157,11 @@ const first = (t, max) => { const all = String(t).trim(), s = all.match(/[^.!?]+
   let rest = all.slice(all.indexOf(head) + head.length).trim(); if (!rest) return [head]; const p2 = parts(rest, 350)[0] || ''; rest = rest.slice(rest.indexOf(p2) + p2.length).trim();
   return [head, p2].concat(rest ? parts(rest, max) : []).filter(Boolean); };
 const parts = (t, max) => { const s = String(t).match(/[^.!?]+[.!?]*\s*/g) || [t], out = []; let cur = ''; s.forEach(x => { if ((cur + x).length > max && cur) { out.push(cur.trim()); cur = ''; } cur += x; }); if (cur.trim()) out.push(cur.trim()); return out; };
-S.stop = () => { tok++; try { playing && playing.stop(); } catch (e) { } playing = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { } try { rec && rec.abort(); } catch (e) { } setSt('idle'); };
+// pausa a voz sem a perder: se quem falou por cima era só o eco do Spyke, ele continua de onde estava
+let paused = '';
+S.pauseVoice = () => { try { if (AU && !AU.paused && playing) { AU.pause(); paused = 'au'; } } catch (e) { } try { if (window.speechSynthesis && speechSynthesis.speaking && !speechSynthesis.paused) { speechSynthesis.pause(); paused = paused || 'ss'; } } catch (e) { } return !!paused; };
+S.resumeVoice = () => { const p = paused; paused = ''; try { if (p === 'au' && AU && playing) { const r = AU.play(); r && r.catch && r.catch(() => { }); } } catch (e) { } try { if (window.speechSynthesis && speechSynthesis.paused) speechSynthesis.resume(); } catch (e) { } };
+S.stop = () => { tok++; paused = ''; try { playing && playing.stop(); } catch (e) { } playing = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { } try { rec && rec.abort(); } catch (e) { } setSt('idle'); };
 const order = () => { const c = cfg(), has = { azure: !!c.azKey, eleven: !!c.elKey, gemini: !!(OS.AI && OS.AI.key()), device: true }, pref = c.eng === 'gemini' ? ['gemini', 'azure', 'eleven', 'device'] : c.eng === 'eleven' ? ['eleven', 'azure', 'gemini', 'device'] : c.eng === 'device' ? ['device'] : ['azure', 'eleven', 'gemini', 'device']; return pref.filter(e => has[e]); };
 S.say = async (text, o = {}) => { if (!text) return; S.stop(); const my = ++tok; curSay = N(text); if (!o.bg) { open(); if (!o.again) push('spyke', text); } else UI.toast(text.slice(0, 160)); setSt('thinking'); hist.push({ r: 'spyke', t: text }); needTap = ''; voiceErr = '';
   let res = '';
@@ -192,7 +196,7 @@ const strict = () => +cfg().convWin < 0; // só responde quando ouve "Spyke" (pa
 const win = () => { const w = +cfg().convWin; return w < 0 ? 0 : w === 0 ? 7 * 864e5 : (w || 120) * 1000; };
 const convOn = () => !strict() && conv && Date.now() < convUntil;
 const convGo = ms => { if (strict() && !ms) return; conv = true; convUntil = Date.now() + (ms || win()); };
-S.listen = async (lo = {}) => { if (!SR) { open(); setSt('idle'); cap('spyke', 'Este navegador não deixa ditar. Escreve abaixo.'); const i = U.$('#spyIn'); i && i.focus(); return; }
+S.listen = async (lo = {}) => { if (silent()) { tapEar = Date.now() + 25000; earStopped = false; earBlock = 0; } if (!SR && !silent()) { open(); setSt('idle'); cap('spyke', 'Este navegador não deixa ditar. Escreve abaixo.'); const i = U.$('#spyIn'); i && i.focus(); return; }
   if (!lo.follow) { earStopped = false; earBlock = 0; earTaps = 0; }
   // escuta contínua ligada: o mesmo microfone continua aberto (não volta a pedir autorização)
   if (earWanted()) { if (!lo.follow) { S.stop(); convGo(Math.max(30000, win())); } open(); earMark(); setSt('listening'); bgSync(); clearTimeout(lsT); lsT = setTimeout(() => { if (st === 'listening') setSt('idle'); }, lo.follow ? 8000 : 15000); return; }
@@ -209,7 +213,11 @@ let earConf = 1, ear = null, appIn = false, earStopped = false, earBlock = 0, ea
 const SAYSTOP = /^(?:e?sp\w*\s+)?(?:para|pare|parar|chega|cala|silencio|stop)\b/;
 const EARSTOP = /\b(para|pare|parar|deixa|deixe|desliga|desligue|desativa|desative)\s+(?:de\s+)?(ouvir|escutar|o microfone|a escuta|microfone)\b|\b(vai|pode ir) dormir\b/;
 let hush = false; // true enquanto o Spyke prepara a resposta e fala (o microfone descansa)
-const earWanted = () => !!SR && appIn && !earStopped && !earBlock && !hush && !document.hidden && !bgPaused && !!cfg().always && (!navigator.webdriver || !!window.__spyEar);
+// ouvido silencioso (sem o som do ditado do iPhone): microfone aberto uma vez + deteção da fala + transcrição pela IA
+let tapEar = 0, silentFail = 0;
+const silent = () => cfg().ear !== 'ditado' && !silentFail && !!(OS.Ear && OS.Ear.can()) && (!navigator.webdriver || !!window.__spyEar);
+S.silent = () => silent();
+const earWanted = () => (!!SR || silent()) && appIn && !earStopped && !earBlock && !hush && !document.hidden && !bgPaused && (!!cfg().always || tapEar > Date.now()) && (!navigator.webdriver || !!window.__spyEar);
 const earMark = () => { clearTimeout(earT); earBase = earFull; };
 const cut = full => { if (full.startsWith(earBase)) return full.slice(earBase.length); let i = 0; const m = Math.min(full.length, earBase.length); while (i < m && full[i] === earBase[i]) i++; return full.slice(i); };
 // o que o Spyke acabou de dizer e o microfone apanhou não conta como pedido teu
@@ -224,7 +232,7 @@ const earPhrase = s => { const n = N(s); if (!n || echo(n)) return; if (earConf 
     armed = Date.now() + 10000; setSt('listening'); const l = el && el.querySelector('.spy-st'); if (l) l.textContent = 'Diz o que precisas…'; lsT = setTimeout(() => { if (st === 'listening' && armed <= Date.now()) setSt('idle'); }, 10500); return; }
   if (inConv) { armed = 0; convGo(); clearTimeout(lsT); S.handle(s); } };
 const earTake = () => { clearTimeout(earT); const s = cut(earFull).trim(); earBase = earFull; const n0 = msgs.length; if (s && st !== 'speaking' && st !== 'thinking') earPhrase(s); if (live && msgs.length === n0) { live = ''; renderChat(); } };
-const earStart = () => { if (ear || !earWanted()) return; let r; try { r = new SR(); } catch (e) { return; }
+const earStart = () => { if (ear || !earWanted()) return; if (silent()) return earSilent(); let r; try { r = new SR(); } catch (e) { return; }
   r.lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1; earFull = earBase = ''; let got = false;
   r.onresult = e => { if (ear !== r) return; got = true; earFails = 0; let full = ''; for (const x of e.results) full += x[0].transcript; earFull = full; const lr = e.results[e.results.length - 1]; earConf = lr && lr[0] && typeof lr[0].confidence === 'number' ? lr[0].confidence : 1; const fresh = cut(full).trim(); if (!fresh) return;
     if (st === 'speaking' || st === 'thinking') { const n = N(fresh); if (!cfg().barge || echo(n)) return;
@@ -235,9 +243,34 @@ const earStart = () => { if (ear || !earWanted()) return; let r; try { r = new S
   r.onend = () => { if (ear !== r) return; ear = null; if (earT) earTake(); setEarCls(); const quick = !got && Date.now() - earAt < 2500; earFails = quick ? earFails + 1 : 0;
     if (earWanted()) setTimeout(earStart, quick ? Math.min(15000, 400 * Math.pow(2, earFails)) : 250); else outSession(); };
   ear = r; earAt = Date.now(); setEarCls(); try { session('play-and-record'); r.start(); } catch (e) { ear = null; setEarCls(); } };
+/* ---------- ouvido silencioso ---------- */
+let bargeP = false, sttBusy = 0, echoN = 0, echoTok = -1, noisy = [], quietUntil = 0;
+const stLbl = t => { const l = el && el.querySelector('.spy-st'); if (l) l.textContent = t; };
+const earSilent = () => { const E = OS.Ear; E.hang = Math.round((+cfg().pausa || 1.2) * 1000); ear = E; earAt = Date.now(); setEarCls(); session('play-and-record');
+  E.start({ onStart: () => { if (st === 'speaking') { if (echoTok !== tok) { echoTok = tok; echoN = 0; } if (cfg().bargeS !== false && echoN < 2 && S.pauseVoice()) { bargeP = true; stLbl('A ouvir-te…'); } return; }
+      if (el && !el.hidden && (st === 'listening' || convOn() || armed > Date.now())) { live = '…'; renderChat(); stLbl('A ouvir-te…'); } },
+    onDrop: () => { if (bargeP) { bargeP = false; S.resumeVoice(); stLbl(STL.speaking); } if (live === '…') { live = ''; renderChat(); } },
+    onUtt: u => { const idle = st === 'idle' && !(el && !el.hidden) && armed <= Date.now() && !convOn() && tapEar <= Date.now();
+      // muito barulho à volta (televisão, conversas) e ninguém a chamar o Spyke: descansa 30 s para não gastar a IA
+      if (idle) { if (Date.now() < quietUntil) return; noisy = noisy.filter(x => Date.now() - x < 60000); noisy.push(Date.now()); if (noisy.length > 14) { quietUntil = Date.now() + 30000; noisy = []; return; } }
+      sttTake(u); },
+    onPeak: (pk, now) => { if (clapSt && clapSt.det && st === 'idle' && !bgPaused && clapSt.det(pk, now)) clapGo(); },
+    onErr: e => { ear = null; setEarCls(); if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) { earBlock = Date.now(); earNeedTap('not-allowed'); return; } silentFail = Date.now(); setTimeout(bgSync, 300); } }).then(ok => { if (!ok && ear === E) { ear = null; setEarCls(); } }); };
+const sttTake = async u => { const wasB = bargeP; bargeP = false; sttBusy++; if (el && !el.hidden && (wasB || st === 'listening' || convOn() || armed > Date.now())) { live = '…'; renderChat(); stLbl('A perceber o que disseste…'); }
+  let text = ''; try { text = await OS.Ear.stt(u.b64); } catch (e) { earErr = e.message || 'erro'; } sttBusy--;
+  if (live === '…') { live = ''; renderChat(); }
+  const n = N(text);
+  // falaste por cima do Spyke
+  if (wasB) { if (!n || echo(n)) { echoN++; S.resumeVoice(); stLbl(STL.speaking); return; } S.stop(); armed = 0; convGo(30000); const c = wakeSplit(text); S.handle(c !== null && N(c) ? c : text); return; }
+  if (!n) { if (st === 'listening') stLbl(idleTxt()); return; }
+  // continuaste a falar enquanto ele pensava: junta ao que já tinhas dito
+  if (st === 'thinking' && curAsk && Date.now() - curAskAt < 60000 && !echo(n)) { const prev = curAsk; askTok++; S.stop(); S.handle(prev + ' ' + (wakeSplit(text) || text)); return; }
+  if (st === 'speaking' || st === 'thinking') return;
+  const n0 = msgs.length; earPhrase(text); if (WAKE.test(n)) noisy = []; if (live && msgs.length === n0) { live = ''; renderChat(); } };
+S._sttTake = sttTake;
 let earClsT = 0; // o iPhone fecha e reabre o microfone a toda a hora: só apaga o ponto se ficar mesmo desligado (mudar a classe do <html> recalcula a página toda)
 const setEarCls = () => { clearTimeout(earClsT); if (ear) document.documentElement.classList.add('spy-ear'); else earClsT = setTimeout(() => { if (!ear) document.documentElement.classList.remove('spy-ear'); }, 1500); if (el && !el.hidden && st === 'idle') { const l = el.querySelector('.spy-st'); if (l) l.textContent = idleTxt(); } };
-const earOff = () => { const r = ear; ear = null; clearTimeout(earT); setEarCls(); try { r && r.abort(); } catch (e) { } };
+const earOff = () => { const r = ear; ear = null; clearTimeout(earT); setEarCls(); try { r && r.abort(); } catch (e) { } if (bargeP) { bargeP = false; S.resumeVoice(); } };
 const earQuit = said => { earStopped = true; earOff(); conv = false; outSession(); if (said) S.say(pickR(['Ok, deixei de ouvir. Toca no microfone quando precisares.', 'Microfone desligado. Estou aqui quando me chamares.'])); else UI.toast('O Spyke deixou de ouvir'); };
 S.earStop = () => earQuit(false); S.earOn = () => !!ear; S._endConv = () => { conv = false; convUntil = 0; if (st === 'listening') setSt('idle'); };
 // o iPhone pode recusar abrir o microfone sem um toque: espera pelo primeiro toque e tenta outra vez
@@ -254,7 +287,7 @@ let clapSt = null, MS = null;
 const pauseBg = () => { bgPaused++; earOff(); };
 const resumeBg = () => { bgPaused = Math.max(0, bgPaused - 1); setTimeout(bgSync, 400); };
 const clapWanted = () => !!cfg().clap && appIn && !document.hidden && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && (!navigator.webdriver || !!window.__spyClap);
-const getMic = async () => { if (MS && MS.getAudioTracks().some(t => t.readyState === 'live')) return MS;
+const getMic = async () => { if (MS && MS.getAudioTracks().some(t => t.readyState === 'live')) return MS; if (OS.Ear && OS.Ear.stream && OS.Ear.stream()) return (MS = OS.Ear.stream());
   MS = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false } });
   MS.getAudioTracks().forEach(t => { t.onended = () => { MS = null; if (clapSt) { stopClap(); setTimeout(bgSync, 800); } }; }); return MS; };
 S._clap = { lvl: 0, muted: false, n: 0 };
@@ -286,7 +319,7 @@ setInterval(() => { if (st !== stWas) { stWas = st; stAt = Date.now(); }
   if (hush && st !== 'speaking' && st !== 'thinking') { hush = false; bgSync(); }
   else if ((st === 'thinking' || st === 'speaking') && Date.now() - stAt > 75000 && !(st === 'speaking' && (playing || (window.speechSynthesis && window.speechSynthesis.speaking)))) { try { S.stop(); } catch (e) { } setSt('idle'); } }, 3000);
 // uma vez: escuta sempre ligada, só responde ao nome e sem "interromper falando" (no iPhone ele ouvia a própria voz e interrompia-se)
-OS.on('ready', () => { const c = OS.one('spyke'); if (c.fix3 !== 1) OS.setOne('spyke', { always: true, convWin: -1, barge: false, fix3: 1 }); });
+OS.on('ready', () => { const c = OS.one('spyke'); if (c.fix3 !== 1) OS.setOne('spyke', { always: true, convWin: -1, barge: false, fix3: 1 }); if (OS.one('spyke').fix4 !== 1) OS.setOne('spyke', { ear: 'auto', bargeS: true, pausa: 1.2, fix4: 1 }); });
 // ao entrar (depois do Face ID ou do código) começa logo a ouvir: podes falar sem tocar em nada
 OS.on('unlock', () => { appIn = true; earStopped = false; earBlock = 0; earTaps = 0; if (cfg().always && SR && !strict() && (!navigator.webdriver || window.__spyEar)) convGo(Math.max(60000, win())); bgSync(); });
 
@@ -395,8 +428,9 @@ S.addExpense = (v, desc) => { const d = String(desc || '').trim() || 'Gasto por 
   return { ok: true, text: `${eurS(v)} em ${d}${g.cat ? ', categoria ' + g.cat : ''}` }; };
 S.findRoute = q => findRoute(q);
 
+let askTok = 0, curAsk = '', curAskAt = 0;
 const askAI = async raw => { if (!OS.Brain || !OS.Brain.which()) return S.say('Para conversas livres preciso do meu cérebro ligado: em Definições, no separador Spyke, cola a chave grátis do Google. Os comandos rápidos funcionam sem ela.');
-  setSt('thinking'); const r = await OS.Brain.ask(raw);
+  const my = ++askTok; curAsk = raw; curAskAt = Date.now(); setSt('thinking'); const r = await OS.Brain.ask(raw); if (my !== askTok) return; curAsk = '';
   if (r.did && r.did.length) { msgs.push({ r: 'act', t: r.did.join(' · ') }); renderChat(); }
   if (!r.text) return S.say('Não consegui pensar agora: ' + (r.err || 'erro') + '.');
   return S.say(r.text.slice(0, 900)); };
@@ -420,8 +454,9 @@ const bargeOn = () => { if (ear || !cfg().barge || !SR || barge || st !== 'speak
   r.onerror = () => { }; r.onend = () => { if (barge === r) { barge = null; if (st === 'speaking') setTimeout(bargeOn, 250); } }; barge = r; try { r.start(); } catch (e) { barge = null; } };
 const idleTxt = () => ear ? (convOn() ? 'A ouvir. Fala à vontade.' : 'A ouvir. Diz "Spyke" para chamar.') : earStopped ? 'Microfone desligado. Toca no microfone para falar.' : 'Toca no microfone e fala';
 const setSt = s => { if ((st === 'speaking') !== (s === 'speaking')) { earMark(); if (st === 'speaking') sayEnd = Date.now(); }
-  const talk = s === 'speaking' || s === 'thinking'; if (talk && !hush && !cfg().barge) { hush = true; earOff(); } else if (!talk && hush) { hush = false; setTimeout(bgSync, 350); }
-  st = s; if (s === 'speaking') setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
+  if (OS.Ear) OS.Ear.playing = s === 'speaking';
+  const talk = s === 'speaking' || s === 'thinking'; if (talk && !hush && !cfg().barge && !silent()) { hush = true; earOff(); } else if (!talk && hush) { hush = false; setTimeout(bgSync, 350); }
+  st = s; if (s === 'speaking' && !silent()) setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
 const bubbles = () => msgs.map(m => `<div class="spy-m ${m.r}"><div class="spy-bb">${esc(m.t)}${m.tap ? `<button class="btn xs pri spy-tap" data-act="spyTap">${UI.ic('play')}Ouvir</button>` : ''}</div></div>`).join('') + (live ? `<div class="spy-m user live"><div class="spy-bb">${esc(live)}</div></div>` : '');
 const renderChat = () => { if (!el) return; const c = el.querySelector('.spy-chat'); if (!c) return; c.innerHTML = bubbles() || `<div class="spy-empty">Diz "Bom dia", pede uma tarefa ou pergunta qualquer coisa.</div>`; c.scrollTop = c.scrollHeight; if (st === 'speaking') setSt('speaking'); };
 const push = (r, t) => { live = ''; msgs.push({ r, t: String(t) }); if (msgs.length > 40) msgs = msgs.slice(-40); renderChat(); };
@@ -435,7 +470,7 @@ function draw() { if (!el) return; el.innerHTML = `<div class="spy-bg" data-act=
     <form class="spy-f" data-form="spyAsk" autocomplete="off"><button type="button" class="spy-mic" data-act="spyListen" aria-label="Falar com o Spyke">${UI.ic('mic')}</button><input id="spyIn" name="q" class="field" placeholder="Escreve ou toca no microfone…" aria-label="Pergunta ao Spyke"><button class="btn spy-send" aria-label="Enviar">${UI.ic('right')}</button><button type="button" class="btn ghost spy-stop" data-act="spyStop" aria-label="Parar">${UI.ic('stop')}</button></form></div></div>`; renderChat(); setSt(st); diag(); }
 const open = () => { if (!el) { el = document.createElement('div'); el.id = 'spy'; document.body.appendChild(el); } if (el.hidden !== false || !el.innerHTML) { el.hidden = false; draw(); } document.documentElement.classList.add('spy-open'); };
 const close = () => { if (!el) return; S.stop(); el.hidden = true; cancelAnimationFrame(raf); raf = 0; document.documentElement.classList.remove('spy-open'); };
-S.open = open; S.close = close;
+S.open = open; S.close = close; S.state = () => st; S.msgs = () => msgs.slice();
 // som de "acordar" (gerado aqui, toca mesmo com o iPhone em silêncio)
 let SFX = null;
 const wakeSnd = () => { try { const rate = 22050, n = Math.round(rate * .9), b = new Uint8Array(n * 2); for (let i = 0; i < n; i++) { const t = i / rate, f = 180 + 900 * Math.pow(t / .9, 1.6), env = Math.min(1, t * 12) * Math.pow(1 - t / .9, 1.4), v = (Math.sin(2 * Math.PI * f * t) * .55 + Math.sin(2 * Math.PI * f * 2.01 * t) * .2 + Math.sin(2 * Math.PI * 1320 * t) * .12 * (t > .55 ? 1 : 0)) * env * .5, s = Math.max(-32767, Math.min(32767, Math.round(v * 32767))); b[2 * i] = s & 255; b[2 * i + 1] = (s >> 8) & 255; }
@@ -491,7 +526,7 @@ const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url 
   return `<div class="pn" id="spyState"><div class="pn-h"><h3>Estado do Spyke</h3><button class="btn sm" data-act="spyCheckAll" ${chkBusy ? 'disabled' : ''}>${UI.ic('sync')}${chkBusy ? 'A verificar…' : 'Verificar tudo'}</button></div>
     <div class="spy-chks">
     ${row(ai ? (aiSt && aiSt.ok === false ? false : true) : false, 'Cérebro (IA)', ai ? (aiSt && aiSt.ok === false ? esc(aiSt.msg || 'a chave não funciona') : 'ligado: conversa, decisões, resumos, e-mails, fotos') : 'desligado: cola a chave em "Cérebro do Spyke", aqui em baixo')}
-    ${row(SR ? (ear ? true : null) : false, 'Microfone', !SR ? 'este navegador não reconhece voz' : ear ? 'a ouvir agora' : earStopped ? 'desligado por ti: toca no microfone ou diz "volta a ouvir"' : cfg().always ? 'parado: toca no microfone para começar' : '"Ouvir sempre" está desligado')}
+    ${row(SR || silent() ? (ear ? true : null) : false, 'Microfone', !SR && !silent() ? 'este navegador não reconhece voz' : ear ? 'a ouvir agora' + (ear === OS.Ear ? ' (silencioso · ' + OS.Ear.engine() + ')' : '') : earStopped ? 'desligado por ti: toca no microfone ou diz "volta a ouvir"' : cfg().always ? 'parado: toca no microfone para começar' : '"Ouvir sempre" está desligado')}
     ${row(hasScr ? (v >= SCRV ? true : false) : false, 'Script Google', !hasScr ? 'não está ligado neste aparelho: Definições → Sincronizar aparelhos → Recuperar os meus dados' : v >= SCRV ? 'versão ' + v + ': notícias, e-mail, Siri e sincronização' : 'versão ' + (v || 'antiga') + ': falta atualizar para a versão ' + SCRV + ' (passo a passo abaixo)')}
     ${row(hasScr && v >= SCRV ? (OS.News && OS.News.old ? false : true) : false, 'Notícias', hasScr && v >= SCRV ? 'prontas no Jornal e no resumo do dia' : 'precisam do script Google atualizado')}
     ${row(hasScr && v >= SCRV ? (OS.one('integ').gcal ? true : null) : false, 'Agenda Google', hasScr && v >= SCRV ? (OS.one('integ').gcal ? 'ligada: os teus eventos aparecem no Calendário' : 'pronta: liga-a no Calendário') : 'precisa do script Google atualizado')}
@@ -530,8 +565,11 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     <div class="ws-form" style="margin-top:10px"><label>Sotaque<select class="field" data-bind="spyke.accent"><option value="BR"${c.accent === 'BR' ? ' selected' : ''}>Brasil</option><option value="PT"${c.accent === 'PT' ? ' selected' : ''}>Portugal</option></select></label>
       <label>Velocidade<select class="field" data-bind="spyke.speed">${[['0.9', 'Calma'], ['1', 'Normal'], ['1.1', 'Rápida']].map(([v, l]) => `<option value="${v}"${String(c.speed) === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
     <p class="mut" style="font-size:12.5px;margin:8px 0 0">Se não ouvires nada: tira o iPhone do modo silencioso e sobe o volume.</p></div>
-  <div class="pn"><div class="pn-h"><h3>Ouvir</h3><small class="mut">${SR ? (ear ? 'a ouvir agora' : earStopped ? 'desligado por ti' : earErr && earErr !== 'no-speech' && earErr !== 'aborted' ? 'erro: ' + esc(earErr) : 'parado') : 'sem reconhecimento de voz'}</small></div>
-    <label class="switch"><input type="checkbox" data-bind="spyke.always" ${c.always ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Ouvir sempre com a app aberta: começa a ouvir sozinho quando entras (sem tocar em nada) e só para quando disseres <b>"para de ouvir"</b></label>
+  <div class="pn"><div class="pn-h"><h3>Ouvir</h3><small class="mut">${SR || silent() ? (ear ? 'a ouvir agora' : earStopped ? 'desligado por ti' : earErr && earErr !== 'no-speech' && earErr !== 'aborted' ? 'erro: ' + esc(earErr) : 'parado') : 'sem reconhecimento de voz'}</small></div>
+    <div class="ws-form" style="margin-bottom:8px"><label>Como ouve<select class="field" data-bind="spyke.ear"><option value="auto"${c.ear !== 'ditado' ? ' selected' : ''}>Silencioso, sem som do microfone (recomendado)${OS.Ear && OS.Ear.engine() ? ' · ' + OS.Ear.engine() : ''}</option><option value="ditado"${c.ear === 'ditado' ? ' selected' : ''}>Ditado do iPhone (faz um som ao ligar e desligar)</option></select></label>
+      <label>Espera antes de responder<select class="field" data-bind="spyke.pausa">${[['0.8', 'Pouco (0,8 s)'], ['1.2', 'Normal (1,2 s)'], ['1.6', 'Mais (1,6 s)'], ['2.2', 'Muito (2,2 s) — para pensar a falar']].map(([v, l]) => `<option value="${v}"${String(c.pausa || 1.2) === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
+    ${OS.Ear && !OS.Ear.engine() ? '<p class="note" style="margin:0 0 8px">A escuta silenciosa precisa do cérebro do Spyke (a chave grátis do Google, mais abaixo) para perceber o que dizes. Sem ela usa o ditado do iPhone.</p>' : ''}
+    <label class="switch"><input type="checkbox" data-bind="spyke.always" ${c.always ? 'checked' : ''} ${SR || silent() ? '' : 'disabled'}><span></span>Ouvir sempre com a app aberta: começa a ouvir sozinho quando entras (sem tocar em nada) e só para quando disseres <b>"para de ouvir"</b></label>
     <div class="ws-form" style="margin-top:8px"><label>Quando responde<select class="field" data-bind="spyke.convWin">${[['-1', 'Só quando digo "Spyke" (recomendado)'], ['30', 'Sem o nome durante 30 s depois de falar comigo'], ['120', 'Sem o nome durante 2 minutos'], ['0', 'Sempre (responde a tudo o que ouvir)']].map(([v, l]) => `<option value="${v}"${String(c.convWin) === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
     <small class="mut">Com "Só quando digo Spyke" ele ignora barulho, televisão e conversas: diz <b>"Spyke, …"</b> e o pedido na mesma frase (ou só "Spyke" e espera pelo "Sim?"). Tocar no microfone também o faz ouvir a próxima frase.</small>
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.clap" ${c.clap ? 'checked' : ''}><span></span>Duas palmas para chamar</label>
@@ -542,7 +580,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     ${SR ? '' : '<p class="neg" style="font-size:12.5px;margin:8px 0 0">Este navegador não tem reconhecimento de voz: usa o Safari no iPhone ou o Chrome.</p>'}</div>
   <div class="pn"><div class="pn-h"><h3>Conversa</h3></div>
     <label class="switch"><input type="checkbox" data-bind="spyke.cont" ${c.cont ? 'checked' : ''}><span></span>Conversa contínua: depois de responder continua a ouvir sem dizeres o nome outra vez</label>
-    <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.barge" ${c.barge ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Interromper por voz: diz "Spyke, para" enquanto ele fala (no iPhone pode ouvir a própria voz e interromper-se; deixa desligado se isso acontecer — podes sempre tocar no ecrã para o parar)</label>
+    <label class="switch" style="margin-top:8px">${silent() ? `<input type="checkbox" data-bind="spyke.bargeS" ${c.bargeS !== false ? 'checked' : ''}><span></span>Interromper falando: se começares a falar enquanto ele fala, ele pára logo e ouve-te (se for só o eco da voz dele, continua). Podes sempre tocar no ecrã para o parar.` : `<input type="checkbox" data-bind="spyke.barge" ${c.barge ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Interromper por voz: diz "Spyke, para" enquanto ele fala (com o ditado do iPhone ele pode ouvir a própria voz e interromper-se). Podes sempre tocar no ecrã para o parar.`}</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.alerts" ${c.alerts ? 'checked' : ''}><span></span>Avisos falados: 30 e 10 min antes dos compromissos, contas do dia, tarefas às 18h, prova amanhã, inegociáveis às 21h (nunca entre as 23h e as 8h)</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.newsBrief" ${c.newsBrief ? 'checked' : ''}><span></span>Três notícias no resumo do dia</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.jarvisStart" ${c.jarvisStart ? 'checked' : ''}><span></span>Abrir o modo Jarvis quando abro a app</label></div>

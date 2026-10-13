@@ -1,5 +1,5 @@
-Check-up completo da app: as 146 páginas e abas e os 147 formulários foram testados com dados em todas as áreas, no computador e no iPhone — sem erros, sem valores partidos e sem travar.
-A Direção agora vê a app inteira: Revisões (semanal e mensal), Minha Evolução, Estrela-guia e Próximos passos incluem também trabalho, desporto, dieta, foco (Floresta), Fé, leitura e investimentos. O Spyke e o Centro de decisões também.
-Finanças: "Selecionar para apagar" nos movimentos (um, vários ou todos, com "Repor" logo a seguir), também nos movimentos de investimento.
-Saldo inicial · o que já tens (Finanças → Contas): quanto tens hoje em cada conta e em que moeda (euro, real, dólar…). Cada conta mostra o saldo na sua moeda e os totais aparecem em euros ao câmbio do dia.
-Correções: aniversários das pessoas e dados dos investimentos no Spyke; simulados registados à mão na Universidade.
+Spyke sem barulho de microfone: deixou de usar o ditado do iPhone (que fazia som ao entrar e ao sair da app). Agora ouve em silêncio, com o microfone aberto uma vez.
+Espera que acabes de falar: só responde depois de uma pausa a sério (1,2 s; podes mudar em Definições → Spyke → "Espera antes de responder") e não corta a frase a meio.
+Interromper falando: se começares a falar enquanto ele fala, ele pára logo, ouve-te e continua a conversa a partir do que disseste. Se era só o eco da voz dele, continua de onde estava.
+Percebe melhor: transcreve a frase inteira com a IA (Google, ou Microsoft se tiveres a chave).
+Sabe tudo: leva o resumo completo da tua vida em cada pergunta, procura em toda a app (notas, livros, biografia, movimentos…) e pesquisa na internet. Responde mais depressa.
