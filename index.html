@@ -2288,6 +2288,10 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .evo-m{display:grid;grid-template-columns:1fr auto 54px;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--line);font-size:13px}.evo-m span:first-child{color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.evo-t{text-align:right;font-size:12px}
 .evo-ar{display:flex;gap:14px;align-items:center;margin:10px 0}.evo-ar p{margin:0;line-height:1.55}.evo-n{display:flex;align-items:baseline;gap:2px;border:2px solid var(--accent);border-radius:14px;padding:8px 12px}.evo-n b{font-size:28px;color:var(--accent)}.evo-n small{color:var(--mut)}
 .evo-pa{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:8px 0}.evo-pa>div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}.evo-pa small{display:block;color:var(--tx2);font-size:12.5px;margin-top:3px;line-height:1.45}
+/* agenda fora da app */
+.cp-types{display:flex;flex-wrap:wrap;gap:6px}
+
+.rp-cty{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}.rp-cty b{display:block;font-size:14px}.rp-cty small{display:block;font-size:12.5px;margin-top:2px}
 
 </style>
 <style>
@@ -2519,7 +2523,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.12", "date": "13/10/2026", "notes": ["Spyke: no resumo do dia já não lê as instruções da voz (\"fala sempre em português…\") — vai direto ao resumo.", "Spyke começa a falar em poucos segundos: a primeira frase é gerada à parte e o resto em paralelo, enquanto ele fala. A voz é a mesma."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.13", "date": "13/10/2026", "notes": ["Relatórios no país que escolheste: no Brasil saem no formato do IRPF (fichas da declaração, bens e direitos, completa x simplificada, carnê-leão e DARF), em reais; em Portugal continuam no formato do IRS. Os relatórios que já passaram ficam como estavam.", "A tua agenda do Oceanum também fora da app: turnos, folgas, compromissos e provas (e, se quiseres, aulas e tarefas) vão sozinhos para um calendário \"Oceanum\" no teu Google Calendar e aparecem no Calendário do iPhone. Alteras ou apagas na app, muda lá também.", "Para ligar: Definições → Ligações → \"Pôr a minha agenda no Google Calendar\". Precisa da Parte 5 nova do script (Definições → Script Google: copia e substitui o conteúdo da Parte5)."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -4406,7 +4410,8 @@ A.calSlot = (b, e) => { if (e.target.closest('[data-edit]')) return; const r = b
 /* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; dentro do claude.ai também pelo conector */
 let gcalUnsub = null, gcalTimer = 0, gcalBusy = false;
 const gscr = () => { const c = OS.one('inbox'); return c && c.url && c.key && +(c.ver || 0) >= 11 ? c : null; };
-const gmap = L => L.map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
+// o calendário "Oceanum" é a cópia que a app põe no Google: não se lê de volta (senão aparecia tudo duas vezes)
+const gmap = L => L.filter(x => x.cal !== 'Oceanum').map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
 try { const sv = U.ls.get('os2gcal', null); if (sv && OS.one('integ').gcal) Cal.gcal = sv.ev || []; } catch (e) { }
 const gcalScript = async quiet => { const c = gscr(); if (!c || gcalBusy) return; gcalBusy = true;
   const from = U.addDays(U.today(), -14), to = U.addDays(U.today(), 90);
@@ -6547,7 +6552,25 @@ const TB = IX.TABS; if (TB && !TB.some(t => t[0] === 'imoveis')) { const i = TB.
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, L = OS.L, esc = U.esc, Fin = OS.Fin, Inv = OS.Inv;
 const IX = () => OS.InvX, n = v => U.num(v) || 0;
 const RP = OS.Reports = {};
-const E = (v, d = 2) => U.eur(v, { dec: d }), ES = v => (v > 0 ? '+' : '') + E(v), P = (v, d = 0) => U.pct(v, d), tone = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+// país e moeda do relatório: seguem o país escolhido na app; um relatório já arquivado fica com o país com que foi gerado
+let RK = 'PT', RC = 'EUR';
+RP.cty = () => (OS.Country && OS.Country.code ? OS.Country.code() : 'PT') || 'PT';
+RP.setCtx = k => { RK = k || 'PT'; RC = RK === 'BR' ? 'BRL' : 'EUR'; return RK; };
+RP.ctx = () => ({ k: RK, cur: RC });
+// histórico do país (para um período que já passou sem relatório arquivado ficar no país de então): [[desde, país], …]
+RP.ctyAt = d => { let k = ''; (OS.one('tax').ctyH || []).forEach(([f, c]) => { if (!f || f <= d) k = c; }); return k || RP.cty(); };
+RP.ctyFor = R => { const r = OS.all('reports').find(x => x && x.per === R.per && x.ref === R.ref); return r ? (r.cty || 'PT') : R.to < U.today() ? RP.ctyAt(R.to) : RP.cty(); };
+const ctyTrack = () => { const c = RP.cty(), H = (OS.one('tax').ctyH || []).slice(), t = U.today(), last = H[H.length - 1];
+  if (!H.length) return OS.setOne('tax', { ctyH: [['', c]] }); if (last[1] === c) return;
+  if (last[0] === t) H.pop(); const prev = H[H.length - 1]; if (!prev || prev[1] !== c) H.push([t, c]); OS.setOne('tax', { ctyH: H }); };
+OS.on('ready', () => { try { ctyTrack(); } catch (e) { } }); OS.on('one:profile', () => { try { ctyTrack(); } catch (e) { } });
+const bf = () => RC === 'BRL' ? (Inv.fx('BRL') || 1) : 1; // os investimentos são calculados em euros: no Brasil passam a reais
+// movimentos: no Brasil, contas em reais ficam como estão e as outras passam a reais ao câmbio (em Portugal fica tudo como sempre)
+const accCur = t => { const a = t && t.account && OS.get('accounts', t.account); return (a && a.currency) || 'EUR'; };
+const cv = (t, v) => { const x = Number(v) || 0; if (RC !== 'BRL') return x; const c = accCur(t); return c === 'BRL' ? x : x * (Inv.fx(c) || 1) / bf(); };
+const amt = t => cv(t, n(t.amount));
+RP.cv = cv; RP.amt = amt;
+const E = (v, d = 2) => { const x = Number(v) || 0; if (RC !== 'BRL') return U.eur(x, { dec: d }); return (x < 0 ? '−' : '') + 'R$ ' + Math.abs(x).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); }, ES = v => (v > 0 ? '+' : '') + E(v), P = (v, d = 0) => U.pct(v, d), tone = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
 OS.ONE_DEF.tax = { res: 'PT', brRes: false, born: '', firstWork: '', civil: 'Solteiro', deps: 0, deps6: 0, indep: false, coef: 0.75, englobar: false };
 const tx = () => OS.one('tax');
 
@@ -6580,23 +6603,23 @@ const closed = R => R.to < U.today();
 
 /* ================= receitas e despesas ================= */
 RP.money = R => { const to = R.to > U.today() ? U.today() : R.to, T = Fin.tx(R.from, to).filter(t => t.type !== 'Transferência'), I = T.filter(t => t.type === 'Receita'), D = T.filter(t => t.type === 'Despesa');
-  const inc = U.sum(I, t => n(t.amount)), exp = U.sum(D, t => n(t.amount)), grp = (arr, f) => Object.entries(U.groupBy(arr, f)).map(([k, a]) => ({ k, v: U.sum(a, t => n(t.amount)), n: a.length, a })).sort((a, b) => b.v - a.v);
-  const months = R.months.map(ym => { const f = ym + '-01', l = lastDay(ym) > U.today() ? U.today() : lastDay(ym), X = f > U.today() ? [] : Fin.tx(f, l).filter(t => t.type !== 'Transferência'); const i = U.sum(X.filter(t => t.type === 'Receita'), t => n(t.amount)), e = U.sum(X.filter(t => t.type === 'Despesa'), t => n(t.amount)); return { ym, inc: i, exp: e, sav: i - e }; });
+  const inc = U.sum(I, t => amt(t)), exp = U.sum(D, t => amt(t)), grp = (arr, f) => Object.entries(U.groupBy(arr, f)).map(([k, a]) => ({ k, v: U.sum(a, t => amt(t)), n: a.length, a })).sort((a, b) => b.v - a.v);
+  const months = R.months.map(ym => { const f = ym + '-01', l = lastDay(ym) > U.today() ? U.today() : lastDay(ym), X = f > U.today() ? [] : Fin.tx(f, l).filter(t => t.type !== 'Transferência'); const i = U.sum(X.filter(t => t.type === 'Receita'), t => amt(t)), e = U.sum(X.filter(t => t.type === 'Despesa'), t => amt(t)); return { ym, inc: i, exp: e, sav: i - e }; });
   const acc = id => { const a = OS.get('accounts', id); return a ? L.accLabel(a) : 'Sem conta'; };
-  const bud = OS.all('budgets').map(b => { const sp = U.sum(D.filter(t => t.cat === b.cat), t => n(t.amount)), lim = n(b.limit) * R.months.length; return { cat: b.cat, sp, lim, p: lim ? sp / lim : 0 }; }).filter(b => b.lim);
+  const bud = OS.all('budgets').map(b => { const sp = U.sum(D.filter(t => t.cat === b.cat), t => amt(t)), lim = n(b.limit) * R.months.length; return { cat: b.cat, sp, lim, p: lim ? sp / lim : 0 }; }).filter(b => b.lim);
   return { T, I, D, inc, exp, sav: inc - exp, rate: inc ? (inc - exp) / inc : 0, byCat: grp(D, t => t.cat || 'Sem categoria'), bySub: grp(D, t => (t.cat || 'Sem categoria') + ' › ' + (t.sub || '—')), incByCat: grp(I, t => t.cat || 'Sem categoria'), byAcc: grp(T.filter(t => t.type === 'Despesa'), t => acc(t.account)), byMethod: grp(D, t => t.method || 'Sem forma'),
-    ess: U.sum(D.filter(t => t.ess !== 'Supérfluo'), t => n(t.amount)), sup: U.sum(D.filter(t => t.ess === 'Supérfluo'), t => n(t.amount)), top: U.sortBy(D, t => -n(t.amount)).slice(0, 10), months, bud, days: Math.max(1, U.diff(to, R.from) + 1) }; };
+    ess: U.sum(D.filter(t => t.ess !== 'Supérfluo'), t => amt(t)), sup: U.sum(D.filter(t => t.ess === 'Supérfluo'), t => amt(t)), top: U.sortBy(D, t => -amt(t)).slice(0, 10), months, bud, days: Math.max(1, U.diff(to, R.from) + 1) }; };
 
 /* ================= investimentos ================= */
 // vendas com a mais/menos-valia (preço médio), igual aos Impostos, mas com datas e custos para os anexos
 RP.sales = () => { const X = IX(); if (!X || !X.st0) return []; const all = U.sortBy(OS.all('invtx'), t => t.date), state = {}, out = [];
-  all.forEach(t => { const a = OS.get('assets', t.asset); if (!a || X.isRF(a)) return; const st = state[a.id] = state[a.id] || X.st0(), fx = Inv.fx(a.currency), m = X.mult(a), before = st.realized, costBefore = st.cost, qtyBefore = st.qty, wasShort = st.qty < 0, hadLong = st.qty > 0;
+  all.forEach(t => { const a = OS.get('assets', t.asset); if (!a || X.isRF(a)) return; const st = state[a.id] = state[a.id] || X.st0(), fx = Inv.fx(a.currency) / bf(), m = X.mult(a), before = st.realized, costBefore = st.cost, qtyBefore = st.qty, wasShort = st.qty < 0, hadLong = st.qty > 0;
     X.step(st, t, m);
     if ((t.type === 'Venda' && hadLong) || t.type === 'Amortização') { const gain = st.realized - before, gross = t.type === 'Amortização' ? n(t.amount) : n(t.qty) * n(t.price) * m, acq = t.type === 'Amortização' ? gross - gain : (qtyBefore ? costBefore / qtyBefore * n(t.qty) : 0);
       const fb = U.sortBy(all.filter(x => x.asset === a.id && L.QTX.includes(x.type) && x.date <= t.date), x => x.date)[0];
       out.push({ t, a, date: t.date, qty: n(t.qty), gross, acq, fees: n(t.fees), gain, grossE: gross * fx, acqE: acq * fx, gainE: gain * fx, feesE: n(t.fees) * fx, buyDate: fb ? fb.date : '', held: fb ? U.diff(t.date, fb.date) : 0, dt: t.type === 'Venda' && all.some(x => x.asset === a.id && x.date === t.date && x.type === 'Compra'), short: wasShort }); } });
   return out; };
-RP.inv = R => { const to = R.to, inR = t => t.date >= R.from && t.date <= to, X = IX(), T = OS.all('invtx').filter(inR), fxOf = t => Inv.fx((OS.get('assets', t.asset) || {}).currency), gross = t => n(t.qty) * n(t.price) * (X ? X.mult(OS.get('assets', t.asset) || {}) : 1) * fxOf(t);
+RP.inv = R => { const to = R.to, inR = t => t.date >= R.from && t.date <= to, X = IX(), T = OS.all('invtx').filter(inR), fxOf = t => Inv.fx((OS.get('assets', t.asset) || {}).currency) / bf(), gross = t => n(t.qty) * n(t.price) * (X ? X.mult(OS.get('assets', t.asset) || {}) : 1) * fxOf(t);
   const buys = T.filter(t => t.type === 'Compra' || t.type === 'Subscrição'), sells = T.filter(t => t.type === 'Venda'), INC = X ? X.INC : new Set(L.INC), prov = T.filter(t => INC.has(t.type));
   const provRows = prov.map(t => { const a = OS.get('assets', t.asset) || {}, f = fxOf(t); return { t, a, type: t.type, gross: n(t.amount) * f, tax: n(t.tax) * f, net: (n(t.amount) - n(t.tax) - n(t.fees)) * f, cty: a.country || (X && X.ctyOf ? X.ctyOf(a) : ''), broker: a.broker || '' }; });
   const sales = RP.sales().filter(s => s.date >= R.from && s.date <= to), fees = U.sum(T, t => n(t.fees) * fxOf(t)) + U.sum(T.filter(t => t.type === 'Taxa'), t => n(t.amount) * fxOf(t));
@@ -6604,7 +6627,7 @@ RP.inv = R => { const to = R.to, inR = t => t.date >= R.from && t.date <= to, X 
     byAssetProv: Object.values(U.groupBy(provRows, r => r.a.id || '?')).map(arr => ({ a: arr[0].a, gross: U.sum(arr, r => r.gross), tax: U.sum(arr, r => r.tax), net: U.sum(arr, r => r.net), n: arr.length })).sort((a, b) => b.net - a.net) }; };
 // posição de cada ativo numa data (quantidade e custo na moeda do ativo)
 RP.posAt = date => { const X = IX(); if (!X || !X.st0) return []; const st = {}; U.sortBy(OS.all('invtx').filter(t => t.date <= date), t => t.date).forEach(t => { const a = OS.get('assets', t.asset); if (!a) return; if (X.isRF(a)) { const s = st[a.id] = st[a.id] || { a, qty: 0, cost: 0, rf: 1 }; if (L.QTX.includes(t.type)) { const v = n(t.qty) * n(t.price); if (/Compra|Subscri|entrada/.test(t.type)) { s.cost += v; s.qty += n(t.qty); } else { s.cost -= Math.min(s.cost, v); s.qty -= n(t.qty); } } return; } const s = st[a.id] = st[a.id] || Object.assign(X.st0(), { a }); X.step(s, t, X.mult(a)); });
-  return Object.values(st).filter(s => Math.abs(s.qty) > 1e-9 || (s.rf && s.cost > 0.005)).map(s => ({ a: s.a, qty: s.qty, cost: s.cost, costE: s.cost * Inv.fx(s.a.currency) })); };
+  return Object.values(st).filter(s => Math.abs(s.qty) > 1e-9 || (s.rf && s.cost > 0.005)).map(s => ({ a: s.a, qty: s.qty, cost: s.cost, costE: s.cost * Inv.fx(s.a.currency) / bf() })); };
 
 /* ================= IRS (Portugal) ================= */
 const yearsOld = y => n(tx().born) ? +y - n(tx().born) : null;
@@ -6633,7 +6656,7 @@ RP.irs = y => { const R = RP.range('a', String(y)), M = RP.money(R), I = RP.inv(
   // Capitais (E) e mais-valias (G / J): Portugal vs estrangeiro
   const isPTsrc = r => (r.cty === 'Portugal') && (!r.broker || brokerCty(r.broker) === 'Portugal' || !brokerCty(r.broker));
   const eForeign = I.provRows.filter(r => !isPTsrc(r) && r.a.currency !== undefined), ePT = I.provRows.filter(isPTsrc);
-  const salesPT = I.sales.filter(s => s.a.currency !== 'BRL' || tx().res !== 'BR'), cr = salesPT.filter(s => s.a.cls === 'Cripto'), crTax = cr.filter(s => s.held < 365), crEx = cr.filter(s => s.held >= 365), sec = salesPT.filter(s => s.a.cls !== 'Cripto');
+  const salesPT = I.sales.filter(s => s.a.currency !== 'BRL' || RK !== 'BR'), cr = salesPT.filter(s => s.a.cls === 'Cripto'), crTax = cr.filter(s => s.held < 365), crEx = cr.filter(s => s.held >= 365), sec = salesPT.filter(s => s.a.cls !== 'Cripto');
   const viaPT = s => brokerCty(s.a.broker) === 'Portugal', gPT = sec.filter(viaPT), jSales = sec.filter(s => !viaPT(s));
   const code = s => ['Opção', 'Futuro', 'CFD'].includes(s.a.cls) ? 'G10' : ['ETF', 'Fundo', 'FII', 'REIT'].includes(s.a.cls) ? 'G20' : 'G01';
   const gNet = U.sum(sec, s => s.gainE), crNet = U.sum(crTax, s => s.gainE);
@@ -6671,7 +6694,7 @@ RP.br = y => { const R = RP.range('a', String(y)), I = RP.inv(R), brS = RP.sales
 
 /* ================= geração automática e arquivo ================= */
 OS.S.reports = { label: 'Relatório', title: r => r.label || r.ref, fields: [{ k: 'note', l: 'Nota', t: 'area' }] };
-const snap = (per, ref) => { const R = RP.range(per, ref), M = RP.money(R), I = RP.inv(R); return { per, ref, label: R.label, at: Date.now(), seen: false, s: { inc: U.r2(M.inc), exp: U.r2(M.exp), sav: U.r2(M.sav), rate: M.rate, buys: U.r2(I.buys), prov: U.r2(I.provNet), gains: U.r2(I.gains) } }; };
+const snap = (per, ref) => { const R = RP.range(per, ref), k = RP.setCtx(RP.ctyFor(R)), M = RP.money(R), I = RP.inv(R); return { per, ref, cty: k, cur: RC, label: R.label, at: Date.now(), seen: false, s: { inc: U.r2(M.inc), exp: U.r2(M.exp), sav: U.r2(M.sav), rate: M.rate, buys: U.r2(I.buys), prov: U.r2(I.provNet), gains: U.r2(I.gains) } }; };
 RP.autogen = () => { if (!OS.all('transactions').length && !OS.all('invtx').length) return 0; const have = new Set(OS.all('reports').map(r => r.per + ':' + r.ref)); let k = 0;
   [['m', RP.defRef('m')], ['q', RP.defRef('q')], ['a', String(+U.today().slice(0, 4) - 1)]].forEach(([per, ref]) => { if (have.has(per + ':' + ref)) return; const R = RP.range(per, ref); if (!closed(R)) return; const firstTx = U.sortBy(OS.all('transactions').concat(OS.all('invtx')), t => t.date)[0]; if (!firstTx || firstTx.date > R.to) return; OS.add('reports', snap(per, ref), { silent: true }); k++; });
   return k; };
@@ -6693,21 +6716,21 @@ const csvBtn = id => `<button class="btn xs ghost rp-csv" data-act="rpCsv" data-
 
 const moneyBlock = (R, M, full) => { const prevR = RP.range(R.per, R.prev), PM = RP.money(prevR), d = (a, b) => b ? (a - b) / Math.abs(b) : null;
   return sec('Receitas e despesas', R.long, kpis([['Receitas', E(M.inc), PM.inc ? 'vs anterior ' + (d(M.inc, PM.inc) >= 0 ? '+' : '') + P(d(M.inc, PM.inc)) : ''], ['Despesas', E(M.exp), PM.exp ? 'vs anterior ' + (d(M.exp, PM.exp) >= 0 ? '+' : '') + P(d(M.exp, PM.exp)) : ''], ['Saldo (poupança)', ES(M.sav), '', tone(M.sav)], ['Taxa de poupança', M.inc ? P(M.rate) : '—', 'do que entrou', tone(M.rate)], ['Gasto médio por dia', E(M.exp / M.days), M.days + ' dias'], ['Essencial · supérfluo', P(M.exp ? M.ess / M.exp : 0) + ' · ' + P(M.exp ? M.sup / M.exp : 0), E(M.sup) + ' supérfluo']])
-    + (R.months.length > 1 ? `<div class="rp-chart">${C.mount({ type: 'bar', labels: M.months.map(m => U.fmtYM(m.ym)), series: [{ name: 'Receitas', data: M.months.map(m => m.inc), color: 'var(--pos)' }, { name: 'Despesas', data: M.months.map(m => m.exp), color: 'var(--neg)' }], fmt: v => U.eurK ? U.eurK(v) : E(v, 0) }, 190)}</div>` : '')
+    + (R.months.length > 1 ? `<div class="rp-chart">${C.mount({ type: 'bar', labels: M.months.map(m => U.fmtYM(m.ym)), series: [{ name: 'Receitas', data: M.months.map(m => m.inc), color: 'var(--pos)' }, { name: 'Despesas', data: M.months.map(m => m.exp), color: 'var(--neg)' }], fmt: v => RC !== 'BRL' && U.eurK ? U.eurK(v) : E(v, 0) }, 190)}</div>` : '')
     + `<div class="g g2"><div>${'<h4 class="rp-h4">Despesas por categoria ' + csvBtn('rpCat') + '</h4>'}${tbl(['Categoria', 'r:Valor', 'r:%', 'r:Movimentos'], (full ? M.byCat : M.byCat.slice(0, 6)).map(c => `<tr>${td(esc(c.k))}${td(E(c.v), 1)}${td(P(M.exp ? c.v / M.exp : 0, 1), 1)}${td(c.n, 1)}</tr>`), `<tr><th>Total</th><th class="r mono">${E(M.exp)}</th><th></th><th class="r mono">${M.D.length}</th></tr>`).replace('<table', '<table id="rpCat"')}</div>
       <div><h4 class="rp-h4">Receitas por categoria</h4>${tbl(['Categoria', 'r:Valor', 'r:%'], M.incByCat.map(c => `<tr>${td(esc(c.k))}${td(E(c.v), 1)}${td(P(M.inc ? c.v / M.inc : 0, 1), 1)}</tr>`), `<tr><th>Total</th><th class="r mono">${E(M.inc)}</th><th></th></tr>`)}</div></div>`
     + (full ? `<h4 class="rp-h4">Detalhe por subcategoria ${csvBtn('rpSub')}</h4>${tbl(['Categoria › subcategoria', 'r:Valor', 'r:%', 'r:N.º'], M.bySub.map(c => `<tr>${td(esc(c.k))}${td(E(c.v), 1)}${td(P(M.exp ? c.v / M.exp : 0, 1), 1)}${td(c.n, 1)}</tr>`)).replace('<table', '<table id="rpSub"')}
       <div class="g g2"><div><h4 class="rp-h4">Por conta / banco</h4>${tbl(['Conta', 'r:Gasto'], M.byAcc.map(c => `<tr>${td(esc(c.k))}${td(E(c.v), 1)}</tr>`))}</div><div><h4 class="rp-h4">Por forma de pagamento</h4>${tbl(['Forma', 'r:Valor'], M.byMethod.map(c => `<tr>${td(esc(c.k))}${td(E(c.v), 1)}</tr>`))}</div></div>
       ${R.months.length > 1 ? `<h4 class="rp-h4">Mês a mês</h4>${tbl(['Mês', 'r:Receitas', 'r:Despesas', 'r:Saldo', 'r:Taxa de poupança'], M.months.map(m => `<tr>${td(U.fmtYM(m.ym))}${td(E(m.inc), 1)}${td(E(m.exp), 1)}<td class="r mono ${tone(m.sav)}">${ES(m.sav)}</td>${td(m.inc ? P(m.sav / m.inc) : '—', 1)}</tr>`))}` : ''}
       ${M.bud.length ? `<h4 class="rp-h4">Orçamento</h4>${tbl(['Categoria', 'r:Gasto', 'r:Limite', 'r:Usado'], M.bud.map(b => `<tr>${td(esc(b.cat))}${td(E(b.sp), 1)}${td(E(b.lim), 1)}<td class="r mono ${b.p > 1 ? 'neg' : b.p > .85 ? 'warn' : 'pos'}">${P(b.p)}</td></tr>`))}` : ''}
-      <h4 class="rp-h4">Maiores despesas</h4>${tbl(['Data', 'Descrição', 'Categoria', 'r:Valor'], M.top.map(t => `<tr>${td(U.fmtD(t.date))}${td(esc(t.desc || '—'))}${td(esc((t.cat || '') + (t.sub ? ' › ' + t.sub : '')))}${td(E(n(t.amount)), 1)}</tr>`))}` : '')); };
+      <h4 class="rp-h4">Maiores despesas</h4>${tbl(['Data', 'Descrição', 'Categoria', 'r:Valor'], M.top.map(t => `<tr>${td(U.fmtD(t.date))}${td(esc(t.desc || '—'))}${td(esc((t.cat || '') + (t.sub ? ' › ' + t.sub : '')))}${td(E(amt(t)), 1)}</tr>`))}` : '')); };
 
 const invBlock = (R, I, full) => { const X = IX(), PV = X && X.passive ? X.passive(24) : null, pasR = PV ? U.sum(R.months, m => PV.by[m] ? U.sum(Object.values(PV.by[m]), x => x) : 0) : I.provNet, S = X ? X.summary() : null;
   return sec('Investimentos', R.long, kpis([['Comprado (aportes)', E(I.buys), I.nBuys + ' compra(s)'], ['Vendido', E(I.sells), I.nSells + ' venda(s)'], ['Mais/menos-valias realizadas', ES(I.gains), I.sales.length + ' venda(s)', tone(I.gains)], ['Proventos recebidos', E(I.provNet), 'bruto ' + E(I.provGross) + ' · retido ' + E(I.provTax)], ['Renda passiva no período', E(pasR), 'dividendos, juros, rendas'], ['Comissões e taxas', E(I.fees)], ...(S && closed(R) === false || R.to >= U.today() ? [['Carteira hoje', E(S ? S.val : 0), S ? 'L/P ' + ES(S.pl) : '']] : [])])
     + `<h4 class="rp-h4">Proventos por ativo ${csvBtn('rpProv')}</h4>${tbl(['Ativo', 'r:N.º', 'r:Bruto', 'r:Retido', 'r:Líquido'], (full ? I.byAssetProv : I.byAssetProv.slice(0, 6)).map(r => `<tr>${td(esc(r.a.ticker || r.a.name || '—'))}${td(r.n, 1)}${td(E(r.gross), 1)}${td(E(r.tax), 1)}${td(E(r.net), 1)}</tr>`), `<tr><th>Total</th><th></th><th class="r mono">${E(I.provGross)}</th><th class="r mono">${E(I.provTax)}</th><th class="r mono">${E(I.provNet)}</th></tr>`).replace('<table', '<table id="rpProv"')}
     ${I.sales.length ? `<h4 class="rp-h4">Vendas e mais-valias ${csvBtn('rpSales')}</h4>${tbl(['Data', 'Ativo', 'r:Qtd.', 'r:Valor de venda', 'r:Custo de aquisição', 'r:Mais/menos-valia', 'r:Detido'], I.sales.map(s => `<tr>${td(U.fmtD(s.date))}${td(esc(s.a.ticker || s.a.name))}${td(U.nf(s.qty, s.qty % 1 ? 4 : 0), 1)}${td(E(s.grossE), 1)}${td(E(s.acqE), 1)}<td class="r mono ${tone(s.gainE)}">${ES(s.gainE)}</td>${td(s.held + ' d', 1)}</tr>`)).replace('<table', '<table id="rpSales"')}` : ''}
     ${full ? `<h4 class="rp-h4">Todos os movimentos ${csvBtn('rpMov')}</h4>${tbl(['Data', 'Ativo', 'Tipo', 'r:Qtd.', 'r:Preço', 'r:Valor', 'r:Comissões'], U.sortBy(I.T, t => t.date).map(t => { const a = OS.get('assets', t.asset) || {}; return `<tr>${td(U.fmtD(t.date))}${td(esc(a.ticker || a.name || '—'))}${td(esc(t.type))}${td(t.qty ? U.nf(n(t.qty), 4) : '', 1)}${td(t.price ? U.nf(n(t.price), 4) : '', 1)}${td(t.amount ? U.nf(n(t.amount), 2) : t.qty ? U.nf(n(t.qty) * n(t.price), 2) : '', 1)}${td(t.fees ? U.nf(n(t.fees), 2) : '', 1)}</tr>`; })).replace('<table', '<table id="rpMov"')}
-      <h4 class="rp-h4">Carteira no fim do período ${csvBtn('rpPos')}</h4>${(() => { const ps = RP.posAt(R.to > U.today() ? U.today() : R.to); return tbl(['Ativo', 'Classe', 'Corretora', 'País', 'r:Quantidade', 'r:Custo (moeda)', 'r:Custo (€)'], ps.map(p => `<tr>${td(esc(p.a.ticker || p.a.name))}${td(esc(p.a.cls || ''))}${td(esc(p.a.broker || ''))}${td(esc(p.a.country || ''))}${td(U.nf(p.qty, p.qty % 1 ? 4 : 0), 1)}${td(X ? X.Mc(p.cost, p.a.currency || 'EUR') : U.nf(p.cost, 2), 1)}${td(E(p.costE), 1)}</tr>`), `<tr><th colspan="6">Total aplicado</th><th class="r mono">${E(U.sum(ps, p => p.costE))}</th></tr>`).replace('<table', '<table id="rpPos"'); })()}` : ''}`); };
+      <h4 class="rp-h4">Carteira no fim do período ${csvBtn('rpPos')}</h4>${(() => { const ps = RP.posAt(R.to > U.today() ? U.today() : R.to); return tbl(['Ativo', 'Classe', 'Corretora', 'País', 'r:Quantidade', 'r:Custo (moeda)', 'r:Custo (' + (RC === 'BRL' ? 'R$' : '€') + ')'], ps.map(p => `<tr>${td(esc(p.a.ticker || p.a.name))}${td(esc(p.a.cls || ''))}${td(esc(p.a.broker || ''))}${td(esc(p.a.country || ''))}${td(U.nf(p.qty, p.qty % 1 ? 4 : 0), 1)}${td(X ? X.Mc(p.cost, p.a.currency || 'EUR') : U.nf(p.cost, 2), 1)}${td(E(p.costE), 1)}</tr>`), `<tr><th colspan="6">Total aplicado</th><th class="r mono">${E(U.sum(ps, p => p.costE))}</th></tr>`).replace('<table', '<table id="rpPos"'); })()}` : ''}`); };
 
 const irsBlock = (y, short) => { const X = RP.irs(y), cfg = tx(), D = X.D2;
   const head = sec(`IRS ${y} · declaração Modelo 3 (entregue em ${+y + 1}, de 1 de abril a 30 de junho)`, 'estimativa com os teus dados', kpis([['Rendimento coletável', E(X.rc), 'taxa marginal ' + P(X.marg, 1)], ['Coleta (escalões)', E(X.colP), X.minEx != null ? 'limitada pelo mínimo de existência' : ''], ['Deduções à coleta', '−' + E(X.dedT)], ['Taxas autónomas', E(X.autE + X.autG + X.autC + X.autF), 'capitais, mais-valias, cripto, rendas'], ['Retenções já pagas', '−' + E(X.ret)], [X.total >= 0 ? 'A pagar (estimativa)' : 'A receber (estimativa)', E(Math.abs(X.total)), X.total >= 0 ? 'imposto em falta' : 'reembolso', X.total > 0 ? 'neg' : 'pos']])
@@ -6748,27 +6771,35 @@ const brBlock = y => { const B = RP.br(y), Mc = IX() ? (v => IX().Mc(v, 'BRL')) 
 const periodBar = R => `<div class="rp-bar"><div class="seg" role="group" aria-label="Período">${PER.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="rpPer" data-v="${k}">${l}</button>`).join('')}</div>
   <div class="rp-nav"><button class="icon-btn" data-act="rpGo" data-d="prev" aria-label="Período anterior">${UI.ic('left')}</button><b>${esc(R.label)}</b><button class="icon-btn" data-act="rpGo" data-d="next" aria-label="Período seguinte" ${R.from > U.today() ? 'disabled' : ''}>${UI.ic('right')}</button></div>
   <span class="grow"></span><button class="btn sm ghost" data-act="rpPrint">${UI.ic('note')}Imprimir / PDF</button><button class="btn sm ghost" data-act="rpDown">${UI.ic('arrowDown')}Descarregar</button></div>`;
-const docHead = (R, kind) => `<div class="rp-doc-h"><div><span class="eyebrow">Oceanum · relatório ${R.per === 'm' ? 'mensal' : R.per === 'q' ? 'trimestral' : 'anual'}</span><h2>${kind} — ${esc(R.long)}</h2><span class="mut">${esc((OS.one('profile') || {}).name || '')} · gerado a ${U.fmtD(U.today())}${R.to >= U.today() ? ' · período ainda a decorrer' : ''}</span></div></div>`;
+const CTYN = k => ((OS.Country && OS.Country.list || []).find(c => c[0] === k) || [k, k === 'BR' ? 'Brasil' : 'Portugal'])[1];
+const docHead = (R, kind) => `<div class="rp-doc-h"><div><span class="eyebrow">Oceanum · relatório ${R.per === 'm' ? 'mensal' : R.per === 'q' ? 'trimestral' : 'anual'} · ${esc(CTYN(RK))}</span><h2>${kind} — ${esc(R.long)}</h2><span class="mut">${esc((OS.one('profile') || {}).name || '')} · gerado a ${U.fmtD(U.today())}${R.to >= U.today() ? ' · período ainda a decorrer' : ''}</span></div></div>`;
 const summary = (R, M, I) => sec('Resumo', '', kpis([['Entrou', E(M.inc)], ['Saiu', E(M.exp)], ['Poupado', ES(M.sav), M.inc ? P(M.rate) + ' do que entrou' : '', tone(M.sav)], ['Investido', E(I.buys)], ['Proventos', E(I.provNet)], ['Mais-valias', ES(I.gains), '', tone(I.gains)]]));
 const taxMonth = (R, I) => { const brS = I.sales.filter(s => s.a.currency === 'BRL'), pt = I.sales.filter(s => s.a.currency !== 'BRL'), resv = Math.max(0, U.sum(pt, s => s.gainE)) * .28 + Math.max(0, U.sum(I.provRows.filter(r => r.cty !== 'Portugal'), r => r.gross * .28 - Math.min(r.tax, r.gross * .28)));
   return sec('Impostos deste período', '', kpis([['Retido na fonte', E(I.provTax), 'proventos'], ['Guardar para o IRS', E(resv), '28% de mais-valias e dividendos estrangeiros'], ['Vendas no Brasil', brS.length ? brS.length + ' venda(s)' : '—', brS.length ? 'vê o DARF em Investimentos → Impostos' : '']])); };
 
-V.relatorios = sub => { const s = sub || '', R = cur(), head = UI.head('Relatórios', 'Relatórios do teu dinheiro: mensal (resumido), trimestral e anual (completo), em formato pronto para a declaração de IRS. Gerados sozinhos quando cada período fecha.', '', 'Dinheiro') + UI.tabs('relatorios', TABS, s);
+V.relatorios = sub => { const s = sub || '', R = cur(); RP.setCtx(RP.ctyFor(R)); const now = RP.cty(), BRm = RK === 'BR', PTm = RK === 'PT', TX = now === 'BR' ? 'IRPF' : now === 'PT' ? 'IRS' : '';
+  const head = UI.head('Relatórios', `Relatórios do teu dinheiro: mensal (resumido), trimestral e anual (completo)${TX ? ', em formato pronto para a declaração de ' + TX + ' (' + CTYN(now) + ')' : ''}. Seguem o país que escolheste na app; os que já foram gerados ficam como estavam. Gerados sozinhos quando cada período fecha.`, OS.Country && OS.Country.btn ? OS.Country.btn() : '', 'Dinheiro') + UI.tabs('relatorios', TABS.map(t => t[0] === 'completo' ? ['completo', 'Completo' + (now === 'BR' ? ' (IRPF)' : now === 'PT' ? ' (IRS)' : '')] : t), s);
   if (s === 'arquivo') { const Rs = U.sortBy(OS.all('reports').filter(r => r && /^[mqa]$/.test(r.per || '') && r.ref).map(r => Object.assign({}, r, { s: Object.assign({ inc: 0, exp: 0, sav: 0, buys: 0, prov: 0 }, r.s || {}) })), r => -(r.at || 0));
-    return head + `<div class="pn"><div class="pn-h"><h3>Relatórios gerados</h3><span class="mut" style="font-size:12px">um por mês, trimestre e ano, logo que fecham</span></div>${Rs.length ? tbl(['Período', 'Tipo', 'r:Entrou', 'r:Saiu', 'r:Poupado', 'r:Investido', 'r:Proventos', ''], Rs.map(r => `<tr class="${r.seen ? '' : 'rp-new'}">${td(esc(r.label) + (r.seen ? '' : ' <span class="bdg acc">novo</span>'))}${td(r.per === 'm' ? 'Mensal' : r.per === 'q' ? 'Trimestral' : 'Anual')}${td(E(r.s.inc), 1)}${td(E(r.s.exp), 1)}<td class="r mono ${tone(r.s.sav)}">${ES(r.s.sav)}</td>${td(E(r.s.buys), 1)}${td(E(r.s.prov), 1)}<td><button class="btn xs" data-act="rpOpen" data-per="${r.per}" data-ref="${esc(r.ref)}" data-k="${r.per === 'm' ? 'receitas' : 'completo'}">Abrir</button></td></tr>`)) : UI.empty('Ainda não há relatórios gerados. O primeiro aparece quando o mês acabar.')}</div>`; }
-  if (!s) { const t = U.today(), y = t.slice(0, 4), m = RP.range('m', RP.defRef('m')), q = RP.range('q', RP.defRef('q')), a = RP.range('a', RP.defRef('a')), MM = RP.money(m), MQ = RP.money(q), MA = RP.money(a), X = RP.irs(RP.defRef('a'));
-    const card = (Rr, M, per, k, txt) => `<div class="pn rp-card"><span class="eyebrow">${per === 'm' ? 'Mensal · resumido' : per === 'q' ? 'Trimestral · completo' : 'Anual · declaração de IRS'}</span><h3>${esc(Rr.label)}</h3><div class="rp-cn"><div><small>Entrou</small><b class="mono">${E(M.inc, 0)}</b></div><div><small>Saiu</small><b class="mono">${E(M.exp, 0)}</b></div><div><small>Poupado</small><b class="mono ${tone(M.sav)}">${ES(M.sav)}</b></div></div><p class="mut">${txt}</p><button class="btn sm pri" data-act="rpOpen" data-per="${per}" data-ref="${Rr.ref}" data-k="${k}">Abrir relatório</button></div>`;
-    const DL = [[y + '-02-25', 'Validar faturas no e-fatura (despesas do ano anterior)'], [y + '-03-15', 'Consultar e reclamar as deduções no Portal das Finanças'], [y + '-04-01', 'Começa a entrega do IRS (até 30 de junho)'], [y + '-06-30', 'Último dia para entregar o IRS'], [y + '-05-31', 'IMI: 1.ª prestação (ou pagamento único)'], [y + '-08-31', 'IMI: 2.ª prestação'], [y + '-11-30', 'IMI: 3.ª prestação'], [y + '-04-30', 'Brasil: entrega do IRPF (se residente, confirma a data do ano)'], ...(tx().indep ? [[y + '-01-31', 'Segurança Social: declaração trimestral (out–dez)'], [y + '-04-30', 'Segurança Social: declaração trimestral (jan–mar)'], [y + '-07-31', 'Segurança Social: declaração trimestral (abr–jun)'], [y + '-10-31', 'Segurança Social: declaração trimestral (jul–set)']] : [])].filter(d => d[0] >= t).sort((a2, b2) => a2[0] < b2[0] ? -1 : 1).slice(0, 6);
-    return head + `<div class="g g3">${card(m, MM, 'm', 'receitas', 'Receitas, despesas, poupança, investimentos e o que guardar para impostos.')}${card(q, MQ, 'q', 'completo', 'Tudo do mês, mais mês a mês, subcategorias, contas, investimentos completos e IRS acumulado.')}${card(a, MA, 'a', 'completo', `IRS ${a.ref}: ${X.total >= 0 ? 'a pagar ~' : 'a receber ~'}${E(Math.abs(X.total), 0)} (estimativa), com todos os anexos.`)}</div>
+    return head + `<div class="pn"><div class="pn-h"><h3>Relatórios gerados</h3><span class="mut" style="font-size:12px">um por mês, trimestre e ano, logo que fecham</span></div>${Rs.length ? tbl(['Período', 'Tipo', 'r:Entrou', 'r:Saiu', 'r:Poupado', 'r:Investido', 'r:Proventos', ''], Rs.map(r => { RP.setCtx(r.cty || 'PT'); return `<tr class="${r.seen ? '' : 'rp-new'}">${td(esc(r.label) + (r.seen ? '' : ' <span class="bdg acc">novo</span>'))}${td((r.per === 'm' ? 'Mensal' : r.per === 'q' ? 'Trimestral' : 'Anual') + ' · ' + esc(CTYN(r.cty || 'PT')))}${td(E(r.s.inc), 1)}${td(E(r.s.exp), 1)}<td class="r mono ${tone(r.s.sav)}">${ES(r.s.sav)}</td>${td(E(r.s.buys), 1)}${td(E(r.s.prov), 1)}<td><button class="btn xs" data-act="rpOpen" data-per="${r.per}" data-ref="${esc(r.ref)}" data-k="${r.per === 'm' ? 'receitas' : 'completo'}">Abrir</button></td></tr>`; })) : UI.empty('Ainda não há relatórios gerados. O primeiro aparece quando o mês acabar.')}</div>`; }
+  if (!s) { const t = U.today(), y = t.slice(0, 4), m = RP.range('m', RP.defRef('m')), q = RP.range('q', RP.defRef('q')), a = RP.range('a', RP.defRef('a'));
+    RP.setCtx(RP.ctyFor(a)); const XA = RK === 'BR' ? RP.irpf && RP.irpf(a.ref) : RK === 'PT' ? RP.irs(a.ref) : null, aTot = XA ? (RK === 'BR' ? XA.saldo : XA.total) : 0, X = { warn: XA ? XA.warn : [] }, aK = RK;
+    const card = (Rr, per, k, tf) => { RP.setCtx(RP.ctyFor(Rr)); const M = RP.money(Rr), txt = typeof tf === 'function' ? tf() : tf; return `<div class="pn rp-card"><span class="eyebrow">${per === 'm' ? 'Mensal · resumido' : per === 'q' ? 'Trimestral · completo' : RK === 'BR' ? 'Anual · declaração de IRPF' : RK === 'PT' ? 'Anual · declaração de IRS' : 'Anual · completo'}</span><h3>${esc(Rr.label)}</h3><div class="rp-cn"><div><small>Entrou</small><b class="mono">${E(M.inc, 0)}</b></div><div><small>Saiu</small><b class="mono">${E(M.exp, 0)}</b></div><div><small>Poupado</small><b class="mono ${tone(M.sav)}">${ES(M.sav)}</b></div></div><p class="mut">${txt}</p><button class="btn sm pri" data-act="rpOpen" data-per="${per}" data-ref="${Rr.ref}" data-k="${k}">Abrir relatório</button></div>`; };
+    const DLBR = RP.deadlinesBR ? RP.deadlinesBR(y).concat(RP.deadlinesBR(String(+y + 1))) : [];
+    const DLPT = [[y + '-02-25', 'Validar faturas no e-fatura (despesas do ano anterior)'], [y + '-03-15', 'Consultar e reclamar as deduções no Portal das Finanças'], [y + '-04-01', 'Começa a entrega do IRS (até 30 de junho)'], [y + '-06-30', 'Último dia para entregar o IRS'], [y + '-05-31', 'IMI: 1.ª prestação (ou pagamento único)'], [y + '-08-31', 'IMI: 2.ª prestação'], [y + '-11-30', 'IMI: 3.ª prestação'], [y + '-04-30', 'Brasil: entrega do IRPF (se residente, confirma a data do ano)'], ...(tx().indep ? [[y + '-01-31', 'Segurança Social: declaração trimestral (out–dez)'], [y + '-04-30', 'Segurança Social: declaração trimestral (jan–mar)'], [y + '-07-31', 'Segurança Social: declaração trimestral (abr–jun)'], [y + '-10-31', 'Segurança Social: declaração trimestral (jul–set)']] : [])];
+    const DL = (now === 'BR' ? DLBR : now === 'PT' ? DLPT : []).filter(d => d[0] >= t).sort((a2, b2) => a2[0] < b2[0] ? -1 : 1).filter((d, i, arr) => !arr.slice(0, i).some(x => x[1] === d[1])).slice(0, 6);
+    return head + `<div class="g g3">${card(m, 'm', 'receitas', 'Receitas, despesas, poupança, investimentos e o que guardar para impostos.')}${card(q, 'q', 'completo', () => 'Tudo do mês, mais mês a mês, subcategorias, contas, investimentos completos e ' + (RK === 'BR' ? 'impostos do Brasil (carnê-leão, DARF, IRPF acumulado).' : RK === 'PT' ? 'IRS acumulado.' : 'impostos.'))}${card(a, 'a', 'completo', () => aK === 'BR' ? `IRPF ${+a.ref + 1}: ${aTot >= 0 ? 'a pagar ~' : 'a restituir ~'}${E(Math.abs(aTot), 0)} (estimativa), com todas as fichas.` : aK === 'PT' ? `IRS ${a.ref}: ${aTot >= 0 ? 'a pagar ~' : 'a receber ~'}${E(Math.abs(aTot), 0)} (estimativa), com todos os anexos.` : 'Receitas, despesas, poupança e investimentos do ano.')}</div>
       <div class="g g2"><div class="pn"><div class="pn-h"><h3>${UI.ic('cal')}Próximos prazos</h3></div><div class="list">${DL.map(([d, l]) => `<div class="li"><span class="when">${U.fmtD(d)}</span><div class="li-t"><b>${esc(l)}</b><small>daqui a ${U.diff(d, t)} dias</small></div></div>`).join('') || '<p class="mut">Sem prazos próximos.</p>'}</div></div>
-      <div class="pn"><div class="pn-h"><h3>${UI.ic('info')}Para o relatório de IRS sair certo</h3><a class="acc" href="#definicoes.impostos" style="font-size:12px">Definições → Impostos →</a></div><div class="list">${(X.warn.length ? X.warn : ['Os teus dados estão prontos para a declaração.']).concat(['Nos salários, preenche o valor bruto, a retenção de IRS e a Segurança Social (campos do movimento).', 'Liga as rendas e as despesas dos imóveis com o campo Imóvel.', 'Preenche o país e a corretora de cada ativo (anexo J).']).slice(0, 6).map(w => `<div class="li"><div class="li-t"><small style="font-size:13px;color:var(--tx)">${esc(w)}</small></div></div>`).join('')}</div></div></div>`; }
-  const M = RP.money(R), I = RP.inv(R), full = R.per !== 'm', y = R.from.slice(0, 4);
+      <div class="pn"><div class="pn-h"><h3>${UI.ic('info')}Para o relatório ${now === 'BR' ? 'de IRPF' : now === 'PT' ? 'de IRS' : ''} sair certo</h3><a class="acc" href="#definicoes.impostos" style="font-size:12px">Definições → Impostos →</a></div><div class="list">${(X.warn.length ? X.warn : ['Os teus dados estão prontos para a declaração.']).concat(now === 'BR' ? ['Nos salários, preenche o valor bruto, o INSS e o IRRF (estão no informe de rendimentos).', 'Regista as consultas médicas e as mensalidades com a subcategoria certa (contam como dedução).', 'Liga os aluguéis recebidos ao imóvel e preenche o país e a corretora de cada ativo.'] : now === 'PT' ? ['Nos salários, preenche o valor bruto, a retenção de IRS e a Segurança Social (campos do movimento).', 'Liga as rendas e as despesas dos imóveis com o campo Imóvel.', 'Preenche o país e a corretora de cada ativo (anexo J).'] : ['Neste país o relatório mostra receitas, despesas e investimentos; o formato da declaração fiscal existe para Portugal e Brasil.']).slice(0, 6).map(w => `<div class="li"><div class="li-t"><small style="font-size:13px;color:var(--tx)">${esc(w)}</small></div></div>`).join('')}</div></div></div>`; }
+  RP.setCtx(RP.ctyFor(R)); const M = RP.money(R), I = RP.inv(R), full = R.per !== 'm', y = R.from.slice(0, 4);
   let body = '';
   if (s === 'receitas') body = docHead(R, 'Receitas e despesas') + moneyBlock(R, M, full);
-  else if (s === 'investimentos') body = docHead(R, 'Investimentos') + invBlock(R, I, full) + (R.per === 'a' ? sec('Para a declaração', '', `<p class="mut">As tabelas por anexo (J 8A, J 9.2A, G, G1) estão no relatório <a class="acc" href="#relatorios.completo">Completo (IRS)</a>.</p>`) : '');
+  else if (s === 'investimentos') body = docHead(R, 'Investimentos') + invBlock(R, I, full) + (R.per === 'a' && (PTm || BRm) ? sec('Para a declaração', '', PTm ? `<p class="mut">As tabelas por anexo (J 8A, J 9.2A, G, G1) estão no relatório <a class="acc" href="#relatorios.completo">Completo (IRS)</a>.</p>` : `<p class="mut">As fichas do IRPF (bens e direitos, isentos, exclusivos, renda variável e exterior) estão no relatório <a class="acc" href="#relatorios.completo">Completo (IRPF)</a>.</p>`) : '');
+  else if (BRm) body = docHead(R, R.per === 'a' ? 'Relatório completo e declaração de IRPF' : 'Relatório completo') + summary(R, M, I) + moneyBlock(R, M, full) + invBlock(R, I, full) + (R.per === 'a' ? RP.irpfBlock(y, false) : RP.taxMonthBR(R, I, M) + (R.per === 'q' ? RP.irpfBlock(y, true) : ''));
+  else if (!PTm) body = docHead(R, 'Relatório completo') + summary(R, M, I) + moneyBlock(R, M, full) + invBlock(R, I, full) + sec('Impostos', '', `<p class="mut">O formato da declaração fiscal existe para Portugal e para o Brasil. Para ${esc(CTYN(RK))} o relatório mostra receitas, despesas e investimentos, prontos para o teu contabilista.</p>`);
   else body = docHead(R, R.per === 'a' ? 'Relatório completo e declaração de IRS' : 'Relatório completo') + summary(R, M, I) + moneyBlock(R, M, full) + invBlock(R, I, full) + (R.per === 'm' ? taxMonth(R, I) : R.per === 'q' ? taxMonth(R, I) + irsBlock(y, true) + (tx().indep && M.I.some(t => t.cat === 'Serviços próprios') ? sec('Segurança Social (trabalhador independente)', 'declaração trimestral', (() => { const b = U.sum(M.I.filter(t => t.cat === 'Serviços próprios'), t => n(t.gross) || n(t.amount)); return kpis([['Serviços no trimestre', E(b)], ['Rendimento relevante (70%)', E(b * .7)], ['Contribuição estimada (21,4%)', E(b * .7 * .214 / 3) + '/mês', 'primeiro ano: isento']]); })()) : '') : irsBlock(y, false) + brBlock(y));
-  return head + periodBar(R) + `<div class="pn rp-doc" id="rpDoc">${body}<p class="mut rp-n rp-disc">Relatório gerado pelo Oceanum com os dados que registaste. Os valores fiscais são estimativas para preparar a declaração: confirma no Portal das Finanças (e na Receita Federal) ou com um contabilista certificado.</p></div>`; };
+  return head + periodBar(R) + `<div class="pn rp-doc" id="rpDoc">${body}<p class="mut rp-n rp-disc">Relatório gerado pelo Oceanum com os dados que registaste, no formato de ${esc(CTYN(RK))}. Os valores fiscais são estimativas para preparar a declaração: confirma ${BRm ? 'no programa da Receita Federal (ou na declaração pré-preenchida) ou com um contador' : 'no Portal das Finanças ou com um contabilista certificado'}.</p></div>`; };
 
+RP._h = { sec, kpis, tbl, td, E: (v, d) => E(v, d), ES: v => ES(v), P, tone, csvBtn, money: (R, M, f) => moneyBlock(R, M, f), inv: (R, I, f) => invBlock(R, I, f), summary: (R, M, I) => summary(R, M, I), docHead: (R, k) => docHead(R, k) };
 /* ---------- exportar ---------- */
 A.rpPrint = () => { document.body.classList.add('rp-printing'); setTimeout(() => { try { window.print(); } catch (e) { } setTimeout(() => document.body.classList.remove('rp-printing'), 800); }, 60); };
 A.rpDown = () => { const el = document.getElementById('rpDoc'); if (!el) return; const R = cur();
@@ -6779,17 +6810,101 @@ A.rpCsv = b => { const t = document.getElementById(b.dataset.id); if (!t) return
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv' })); a.download = 'oceanum-' + b.dataset.id.replace(/^rp/, '').toLowerCase() + '-' + cur().ref + '.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); };
 
 /* ---------- Definições → Impostos ---------- */
-RP.settings = () => { const c = tx(), f = (k, l, inp, h = '') => `<label class="fld"><span>${l}</span>${inp}${h ? `<small class="mut">${h}</small>` : ''}</label>`, num = (k, ph = '') => `<input class="field" type="number" step="any" data-bind="tax.${k}" value="${esc(c[k] == null ? '' : c[k])}" placeholder="${ph}">`;
-  return `<div class="pn" id="taxSet"><div class="pn-h"><h3>${UI.ic('note')}Impostos (para os Relatórios)</h3></div><p class="mut" style="margin:0 0 10px">Só servem para o relatório anual sair no formato certo da declaração. Nada sai do teu aparelho.</p>
-    <div class="set-grid">${f('res', 'Residência fiscal', `<select class="field" data-bind="tax.res">${[['PT', 'Portugal'], ['BR', 'Brasil']].map(([v, l]) => `<option value="${v}"${c.res === v ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'Onde vives mais de 183 dias por ano.')}
-    ${f('brRes', 'Ainda sou residente fiscal no Brasil', `<select class="field" data-bind="tax.brRes"><option value=""${!c.brRes ? ' selected' : ''}>Não (fiz a saída definitiva)</option><option value="1"${c.brRes ? ' selected' : ''}>Sim (entrego o IRPF)</option></select>`)}
+RP.settings = () => { const c = tx(), k = RP.cty(), f = (k2, l, inp, h = '') => `<label class="fld"><span>${l}</span>${inp}${h ? `<small class="mut">${h}</small>` : ''}</label>`, num = (k2, ph = '') => `<input class="field" type="number" step="any" data-bind="tax.${k2}" value="${esc(c[k2] == null ? '' : c[k2])}" placeholder="${ph}">`, yn = (k2, no, yes) => `<select class="field" data-bind="tax.${k2}"><option value=""${!c[k2] ? ' selected' : ''}>${no}</option><option value="1"${c[k2] ? ' selected' : ''}>${yes}</option></select>`;
+  const pais = `<div class="rp-cty"><div><b>País dos relatórios: ${esc(CTYN(k))}</b><small class="mut">É o país que escolheste na app. Os relatórios novos seguem-no${k === 'BR' ? ' (IRPF, carnê-leão e DARF, em reais)' : k === 'PT' ? ' (IRS, em euros)' : ''}; os que já foram gerados ficam como estavam.</small></div>${OS.Country && OS.Country.btn ? OS.Country.btn() : ''}</div>`;
+  const body = k === 'BR' ? `<div class="set-grid">${f('deps', 'Dependentes', num('deps', '0'), 'Cada um deduz R$ 2.275,08 na declaração completa.')}${f('born', 'Ano de nascimento', num('born', 'ex.: 2004'), 'Para os prazos e a previdência.')}</div>
+      <p class="mut rp-n" style="margin-top:10px">Para o IRPF sair certo: nos salários preenche o valor bruto, o INSS e o IRRF (estão no informe de rendimentos); regista consultas, planos de saúde e mensalidades com a subcategoria certa; liga os aluguéis recebidos ao imóvel. O relatório escolhe sozinho entre a declaração completa e a simplificada.</p>`
+    : k === 'PT' ? `<div class="set-grid">${f('brRes', 'Ainda sou residente fiscal no Brasil', yn('brRes', 'Não (fiz a saída definitiva)', 'Sim (entrego o IRPF)'))}
     ${f('born', 'Ano de nascimento', num('born', 'ex.: 2004'), 'IRS Jovem (até aos 35) e limite do PPR.')}${f('firstWork', 'Ano do primeiro rendimento de trabalho', num('firstWork', 'ex.: 2025'), 'O IRS Jovem conta 10 anos a partir daqui.')}
-    ${f('deps', 'Dependentes', num('deps', '0'))}${f('indep', 'Trabalhador independente (recibos verdes)', `<select class="field" data-bind="tax.indep"><option value=""${!c.indep ? ' selected' : ''}>Não</option><option value="1"${c.indep ? ' selected' : ''}>Sim</option></select>`)}
-    ${f('coef', 'Coeficiente do regime simplificado', num('coef', '0,75'), '0,75 para profissões do art. 151.º; 0,35 para outros serviços.')}${f('englobar', 'Englobar rendas e rendimentos', `<select class="field" data-bind="tax.englobar"><option value=""${!c.englobar ? ' selected' : ''}>Não (taxas autónomas)</option><option value="1"${c.englobar ? ' selected' : ''}>Sim</option></select>`)}</div></div>`; };
+    ${f('deps', 'Dependentes', num('deps', '0'))}${f('indep', 'Trabalhador independente (recibos verdes)', yn('indep', 'Não', 'Sim'))}
+    ${f('coef', 'Coeficiente do regime simplificado', num('coef', '0,75'), '0,75 para profissões do art. 151.º; 0,35 para outros serviços.')}${f('englobar', 'Englobar rendas e rendimentos', yn('englobar', 'Não (taxas autónomas)', 'Sim'))}</div>`
+    : `<p class="mut">O formato da declaração fiscal existe para Portugal e para o Brasil. Para ${esc(CTYN(k))} os relatórios mostram receitas, despesas e investimentos, prontos para o teu contabilista.</p>`;
+  return `<div class="pn" id="taxSet"><div class="pn-h"><h3>${UI.ic('note')}Impostos (para os Relatórios)</h3></div><p class="mut" style="margin:0 0 10px">Só servem para o relatório sair no formato certo da declaração. Nada sai do teu aparelho.</p>${pais}${body}</div>`; };
 
 /* ---------- campos fiscais nos movimentos (salários, serviços e rendas) ---------- */
 (() => { const fs = OS.S.transactions.fields; if (fs.some(f => f.k === 'gross')) return; const i = fs.findIndex(f => f.k === 'method'), fisc = r => r.type === 'Receita' && ['Salário', 'Serviços próprios', 'Rendas'].includes(r.cat);
   fs.splice(i < 0 ? fs.length : i, 0, { k: 'gross', l: 'Valor bruto (antes de impostos)', t: 'money', show: fisc, h: 'Para o IRS: o valor antes da retenção e da Segurança Social.' }, { k: 'wht', l: 'Retenção na fonte de IRS', t: 'money', show: fisc }, { k: 'ss', l: 'Segurança Social descontada', t: 'money', show: r => r.type === 'Receita' && r.cat === 'Salário' }, { k: 'payer', l: 'Entidade pagadora', t: 'text', show: fisc, h: 'Empresa ou cliente (aparece no anexo A ou B).' }); })();
+})();
+
+</script>
+<script>
+/* OCEANUM — Relatórios no formato do Brasil (quando o país da app é o Brasil):
+   Declaração de Ajuste Anual do IRPF por fichas (rendimentos tributáveis de PJ e de PF/exterior, isentos, tributação exclusiva,
+   renda variável, bens e direitos, dívidas e ônus, pagamentos efetuados), simulação completa x simplificada, carnê-leão mês a mês,
+   DARF da renda variável e aplicações no exterior (Lei 14.754/2023). Valores em reais. Estimativa: confirma no programa da Receita
+   Federal (ou na declaração pré-preenchida) ou com um contador. */
+(() => {
+'use strict';
+const U = OS.U, L = OS.L, esc = U.esc, Fin = OS.Fin, RP = OS.Reports;
+const n = v => U.num(v) || 0, h = () => RP._h, Inv = OS.Inv;
+// valor numa moeda → reais (contas, imóveis e dívidas guardam a sua moeda; sem moeda = euros)
+const toR = (cur, v) => { const x = Number(v) || 0, c = cur || 'EUR'; return c === 'BRL' ? x : x * (Inv.fx(c) || 1) / (Inv.fx('BRL') || 1); };
+RP.toR = toR;
+// tabela mensal (carnê-leão e retenção): até abril de 2025 / a partir de maio de 2025
+const MTAB = { a: [[2259.20, 0, 0], [2826.65, .075, 169.44], [3751.05, .15, 381.44], [4664.68, .225, 662.77], [Infinity, .275, 896.00]], b: [[2428.80, 0, 0], [2826.65, .075, 182.16], [3751.05, .15, 394.16], [4664.68, .225, 675.49], [Infinity, .275, 908.73]] };
+const ATAB = { 2024: [[26963.20, 0, 0], [33919.80, .075, 2022.24], [45012.60, .15, 4566.23], [55976.16, .225, 7942.17], [Infinity, .275, 10740.98]], 2025: [[28467.20, 0, 0], [33919.80, .075, 2135.04], [45012.60, .15, 4679.03], [55976.16, .225, 8054.97], [Infinity, .275, 10853.78]] };
+const tab = (T, b) => { const r = T.find(x => b <= x[0]) || T[T.length - 1]; return Math.max(0, b * r[1] - r[2]); };
+// a partir de 2026: isenção até R$ 5 mil/mês (R$ 60 mil/ano) com redução gradual até R$ 7.350/mês (R$ 88.200/ano) — confirma as regras do ano
+const redM = (ym, b, t) => ym < '2026-01' ? 0 : b <= 5000 ? t : b <= 7350 ? Math.min(t, Math.max(0, 978.62 - .133145 * b)) : 0;
+const redA = (y, b, t) => +y < 2026 ? 0 : b <= 60000 ? t : b <= 88200 ? Math.min(t, Math.max(0, 8429.73 - .095575 * b)) : 0;
+RP.carneM = (ym, base) => { const T = ym < '2025-05' ? MTAB.a : MTAB.b, desc = ym < '2025-05' ? 564.80 : 607.20, b = Math.max(0, base - desc), t = tab(T, b); return Math.max(0, t - redM(ym, base, t)); };
+const DESC_SIMPL = 16754.34, DEP = 2275.08, EDU = 3561.50;
+
+RP.irpf = y => { const { E } = h(), R = RP.range('a', String(y)), M = RP.money(R), I = RP.inv(R), cfg = OS.one('tax'), out = { y, R, M, I, warn: [] };
+  // tributáveis de pessoa jurídica (salários): fonte pagadora, rendimento, INSS e IRRF
+  const sal = M.I.filter(t => t.cat === 'Salário'), pj = Object.values(U.groupBy(sal, t => (t.payer || t.desc || 'Fonte pagadora').trim())).map(a => ({ payer: (a[0].payer || a[0].desc || 'Fonte pagadora').trim(), gross: U.sum(a, t => RP.cv(t, n(t.gross) || n(t.amount))), inss: U.sum(a, t => RP.cv(t, t.ss)), irrf: U.sum(a, t => RP.cv(t, t.wht)), liq: a.filter(t => !n(t.gross)).length }));
+  if (pj.some(r => r.liq)) out.warn.push('Alguns salários estão só com o valor líquido: indica o bruto, o INSS e o IRRF (estão no informe de rendimentos da empresa).');
+  // tributáveis de pessoa física e do exterior (carnê-leão): serviços próprios e aluguéis recebidos de pessoas físicas
+  const pfT = M.I.filter(t => t.cat === 'Serviços próprios' || t.cat === 'Rendas' || t.prop), months = R.months.map(ym => { const b = U.sum(pfT.filter(t => U.ym(t.date) === ym), t => RP.cv(t, n(t.gross) || n(t.amount))); return { ym, b, t: b ? RP.carneM(ym, b) : 0 }; });
+  const pfG = U.sum(months, m => m.b), carne = U.sum(months, m => m.t);
+  // isentos e exclusivos (ativos do Brasil)
+  const br = I.provRows.filter(r => r.a.currency === 'BRL'), ex = I.provRows.filter(r => r.a.currency !== 'BRL');
+  const div = U.sum(br.filter(r => r.type === 'Dividendo'), r => r.gross), fii = U.sum(br.filter(r => r.type === 'Rendimento'), r => r.gross), jcp = U.sum(br.filter(r => r.type === 'JCP'), r => r.net), jcpIR = U.sum(br.filter(r => r.type === 'JCP'), r => r.tax);
+  const isRFx = r => ['LCI/LCA', 'Poupança', 'CRI/CRA'].includes(r.a.cls), juI = U.sum(br.filter(r => r.type === 'Juros' && isRFx(r)), r => r.gross), juT = U.sum(br.filter(r => r.type === 'Juros' && !isRFx(r)), r => r.net);
+  const B = RP.br(y), vend = B.isentos ? B.isentos.vendas : 0;
+  const bolsa = U.sum(M.I.filter(t => t.cat === 'Bolsas'), t => RP.amt(t));
+  // exterior (Lei 14.754/2023): rendimentos e ganhos de aplicações fora do Brasil, 15% por ano, com crédito do imposto pago lá fora
+  const exG = U.sum(I.sales.filter(s => s.a.currency !== 'BRL'), s => s.gainE), exR = U.sum(ex, r => r.gross), exTax = U.sum(ex, r => r.tax), exIR = Math.max(0, (Math.max(0, exG) + exR) * .15 - Math.min(exTax, exR * .15));
+  // bens e direitos em 31/12, dívidas e ônus
+  const pos = RP.posAt(R.to), contas = Fin.accounts().map(a => ({ a, v: toR(a.currency, Fin.accBal(a, R.to)) })).filter(x => x.v > 140), props = OS.all('props').map(p => Object.assign({}, p, { costR: toR(p.currency, (n(p.buyPrice) + n(p.buyCosts) + n(p.works)) * (n(p.share) || 100) / 100) }));
+  const dividas = OS.all('debts').map(d => ({ name: d.name, cred: d.creditor || '', v: toR('EUR', Fin.debtBal(d)) })).concat(props.filter(p => n(p.loanBal) && !p.debt).map(p => ({ name: 'Financiamento · ' + p.name, cred: p.loanBank || '', v: toR(p.currency, p.loanBal) }))).filter(x => x.v > 5000);
+  // pagamentos efetuados (deduções da declaração completa)
+  const saude = U.sum(M.D.filter(t => t.cat === 'Saúde' && /Consult|Médic|Dent|Psic|Plano|Exame|Hospital|Fisio/i.test(t.sub || t.desc || '')), t => RP.amt(t)), edu = Math.min(EDU * (1 + n(cfg.deps)), U.sum(M.D.filter(t => t.cat === 'Universidade' && /Propina|Mensalidade/i.test(t.sub || '')), t => RP.amt(t)));
+  const aluguel = U.sum(M.D.filter(t => t.cat === 'Casa' && /^Renda$/i.test(t.sub || '')), t => RP.amt(t)), inss = U.sum(pj, r => r.inss), irrf = U.sum(pj, r => r.irrf);
+  const pgbl = U.sum(I.T.filter(t => t.type === 'Compra' && (OS.get('assets', t.asset) || {}).cls === 'Previdência'), t => toR((OS.get('assets', t.asset) || {}).currency, n(t.qty) * n(t.price)));
+  const trib = U.sum(pj, r => r.gross) + pfG, dedC = inss + n(cfg.deps) * DEP + edu + saude + Math.min(pgbl, trib * .12), dedS = Math.min(trib * .2, DESC_SIMPL);
+  const T = ATAB[+y <= 2024 ? 2024 : 2025], bC = Math.max(0, trib - dedC), bS = Math.max(0, trib - dedS), tC0 = tab(T, bC), tS0 = tab(T, bS), tC = tC0 - redA(y, trib, tC0), tS = tS0 - redA(y, trib, tS0);
+  const best = tC < tS ? 'completa' : 'simplificada', dev = Math.min(tC, tS), saldo = dev - irrf - carne;
+  Object.assign(out, { pj, months, pfG, carne, div, fii, jcp, jcpIR, juI, juT, vend, bolsa, exG, exR, exTax, exIR, pos, contas, props, dividas, saude, edu, aluguel, inss, irrf, pgbl, trib, dedC, dedS, bC, bS, tC, tS, best, dev, saldo, B });
+  if (!OS.one('profile').fx || !n((OS.one('profile').fx || {}).BRL)) out.warn.push('Falta o câmbio do real (Definições → Ligações): os investimentos em euros e dólares são convertidos para reais.');
+  return out; };
+
+RP.irpfBlock = (y, short) => { const { sec, kpis, tbl, td, E, ES, P, tone, csvBtn } = h(), X = RP.irpf(y);
+  const head = sec(`IRPF ${+y + 1} · Declaração de Ajuste Anual (ano-calendário ${y})`, 'entrega entre março e maio · estimativa', kpis([['Rendimentos tributáveis', E(X.trib)], ['Melhor modelo', X.best === 'completa' ? 'Completa' : 'Simplificada', `completa ${E(X.tC)} · simplificada ${E(X.tS)}`], ['Imposto devido', E(X.dev)], ['IR já retido / pago', E(X.irrf + X.carne), 'IRRF + carnê-leão'], [X.saldo > 0 ? 'A pagar (estimativa)' : 'A restituir (estimativa)', E(Math.abs(X.saldo)), X.saldo > 0 ? 'imposto em falta' : 'restituição', X.saldo > 0 ? 'neg' : 'pos'], ['Exterior (Lei 14.754)', E(X.exIR), '15% sobre rendimentos e ganhos lá fora']])
+    + (X.warn.length ? `<div class="note rp-warn">${X.warn.map(w => `<div>• ${esc(w)}</div>`).join('')}</div>` : ''));
+  if (short) return head;
+  const f1 = sec('Rendimentos tributáveis recebidos de pessoa jurídica', 'ficha do titular', X.pj.length ? tbl(['Fonte pagadora', 'r:Rendimentos', 'r:Contribuição previdenciária (INSS)', 'r:IR retido na fonte'], X.pj.map(r => `<tr>${td(esc(r.payer) + (r.liq ? ' <span class="bdg warn">líquido</span>' : ''))}${td(E(r.gross), 1)}${td(E(r.inss), 1)}${td(E(r.irrf), 1)}</tr>`)) + '<p class="mut rp-n">O CNPJ e os valores exatos estão no informe de rendimentos que a empresa entrega até ao fim de fevereiro.</p>' : '<p class="mut">Sem salários registados (categoria Salário).</p>');
+  const f2 = sec('Rendimentos tributáveis de pessoa física e do exterior (carnê-leão)', 'serviços e aluguéis recebidos de pessoas físicas', X.pfG ? tbl(['Mês', 'r:Rendimentos', 'r:Carnê-leão (DARF 0190)'], X.months.filter(m => m.b).map(m => `<tr>${td(U.fmtYM(m.ym))}${td(E(m.b), 1)}${td(E(m.t), 1)}</tr>`), `<tr><th>Total</th><th class="r mono">${E(X.pfG)}</th><th class="r mono">${E(X.carne)}</th></tr>`) + '<p class="mut rp-n">O carnê-leão paga-se até ao último dia útil do mês seguinte (no app Carnê-Leão Web da Receita). Calculado com o desconto simplificado mensal.</p>' : '<p class="mut">Sem rendimentos de pessoas físicas ou do exterior.</p>');
+  const f3 = sec('Rendimentos isentos e não tributáveis', '', tbl(['Tipo', 'r:Valor'], [['Lucros e dividendos recebidos (linha 09)', X.div], ['Rendimentos de FII (pessoa física)', X.fii], ['Ganhos com vendas de ações até R$ 20 mil no mês (linha 20)', X.vend], ['Juros de poupança, LCI, LCA, CRI e CRA', X.juI], ['Bolsas de estudo', X.bolsa]].filter(r => r[1]).map(r => `<tr>${td(r[0])}${td(E(r[1]), 1)}</tr>`)));
+  const f4 = sec('Rendimentos sujeitos à tributação exclusiva / definitiva', '', tbl(['Tipo', 'r:Valor'], [['Juros sobre capital próprio (líquido, linha 10)', X.jcp], ['Rendimentos de aplicações financeiras (CDB, Tesouro… líquido)', X.juT]].filter(r => r[1]).map(r => `<tr>${td(r[0])}${td(E(r[1]), 1)}</tr>`)) + (X.jcpIR ? `<p class="mut rp-n">IR retido no JCP: ${E(X.jcpIR)} (já é definitivo).</p>` : ''));
+  const f5 = sec('Renda variável', 'operações comuns, day trade e FII · mês a mês', X.B.months.length ? tbl(['Mês', 'r:Vendas de ações', 'r:Ganho ações', 'r:Ganho FII', 'r:Ganho ETF/outros', 'r:Day trade', 'r:IR devido (DARF 6015)'], X.B.months.map(m => `<tr>${td(U.fmtYM(m.ym))}${td(E(m.vAc) + (m.ex && m.vAc ? ' <span class="bdg pos">isento</span>' : ''), 1)}${td(E(m.gAc), 1)}${td(E(m.gF), 1)}${td(E(m.gO), 1)}${td(m.gD ? E(m.gD) : '—', 1)}${td(E(m.ir), 1)}</tr>`)) + '<p class="mut rp-n">O DARF 6015 paga-se até ao último dia útil do mês seguinte à venda. Prejuízos compensam ganhos futuros da mesma categoria.</p>' : '<p class="mut">Sem vendas de ações, FII ou ETFs neste ano.</p>');
+  const grp = a => a.cls === 'Ação' ? '03 · 01 Ações' : ['FII', 'REIT'].includes(a.cls) ? '07 · Fundos imobiliários' : ['ETF', 'Fundo'].includes(a.cls) ? '07 · Fundos (ETF)' : a.cls === 'BDR' ? '04 · BDR' : a.cls === 'Cripto' ? '08 · Criptoativos' : (L.RFC.includes(a.cls) || a.cls === 'Tesouro Direto') ? '04 · Aplicações (renda fixa)' : '99 · Outros';
+  const f6 = sec(`Bens e direitos em 31/12/${y}`, 'pelo custo de aquisição', `${csvBtn('rpBensBR')}${tbl(['Grupo · código', 'Discriminação', 'País', 'r:Situação em 31/12'], X.pos.map(p => `<tr>${td(grp(p.a))}${td(esc((p.a.ticker ? p.a.ticker + ' — ' : '') + (p.a.name || '')) + (p.a.broker ? ' · ' + esc(p.a.broker) : '') + ` · ${U.nf(p.qty, p.qty % 1 ? 4 : 0)} un.`)}${td(esc(p.a.country || (p.a.currency === 'BRL' ? 'Brasil' : '')))}${td(E(p.costE), 1)}</tr>`).concat(X.contas.map(c => `<tr>${td('06 · 01 Depósito em conta')}${td(esc(OS.L.accLabel(c.a)))}${td('')}${td(E(c.v), 1)}</tr>`), X.props.map(p => `<tr>${td('01 · Bens imóveis')}${td(esc(p.name) + (p.city ? ' · ' + esc(p.city) : ''))}${td(esc(p.country || ''))}${td(E(p.costR), 1)}</tr>`))).replace('<table', '<table id="rpBensBR"')}<p class="mut rp-n">Contas com saldo acima de R$ 140 e bens acima de R$ 5 mil têm de ser declarados. Bens no exterior usam o câmbio da data da compra (aqui: câmbio atual, confirma).</p>`);
+  const f7 = X.dividas.length ? sec('Dívidas e ônus reais', 'acima de R$ 5 mil em 31/12', tbl(['Dívida', 'Credor', 'r:Valor'], X.dividas.map(d => `<tr>${td(esc(d.name))}${td(esc(d.cred))}${td(E(d.v), 1)}</tr>`))) : '';
+  const f8 = sec('Pagamentos efetuados (deduções da declaração completa)', '', tbl(['Dedução', 'r:Valor', 'Regra'], [['Saúde (médicos, dentistas, psicólogos, planos, exames)', X.saude, 'sem limite (farmácia não conta)'], ['Educação (mensalidades do ensino formal)', X.edu, `até ${E(EDU)} por pessoa`], ['Previdência oficial (INSS)', X.inss, 'total'], ['Previdência privada PGBL', Math.min(X.pgbl, X.trib * .12), 'até 12% do rendimento tributável'], ['Dependentes', n(OS.one('tax').deps) * DEP, `${E(DEP)} cada`], ['Aluguel pago (só informativo)', X.aluguel, 'não deduz']].filter(r => r[1]).map(r => `<tr>${td(r[0])}${td(E(r[1]), 1)}${td(`<span class="mut">${r[2]}</span>`)}</tr>`)));
+  const f9 = sec('Cálculo do imposto', 'completa x simplificada', tbl(['', 'r:Completa', 'r:Simplificada'], [['Rendimentos tributáveis', X.trib, X.trib], ['− Deduções / desconto simplificado (20%, até R$ 16.754,34)', -X.dedC, -X.dedS], ['= Base de cálculo', X.bC, X.bS], ['Imposto devido' + (+y >= 2026 ? ' (com a redução da nova isenção)' : ''), X.tC, X.tS]].map(([l, a, b]) => `<tr${/^=/.test(l) ? ' class="rp-tot"' : ''}>${td(l)}${td(E(a), 1)}${td(E(b), 1)}</tr>`)) + `<p class="mut rp-n">O programa escolhe o modelo que te dá menos imposto: aqui, a ${X.best}. Imposto devido ${E(X.dev)} − IRRF ${E(X.irrf)} − carnê-leão ${E(X.carne)} = <b>${X.saldo > 0 ? 'a pagar ' : 'a restituir '}${E(Math.abs(X.saldo))}</b>.</p>`);
+  const f10 = X.exR || X.exG ? sec('Aplicações e rendimentos no exterior (Lei 14.754/2023)', 'apuração anual a 15%', kpis([['Rendimentos (dividendos, juros)', E(X.exR)], ['Ganhos realizados', ES(X.exG)], ['Imposto pago lá fora', E(X.exTax)], ['Imposto estimado no Brasil', E(X.exIR)]]) + '<p class="mut rp-n">Declarados na ficha própria de aplicações no exterior e em Bens e Direitos; o imposto paga-se com a declaração anual.</p>') : '';
+  return head + f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10; };
+
+// impostos do mês/trimestre no Brasil: carnê-leão, DARF da renda variável, IR retido e o que guardar para a declaração
+RP.taxMonthBR = (R, I, M) => { const { sec, kpis, E } = h(), pf = M.I.filter(t => t.cat === 'Serviços próprios' || t.cat === 'Rendas' || t.prop), carne = U.sum(R.months, ym => { const b = U.sum(pf.filter(t => U.ym(t.date) === ym), t => RP.cv(t, n(t.gross) || n(t.amount))); return b ? RP.carneM(ym, b) : 0; });
+  const B = RP.br(R.from.slice(0, 4)), darf = U.sum(B.months.filter(m => R.months.includes(m.ym)), m => m.ir), ex = I.provRows.filter(r => r.a.currency !== 'BRL'), exG = U.sum(I.sales.filter(s => s.a.currency !== 'BRL'), s => s.gainE), guard = Math.max(0, (Math.max(0, exG) + U.sum(ex, r => r.gross)) * .15 - U.sum(ex, r => Math.min(r.tax, r.gross * .15)));
+  const venc = U.fmtD(RP.lastBiz(U.addMonths(R.to.slice(0, 7), 1)));
+  return sec('Impostos deste período (Brasil)', '', kpis([['Carnê-leão', E(carne), carne ? 'DARF 0190 · paga até ' + venc : 'sem rendimentos de pessoas físicas'], ['DARF renda variável', E(darf), darf ? 'código 6015 · paga até ' + venc : 'sem imposto de vendas'], ['IR retido na fonte', E(I.provTax), 'JCP e outros'], ['Guardar para a declaração', E(guard), '15% de ganhos e rendimentos no exterior']])); };
+
+// último dia útil (segunda a sexta) de um mês 'aaaa-mm'
+RP.lastBiz = ym => { const d = new Date(+ym.slice(0, 4), +ym.slice(5, 7), 0); while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1); return U.iso(d); };
+RP.deadlinesBR = y => [[y + '-02-28', 'Informes de rendimentos das empresas, bancos e corretoras'], [y + '-03-15', 'Começa a entrega do IRPF (confirma a data do ano)'], [y + '-05-29', 'Último dia para entregar o IRPF (confirma a data do ano)'], [y + '-01-31', 'IPVA e IPTU: datas do teu estado e município'], ...Array.from({ length: 12 }, (_, i) => [RP.lastBiz(y + '-' + U.pad(i + 1)), 'Carnê-leão e DARF da renda variável do mês anterior (se houver)'])];
 })();
 
 </script>
@@ -15178,15 +15293,15 @@ IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.ke
     [1, 'Parte 2 · ficheiro Parte2', 'O resto do núcleo (o "colar" do telemóvel corta textos grandes, por isso vai em dois).', on && v >= 10],
     [2, 'Parte 3 · ficheiro Parte3', 'E-mail completo dentro da app, Agenda Google e leitor de notícias.', on && v >= 11],
     [3, 'Parte 4 · ficheiro Parte4', 'Outlook da faculdade (separado por matéria) e IA sem limites nas perguntas pela Siri.', has4],
-    [4, 'Parte 5 · ficheiro Parte5', 'Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos guardados no teu Google Drive.', !!(OS.Files && OS.Files.has5())]];
-  const has5 = !!(OS.Files && OS.Files.has5()), nx = !has4 ? 4 : !has5 ? 5 : 4, done = nx === 4 ? has4 : has5;
-  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ As partes 4 e 5 já estão no teu script' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : !IB._p5d) : ''}</div>
+    [4, 'Parte 5 · ficheiro Parte5', 'Ficheiros na nuvem (PDFs da Universidade e dos Cursos no teu Google Drive) e a tua agenda do Oceanum no Google Calendar e no iPhone.', !!(OS.Files && OS.Files.has6())]];
+  const has5 = !!(OS.Files && OS.Files.has6()), old5 = !!(OS.Files && OS.Files.has5()) && !has5, nx = !has4 ? 4 : !has5 ? 5 : 4, done = nx === 4 ? has4 : has5;
+  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ As partes 4 e 5 já estão no teu script' : nx === 5 && old5 ? 'Atualizar a Parte 5 (2 minutos)' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : !IB._p5d) : ''}</div>
     ${!on ? `<p class="mut" style="margin:0 0 8px">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ''}
-    ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nada das outras partes.${nx === 5 ? ' Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive.' : ''}</p>
+    ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nada das outras partes.${nx === 5 ? (old5 ? ' A tua Parte 5 é a antiga: copia-a outra vez e <b>substitui o conteúdo</b> do ficheiro Parte5. A nova põe também a tua agenda do Oceanum no Google Calendar e no iPhone.' : ' Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive e para pores a tua agenda do Oceanum no Google Calendar e no iPhone.') : ''}</p>
     <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', nx - 1, nx - 1)}</div></li>
       <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Oceanum (no iPhone: <b>aA → Pedir site para computador</b>).</li>
       <li><b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte${nx}</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte${nx} já existir, abre-a e substitui o conteúdo.</li>
-      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}${nx === 5 ? ' Se pedir, autoriza o acesso ao Google Drive.' : ''}</li>
+      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}${nx === 5 ? ' Se pedir, autoriza o acesso ao Google Drive e à Agenda.' : ''}</li>
       <li>Volta aqui e toca em <b>Verificar</b>. Se continuar a dizer "falta", a Parte${nx} tem de ficar <b>por baixo</b> da Parte${nx - 1} na lista de ficheiros (⋮ → Mover para baixo) e repete o passo 4.</li></ol>`}
     <div class="row gap8" style="flex-wrap:wrap"><button class="btn sm" data-act="scVer" ${on ? '' : 'disabled'}>${UI.ic('sync')}Verificar</button>${has4 ? '<a class="btn sm ghost" href="#email.faculdade">Ligar o Outlook da faculdade</a>' : ''}${has5 ? '<a class="btn sm ghost" href="#universidade.materiais">Guardar ficheiros da Universidade</a>' : ''}</div></div>
   <div class="pn"><div class="pn-h"><h3>Todas as partes do script</h3>${on ? `<span class="mut" style="font-size:12px">versão ${v || '?'}${has4 ? ' + Parte 4' : ''}${has5 ? ' + Parte 5' : ''}</span>` : ''}</div>
@@ -15194,7 +15309,7 @@ IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.ke
     <div class="list sc-parts">${P.map(([i, t, d, ok]) => `<div class="li"><div class="li-t"><b>${t}</b><small>${d}</small></div><div class="li-r row gap8">${on ? st(ok, (i === 3 && !I) || (i === 4 && !ok && !IB._p5d)) : ''}${partsBtns('btn sm', i, i).replace(/Copiar parte \d+ \([^)]*\)/, 'Copiar')}</div></div>`).join('')}</div>
     <small class="mut">O endereço e a chave nunca mudam: os outros aparelhos continuam ligados sem fazer nada.</small></div>`; };
 A.scVer = async () => { UI.toast('A verificar…'); try { await IB.check(); } catch (e) { } const UM = OS.UniMail, i = UM && UM.check ? await UM.check() : null; if (OS.Files) await OS.Files.check(); OS.request();
-  const f5 = OS.Files && OS.Files.has5(); if (i && i.has4 && f5) return UI.toast('Partes 4 e 5 instaladas ✓', 'pos'); if (i && i.has4 && !f5) return UI.toast('Parte 4 ✓ · ainda não vejo a Parte 5: confirma a "Nova versão" ao implantar.', 'warn');
+  const f5 = OS.Files && OS.Files.has6(), o5 = OS.Files && OS.Files.has5() && !f5; if (i && i.has4 && f5) return UI.toast('Partes 4 e 5 instaladas ✓', 'pos'); if (i && i.has4 && !f5) return UI.toast(o5 ? 'A Parte 5 é a antiga: copia-a outra vez e substitui o conteúdo do ficheiro Parte5 (depois Nova versão).' : 'Parte 4 ✓ · ainda não vejo a Parte 5: confirma a "Nova versão" ao implantar.', 'warn');
   UI.toast(i && i.has4 ? 'Parte 4 instalada ✓' : (+(cfg().ver || 0) < 11 ? 'Falta atualizar o script (versão ' + (cfg().ver || 'antiga') + ').' : 'Ainda não vejo a Parte 4: confirma a "Nova versão" ao implantar.'), i && i.has4 ? 'pos' : 'warn'); };
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   if (b.dataset.t === 'code') return partsModal();
@@ -15231,15 +15346,16 @@ OS.S.files = { label: 'Ficheiro', title: r => r.name, fields: [
   { k: 'notes', l: 'Notas', t: 'area', rows: 2 }], defaults: () => ({ kind: 'PDF' }) };
 
 /* ---------- Parte 5 do script ---------- */
-IB.addon5 = () => `// Oceanum · PARTE 5 — Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos guardados no TEU Google Drive
-// (pasta "Oceanum · Ficheiros"). Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Não apagues as outras partes.
+IB.addon5 = () => `// Oceanum · PARTE 5 (versão 6) — Ficheiros na nuvem (pasta "Oceanum · Ficheiros" no TEU Google Drive) e a tua agenda do Oceanum
+// no Google Calendar (calendário "Oceanum": turnos, folgas, compromissos, provas…), que também aparece no Calendário do iPhone.
+// Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Se a Parte5 já existir, substitui o conteúdo. Não apagues as outras partes.
 function fRaiz_() { const P = PropertiesService.getScriptProperties(); let f = null; const id = P.getProperty('F_ROOT');
   if (id) { try { f = DriveApp.getFolderById(id); if (f.isTrashed()) f = null; } catch (e) { f = null; } }
   if (!f) { const it = DriveApp.getFoldersByName('Oceanum · Ficheiros'); f = it.hasNext() ? it.next() : DriveApp.createFolder('Oceanum · Ficheiros'); P.setProperty('F_ROOT', f.getId()); }
   return f; }
 function fPasta_(c) { let f = fRaiz_(); String(c || '').split('/').map(function (x) { return x.replace(/[\\\\:*?"<>|]/g, ' ').trim().slice(0, 80); }).filter(String).forEach(function (n) { const it = f.getFoldersByName(n); f = it.hasNext() ? it.next() : f.createFolder(n); }); return f; }
 function fTmp_() { const r = fRaiz_(), it = r.getFoldersByName('_envios'); return it.hasNext() ? it.next() : r.createFolder('_envios'); }
-function op_fping(p) { const r = fRaiz_(); return { ok: true, v: 5, pasta: r.getUrl() }; }
+function op_fping(p) { const r = fRaiz_(); return { ok: true, v: 6, pasta: r.getUrl() }; }
 // envio por partes: up = id do envio, i = número da parte, n = total de partes, d = pedaço em base64
 function op_fup(p) { const up = String(p.up || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 40), i = Number(p.i || 0), n = Number(p.n || 1);
   if (!up || !(n >= 1) || !(i >= 0) || i >= n) return { ok: false, msg: 'Pedido inválido' };
@@ -15259,14 +15375,30 @@ function op_frm(p) { try { DriveApp.getFileById(String(p.id || '')).setTrashed(t
 // lista tudo o que está na pasta (para recuperar a lista noutro aparelho)
 function op_fls(p) { const out = []; (function anda(f, cam) { const fs = f.getFiles(); while (fs.hasNext() && out.length < 3000) { const x = fs.next(); if (!x.isTrashed()) out.push({ id: x.getId(), n: x.getName(), s: x.getSize(), m: x.getMimeType(), u: x.getUrl(), p: cam, t: x.getDateCreated().getTime() }); }
   const ds = f.getFolders(); while (ds.hasNext()) { const d = ds.next(); if (d.getName() !== '_envios') anda(d, cam ? cam + '/' + d.getName() : d.getName()); } })(fRaiz_(), ''); return { ok: true, f: out }; }
+// ---- agenda: o Oceanum escreve num calendário só dele ("Oceanum"), para não misturar com os teus eventos ----
+function ocCal_() { const P = PropertiesService.getScriptProperties(); let c = null; const id = P.getProperty('OC_CAL');
+  if (id) { try { c = CalendarApp.getCalendarById(id); } catch (e) { c = null; } }
+  if (!c) { const l = CalendarApp.getCalendarsByName('Oceanum'); c = l.length ? l[0] : CalendarApp.createCalendar('Oceanum', { summary: 'Turnos, folgas, compromissos e provas que registas no Oceanum.' }); P.setProperty('OC_CAL', c.getId()); }
+  return c; }
+function ocDia_(s) { const d = String(s).split('-'); return new Date(+d[0], +d[1] - 1, +d[2]); }
+// j = {"up":[{"id","eid","t","s","e","all","l","d"}], "del":["eid", …]} → cria, atualiza e apaga; devolve id → eid
+function op_calsync(p) { const c = ocCal_(), J = JSON.parse(String(p.j || '{}')), map = {}; let n = 0, x = 0;
+  (J.del || []).slice(0, 80).forEach(function (eid) { try { const e = c.getEventById(String(eid)); if (e) e.deleteEvent(); x++; } catch (er) { } });
+  (J.up || []).slice(0, 60).forEach(function (it) { try { let e = it.eid ? c.getEventById(String(it.eid)) : null; const t = String(it.t || '').slice(0, 200), o = { location: String(it.l || '').slice(0, 200), description: String(it.d || '').slice(0, 800) };
+      if (e) { e.setTitle(t); e.setLocation(o.location); e.setDescription(o.description); if (it.all) { const a = ocDia_(it.s), b = ocDia_(it.e || it.s); if (b > a) e.setAllDayDates(a, new Date(b.getTime() + 864e5)); else e.setAllDayDate(a); } else e.setTime(new Date(it.s), new Date(it.e)); }
+      else if (it.all) { const a = ocDia_(it.s), b = ocDia_(it.e || it.s); e = b > a ? c.createAllDayEvent(t, a, new Date(b.getTime() + 864e5), o) : c.createAllDayEvent(t, a, o); }
+      else e = c.createEvent(t, new Date(it.s), new Date(it.e), o);
+      map[it.id] = e.getId(); n++; } catch (er) { map[it.id] = ''; } });
+  return { ok: true, v: 6, map: map, n: n, apagados: x, cal: c.getName() }; }
 `;
 
 /* ---------- estado ---------- */
 const st = () => OS.one('inbox') || {};
 FL.ready = () => !!(st().url && st().key);
 FL.has5 = () => !!(st().f5);
-FL.check = async () => { if (!FL.ready()) return false; try { const j = await IB.post({ op: 'fping' }); const ok = !!(j && j.ok && j.v >= 5); const c = st(); if (!!c.f5 !== ok || (ok && j.pasta && c.f5url !== j.pasta)) { c.f5 = ok ? 1 : 0; if (j.pasta) c.f5url = j.pasta; OS.touch('inbox'); } return ok; } catch (e) { return false; } };
-OS.on('ready', () => setTimeout(() => { if (FL.ready() && !FL.has5()) FL.check(); }, 5000));
+FL.has6 = () => +(st().f5v || 0) >= 6;
+FL.check = async () => { if (!FL.ready()) return false; try { const j = await IB.post({ op: 'fping' }); const ok = !!(j && j.ok && j.v >= 5); const c = st(), v = ok ? +j.v : 0; if (!!c.f5 !== ok || +(c.f5v || 0) !== v || (ok && j.pasta && c.f5url !== j.pasta)) { c.f5 = ok ? 1 : 0; c.f5v = v; if (j.pasta) c.f5url = j.pasta; OS.touch('inbox'); } return ok; } catch (e) { return false; } };
+OS.on('ready', () => setTimeout(() => { if (FL.ready() && (!FL.has5() || !FL.has6())) FL.check(); }, 5000));
 
 const ext = n => (String(n).match(/\.([a-z0-9]{1,5})$/i) || [, ''])[1].toLowerCase();
 const kindOf = (n, m) => { const e = ext(n); return e === 'pdf' ? 'PDF' : /^(ppt|pptx|key|odp)$/.test(e) ? 'Slides' : /^(png|jpe?g|heic|webp|gif)$/.test(e) || /^image\//.test(m || '') ? 'Imagem' : /^(doc|docx|odt|pages|txt|rtf|md)$/.test(e) ? 'Documento' : /^(xls|xlsx|csv|numbers|ods)$/.test(e) ? 'Documento' : 'Outro'; };
@@ -15333,6 +15465,82 @@ FL.row = f => `<div class="li f-li"><span class="un-mi">${UI.ic(ICON[f.kind] || 
 FL.list = (area, ref, empty = '') => { const L = FL.of(area, ref); return L.length ? `<div class="list f-list">${L.map(FL.row).join('')}</div>` : (empty ? `<p class="mut" style="font-size:13px;margin:6px 0">${empty}</p>` : ''); };
 FL.summary = area => { const L = OS.all('files').filter(f => !area || f.area === area), sz = U.sum(L, f => +f.size || 0);
   return `<div class="f-sum"><span>${UI.ic('arrowUp')}<b>${L.length}</b> ficheiro(s) na nuvem · ${FL.size(sz)}</span>${FL.has5() ? `${st().f5url ? `<a class="btn xs ghost" href="${esc(st().f5url)}" target="_blank" rel="noopener">Abrir pasta no Drive ↗</a>` : ''}<button class="btn xs ghost" data-act="fSync" title="Ir buscar ao Drive ficheiros guardados noutro aparelho">${UI.ic('sync')}Atualizar lista</button>` : `<button class="btn xs ghost" data-act="fPick" data-area="${area || 'outro'}" data-ref="">Ativar ficheiros na nuvem</button>`}</div>`; };
+})();
+
+</script>
+<script>
+/* OCEANUM — A tua agenda do Oceanum também FORA da app: tudo o que registas (turnos e folgas do trabalho, compromissos,
+   provas e entregas, aulas, tarefas com data…) vai sozinho para um calendário "Oceanum" no teu Google Calendar, que aparece
+   no Calendário do iPhone. Quando alteras ou apagas na app, atualiza ou apaga lá. É feito pelo teu script Google (Parte 5, versão 6).
+   Só escreve no calendário "Oceanum": os teus outros calendários ficam intactos. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc, IB = OS.Inbox;
+const CP = OS.CalPush = {};
+OS.ONE_DEF.calx = { on: false, types: { shift: 1, off: 1, event: 1, exam: 1, class: 0, task: 0, opp: 0 }, map: {}, at: 0, n: 0, err: '' };
+const cfg = () => OS.one('calx');
+const TYPES = [['shift', 'Turnos de trabalho'], ['off', 'Folgas'], ['event', 'Compromissos'], ['exam', 'Provas, testes e entregas'], ['class', 'Aulas'], ['task', 'Tarefas com data'], ['opp', 'Prazos (oportunidades e contactos)']];
+const BACK = 30, AHEAD = 180;   // janela gerida: 30 dias para trás e 6 meses para a frente
+const win = () => [U.addDays(U.today(), -BACK), U.addDays(U.today(), AHEAD)];
+const ready = () => !!(OS.Files && OS.Files.ready() && OS.Files.has6());
+
+/* ---------- o que vai para fora ---------- */
+const iso = (d, hm) => new Date(d + 'T' + hm + ':00').toISOString();
+const plusMin = (d, hm, m) => new Date(new Date(d + 'T' + hm + ':00').getTime() + m * 6e4).toISOString();
+CP.items = () => { const [a, b] = win(), T = cfg().types || {}, out = [];
+  (OS.Cal.items(a, b) || []).forEach(x => { if (!x.edit || x.src === 'gcal' || !T[x.src] || x.planned) return; if (x.src === 'task' && x.done) return;
+    const id = x.edit + '@' + x.date, hm = /^\d\d:\d\d$/.test(x.start || '') ? x.start : '', he = /^\d\d:\d\d$/.test(x.end || '') ? x.end : '';
+    let s, e, all = false; if (!hm) { all = true; s = x.date; e = x.date; }
+    else { s = iso(x.date, hm); e = he ? (he > hm ? iso(x.date, he) : iso(U.addDays(x.date, 1), he)) : plusMin(x.date, hm, x.src === 'exam' ? 120 : 60); } // turno da noite: acaba no dia seguinte
+    const title = x.src === 'off' ? (x.title || 'Folga') : x.src === 'class' ? 'Aula: ' + x.title : x.src === 'task' ? 'Tarefa: ' + x.title : x.title;
+    out.push({ id, date: x.date, t: String(title).slice(0, 200), s, e, all, l: String(x.sub || '').slice(0, 200), d: 'Criado pelo Oceanum (' + ((OS.Cal.src[x.src] || [x.src])[0]) + '). Para mudar, altera na app.' }); });
+  return out; };
+const H = it => U.hash ? U.hash([it.t, it.s, it.e, it.all ? 1 : 0, it.l].join('|')).toString(36) : JSON.stringify([it.t, it.s, it.e, it.all, it.l]);
+CP.plan = () => { const c = cfg(), map = c.map || {}, cur = CP.items(), ids = new Set(cur.map(x => x.id)), [a, b] = win();
+  const up = cur.filter(x => !map[x.id] || !map[x.id].e || map[x.id].h !== H(x)).map(x => Object.assign({}, x, { eid: (map[x.id] || {}).e || '' }));
+  const del = Object.entries(map).filter(([id, m]) => !ids.has(id) && m && m.e && (!m.d || (m.d >= a && m.d <= b))).map(([id, m]) => ({ id, e: m.e }));
+  return { up, del, n: cur.length }; };
+
+/* ---------- enviar ---------- */
+let busy = false, timer = 0, again = false;
+CP.state = { msg: '' };
+CP.sync = async (quiet = true) => { const c = cfg(); if (!c.on) return 0; if (!ready()) { CP.state.msg = 'Falta a Parte 5 (versão 6) do script.'; return 0; } if (busy) { again = true; return 0; } busy = true; let sent = 0;
+  try { for (let round = 0; round < 12; round++) { const P = CP.plan(); if (!P.up.length && !P.del.length) break;
+      const up = P.up.slice(0, 40), del = P.del.slice(0, 60), j = await IB.post({ op: 'calsync', j: JSON.stringify({ up: up.map(x => ({ id: x.id, eid: x.eid, t: x.t, s: x.s, e: x.e, all: x.all, l: x.l, d: x.d })), del: del.map(x => x.e) }) });
+      if (!j || !j.ok) throw new Error(j && /Valor inválido|Pedido inválido/.test(j.msg || '') ? 'O teu script ainda não tem a agenda: atualiza a Parte 5 (Definições → Script Google).' : (j && j.msg) || 'o script não respondeu');
+      const map = Object.assign({}, cfg().map || {}); del.forEach(x => { delete map[x.id]; });
+      up.forEach(x => { const eid = (j.map || {})[x.id]; if (eid) map[x.id] = { e: eid, h: H(x), d: x.date }; });
+      const okN = up.filter(x => (j.map || {})[x.id]).length; sent += okN + del.length;
+      OS.setOne('calx', { map, at: Date.now(), n: Object.keys(map).length, err: '' }); if (!okN && !del.length) break; }
+    CP.state.msg = ''; if (!quiet) UI.toast(sent ? `Google Calendar atualizado (${sent} alteração${sent === 1 ? '' : 'ões'})` : 'O Google Calendar já está igual à app ✓', 'pos'); }
+  catch (e) { OS.setOne('calx', { err: e.message || 'erro', at: Date.now() }); if (!quiet) UI.toast('Não consegui atualizar o Google Calendar: ' + (e.message || e), 'neg'); }
+  busy = false; OS.request(); if (again) { again = false; CP.soon(3000); } return sent; };
+CP.soon = (ms = 12000) => { if (!cfg().on) return; clearTimeout(timer); timer = setTimeout(() => CP.sync(true), ms); };
+const WATCH = new Set(['shifts', 'dayoffs', 'events', 'assessments', 'classes', 'subjects', 'tasks', 'opps', 'contacts']);
+OS.on('change', c => { if (WATCH.has(c)) CP.soon(); });
+OS.on('ready', () => { setTimeout(() => CP.sync(true), 9000); setInterval(() => { if (!document.hidden) CP.sync(true); }, 30 * 6e4); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) CP.soon(4000); });
+
+/* ---------- apagar tudo o que a app pôs lá ---------- */
+CP.clear = async () => { const c = cfg(), L = Object.entries(c.map || {}).filter(([, m]) => m && m.e); let k = 0;
+  while (k < L.length) { const part = L.slice(k, k + 60), j = await IB.post({ op: 'calsync', j: JSON.stringify({ up: [], del: part.map(([, m]) => m.e) }) }); if (!j || !j.ok) throw new Error((j && j.msg) || 'o script não respondeu'); k += part.length; }
+  OS.setOne('calx', { map: {}, n: 0, at: Date.now() }); return L.length; };
+
+/* ---------- Definições → Ligações ---------- */
+A.cpOn = async () => { if (!ready()) { if (OS.Files && OS.Files.ready()) await OS.Files.check(); if (!ready()) { location.hash = 'definicoes.script'; return UI.toast(OS.Files && OS.Files.has5() ? 'Atualiza a Parte 5 do script (copia de novo e substitui o conteúdo do ficheiro Parte5).' : 'Cola primeiro a Parte 5 do script.', 'warn'); } }
+  OS.setOne('calx', { on: true, err: '' }); OS.request(); UI.toast('A pôr a tua agenda no Google Calendar…'); await CP.sync(false); };
+A.cpOff = () => UI.ask('Deixar de enviar para o Google Calendar?', 'Os eventos que a app já lá pôs (calendário "Oceanum") podem ficar ou ser apagados.', 'Desligar e apagar de lá', async () => {
+  try { const n = await CP.clear(); OS.setOne('calx', { on: false }); UI.toast(`Desligado. ${n} evento(s) apagado(s) do calendário Oceanum.`, 'pos'); } catch (e) { OS.setOne('calx', { on: false }); UI.toast('Desligado, mas não consegui apagar de lá: ' + (e.message || e), 'warn'); } OS.request(); });
+A.cpNow = () => CP.sync(false);
+A.cpType = b => { const t = Object.assign({}, cfg().types || {}); t[b.dataset.k] = t[b.dataset.k] ? 0 : 1; OS.setOne('calx', { types: t }); CP.soon(1500); OS.request(); };
+CP.panel = () => { const c = cfg(), T = c.types || {}, ok = ready(), P = c.on && ok ? CP.plan() : null;
+  return `<div class="pn" id="cpSet"><div class="pn-h"><h3>${UI.ic('cal')}A tua agenda também fora da app</h3>${c.on ? `<span class="bdg ${c.err ? 'warn' : 'pos'}">${c.err ? 'com erro' : 'ligado'}</span>` : ''}</div>
+    <p class="mut" style="margin:0 0 10px">Tudo o que registas no Oceanum vai sozinho para um calendário <b>Oceanum</b> no teu Google Calendar e aparece no <b>Calendário do iPhone</b>. Quando alteras ou apagas na app, muda lá também. Os teus outros calendários não são tocados.</p>
+    <div class="cp-types">${TYPES.map(([k, l]) => `<button class="chip ${T[k] ? 'on' : ''}" data-act="cpType" data-k="${k}" aria-pressed="${T[k] ? 'true' : 'false'}">${T[k] ? '✓ ' : ''}${l}</button>`).join('')}</div>
+    ${!ok ? `<div class="note" style="margin-top:10px">${OS.Files && OS.Files.has5() ? 'O teu script tem a Parte 5 antiga: em <a class="acc" href="#definicoes.script">Definições → Script Google</a> copia outra vez a <b>Parte 5</b> e substitui o conteúdo do ficheiro Parte5 (e faz Nova versão). Na primeira vez o Google pede autorização para a Agenda.' : 'Precisa da <b>Parte 5</b> do script (em <a class="acc" href="#definicoes.script">Definições → Script Google</a>).'}</div>` : ''}
+    <div class="row gap8" style="margin-top:10px;flex-wrap:wrap">${c.on ? `<button class="btn sm" data-act="cpNow">${UI.ic('sync')}Atualizar agora</button><button class="btn sm ghost" data-act="cpOff">Desligar</button>` : `<button class="btn sm pri" data-act="cpOn">${UI.ic('cal')}Pôr a minha agenda no Google Calendar</button>`}</div>
+    ${c.on ? `<p class="mut" style="font-size:12.5px;margin:8px 0 0">${c.n || 0} evento(s) no calendário Oceanum${c.at ? ' · última atualização ' + new Date(c.at).toLocaleString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}${P && (P.up.length || P.del.length) ? ` · ${P.up.length + P.del.length} por enviar` : ''}${c.err ? `<br><span class="warn">${esc(c.err)}</span>` : ''}</p>` : ''}
+    <details class="tog" style="margin-top:10px"><summary><span>Ver no iPhone</span>${UI.ic('down', 'chev')}</summary><div class="tog-b"><ol class="ai-steps"><li>No iPhone: <b>Ajustes → Apps → Calendário → Contas</b> (ou Ajustes → Calendário → Contas).</li><li>Se a tua conta Google não estiver lá: <b>Adicionar conta → Google</b>. Se estiver, abre-a e liga <b>Calendários</b>.</li><li>Abre a app Calendário → <b>Calendários</b> (em baixo) e confirma que o <b>Oceanum</b> está marcado.</li></ol><p class="mut" style="font-size:12.5px">Também aparece no Google Calendar no telemóvel e no computador. As alterações chegam em poucos minutos.</p></div></details></div>`; };
 })();
 
 </script>
@@ -15778,11 +15986,11 @@ document.addEventListener('submit', e => {
 OS.SETT = [['', 'Geral'], ['email', 'E-mail'], ['ligacoes', 'Ligações'], ['atalhos', 'Atalhos do iPhone'], ['spyke', 'Spyke (assistente)'], ['impostos', 'Impostos'], ['script', 'Script Google']];
 OS.settingsView = sub => { const s = String(sub || ''), k = ['script', 'email', 'ligacoes', 'atalhos', 'impostos'].includes(s) ? s : /^spyke(\.|$)/.test(s) ? 'spyke' : '';
   const sp = k === 'spyke' ? `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>` : '';
-  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Oceanum: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Oceanum: agenda Google, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, relógio da corrida e bloquear apps no bloco de foco.' : k === 'impostos' ? 'A tua situação fiscal, para os Relatórios saírem no formato certo da declaração de IRS (e do IRPF no Brasil).' : 'O teu perfil alimenta cálculos em todo o sistema.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
+  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Oceanum: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Oceanum: a tua agenda no Google Calendar e no iPhone, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, relógio da corrida e bloquear apps no bloco de foco.' : k === 'impostos' ? 'A tua situação fiscal, para os Relatórios saírem no formato certo da declaração de IRS (e do IRPF no Brasil).' : 'O teu perfil alimenta cálculos em todo o sistema.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
   if (k === 'spyke') return head + String(V.spyke ? V.spyke(s.slice(6)) : '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
   if (k === 'script') return head + (OS.Inbox && OS.Inbox.scriptTab ? OS.Inbox.scriptTab() : '');
   const sec = (t, h) => h ? `<h4 class="set-h">${t}</h4>${h}` : '';
-  if (k === 'ligacoes') return head + `<div class="set-page">${sec('Agenda', OS.gcalPanel ? OS.gcalPanel() : '')}${sec('Investimentos', (OS.InvX && OS.InvX.quotesSettings ? OS.InvX.quotesSettings() : '') + (OS.InvX && OS.InvX.alertSettings ? OS.InvX.alertSettings() : ''))}${sec('Notícias, e-mail e IA', `<div class="pn"><div class="list"><a class="li" href="#definicoes.script"><div class="li-t"><b>Notícias (Jornal)</b><small>Chegam pelo teu script Google: vê o estado em Script Google.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.email"><div class="li-t"><b>E-mail e faculdade</b><small>Gmail, Outlook da faculdade e outras contas.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.spyke"><div class="li-t"><b>IA (Spyke)</b><small>Uma só ligação para tudo o que usa IA.</small></div><span class="mut">›</span></a></div></div>`)}</div>`;
+  if (k === 'ligacoes') return head + `<div class="set-page">${sec('Agenda', (OS.CalPush ? OS.CalPush.panel() : '') + (OS.gcalPanel ? OS.gcalPanel() : ''))}${sec('Investimentos', (OS.InvX && OS.InvX.quotesSettings ? OS.InvX.quotesSettings() : '') + (OS.InvX && OS.InvX.alertSettings ? OS.InvX.alertSettings() : ''))}${sec('Notícias, e-mail e IA', `<div class="pn"><div class="list"><a class="li" href="#definicoes.script"><div class="li-t"><b>Notícias (Jornal)</b><small>Chegam pelo teu script Google: vê o estado em Script Google.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.email"><div class="li-t"><b>E-mail e faculdade</b><small>Gmail, Outlook da faculdade e outras contas.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.spyke"><div class="li-t"><b>IA (Spyke)</b><small>Uma só ligação para tudo o que usa IA.</small></div><span class="mut">›</span></a></div></div>`)}</div>`;
   if (k === 'atalhos') return head + `<div class="set-page">${OS.quickSettings ? OS.quickSettings() : ''}${OS.RunLink && OS.RunLink.panel ? `<div class="pn" id="runSet"><div class="pn-h"><h3>Relógio → Corrida</h3></div>${OS.RunLink.panel()}</div>` : ''}${OS.FocusBlock && OS.FocusBlock.settings ? OS.FocusBlock.settings() : ''}</div>`;
   if (k === 'impostos') return head + `<div class="set-page">${OS.Reports && OS.Reports.settings ? OS.Reports.settings() : ''}</div>`;
   if (k === 'email') return head + `<div class="ml-page set-mail">${OS.Mail && OS.Mail.settings ? OS.Mail.settings() : ''}</div>`;
