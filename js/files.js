@@ -11,15 +11,16 @@ OS.S.files = { label: 'Ficheiro', title: r => r.name, fields: [
   { k: 'notes', l: 'Notas', t: 'area', rows: 2 }], defaults: () => ({ kind: 'PDF' }) };
 
 /* ---------- Parte 5 do script ---------- */
-IB.addon5 = () => `// Oceanum · PARTE 5 — Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos guardados no TEU Google Drive
-// (pasta "Oceanum · Ficheiros"). Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Não apagues as outras partes.
+IB.addon5 = () => `// Oceanum · PARTE 5 (versão 6) — Ficheiros na nuvem (pasta "Oceanum · Ficheiros" no TEU Google Drive) e a tua agenda do Oceanum
+// no Google Calendar (calendário "Oceanum": turnos, folgas, compromissos, provas…), que também aparece no Calendário do iPhone.
+// Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Se a Parte5 já existir, substitui o conteúdo. Não apagues as outras partes.
 function fRaiz_() { const P = PropertiesService.getScriptProperties(); let f = null; const id = P.getProperty('F_ROOT');
   if (id) { try { f = DriveApp.getFolderById(id); if (f.isTrashed()) f = null; } catch (e) { f = null; } }
   if (!f) { const it = DriveApp.getFoldersByName('Oceanum · Ficheiros'); f = it.hasNext() ? it.next() : DriveApp.createFolder('Oceanum · Ficheiros'); P.setProperty('F_ROOT', f.getId()); }
   return f; }
 function fPasta_(c) { let f = fRaiz_(); String(c || '').split('/').map(function (x) { return x.replace(/[\\\\:*?"<>|]/g, ' ').trim().slice(0, 80); }).filter(String).forEach(function (n) { const it = f.getFoldersByName(n); f = it.hasNext() ? it.next() : f.createFolder(n); }); return f; }
 function fTmp_() { const r = fRaiz_(), it = r.getFoldersByName('_envios'); return it.hasNext() ? it.next() : r.createFolder('_envios'); }
-function op_fping(p) { const r = fRaiz_(); return { ok: true, v: 5, pasta: r.getUrl() }; }
+function op_fping(p) { const r = fRaiz_(); return { ok: true, v: 6, pasta: r.getUrl() }; }
 // envio por partes: up = id do envio, i = número da parte, n = total de partes, d = pedaço em base64
 function op_fup(p) { const up = String(p.up || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 40), i = Number(p.i || 0), n = Number(p.n || 1);
   if (!up || !(n >= 1) || !(i >= 0) || i >= n) return { ok: false, msg: 'Pedido inválido' };
@@ -39,14 +40,30 @@ function op_frm(p) { try { DriveApp.getFileById(String(p.id || '')).setTrashed(t
 // lista tudo o que está na pasta (para recuperar a lista noutro aparelho)
 function op_fls(p) { const out = []; (function anda(f, cam) { const fs = f.getFiles(); while (fs.hasNext() && out.length < 3000) { const x = fs.next(); if (!x.isTrashed()) out.push({ id: x.getId(), n: x.getName(), s: x.getSize(), m: x.getMimeType(), u: x.getUrl(), p: cam, t: x.getDateCreated().getTime() }); }
   const ds = f.getFolders(); while (ds.hasNext()) { const d = ds.next(); if (d.getName() !== '_envios') anda(d, cam ? cam + '/' + d.getName() : d.getName()); } })(fRaiz_(), ''); return { ok: true, f: out }; }
+// ---- agenda: o Oceanum escreve num calendário só dele ("Oceanum"), para não misturar com os teus eventos ----
+function ocCal_() { const P = PropertiesService.getScriptProperties(); let c = null; const id = P.getProperty('OC_CAL');
+  if (id) { try { c = CalendarApp.getCalendarById(id); } catch (e) { c = null; } }
+  if (!c) { const l = CalendarApp.getCalendarsByName('Oceanum'); c = l.length ? l[0] : CalendarApp.createCalendar('Oceanum', { summary: 'Turnos, folgas, compromissos e provas que registas no Oceanum.' }); P.setProperty('OC_CAL', c.getId()); }
+  return c; }
+function ocDia_(s) { const d = String(s).split('-'); return new Date(+d[0], +d[1] - 1, +d[2]); }
+// j = {"up":[{"id","eid","t","s","e","all","l","d"}], "del":["eid", …]} → cria, atualiza e apaga; devolve id → eid
+function op_calsync(p) { const c = ocCal_(), J = JSON.parse(String(p.j || '{}')), map = {}; let n = 0, x = 0;
+  (J.del || []).slice(0, 80).forEach(function (eid) { try { const e = c.getEventById(String(eid)); if (e) e.deleteEvent(); x++; } catch (er) { } });
+  (J.up || []).slice(0, 60).forEach(function (it) { try { let e = it.eid ? c.getEventById(String(it.eid)) : null; const t = String(it.t || '').slice(0, 200), o = { location: String(it.l || '').slice(0, 200), description: String(it.d || '').slice(0, 800) };
+      if (e) { e.setTitle(t); e.setLocation(o.location); e.setDescription(o.description); if (it.all) { const a = ocDia_(it.s), b = ocDia_(it.e || it.s); if (b > a) e.setAllDayDates(a, new Date(b.getTime() + 864e5)); else e.setAllDayDate(a); } else e.setTime(new Date(it.s), new Date(it.e)); }
+      else if (it.all) { const a = ocDia_(it.s), b = ocDia_(it.e || it.s); e = b > a ? c.createAllDayEvent(t, a, new Date(b.getTime() + 864e5), o) : c.createAllDayEvent(t, a, o); }
+      else e = c.createEvent(t, new Date(it.s), new Date(it.e), o);
+      map[it.id] = e.getId(); n++; } catch (er) { map[it.id] = ''; } });
+  return { ok: true, v: 6, map: map, n: n, apagados: x, cal: c.getName() }; }
 `;
 
 /* ---------- estado ---------- */
 const st = () => OS.one('inbox') || {};
 FL.ready = () => !!(st().url && st().key);
 FL.has5 = () => !!(st().f5);
-FL.check = async () => { if (!FL.ready()) return false; try { const j = await IB.post({ op: 'fping' }); const ok = !!(j && j.ok && j.v >= 5); const c = st(); if (!!c.f5 !== ok || (ok && j.pasta && c.f5url !== j.pasta)) { c.f5 = ok ? 1 : 0; if (j.pasta) c.f5url = j.pasta; OS.touch('inbox'); } return ok; } catch (e) { return false; } };
-OS.on('ready', () => setTimeout(() => { if (FL.ready() && !FL.has5()) FL.check(); }, 5000));
+FL.has6 = () => +(st().f5v || 0) >= 6;
+FL.check = async () => { if (!FL.ready()) return false; try { const j = await IB.post({ op: 'fping' }); const ok = !!(j && j.ok && j.v >= 5); const c = st(), v = ok ? +j.v : 0; if (!!c.f5 !== ok || +(c.f5v || 0) !== v || (ok && j.pasta && c.f5url !== j.pasta)) { c.f5 = ok ? 1 : 0; c.f5v = v; if (j.pasta) c.f5url = j.pasta; OS.touch('inbox'); } return ok; } catch (e) { return false; } };
+OS.on('ready', () => setTimeout(() => { if (FL.ready() && (!FL.has5() || !FL.has6())) FL.check(); }, 5000));
 
 const ext = n => (String(n).match(/\.([a-z0-9]{1,5})$/i) || [, ''])[1].toLowerCase();
 const kindOf = (n, m) => { const e = ext(n); return e === 'pdf' ? 'PDF' : /^(ppt|pptx|key|odp)$/.test(e) ? 'Slides' : /^(png|jpe?g|heic|webp|gif)$/.test(e) || /^image\//.test(m || '') ? 'Imagem' : /^(doc|docx|odt|pages|txt|rtf|md)$/.test(e) ? 'Documento' : /^(xls|xlsx|csv|numbers|ods)$/.test(e) ? 'Documento' : 'Outro'; };

@@ -1,9 +1,10 @@
 {
- "n": 112,
- "hash": "5790ba7fd731",
+ "n": 113,
+ "hash": "dc5deea9ec2a",
  "notes": [
-  "Spyke: no resumo do dia já não lê as instruções da voz (\"fala sempre em português…\") — vai direto ao resumo.",
-  "Spyke começa a falar em poucos segundos: a primeira frase é gerada à parte e o resto em paralelo, enquanto ele fala. A voz é a mesma."
+  "Relatórios no país que escolheste: no Brasil saem no formato do IRPF (fichas da declaração, bens e direitos, completa x simplificada, carnê-leão e DARF), em reais; em Portugal continuam no formato do IRS. Os relatórios que já passaram ficam como estavam.",
+  "A tua agenda do Oceanum também fora da app: turnos, folgas, compromissos e provas (e, se quiseres, aulas e tarefas) vão sozinhos para um calendário \"Oceanum\" no teu Google Calendar e aparecem no Calendário do iPhone. Alteras ou apagas na app, muda lá também.",
+  "Para ligar: Definições → Ligações → \"Pôr a minha agenda no Google Calendar\". Precisa da Parte 5 nova do script (Definições → Script Google: copia e substitui o conteúdo da Parte5)."
  ],
  "date": "13/10/2026"
 }

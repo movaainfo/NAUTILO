@@ -228,7 +228,8 @@ A.calSlot = (b, e) => { if (e.target.closest('[data-edit]')) return; const r = b
 /* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; dentro do claude.ai também pelo conector */
 let gcalUnsub = null, gcalTimer = 0, gcalBusy = false;
 const gscr = () => { const c = OS.one('inbox'); return c && c.url && c.key && +(c.ver || 0) >= 11 ? c : null; };
-const gmap = L => L.map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
+// o calendário "Oceanum" é a cópia que a app põe no Google: não se lê de volta (senão aparecia tudo duas vezes)
+const gmap = L => L.filter(x => x.cal !== 'Oceanum').map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
 try { const sv = U.ls.get('os2gcal', null); if (sv && OS.one('integ').gcal) Cal.gcal = sv.ev || []; } catch (e) { }
 const gcalScript = async quiet => { const c = gscr(); if (!c || gcalBusy) return; gcalBusy = true;
   const from = U.addDays(U.today(), -14), to = U.addDays(U.today(), 90);

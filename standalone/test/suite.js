@@ -1564,7 +1564,32 @@ async function extras2Tests(b) { cur = 'Extras'; console.log('\n=== Investimento
   const ag = await E(p, () => { OS.all('reports').slice().forEach(r => OS.del('reports', r.id)); const k = OS.Reports.autogen(); return { k, per: OS.all('reports').map(r => r.per).sort().join(',') }; });
   ok('Relatórios gerados sozinhos quando o mês, o trimestre e o ano fecham (Arquivo)', ag.k === 3 && ag.per === 'a,m,q', JSON.stringify(ag));
   v = await go('relatorios.arquivo', 600); ok('Arquivo lista os relatórios novos', /novo/.test(v) && /Mensal/.test(v));
-  v = await go('definicoes.impostos', 600); ok('Definições → Impostos: residência, IRS Jovem, dependentes, englobamento', /Residência fiscal/.test(v) && /Ano de nascimento/.test(v) && /primeiro rendimento de trabalho/.test(v) && /Englobar/.test(v));
+  v = await go('definicoes.impostos', 600); ok('Definições → Impostos: país dos relatórios, IRS Jovem, dependentes, englobamento', /País dos relatórios: Portugal/.test(v) && /Ano de nascimento/.test(v) && /primeiro rendimento de trabalho/.test(v) && /Englobar/.test(v));
+  // ---- Relatórios adaptados ao país: os novos seguem o país da app, os que já passaram ficam como estavam ----
+  const cy = await E(p, () => { const U = OS.U, T = U.today(), acc = OS.add('accounts', { name: 'Conta BR', inst: 'BTG', type: 'Conta à ordem', currency: 'BRL', opening: 0, openDate: T.slice(0, 4) + '-01-01' });
+    OS.add('transactions', { type: 'Receita', amount: 4200, gross: 5000, wht: 300, ss: 500, payer: 'Empresa Brasil', date: T.slice(0, 4) + '-01-28', desc: 'Salário BR', account: acc.id, cat: 'Salário', sub: 'Salário', tags: [] });
+    OS.setOne('profile', { country: 'BR' }); return { y: T.slice(0, 4), H: JSON.stringify(OS.one('tax').ctyH || []) }; });
+  ok('País: a app guarda quando mudaste de país (Portugal → Brasil hoje)', /\["","PT"\]/.test(cy.H) && new RegExp('\\["' + (await E(p, () => OS.U.today())) + '","BR"\\]').test(cy.H), cy.H);
+  await E(p, y => { OS.setUI('rpPer', 'a'); OS.setUI('rpRef_a', y); }, cy.y); v = await go('relatorios.completo', 1200);
+  ok('Brasil: relatório anual no formato do IRPF (fichas, bens e direitos, completa x simplificada) em reais', /Declaração de Ajuste Anual/.test(v) && /Bens e direitos/.test(v) && /Rendimentos tributáveis/.test(v) && /Pagamentos efetuados/.test(v) && /simplificada/i.test(v) && /R\$ /.test(v) && !/Anexo J/.test(v) && !/\(€\)/.test(v) && /Custo \(R\$\)/.test(v), JSON.stringify([/Declaração de Ajuste Anual/.test(v), /Bens e direitos/.test(v), /Rendimentos tributáveis/.test(v), /Pagamentos efetuados/.test(v), /simplificada/i.test(v), /R\$ /.test(v), !/Anexo J/.test(v), v.split('Bens e direitos')[0].slice(Math.max(0, v.split('Bens e direitos')[0].indexOf('€ ') - 80), v.split('Bens e direitos')[0].indexOf('€ ') + 40)]));
+  const BRx = await E(p, y => { OS.Reports.setCtx('BR'); const x = OS.Reports.irpf(y), u = 900 / OS.Inv.fx('BRL'), r = { pj: Math.round(x.pj.find(q => q.payer === 'Empresa Brasil').gross), irrf: x.irrf, inss: x.inss, pf: Math.round(x.pfG), k: x.pfG / u, carne: x.carne > 0, best: x.best }; OS.Reports.setCtx('PT'); return r; }, cy.y);
+  ok('Brasil: salário da conta em reais fica em reais; rendas em euros passam a reais (carnê-leão)', BRx.pj === 5000 && BRx.irrf === 300 && BRx.inss === 500 && BRx.carne && BRx.pf > 0 && Math.abs(BRx.k - Math.round(BRx.k)) < .01, JSON.stringify(BRx));
+  ok('Brasil: DARF e carnê-leão vencem no último dia útil do mês', await E(p, () => OS.Reports.lastBiz('2026-05') === '2026-05-29' && OS.Reports.lastBiz('2026-11') === '2026-11-30'));
+  await E(p, () => { OS.setUI('rpPer', 'm'); OS.setUI('rpRef_m', OS.U.today().slice(0, 7)); }); v = await go('relatorios.completo', 900);
+  ok('Brasil: relatório deste mês com carnê-leão, DARF da renda variável e IR retido', /Impostos deste período \(Brasil\)/.test(v) && /Carnê-leão/.test(v) && /DARF renda variável/.test(v));
+  await E(p, y => { OS.setUI('rpPer', 'a'); OS.setUI('rpRef_a', y); }, ids.Y); v = await go('relatorios.completo', 1200);
+  ok('Os relatórios que já passaram ficam como estavam (ano anterior continua no formato do IRS, em euros)', /Anexo J/.test(v) && /Simulação do imposto/.test(v) && /€ /.test(v) && !/Declaração de Ajuste Anual/.test(v));
+  await E(p, () => { OS.setUI('rpPer', 'm'); OS.setUI('rpRef_m', OS.U.addMonths(OS.U.today().slice(0, 7), -1)); }); v = await go('relatorios.completo', 800);
+  ok('O mês passado (já arquivado) continua no formato de Portugal', /Impostos deste período/.test(v) && !/Impostos deste período \(Brasil\)/.test(v) && /€ /.test(v), JSON.stringify([/Impostos deste período/.test(v), !/\(Brasil\)/.test(v), /€ /.test(v), (v.match(/.{50}Brasil.{30}/g) || []).slice(0, 4)]));
+  v = await go('relatorios.arquivo', 600); ok('Arquivo: cada relatório mostra o país com que foi gerado', /Portugal/.test(v));
+  v = await go('relatorios', 700); const hubOk = [/declaração de IRPF \(Brasil\)/.test(v), /Completo \(IRPF\)/.test(v), /Anual · declaração de IRPF/i.test(v), /IRPF \d{4}: a (pagar|restituir) ~R\$/.test(v), /Mensal · resumido[\s\S]{0,40}Entrou\s*€/i.test(v), /Carnê-leão e DARF/.test(v), !!(await p.$('#view [data-act=countryPick]'))];
+  ok('Relatórios: o topo segue o Brasil ("Completo (IRPF)", prazos do Brasil); o mês já fechado continua em euros', hubOk.every(Boolean), JSON.stringify(hubOk) + v.slice(300, 900));
+  const ag2 = await E(p, () => { OS.all('reports').slice().forEach(r => OS.del('reports', r.id)); OS.Reports.autogen(); return OS.all('reports').map(r => r.per + ':' + r.cty).sort().join(','); });
+  ok('Períodos que fecharam antes da mudança de país são gerados no país de então (Portugal)', ag2 === 'a:PT,m:PT,q:PT', ag2);
+  v = await go('definicoes.impostos', 600); ok('Definições → Impostos no Brasil: país, dependentes (sem campos do IRS português)', /País dos relatórios: Brasil/.test(v) && /Dependentes/.test(v) && /IRPF/.test(v) && !/IRS Jovem/.test(v) && !/Englobar/.test(v));
+  await E(p, y => { OS.setOne('profile', { country: 'ES' }); OS.setUI('rpPer', 'a'); OS.setUI('rpRef_a', y); }, cy.y); v = await go('relatorios.completo', 1000);
+  ok('Outro país: relatório completo de receitas, despesas e investimentos (sem formato fiscal português ou brasileiro)', /O formato da declaração fiscal existe para Portugal e para o Brasil/.test(v) && /Espanha/.test(v) && !/Anexo J/.test(v) && !/Declaração de Ajuste Anual/.test(v));
+  await E(p, () => OS.setOne('profile', { country: 'PT' }));
   ok('Movimento de salário com bruto, retenção e Segurança Social', await E(p, () => ['gross', 'wht', 'ss', 'payer'].every(k => OS.S.transactions.fields.some(f => f.k === k)) && OS.S.transactions.fields.some(f => f.k === 'prop')));
   // ---- Análise de empresas: história, dossiê, longo prazo, 10 anos, trimestres ----
   await E(p, () => { OS.setUI('invCo', 'MACA'); location.hash = 'investimentos.empresas'; }); await sleep(1500); v = await view();
@@ -1614,11 +1639,43 @@ async function voiceTests(b) { cur = 'Voz'; console.log('\n=== Voz do Spyke (res
   ok('Resumo: nada do texto se perde ao dividir em pedaços', tts.map(x => x.text).join(' ').replace(/\s+/g, ' ').trim() === brief.replace(/\s+/g, ' ').trim());
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (voz)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
+/* ---------- a agenda do Oceanum fora da app (Google Calendar e iPhone) ---------- */
+async function calTests(b) { cur = 'Agenda'; console.log('\n=== Agenda fora da app (Google Calendar e iPhone) ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const calls = []; const G = {}; let nid = 0;
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.assign(Object.fromEntries(u.searchParams), Object.fromEntries(new URLSearchParams(rt.request().postData() || ''))), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+    if (P.op === 'ping') return J({ ok: true, v: 11 }); if (P.op === 'olinfo') return J({ ok: true, v: 12 }); if (P.op === 'fping') return J({ ok: true, v: 6, pasta: 'https://drive.google.com/x' });
+    if (P.op === 'calsync') { const j = JSON.parse(P.j); calls.push(j); const map = {}; (j.del || []).forEach(e => { delete G[e]; }); (j.up || []).forEach(it => { const e = it.eid && G[it.eid] ? it.eid : 'E' + (++nid); G[e] = it; map[it.id] = e; }); return J({ ok: true, v: 6, map, n: (j.up || []).length }); }
+    if (P.op === 'cl') return J({ ok: true, ev: [{ id: 'x1', t: 'Jantar com a família', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Pessoal' }, { id: 'x2', t: 'Turno · Loja', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Oceanum' }] });
+    return J({ ok: true, items: [], docs: {} }); });
+  await p.goto(BASE); await unlock(p);
+  const T = await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); return OS.U.today(); });
+  await E(p, () => OS.Files.check()); ok('Agenda: o script com a Parte 5 nova (versão 6) é reconhecido', await E(p, () => OS.Files.has6()));
+  const ids = await E(p, T => { const U = OS.U; const sh = OS.add('shifts', { date: T, start: '22:00', end: '06:00', place: 'Loja' }); const off = OS.add('dayoffs', { date: U.addDays(T, 1), kind: 'Folga' }); const ev = OS.add('events', { title: 'Dentista', date: U.addDays(T, 2), start: '10:00', end: '11:00', location: 'Aveiro' }); const s0 = OS.add('subjects', { name: 'Contabilidade', status: 'Em curso' }); const ex = OS.add('assessments', { title: 'Contabilidade', type: 'Teste', date: U.addDays(T, 3), subject: s0.id }); OS.add('tasks', { title: 'Tarefa privada', sched: T, status: 'Próxima' }); return { sh: sh.id, ev: ev.id }; }, T);
+  let v = await (async () => { await E(p, () => location.hash = 'definicoes.ligacoes'); await sleep(700); return E(p, () => document.getElementById('view').innerText); })();
+  ok('Definições → Ligações: "A tua agenda também fora da app" com turnos, folgas, compromissos e provas', /A tua agenda também fora da app/.test(v) && /Turnos de trabalho/.test(v) && /Folgas/.test(v) && /Calendário do iPhone/.test(v));
+  await p.click('#cpSet [data-act=cpOn]'); await p.waitForFunction(() => OS.one('calx').n > 0, null, { timeout: 8000 }).catch(() => { }); await sleep(300);
+  const up = calls.flatMap(c => c.up || []), by = t => up.find(x => x.t === t);
+  const sh = by('Turno · Loja'), off = by('Folga'), ev = by('Dentista'), ex = up.find(x => /Teste: Contabilidade/.test(x.t));
+  ok('Liga com um toque e envia turnos, folgas, compromissos e provas (sem tarefas, por omissão)', !!sh && !!off && !!ev && !!ex && !up.some(x => /Tarefa privada/.test(x.t)), JSON.stringify(up.map(x => x.t)));
+  ok('Turno da noite (22:00–06:00) acaba no dia seguinte; folga e prova sem hora ficam "dia inteiro"', sh && new Date(sh.e) - new Date(sh.s) === 8 * 36e5 && off.all === true && ex.all === true && ev && new Date(ev.e) - new Date(ev.s) === 36e5, JSON.stringify({ sh, off, ex }));
+  const eidSh = await E(p, id => { const m = OS.one('calx').map; const k = Object.keys(m).find(x => x.startsWith('shifts:' + id)); return k && m[k].e; }, ids.sh);
+  calls.length = 0; await E(p, id => { OS.upd('shifts', id, { start: '21:00' }); }, ids.sh); await E(p, () => OS.CalPush.sync(true)); await sleep(200);
+  const up2 = calls.flatMap(c => c.up || []);
+  ok('Alterar o turno na app atualiza o MESMO evento lá fora (sem duplicar)', up2.length === 1 && up2[0].eid === eidSh && /T\d\d:00:00/.test(up2[0].s) && Object.keys(G).length === 4, JSON.stringify({ up2: up2.map(x => [x.t, x.eid]), total: Object.keys(G).length }));
+  calls.length = 0; await E(p, id => OS.del('events', id), ids.ev); await E(p, () => OS.CalPush.sync(true)); await sleep(200);
+  ok('Apagar na app apaga lá fora', calls.some(c => (c.del || []).length === 1) && !Object.values(G).some(x => x.t === 'Dentista'), JSON.stringify(calls));
+  calls.length = 0; await E(p, () => OS.CalPush.sync(true)); ok('Sem mudanças não envia nada (não gasta o script)', calls.length === 0);
+  calls.length = 0; await E(p, T => OS.add('dayoffs', { date: OS.U.addDays(T, 5), kind: 'Férias' }), T); await sleep(13500);
+  ok('Uma folga nova vai sozinha para fora, poucos segundos depois de a registar', calls.some(c => (c.up || []).some(x => x.t === 'Férias' && x.all)), JSON.stringify(calls));
+  await E(p, () => { OS.setOne('integ', { gcal: true }); OS.gcalStart && OS.gcalStart(); }); await sleep(1200);
+  ok('A app não lê de volta o calendário "Oceanum" (nada aparece duas vezes)', await E(p, () => OS.Cal.gcal.some(g => g.title === 'Jantar com a família') && !OS.Cal.gcal.some(g => /Turno · Loja/.test(g.title))));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (agenda)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 (async () => {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('agenda')) await calTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);
