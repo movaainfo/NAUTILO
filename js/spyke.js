@@ -63,9 +63,19 @@ S.ctx = () => { const t = U.today(), L = [], add = (k, v) => { if (v) L.push(k +
   try { if (OS.Mail) add('E-mails importantes', OS.Mail.ctx().replace(/\n/g, '; ')); } catch (e) { }
   try { const wx = OS.Weather && OS.Weather.cached(); if (wx && wx.now) add('Clima', OS.Weather.say(wx, 0) + ' ' + OS.Weather.say(wx, 1)); } catch (e) { }
   try { add('Decisões em análise', OS.all('decisions').filter(d => d.status === 'Em análise').slice(0, 4).map(d => d.title + ' (' + (d.alts || []).map(a => a.name).filter(Boolean).join(' vs ') + ')' + (d.ai && d.ai.r && d.ai.r.inclinacao && d.ai.r.inclinacao.nome ? ' — a análise aponta para ' + d.ai.r.inclinacao.nome : '')).join('; ')); } catch (e) { }
-  try { add('Pessoas da vida dele', OS.all('people').slice(0, 30).map(x => x.name + (x.rel ? ' (' + x.rel + ')' : '') + (x.birth ? ' anos ' + x.birth.slice(5) : '')).join('; ')); } catch (e) { }
+  try { const I = OS.Inv; add('Património e investimentos', `património líquido ${U.eur(OS.Fin.netWorth(), { dec: 0 })}; carteira ${U.eur(I.value(), { dec: 0 })} (investido ${U.eur(I.cost(), { dec: 0 })}); proventos nos últimos 12 meses ${U.eur(I.divs(U.addDays(t, -365), t), { dec: 0 })}`); } catch (e) { }
+  try { const S = OS.all('shifts').filter(s => U.ym(s.date) === U.ym(t)); if (S.length) add('Horas de trabalho este mês', `${U.nf(U.sum(S, s => OS.Car.workedHours(s)), 1)} h trabalhadas de ${U.nf(U.sum(S, OS.Car.shiftHours), 1)} h marcadas`); } catch (e) { }
+  try { const wk = U.monday(t), h = U.sum(OS.all('sessions').filter(s => s.date >= wk), s => s.minutes) / 60, tg = OS.St.targetWeek(); add('Estudo esta semana', U.nf(h, 1) + ' h' + (tg ? ' de ' + tg + ' h' : '') + (OS.St.gpa() ? ' · média ' + OS.St.gpa() : '')); } catch (e) { }
+  try { add('Projetos ativos', OS.all('projects').filter(p => !['Concluído', 'Cancelado'].includes(p.status)).slice(0, 6).map(p => p.name + ' ' + Math.round(OS.Proj.info(p).prog * 100) + '%').join('; ')); } catch (e) { }
+  try { add('Desporto (últimas práticas)', U.sortBy(OS.all('sportlog'), x => x.date).slice(-4).map(x => x.date + ' ' + ((OS.get('sports', x.sport) || {}).name || '') + ' ' + (x.kind || '') + (x.mins ? ' ' + x.mins + ' min' : '') + (x.res ? ' ' + x.res : '')).join('; ')); } catch (e) { }
+  try { if (OS.Diet && OS.Diet.day) { const d = OS.Diet.day(t), o = OS.one('diet'); if (d.n || o.kcal) add('Dieta hoje', `${Math.round(d.kcal)}${o.kcal ? ' de ' + o.kcal : ''} kcal, ${Math.round(d.p)}${o.p ? ' de ' + o.p : ''} g de proteína`); } } catch (e) { }
+  try { const T = OS.all('trees').filter(x => x.date >= U.addDays(t, -6) && x.alive !== false); if (T.length) add('Foco (Floresta, 7 dias)', U.nf(U.sum(T, x => U.num(x.mins)) / 60, 1) + ' h'); } catch (e) { }
+  try { const dv = OS.all('devos'); if (dv.length) add('Fé', 'devocionais nos últimos 30 dias: ' + dv.filter(x => x.date >= U.addDays(t, -29)).length + (dv.some(x => x.date === t) ? ' (já fez o de hoje)' : '')); } catch (e) { }
+  try { add('A ler', OS.all('books').filter(b => b.status === 'A ler').map(b => b.title + (b.curPage && b.pages ? ' (' + b.curPage + '/' + b.pages + ')' : '')).join('; ')); } catch (e) { }
+  try { add('Tendências recentes', OS.Intel.insights().slice(0, 5).map(x => x.text).join(' ')); } catch (e) { }
+  try { add('Pessoas da vida dele', OS.all('people').slice(0, 30).map(x => x.name + (x.rel ? ' (' + x.rel + ')' : '') + (x.birthday ? ' faz anos a ' + x.birthday.slice(8, 10) + '/' + x.birthday.slice(5, 7) : '')).join('; ')); } catch (e) { }
   try { add('Memória (coisas que ele te contou)', U.sortBy(OS.all('spymem'), m => m.date || '').reverse().slice(0, 60).map(m => m.text).join(' | ')); } catch (e) { }
-  return L.join('\n').slice(0, 7800); };
+  return L.join('\n').slice(0, 9500); };
 
 /* ================= voz ================= */
 let AC = null, tok = 0, engine = '';

@@ -123,15 +123,16 @@ S.decisions = { label: 'Decisão', title: r => r.title, fields: [
 /* ---- Finanças ---- */
 S.accounts = { label: 'Conta', title: r => L.accLabel(r), fields: [
   F('inst', 'Banco', 'text', { list: () => L.BANKS.map(b => b[0]), ph: 'Ex.: Revolut, Santander, BTG, Caixa Geral, Wise' }), F('name', 'Nome da conta', 'text', { req: 1, ph: 'Ex.: Conta à ordem, Cartão, Poupança' }), F('type', 'Tipo', 'sel', { o: L.ACCT, req: 1 }),
-  F('opening', 'Saldo inicial', 'money'), F('openDate', 'Data do saldo inicial', 'date'), F('currency', 'Moeda', 'sel', { o: L.CUR }),
-  F('limit', 'Limite do cartão', 'money', { show: r => r.type === 'Cartão de crédito' }), F('dueDay', 'Dia de pagamento', 'num', { show: r => r.type === 'Cartão de crédito' }),
+  F('currency', 'Moeda', 'sel', { o: L.CUR, re: 1, h: 'Euro, real, dólar… O saldo fica nesta moeda; os totais aparecem em euros ao câmbio do dia.' }), F('opening', 'Saldo inicial', 'money', { cur: r => r.currency }), F('openDate', 'Data do saldo inicial', 'date'),
+  F('limit', 'Limite do cartão', 'money', { show: r => r.type === 'Cartão de crédito', cur: r => r.currency }), F('dueDay', 'Dia de pagamento', 'num', { show: r => r.type === 'Cartão de crédito' }),
   F('archived', 'Arquivada', 'bool')
 ], defaults: () => ({ type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: U.today() }) };
 
 S.transactions = { label: 'Movimento', title: r => r.desc || r.cat || r.type, fields: [
-  F('type', 'Tipo', 'sel', { o: ['Despesa', 'Receita', 'Transferência'], req: 1, re: 1 }), F('amount', 'Valor', 'money', { req: 1 }),
+  F('type', 'Tipo', 'sel', { o: ['Despesa', 'Receita', 'Transferência'], req: 1, re: 1 }), F('amount', 'Valor', 'money', { req: 1, cur: r => OS.Fin.curOf(r.account) }),
   F('date', 'Data', 'date', { req: 1 }), F('desc', 'Descrição', 'text', { list: () => [...new Set(OS.all('transactions').map(t => t.desc).filter(Boolean))].slice(-80) }),
-  rel('account', 'Conta', 'accounts', { req: 1, filter: a => !a.archived }), rel('toAccount', 'Para a conta', 'accounts', { show: r => r.type === 'Transferência', filter: a => !a.archived }),
+  rel('account', 'Conta', 'accounts', { req: 1, filter: a => !a.archived, re: 1 }), rel('toAccount', 'Para a conta', 'accounts', { show: r => r.type === 'Transferência', filter: a => !a.archived, re: 1 }),
+  F('toAmount', 'Valor que chega à outra conta', 'money', { show: r => r.type === 'Transferência' && r.toAccount && OS.Fin.curOf(r.account) !== OS.Fin.curOf(r.toAccount), cur: r => OS.Fin.curOf(r.toAccount), h: 'As contas têm moedas diferentes. Se deixares vazio, usa o câmbio do dia.' }),
   F('cat', 'Categoria', 'sel', { o: catsFor, show: r => r.type !== 'Transferência', re: 1 }), F('sub', 'Subcategoria', 'sel', { o: subsFor, show: r => r.type !== 'Transferência' }),
   F('method', 'Forma de pagamento', 'sel', { o: L.METHOD }), F('ess', 'Classificação', 'sel', { o: ['Essencial', 'Supérfluo'], show: r => r.type === 'Despesa' }),
   F('inst', 'Parcelas', 'num', { show: r => r.type === 'Despesa' && !r.instG, h: 'Divide o valor em N meses (cria as parcelas futuras)' }),
@@ -377,25 +378,32 @@ Hab.perfectStreak = () => { const core = OS.all('habits').filter(h => h.active &
 /* ---- Finanças ---- */
 const Fin = OS.Fin = {};
 Fin.cats = type => OS.one('fin').cats[type] || {};
+const curOf = id => { const a = id && OS.get('accounts', id); return (a && a.currency) || 'EUR'; };
+Fin.curOf = curOf;
 Fin.accBal = (a, upTo) => {
   let b = U.num(a.opening);
-  OS.all('transactions').forEach(t => { if (upTo && t.date > upTo) return; if (t.date > U.today() && !upTo) return; const v = U.num(t.amount);
+  const from = a.openSet && a.openDate ? a.openDate : ''; // com o saldo inicial definido, o que é anterior já está dentro dele
+  OS.all('transactions').forEach(t => { if (upTo && t.date > upTo) return; if (t.date > U.today() && !upTo) return; if (from && t.date < from) return; const v = U.num(t.amount);
     if (t.type === 'Receita' && t.account === a.id) b += v; else if (t.type === 'Despesa' && t.account === a.id) b -= v;
-    else if (t.type === 'Transferência') { if (t.account === a.id) b -= v; if (t.toAccount === a.id) b += v; } });
-  OS.all('invtx').forEach(t => { if (t.account !== a.id) return; if (upTo && t.date > upTo) return; const gross = ['Compra', 'Venda', 'Subscrição'].includes(t.type) ? U.num(t.qty) * U.num(t.price) * (U.num((OS.get('assets', t.asset) || {}).mult) || 1) : U.num(t.amount);
-    const fx = Inv.fx((OS.get('assets', t.asset) || {}).currency);
+    else if (t.type === 'Transferência') { if (t.account === a.id) b -= v; if (t.toAccount === a.id) b += U.num(t.toAmount) || (curOf(t.account) === (a.currency || 'EUR') ? v : v * (Inv.fx(curOf(t.account)) || 1) / (Inv.fx(a.currency) || 1)); } });
+  const accFx = Inv.fx(a.currency) || 1; // os ativos passam para a moeda da conta (e não para euros)
+  OS.all('invtx').forEach(t => { if (t.account !== a.id) return; if (upTo && t.date > upTo) return; if (from && t.date < from) return; const gross = ['Compra', 'Venda', 'Subscrição'].includes(t.type) ? U.num(t.qty) * U.num(t.price) * (U.num((OS.get('assets', t.asset) || {}).mult) || 1) : U.num(t.amount);
+    const fx = Inv.fx((OS.get('assets', t.asset) || {}).currency) / accFx;
     if (['Bonificação', 'Desdobramento/Grupamento', 'Transferência (entrada)', 'Transferência (saída)'].includes(t.type)) return; if (t.type === 'Compra' || t.type === 'Subscrição') b -= gross * fx + U.num(t.fees); else if (t.type === 'Venda') b += gross * fx - U.num(t.fees); else if (t.type === 'Taxa') b -= U.num(t.amount) + U.num(t.fees); else b += (U.num(t.amount) - U.num(t.tax)) * fx - U.num(t.fees); });
   return b;
 };
+Fin.accBalE = (a, upTo) => Fin.accBal(a, upTo) * (Inv.fx(a.currency) || 1);   // o saldo em euros (para somar contas de moedas diferentes)
 Fin.accounts = () => OS.all('accounts').filter(a => !a.archived);
-Fin.liquid = () => U.sum(Fin.accounts().filter(a => ['Conta à ordem', 'Dinheiro', 'Poupança'].includes(a.type)), a => Fin.accBal(a));
-Fin.reserve = () => U.sum(Fin.accounts().filter(a => a.type === 'Reserva'), a => Fin.accBal(a));
-Fin.cardDebt = () => -U.sum(Fin.accounts().filter(a => a.type === 'Cartão de crédito'), a => Math.min(0, Fin.accBal(a)));
+Fin.liquid = () => U.sum(Fin.accounts().filter(a => ['Conta à ordem', 'Dinheiro', 'Poupança'].includes(a.type)), a => Fin.accBalE(a));
+Fin.reserve = () => U.sum(Fin.accounts().filter(a => a.type === 'Reserva'), a => Fin.accBalE(a));
+Fin.cardDebt = () => -U.sum(Fin.accounts().filter(a => a.type === 'Cartão de crédito'), a => Math.min(0, Fin.accBalE(a)));
 Fin.debtBal = d => Math.max(0, U.num(d.principal) - U.sum(OS.all('transactions').filter(t => t.debt === d.id && t.date <= U.today()), t => t.amount));
 Fin.debtsTotal = () => U.sum(OS.all('debts'), Fin.debtBal);
-Fin.cashTotal = () => U.sum(OS.all('accounts'), a => Fin.accBal(a));
+Fin.cashTotal = () => U.sum(OS.all('accounts'), a => Fin.accBalE(a));
 Fin.netWorth = () => Fin.cashTotal() + Inv.value() - Fin.debtsTotal();
-Fin.tx = (from, to, f = {}) => OS.all('transactions').filter(t => t.date >= from && t.date <= to && (!f.type || t.type === f.type) && (!f.cat || t.cat === f.cat) && (!f.account || t.account === f.account || t.toAccount === f.account) && (!f.method || t.method === f.method) && (!f.tag || (t.tags || []).includes(f.tag)) && (!f.q || ((t.desc || '') + ' ' + (t.note || '') + ' ' + (t.cat || '') + ' ' + (t.sub || '')).toLowerCase().includes(f.q.toLowerCase())));
+const toE = (L) => { const cur = {}; let other = false; OS.all('accounts').forEach(a => { cur[a.id] = a.currency || 'EUR'; if (cur[a.id] !== 'EUR') other = true; }); if (!other) return L;
+  return L.map(t => { const c = cur[t.account] || 'EUR'; return c === 'EUR' ? t : Object.assign({}, t, { amount: U.num(t.amount) * (Inv.fx(c) || 1), amountOrig: t.amount, curOrig: c }); }); };
+Fin.tx = (from, to, f = {}) => toE(OS.all('transactions').filter(t => t.date >= from && t.date <= to && (!f.type || t.type === f.type) && (!f.cat || t.cat === f.cat) && (!f.account || t.account === f.account || t.toAccount === f.account) && (!f.method || t.method === f.method) && (!f.tag || (t.tags || []).includes(f.tag)) && (!f.q || ((t.desc || '') + ' ' + (t.note || '') + ' ' + (t.cat || '') + ' ' + (t.sub || '')).toLowerCase().includes(f.q.toLowerCase()))));
 Fin.isInvestAcc = id => { const a = OS.get('accounts', id); return a && ['Corretora', 'Reserva', 'Poupança'].includes(a.type); };
 Fin.month = ym => {
   const from = ym + '-01', to = ym + '-' + U.pad(U.dim(ym)), txs = Fin.tx(from, to);
@@ -587,7 +595,7 @@ Goal.lower = g => g.metric === 'run5k';
 Goal.value = g => {
   const since = g.start || '0000';
   switch (g.metric) {
-    case 'account': { const a = OS.get('accounts', g.account); return a ? Fin.accBal(a) : 0; }
+    case 'account': { const a = OS.get('accounts', g.account); return a ? Fin.accBalE(a) : 0; }
     case 'networth': return Fin.netWorth();
     case 'invested': return Inv.value();
     case 'studyHours': return U.r1(U.sum(OS.all('sessions').filter(s => s.date >= since), s => s.minutes) / 60);

@@ -1705,11 +1705,108 @@ async function calTests(b) { cur = 'Agenda'; console.log('\n=== Agenda fora da a
   ok('Trabalho: "Horas trabalhadas este mês" mostra só o que já trabalhaste e as marcadas à parte', /Horas trabalhadas este mês/i.test(v) && hm.marc > hm.real && new RegExp('de ' + hm.marc.toLocaleString('pt-PT', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).replace('.', '\\.') + ' h marcadas no mês').test(v) && /Horas trabalhadas esta semana/i.test(v), JSON.stringify(hm) + ' ' + (v.match(/Horas trabalhadas este mês[\s\S]{0,60}/i) || [''])[0]);
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (agenda)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
+/* ---------- CHECK-UP GERAL: dados em todas as áreas, todas as páginas, abas e formulários; Direção ligada a tudo; Finanças ---------- */
+async function checkupTests(b, prof = PROFILES[4]) { cur = 'Check-up ' + prof.id; console.log('\n=== Check-up geral (' + prof.id + ') ===');
+  const { ctx, p, errs } = await newPage(b, prof); await ctx.route(/script\.google\.com|generativelanguage|googleapis|query[12]\.finance|stooq|coingecko|frankfurter|open-meteo|allorigins|corsproxy/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close && OS.Spyke.close(); });
+  // 1 · dados em TODAS as coleções (3 registos cada, datas no passado, hoje e futuro)
+  const seed = await E(p, () => { const U = OS.U, T = U.today(), out = { n: 0, skip: [], err: [] }, SKIP = new Set(['reports', 'files']);
+    const val = (f, c, i, rec) => { const o = typeof f.o === 'function' ? (() => { try { return f.o(rec); } catch (e) { return []; } })() : f.o || [];
+      switch (f.t) { case 'text': return f.k === 'time' ? '09:00' : 'Teste ' + c + ' ' + (i + 1); case 'area': return 'Nota de teste ' + (i + 1); case 'num': case 'money': return 10 + i * 5; case 'pct': return 5;
+        case 'date': return U.addDays(T, [-10, 0, 5][i]); case 'time': return ['09:00', '14:00', '22:00'][i]; case 'bool': return i !== 1; case 'rating': return 3; case 'tags': return ['teste'];
+        case 'sel': { const x = o.find(v => (Array.isArray(v) ? v[0] : v) !== '' ); return x == null ? '' : Array.isArray(x) ? x[0] : x; }
+        case 'rel': { const L = OS.all(f.c || '').filter(r => !f.filter || f.filter(r, rec)); return L[0] ? L[0].id : ''; } default: return ''; } };
+    const order = ['accounts', 'subjects', 'assets', 'sports', 'projects', 'goals', 'people', 'debts', 'exercises', 'habits'].concat(Object.keys(OS.S));
+    [...new Set(order)].forEach(c => { const S = OS.S[c]; if (!S || !S.fields || SKIP.has(c)) { out.skip.push(c); return; }
+      for (let i = 0; i < 3; i++) { try { const rec = Object.assign({}, S.defaults ? S.defaults() : {}); S.fields.forEach(f => { if (rec[f.k] != null && rec[f.k] !== '' && !(f.t === 'date')) return; if (f.show && !(() => { try { return f.show(rec); } catch (e) { return false; } })()) return; const v = val(f, c, i, rec); if (v !== '') rec[f.k] = v; });
+          if (c === 'transactions') { rec.type = ['Despesa', 'Receita', 'Despesa'][i]; rec.amount = [12.5, 900, 40][i]; } if (c === 'invtx') { rec.type = ['Compra', 'Dividendo', 'Compra'][i]; rec.qty = 2; rec.price = 50; rec.amount = 3; }
+          if (c === 'shifts') { rec.start = '09:00'; rec.end = '17:00'; } OS.add(c, rec); out.n++; } catch (e) { out.err.push(c + ': ' + e.message + ' @ ' + String(e.stack || '').split('\n').slice(1, 4).map(x => x.trim().slice(0, 140)).join(' < ')); } } });
+    return out; });
+  if (process.env.CKPROF) { const P = await E(p, () => { const T = {}, N = {}; const wrapAll = (o, pre) => { if (!o) return; Object.keys(o).forEach(k => { const f = o[k]; if (typeof f !== 'function' || f.__w) return; const g = function (...a) { const t0 = performance.now(); try { return f.apply(this, a); } finally { T[pre + k] = (T[pre + k] || 0) + performance.now() - t0; N[pre + k] = (N[pre + k] || 0) + 1; } }; g.__w = 1; Object.assign(g, f); o[k] = g; }); };
+      [['Intel', OS.Intel], ['Fin', OS.Fin], ['Inv', OS.Inv], ['Cal', OS.Cal], ['Hab', OS.Hab], ['Goal', OS.Goal], ['St', OS.St], ['Car', OS.Car], ['Tasks', OS.Tasks], ['LifePlan', OS.LifePlan], ['InvX', OS.InvX], ['Diet', OS.Diet], ['Run', OS.Run], ['Fit', OS.Fit], ['Proj', OS.Proj], ['Dom', OS.Dom], ['Mv', OS.Mv], ['Spyke', OS.Spyke], ['Reports', OS.Reports], ['C', OS.C], ['UI', OS.UI]].forEach(([n, o]) => wrapAll(o, n + '.'));
+      const t0 = performance.now(); OS.views.visao(''); const tot = performance.now() - t0; return { tot: Math.round(tot), top: Object.entries(T).sort((a, b) => b[1] - a[1]).slice(0, 25).map(([k, v]) => k + ' ' + Math.round(v) + 'ms x' + N[k]) }; });
+    console.log('PERFIL DO PAINEL', JSON.stringify(P, null, 1)); }
+  ok('Check-up: dados de teste em todas as áreas da app (' + seed.n + ' registos)', seed.n > 150 && !seed.err.length, JSON.stringify({ err: seed.err.slice(0, 5), skip: seed.skip }));
+  // 2 · todas as páginas e as suas abas (e as de Definições): sem erros, sem "undefined/NaN", sem travar
+  const routes = await E(p, () => [...new Set([...document.querySelectorAll('#side a[href^="#"], .tn-dd a[href^="#"]')].map(a => a.getAttribute('href').slice(1)).filter(Boolean))]);
+  const bad = [], slow = [], reloads = [], seen = new Set(), queue = routes.concat(['definicoes', 'definicoes.email', 'definicoes.ligacoes', 'definicoes.atalhos', 'definicoes.spyke', 'definicoes.impostos', 'definicoes.script']); let visited = 0;
+  for (let qi = 0; qi < queue.length && qi < 400; qi++) { const r = queue[qi]; if (seen.has(r)) continue; seen.add(r); const e0 = errs.length;
+    // o render corre no "hashchange": um segundo ouvinte (registado depois) mede quanto tempo a página levou a desenhar
+    let ms = 0; try { ms = await E(p, r => new Promise(res => { if (!window.__rdOn) { window.__rdOn = 1; addEventListener('hashchange', () => { if (window.__res) { const f = window.__res; window.__res = null; f(Math.round(performance.now() - window.__t0)); } }); }
+      window.__t0 = performance.now(); if (location.hash.slice(1) === r) { OS.emit('render'); return res(Math.round(performance.now() - window.__t0)); } window.__res = res; location.hash = r; setTimeout(() => { if (window.__res) { window.__res = null; res(9999); } }, 6000); }), r); } catch (e) { reloads.push(r); await sleep(2500); await p.waitForFunction(() => window.OS && OS.Lock && OS.Lock.unlocked && OS.Lock.unlocked(), null, { timeout: 8000 }).catch(() => { }); continue; } await sleep(150); visited++;
+    const info = await E(p, () => { const v = document.getElementById('view'), t = v.innerText || ''; return { len: t.trim().length, bad: (t.match(/\bundefined\b|\bNaN\b|\[object Object\]|\bInfinity\b/g) || []).slice(0, 3), tabs: [...v.querySelectorAll('.tabs a[href^="#"]')].map(a => a.getAttribute('href').slice(1)), hash: location.hash.slice(1) }; });
+    info.tabs.forEach(tb => { if (!seen.has(tb)) queue.push(tb); });
+    const newErr = errs.slice(e0).filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)|WebGL|AudioContext/.test(e));
+    if (newErr.length || info.bad.length || info.len < 20) bad.push(r + ': ' + (newErr[0] || (info.bad.length ? 'mostra ' + info.bad.join(',') : 'página vazia')));
+    if (ms > 1500) slow.push(r + ' ' + ms + ' ms'); }
+  ok('Check-up: todas as páginas e abas abrem sem erros nem valores partidos (' + visited + ' visitadas)', !bad.length && visited > 80, bad.slice(0, 8).join(' | '));
+  ok('Check-up: nenhuma página recarrega a app sozinha', !reloads.length, reloads.join(' | '));
+  ok('Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)', !slow.length, slow.join(' | '));
+  // 3 · todos os formulários (novo e editar) abrem sem erros
+  const forms = await E(p, async () => { const bad = [], n = { ok: 0 }; for (const c of Object.keys(OS.S)) { const S = OS.S[c]; if (!S || !S.fields) continue; for (const id of [null, (OS.all(c)[0] || {}).id]) { if (id === undefined) continue; try { OS.UI.openForm(c, id || null, {}); const d = document.querySelector('#osform'); if (!d) bad.push(c + (id ? ' (editar)' : ' (novo)') + ': não abriu'); else { if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(d.innerText)) bad.push(c + ': mostra undefined/NaN'); n.ok++; } OS.UI.closeDrawer && OS.UI.closeDrawer(); } catch (e) { bad.push(c + ': ' + e.message); } await new Promise(r => setTimeout(r, 15)); } } return { bad, n: n.ok }; });
+  ok('Check-up: todos os formulários (criar e editar) abrem sem erros (' + forms.n + ')', !forms.bad.length && forms.n > 60, forms.bad.slice(0, 6).join(' | '));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)|WebGL|AudioContext/.test(e)); ok('Check-up: sem erros de JavaScript em toda a app', !er.length, er.slice(0, 4).join(' | ')); await ctx.close(); }
+
+/* ---------- a Direção sabe tudo o que acontece na app; Finanças: apagar movimentos, saldo inicial e moedas ---------- */
+async function direcaoTests(b) { cur = 'Direção'; console.log('\n=== Direção ligada à app inteira + Finanças ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[4]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); });
+  const view = () => E(p, () => document.getElementById('view').innerText), go = async (h, ms = 700) => { await E(p, h => location.hash = h, h); await sleep(ms); return view(); };
+  const W = await E(p, () => { const U = OS.U, T = U.today(), wk = U.monday(U.addDays(T, -7)), d1 = U.addDays(wk, 2);
+    const sp = OS.add('sports', { name: 'Futebol', cat: 'futebol' }); OS.add('sportlog', { sport: sp.id, date: d1, kind: 'Jogo', mins: 90, res: 'Vitória', score: '3-1' });
+    OS.add('trees', { date: d1, mins: 50, sp: 'carvalho', alive: true }); OS.add('devos', { date: d1, ref: 'Salmos 23' }); OS.add('books', { title: 'Hábitos Atómicos', status: 'Lido', end: d1, pages: 300 }); OS.add('books', { title: 'O Poder do Agora', status: 'A ler', pages: 200, curPage: 40 });
+    OS.add('shifts', { date: d1, start: '09:00', end: '17:00' }); OS.add('meals', { date: d1, food: 'Frango', kcal: 500, p: 40, meal: 'Almoço' }); OS.setOne('diet', { p: 150, kcal: 2500 }); OS.add('meals', { date: T, food: 'Ovos', kcal: 300, p: 20, meal: 'Pequeno-almoço' });
+    OS.add('people', { name: 'Mãe Teste', rel: 'Mãe', birthday: '1975-04-12' });
+    const a = OS.add('assets', { name: 'ETF Mundo', ticker: 'MUND', cls: 'ETF', currency: 'EUR', price: 110, priceDate: T, sector: 'Diversificado', country: 'Irlanda' }); OS.add('invtx', { asset: a.id, type: 'Compra', date: d1, qty: 10, price: 100 }); OS.add('invtx', { asset: a.id, type: 'Dividendo', date: d1, amount: 12 });
+    OS.setUI('revW', wk); OS.setUI('revM', U.ym(d1)); return { wk, d1 }; });
+  let v = await go('revisao', 900);
+  ok('Revisão semanal: hábitos, horas trabalhadas, desporto e foco; o jogo e o livro terminado aparecem nos acontecimentos', /Hábitos/.test(v) && /Horas trabalhadas/i.test(v) && /Desporto · foco/i.test(v) && /Futebol: Jogo · Vitória 3-1/.test(v) && /Livro terminado: Hábitos Atómicos/.test(v), v.slice(0, 300));
+  v = await go('revisao.mensal', 900);
+  ok('Revisão mensal: "Equilíbrio da vida" (desporto, foco, dieta, Fé, leitura) e investimentos do mês', /Equilíbrio da vida/i.test(v) && /Desporto/.test(v) && /Foco profundo/.test(v) && /Dieta registada/.test(v) && /Devocionais/.test(v) && /Hábitos Atómicos/.test(v) && /Investido \(líquido\)/.test(v) && /Proventos recebidos/.test(v));
+  v = await go('northstar', 700); ok('Estrela-guia: "onde foi o teu tempo" inclui desporto e foco (Floresta)', /Desporto/.test(v) && /Foco \(Floresta\)/.test(v));
+  v = await go('evolucao', 1000); ok('Minha Evolução: também Fé, desporto, foco, dieta, leitura e horas trabalhadas', await E(p, () => { const t = document.getElementById('view').textContent; return /Fé/.test(t) && /Desporto \(30 dias\)/.test(t) && /Foco profundo/.test(t) && /Devocionais/.test(t); }));
+  v = await go('next', 900); ok('Próximos passos: devocional, leitura e proteína do dia entram nos passos', await E(p, () => { const t = document.getElementById('view').textContent; return /Ler 20 páginas de "O Poder do Agora"/.test(t) && /Comer mais \d+ g de proteína hoje/.test(t); }));
+  const C = await E(p, () => OS.Spyke.ctx());
+  ok('Spyke e Centro de decisões sabem tudo: património, investimentos, estudo, projetos, desporto, dieta, Fé, leitura, tendências e aniversários certos', /Património e investimentos/.test(C) && /Desporto/.test(C) && /Dieta hoje/.test(C) && /A ler: O Poder do Agora/.test(C) && /Mãe Teste \(Mãe\) faz anos a 12\/04/.test(C), C.slice(0, 200));
+  const BR = await E(p, async () => { const T = OS.Brain && OS.Brain.tools ? OS.Brain.tools : null; return null; });
+  // 3 · Finanças: saldo inicial em várias moedas, totais em euros, apagar movimentos e repor
+  const F = await E(p, () => { const U = OS.U, T = U.today(); OS.one('profile').fx = Object.assign({}, OS.one('profile').fx, { BRL: 0.16, USD: 0.9 }); OS.touch('profile');
+    OS.all('transactions').slice().forEach(t => OS.del('transactions', t.id)); OS.all('accounts').slice().forEach(a => OS.del('accounts', a.id));
+    const e = OS.add('accounts', { name: 'Conta', inst: 'Santander', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: '2020-01-01' }); const r = OS.add('accounts', { name: 'Conta', inst: 'BTG', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: '2020-01-01' });
+    for (let i = 0; i < 5; i++) OS.add('transactions', { type: 'Despesa', amount: 10 + i, date: U.addDays(T, -i - 1), desc: 'Teste ' + i, account: e.id, cat: 'Alimentação', tags: [] });
+    return { e: e.id, r: r.id }; });
+  v = await go('financas.contas', 800);
+  ok('Contas: painel "Saldo inicial · o que já tens" com a moeda de cada conta', /Saldo inicial · o que já tens/i.test(v) && await E(p, () => !!document.querySelector('#saldoIni select[name^="c_"]') && !!document.querySelector('#saldoIni input[name^="v_"]')));
+  await E(p, F => { const f = document.getElementById('saldoIni'); f.elements['v_' + F.e].value = '1500'; f.elements['c_' + F.r].value = 'BRL'; f.elements['v_' + F.r].value = '5000'; f.elements.nn.value = 'Wise dólares'; f.elements.nc.value = 'USD'; f.elements.nv.value = '200'; f.requestSubmit(); }, F); await sleep(600);
+  const S = await E(p, F => { const Fin = OS.Fin, e = OS.get('accounts', F.e), r = OS.get('accounts', F.r), w = OS.all('accounts').find(a => /Wise/.test((a.inst || '') + ' ' + a.name)); return { e: Fin.accBal(e), r: Fin.accBal(r), rc: r.currency, w: w && Fin.accBal(w), wc: w && w.currency, liq: Math.round(Fin.liquid() * 100) / 100 }; }, F);
+  ok('Saldo inicial: € 1500 (os testes antigos não contam), R$ 5000 e US$ 200; total disponível em euros ao câmbio', S.e === 1500 && S.r === 5000 && S.rc === 'BRL' && S.w === 200 && S.wc === 'USD' && Math.abs(S.liq - (1500 + 5000 * .16 + 200 * .9)) < .01, JSON.stringify(S));
+  v = await view(); ok('Contas: saldo de cada conta na sua moeda (R$ 5.000,00 ≈ € 800,00)', /R\$ 5\.000,00/.test(v) && /≈ € 800,00/.test(v) && /US\$ 200,00/.test(v), (v.match(/R\$[^\n]*/) || [''])[0]);
+  const exp0 = await E(p, () => OS.Fin.month(OS.U.ym(OS.U.today())).exp); await E(p, F => { OS.add('transactions', { type: 'Despesa', amount: 100, date: OS.U.today(), desc: 'Mercado no Brasil', account: F.r, cat: 'Alimentação', tags: [] }); }, F);
+  const M = await E(p, ([F, exp0]) => ({ bal: OS.Fin.accBal(OS.get('accounts', F.r)), exp: OS.Fin.month(OS.U.ym(OS.U.today())).exp - exp0 }), [F, exp0]);
+  ok('Movimento numa conta em reais: tira R$ 100 do saldo em reais e conta € 16 nas despesas do mês', M.bal === 4900 && Math.abs(M.exp - 16) < .01, JSON.stringify(M));
+  await E(p, () => OS.setUI('txf', { per: 'tudo' })); v = await go('financas.transacoes', 800);
+  ok('Movimentos: o gasto em reais aparece em R$ com o equivalente em euros', /−R\$ 100,00/.test(v) && /≈ € 16,00/.test(v));
+  await E(p, F => { OS.UI.openForm('transactions', null, { account: F.r }); }, F); await sleep(300);
+  ok('Formulário: o valor mostra R$ quando a conta é em reais', await E(p, () => (document.querySelector('#osform [name=amount]').parentElement.textContent || '').includes('R$')));
+  await E(p, () => OS.UI.closeDrawer && OS.UI.closeDrawer()); await sleep(200);
+  await p.click('#view [data-act=selOn][data-c=transactions]'); await sleep(300);
+  await p.click('#view [data-act=selAll][data-c=transactions]'); await sleep(300);
+  const n0 = await E(p, () => OS.all('transactions').length); await p.click('#view [data-act=selDel][data-c=transactions]'); await sleep(300);
+  await E(p, () => { const b = [...document.querySelectorAll('#modal button, .modal button, [data-mok]')].find(x => /^Apagar$/.test(x.textContent.trim())); b && b.click(); }); await sleep(500);
+  const n1 = await E(p, () => OS.all('transactions').length); v = await view();
+  ok('Movimentos: "Selecionar para apagar" → selecionar todos → apagar (com confirmação)', n0 === 6 && n1 === 0 && /6 movimentos apagados/.test(v), JSON.stringify({ n0, n1 }));
+  await p.click('#view [data-act=selUndo]'); await sleep(400);
+  ok('Movimentos: "Repor" traz de volta os que apagaste', (await E(p, () => OS.all('transactions').length)) === 6);
+  await E(p, () => location.hash = 'financas.transacoes'); await sleep(400); await p.click('#view [data-act=selOn][data-c=transactions]'); await sleep(300);
+  await p.click('#view tr.tx-pick'); await sleep(300); const one = await E(p, () => (OS.ui.sel_transactions || []).length);
+  ok('Movimentos: tocar numa linha seleciona-a (em vez de abrir)', one === 1 && !(await E(p, () => !!document.querySelector('#osform'))));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (Direção e Finanças)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 (async () => {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('agenda')) await calTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('agenda')) await calTests(b); if (run('direcao')) await direcaoTests(b); if (run('checkup')) { await checkupTests(b, PROFILES[4]); await checkupTests(b, PROFILES[0]); } if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

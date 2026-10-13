@@ -39,6 +39,9 @@ U.r2 = v => Math.round(v * 100) / 100;
 U.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 U.nf = (v, d = 0) => (Number(v) || 0).toLocaleString('pt-PT', { minimumFractionDigits: d, maximumFractionDigits: d });
 U.eur = (v, o = {}) => { const n = Number(v) || 0; const s = (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + '€ ' + Math.abs(n).toLocaleString('pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); return s; };
+// valor numa moeda qualquer (contas em reais, dólares…): símbolo + número como no resto da app
+U.SYM = { EUR: '€', BRL: 'R$', USD: 'US$', GBP: '£', CHF: 'CHF', JPY: '¥', CAD: 'C$', AUD: 'A$' };
+U.money = (v, cur = 'EUR', o = {}) => { if (!cur || cur === 'EUR') return U.eur(v, o); const n = Number(v) || 0; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + (U.SYM[cur] || cur) + ' ' + Math.abs(n).toLocaleString(cur === 'BRL' ? 'pt-BR' : 'pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); };
 U.eurK = v => { const a = Math.abs(v); if (a >= 1e6) return (v < 0 ? '−' : '') + '€' + U.r1(a / 1e6) + 'M'; if (a >= 1e4) return (v < 0 ? '−' : '') + '€' + Math.round(a / 1e3) + 'k'; return (v < 0 ? '−' : '') + '€' + Math.round(a); };
 U.pct = (v, d = 0) => (isFinite(v) ? (v * 100).toLocaleString('pt-PT', { maximumFractionDigits: d, minimumFractionDigits: d }) : '0') + '%';
 U.mmss = sec => { sec = Math.round(sec || 0); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60; return (h ? h + ':' + U.pad(m) : m) + ':' + U.pad(s); };

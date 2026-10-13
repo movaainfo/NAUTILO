@@ -8,6 +8,31 @@ const accN = id => { const a = OS.get('accounts', id); return a ? L.accLabel(a) 
 const bankDot = a => { const b = a && L.bank(a.inst); return b ? `<i class="bk-dot" style="background:${b[1]}" aria-hidden="true"></i>` : ''; };
 const money = (v, tone = true) => `<span class="mono ${tone ? (v > 0 ? 'pos' : v < 0 ? '' : 'mut') : ''}">${U.eur(v, { sign: tone })}</span>`;
 const txSign = t => t.type === 'Receita' ? U.num(t.amount) : t.type === 'Despesa' ? -U.num(t.amount) : 0;
+// valor na moeda da conta (contas em reais, dólares…), com o equivalente em euros por baixo
+const txMoney = x => { if (!x.curOrig) return x.type === 'Transferência' ? `<span class="mono mut">${U.eur(x.amount)}</span>` : money(txSign(x)); const o = U.num(x.amountOrig), v = x.type === 'Receita' ? o : x.type === 'Despesa' ? -o : o;
+  return `<span class="mono ${x.type === 'Transferência' ? 'mut' : v > 0 ? 'pos' : ''}">${U.money(v, x.curOrig, { sign: x.type !== 'Transferência' })}</span><small class="mut" style="display:block">≈ ${U.eur(Math.abs(U.num(x.amount)))}</small>`; };
+const accMoney = (a, b, cls = '') => `<span class="mono ${cls}">${U.money(b, a.currency)}</span>${a.currency && a.currency !== 'EUR' ? `<small class="mut" style="display:block">≈ ${U.eur(b * (OS.Inv.fx(a.currency) || 1))}</small>` : ''}`;
+// selecionar registos para apagar (um, vários ou todos os do filtro), com "Repor" logo a seguir — nos movimentos das Finanças e dos Investimentos
+const LAST = {}, LASTDEL = {}, SELN = { transactions: ['movimento', 'movimentos'], invtx: ['movimento de investimento', 'movimentos de investimento'] };
+const selIds = c => new Set(OS.ui['sel_' + c] || []), selOn = c => !!OS.ui['selOn_' + c], nm = (c, n) => n + ' ' + (SELN[c] || ['registo', 'registos'])[n === 1 ? 0 : 1];
+A.selOn = b => { OS.setUI('sel_' + b.dataset.c, []); OS.setUI('selOn_' + b.dataset.c, 1); };
+A.selOff = b => { OS.setUI('sel_' + b.dataset.c, []); OS.setUI('selOn_' + b.dataset.c, 0); };
+A.selPick = b => { const c = b.dataset.c, s = selIds(c), id = b.dataset.id; s.has(id) ? s.delete(id) : s.add(id); OS.setUI('sel_' + c, [...s]); };
+A.selAll = b => OS.setUI('sel_' + b.dataset.c, (LAST[b.dataset.c] || []).slice());
+A.selNone = b => OS.setUI('sel_' + b.dataset.c, []);
+A.selDel = b => { const c = b.dataset.c, ids = [...selIds(c)].filter(id => OS.get(c, id)); if (!ids.length) return;
+  UI.ask(`Apagar ${nm(c, ids.length)}?`, 'Os saldos, os relatórios e o resto da app atualizam logo. Se te enganares, tens o botão "Repor" logo a seguir.', 'Apagar', () => {
+    const recs = ids.map(id => U.clone(OS.get(c, id))); recs.forEach(r => OS.del(c, r.id)); LASTDEL[c] = { at: Date.now(), recs }; OS.setUI('sel_' + c, []); OS.setUI('selOn_' + c, 0);
+    UI.toast(`${nm(c, recs.length)} apagado${recs.length === 1 ? '' : 's'}`, 'pos'); }); };
+A.selUndo = b => { const c = b.dataset.c, L0 = LASTDEL[c]; if (!L0) return; L0.recs.forEach(r => { if (!OS.get(c, r.id)) OS.add(c, r); }); LASTDEL[c] = null; OS.request(); UI.toast(`${nm(c, L0.recs.length)} reposto${L0.recs.length === 1 ? '' : 's'}`, 'pos'); };
+const selBar = (c, rows, extra = '') => { LAST[c] = rows.map(x => x.id); const on = selOn(c), S = selIds(c), n = rows.filter(x => S.has(x.id)).length, D = LASTDEL[c], undo = D && Date.now() - D.at < 10 * 6e4;
+  return `${undo ? `<div class="note tx-undo">${nm(c, D.recs.length)} apagado${D.recs.length === 1 ? '' : 's'}. <button class="btn xs" data-act="selUndo" data-c="${c}">Repor</button></div>` : ''}
+  <div class="tx-sel row gap8">${on ? `<b>${n} selecionado${n === 1 ? '' : 's'}</b><button class="btn xs" data-act="selAll" data-c="${c}">Selecionar os ${rows.length} deste filtro</button>${n ? `<button class="btn xs ghost" data-act="selNone" data-c="${c}">Limpar</button>` : ''}<button class="btn xs danger" data-act="selDel" data-c="${c}" ${n ? '' : 'disabled'}>${UI.ic('trash')}Apagar selecionados</button><button class="btn xs ghost" data-act="selOff" data-c="${c}">Concluir</button>${c === 'transactions' ? '<span class="mut" style="font-size:12px">Para apagar tudo (ex.: os de teste), escolhe o período "Tudo" e "Selecionar os … deste filtro".</span>' : ''}`
+    : `<button class="btn xs ghost" data-act="selOn" data-c="${c}">${UI.ic('trash')}Selecionar para apagar</button>${extra}`}</div>`; };
+// tabela com seleção: no modo seleção, tocar numa linha marca-a (em vez de abrir)
+const selTable = (c, o) => { const on = selOn(c), S = selIds(c); return UI.table(Object.assign({}, o, { coll: on ? '' : c, rowAttr: on ? (x => `data-act="selPick" data-c="${c}" data-id="${x.id}" tabindex="0" role="checkbox" aria-checked="${S.has(x.id)}"`) : null,
+  rowCls: x => (o.rowCls ? o.rowCls(x) : '') + (on ? ' tx-pick' + (S.has(x.id) ? ' on' : '') : ''), cols: (on ? [{ l: '', v: x => `<span class="tx-ck ${S.has(x.id) ? 'on' : ''}" aria-hidden="true">${S.has(x.id) ? '✓' : ''}</span>` }] : []).concat(o.cols) })); };
+OS.SelUI = { bar: selBar, table: selTable };
 const TABS = [['', 'Visão'], ['transacoes', 'Transações'], ['contas', 'Contas'], ['orcamento', 'Orçamento'], ['recorrentes', 'Recorrentes'], ['dividas', 'Dívidas'], ['inteligencia', 'Inteligência'], ['categorias', 'Categorias']];
 const periodRange = p => { const t = U.today(), ym = U.ym(t); switch (p) { case 'mesant': { const m = U.addMonths(ym, -1); return [m + '-01', m + '-' + U.dim(m)]; } case '3m': return [U.addMonths(ym, -2) + '-01', t]; case '12m': return [U.addMonths(ym, -11) + '-01', t]; case 'ano': return [t.slice(0, 4) + '-01-01', t]; case 'tudo': return ['0000-01-01', '9999-12-31']; case 'custom': return [OS.ui.txFrom || ym + '-01', OS.ui.txTo || t]; default: return [ym + '-01', ym + '-' + U.dim(ym)]; } };
 const PERIODS = [['mes', 'Este mês'], ['mesant', 'Mês anterior'], ['3m', '3 meses'], ['12m', '12 meses'], ['ano', 'Este ano'], ['tudo', 'Tudo'], ['custom', 'Personalizado']];
@@ -25,7 +50,7 @@ FIN.visao = () => {
   const per = OS.ui.fvPer || 'mes', [a, b] = periodRange(per);
   const cats = Fin.byCat(a, b);
   const nws = Fin.nwSeries(); const liq = Fin.liquid(), res = Fin.reserve(), inv = Inv.value(), card = Fin.cardDebt(), debt = Fin.debtsTotal(), nw = Fin.netWorth();
-  const dist = [...Fin.accounts().filter(x => x.type !== 'Cartão de crédito').map(x => ({ l: x.name, v: Math.max(0, Fin.accBal(x)) })), ...Inv.byKey('cls').map(x => ({ l: 'Invest. · ' + x.l, v: x.v }))].filter(x => x.v > 0);
+  const dist = [...Fin.accounts().filter(x => x.type !== 'Cartão de crédito').map(x => ({ l: x.name, v: Math.max(0, Fin.accBalE(x)) })), ...Inv.byKey('cls').map(x => ({ l: 'Invest. · ' + x.l, v: x.v }))].filter(x => x.v > 0);
   const upc = Fin.upcoming(30), upOut = upc.filter(x => x.amount < 0);
   const prev3 = [1, 2, 3].map(i => U.addMonths(ym, -i));
   const catRows = [...new Set([...Fin.byCat(prev3[2] + '-01', t).map(x => x.l)])].map(c => ({ c, cur: Fin.spentCat(c, ym), m: prev3.map(x => Fin.spentCat(c, x)) })).map(r => Object.assign(r, { avg: U.avg(r.m.filter((v, i) => Fin.month(prev3[i]).n)) || 0 })).sort((x, y) => y.cur - x.cur);
@@ -62,29 +87,46 @@ FIN.transacoes = () => {
     <input type="search" placeholder="Procurar…" value="${esc(f.q || '')}" data-uif="txf.q" aria-label="Procurar"></div>
   <div class="kpis">${UI.kpi('Movimentos', txs.length)}${UI.kpi('Receitas', U.eur(inc), '', { tone: 'pos' })}${UI.kpi('Despesas', U.eur(exp))}${UI.kpi('Saldo do período', U.eur(inc - exp, { sign: 1 }), '', { tone: inc - exp >= 0 ? 'pos' : 'neg' })}${UI.kpi('Média diária de gasto', U.eur(exp / Math.max(1, days.length)))}</div>
   ${days.length > 1 && days.length <= 120 ? `<div class="pn"><div class="pn-h"><h3>Gastos por dia</h3></div>${C.mount({ type: 'bar', labels: days.map(d => U.fmtDS(d)), series: [{ name: 'Despesas', data: days.map(d => U.sum(byDay[d] || [], x => x.amount)), color: 'var(--c2)' }], fmt: U.eurK }, 150)}</div>` : ''}
-  ${UI.table({ key: 'tx', coll: 'transactions', rows: txs, limit: 60, empty: 'Sem movimentos neste filtro.', emptyAct: UI.addBtn('transactions', 'Registar movimento', null, ''), rowCls: x => x.date > U.today() ? 'muted' : '', cols: [
+  ${selBar('transactions', txs, `<a class="btn xs ghost" href="#financas.contas">${UI.ic('wallet')}Saldo inicial das contas</a>`)}
+  ${selTable('transactions', { key: 'tx', rows: txs, limit: 60, empty: 'Sem movimentos neste filtro.', emptyAct: UI.addBtn('transactions', 'Registar movimento', null, ''), rowCls: x => x.date > U.today() ? 'muted' : '', cols: [
     { l: 'Data', v: x => `<span class="mono">${U.fmtD(x.date)}</span>`, s: x => x.date },
     { l: 'Descrição', v: x => `<b style="font-weight:520">${esc(x.desc || x.sub || x.cat || x.type)}</b>${x.instN ? ` <span class="bdg out">${x.instI}/${x.instN}</span>` : ''}${x.recurring ? ' <span class="bdg out">recorrente</span>' : ''}${x.ess === 'Supérfluo' ? ' ' + UI.badge('supérfluo', 'warn') : ''}`, cls: 'wrap' },
     { l: 'Categoria', v: x => x.type === 'Transferência' ? `<span class="mut">${esc(accN(x.account))} → ${esc(accN(x.toAccount))}</span>` : esc([x.cat, x.sub].filter(Boolean).join(' · ')), s: x => x.cat || '' },
     { l: 'Conta', v: x => esc(accN(x.account)), s: x => accN(x.account) },
     { l: 'Forma', v: x => esc(x.method || '') },
     { l: 'Tags', v: x => (x.tags || []).map(g => UI.badge(g, 'out')).join(' ') },
-    { l: 'Valor', cls: 'r', v: x => x.type === 'Transferência' ? `<span class="mono mut">${U.eur(x.amount)}</span>` : money(txSign(x)), s: x => txSign(x) }] })}`;
+    { l: 'Valor', cls: 'r', v: txMoney, s: x => txSign(x) }] })}`;
 };
 // juntar uma conta de um banco com um toque (abre o formulário já com o banco e a moeda)
 FIN.banks = (acc, title = 'Juntar conta de um banco') => { const have = new Set((acc || []).map(a => (L.bank(a.inst) || [])[0]).filter(Boolean));
   return `<div class="pn bk-add"><div class="pn-h"><h3>${title}</h3><span class="mut" style="font-size:12px">ou escreve outro em "Nova conta"</span></div><div class="bk-chips">${L.BANKS.map(([n, c, cur]) => `<button type="button" class="chip ${have.has(n) ? 'on' : ''}" data-new="accounts" data-defs='${esc(JSON.stringify({ inst: n, name: 'Conta à ordem', type: 'Conta à ordem', currency: cur }))}'><i class="bk-dot" style="background:${c}" aria-hidden="true"></i>${esc(n)}</button>`).join('')}</div></div>`; };
 OS.FinBanks = FIN.banks;
+// "Saldo inicial · o que já tens": quanto tens hoje em cada conta e em que moeda (euro, real, dólar…). A partir daí os movimentos somam e tiram.
+FIN.saldoIni = () => { const acc = Fin.accounts().filter(a => a.type !== 'Cartão de crédito'), t = U.today(), curSel = (name, v) => `<select class="field" name="${name}" aria-label="Moeda">${L.CUR.map(c => `<option value="${c}"${(v || 'EUR') === c ? ' selected' : ''}>${c === 'EUR' ? '€ euro' : c === 'BRL' ? 'R$ real' : c === 'USD' ? 'US$ dólar' : c === 'GBP' ? '£ libra' : c}</option>`).join('')}</select>`;
+  return `<form class="pn si" id="saldoIni" data-form="saldoIni"><div class="pn-h"><h3>${UI.ic('wallet')}Saldo inicial · o que já tens</h3></div>
+    <p class="mut" style="margin:0 0 10px">Para começares com a realidade: escreve quanto tens <b>hoje</b> em cada conta e em que moeda (euro, real, dólar…). Os movimentos a partir de hoje somam e tiram a este valor. Os totais da app aparecem em euros, ao câmbio do dia.</p>
+    <div class="si-rows">${acc.map(a => { const b = Fin.accBal(a); return `<div class="si-row"><span class="si-n">${bankDot(a)}<b>${esc(L.accLabel(a))}</b><small class="mut">agora: ${U.money(b, a.currency)}${a.openSet ? ' · saldo inicial a ' + U.fmtD(a.openDate) : ''}</small></span>${curSel('c_' + a.id, a.currency)}<input class="field" name="v_${a.id}" type="number" step="any" inputmode="decimal" placeholder="Quanto tens hoje" aria-label="Saldo de hoje em ${esc(L.accLabel(a))}"></div>`; }).join('')}
+      <div class="si-row si-new"><span class="si-n"><input class="field" name="nn" placeholder="Nova conta (ex.: Nubank, Wise, Dinheiro)" aria-label="Nome da nova conta"></span>${curSel('nc', 'EUR')}<input class="field" name="nv" type="number" step="any" inputmode="decimal" placeholder="Quanto tens hoje" aria-label="Saldo da nova conta"></div></div>
+    <div class="row gap8" style="margin-top:10px"><button class="btn pri sm">${UI.ic('check')}Guardar saldos</button><span class="mut" style="font-size:12px">Só mudam as contas onde escreveres um valor (e a moeda que mudares).</span></div></form>`; };
+OS.forms = OS.forms || {};
+OS.forms.saldoIni = f => { const t = U.today(), val = n => { const el = f.elements[n]; return el && el.value !== '' ? U.num(el.value) : null; }; let k = 0;
+  Fin.accounts().filter(a => a.type !== 'Cartão de crédito').forEach(a => { const c = (f.elements['c_' + a.id] || {}).value || a.currency || 'EUR', v = val('v_' + a.id), patch = {};
+    if (c !== (a.currency || 'EUR')) patch.currency = c;
+    if (v != null) { const today = Fin.accBal(Object.assign({}, a, patch, { opening: 0, openDate: t, openSet: true })); Object.assign(patch, { opening: U.r2(v - today), openDate: t, openSet: true }); }   // o que já entrou/saiu hoje fica por cima
+    if (Object.keys(patch).length) { OS.upd('accounts', a.id, patch); k++; } });
+  const nn = (f.elements.nn || {}).value, nv = val('nv'); if (nn && nn.trim()) { const nm = nn.trim(), b = L.bank(nm); OS.add('accounts', { name: b ? (nm.replace(new RegExp(b[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '').trim() || 'Conta à ordem') : nm, inst: b ? b[0] : '', type: nm.toLowerCase() === 'dinheiro' ? 'Dinheiro' : 'Conta à ordem', currency: (f.elements.nc || {}).value || 'EUR', opening: nv || 0, openDate: t, openSet: true }); k++; }
+  UI.toast(k ? `Saldos guardados (${k} conta${k === 1 ? '' : 's'}). A partir de hoje, os movimentos somam e tiram a estes valores.` : 'Escreve o valor de hoje numa conta (ou o nome de uma conta nova).', k ? 'pos' : 'warn'); };
 FIN.contas = () => {
   const acc = OS.all('accounts');
   return `<div class="row between"><div class="kpis grow">${UI.kpi('Disponível', U.eur(Fin.liquid()))}${UI.kpi('Reservas', U.eur(Fin.reserve()))}${UI.kpi('Cartões (em dívida)', U.eur(Fin.cardDebt()), '', { tone: Fin.cardDebt() ? 'warn' : '' })}${UI.kpi('Total em contas', U.eur(Fin.cashTotal()))}</div></div>
   <div class="row gap8">${UI.addBtn('accounts', 'Nova conta')}${UI.addBtn('transactions', 'Transferência', { type: 'Transferência' }, '')}</div>
+  ${FIN.saldoIni()}
   ${FIN.banks(acc)}
   ${UI.table({ key: 'acc', coll: 'accounts', rows: acc, cols: [
     { l: 'Conta', v: a => `${bankDot(a)}<b style="font-weight:530">${esc(L.accLabel(a))}</b>${a.archived ? ' ' + UI.badge('arquivada') : ''}`, s: a => L.accLabel(a) },
     { l: 'Tipo', v: a => esc(a.type) }, { l: 'Banco', v: a => esc(a.inst || '') }, { l: 'Moeda', v: a => a.currency || 'EUR' },
     { l: 'Movimentos', cls: 'r', v: a => `<span class="mono">${OS.all('transactions').filter(t => t.account === a.id || t.toAccount === a.id).length}</span>` },
-    { l: 'Saldo', cls: 'r', v: a => { const b = Fin.accBal(a); return a.type === 'Cartão de crédito' ? `<span class="mono ${b < 0 ? 'warn' : ''}">${U.eur(b)}</span>${U.num(a.limit) ? `<div style="width:120px;margin-left:auto;margin-top:4px">${UI.bar(-b / U.num(a.limit), -b / U.num(a.limit) > .8 ? 'neg' : 'warn')}</div>` : ''}` : `<span class="mono ${b < 0 ? 'neg' : ''}">${U.eur(b)}</span>`; }, s: a => Fin.accBal(a) }] })}
+    { l: 'Saldo', cls: 'r', v: a => { const b = Fin.accBal(a); return a.type === 'Cartão de crédito' ? `${accMoney(a, b, b < 0 ? 'warn' : '')}${U.num(a.limit) ? `<div style="width:120px;margin-left:auto;margin-top:4px">${UI.bar(-b / U.num(a.limit), -b / U.num(a.limit) > .8 ? 'neg' : 'warn')}</div>` : ''}` : accMoney(a, b, b < 0 ? 'neg' : ''); }, s: a => Fin.accBalE(a) }] })}
   <div class="note">Cartão de crédito: as compras no cartão ficam como despesas na conta do cartão (saldo negativo). Pagar a fatura = transferência da conta à ordem para o cartão. Corretora: compras de ativos em Investimentos debitam a conta escolhida.</div>`;
 };
 FIN.orcamento = () => {
@@ -200,11 +242,11 @@ INV.ativos = () => UI.table({ key: 'assets', coll: 'assets', rows: OS.all('asset
   { l: 'Ticker', v: a => `<b class="mono">${esc(a.ticker || '—')}</b>`, s: a => a.ticker || '' }, { l: 'Nome', v: a => esc(a.name), s: a => a.name, cls: 'wrap' }, { l: 'Classe', v: a => esc(a.cls), s: a => a.cls },
   { l: 'Corretora', v: a => esc(a.broker || '') }, { l: 'Moeda', v: a => a.currency || 'EUR' }, { l: 'País', v: a => esc(a.country || '') }, { l: 'Setor', v: a => esc(a.sector || '') },
   { l: 'Qtd.', cls: 'r', v: a => `<span class="mono">${U.nf(Inv.pos(a).qty, 2)}</span>` }, { l: 'Valor', cls: 'r', v: a => `<span class="mono">${U.eur(Inv.pos(a).value)}</span>`, s: a => Inv.pos(a).value }] });
-INV.movimentos = () => UI.table({ key: 'invtx', coll: 'invtx', rows: U.sortBy(OS.all('invtx'), t => t.date, -1), limit: 80, empty: 'Sem movimentos.', emptyAct: UI.addBtn('invtx', 'Registar compra', null, ''), cols: [
+INV.movimentos = () => { const R0 = U.sortBy(OS.all('invtx'), t => t.date, -1); return selBar('invtx', R0) + selTable('invtx', { key: 'invtx', rows: R0, limit: 80, empty: 'Sem movimentos.', emptyAct: UI.addBtn('invtx', 'Registar compra', null, ''), cols: [
   { l: 'Data', v: t => `<span class="mono">${U.fmtD(t.date)}</span>`, s: t => t.date }, { l: 'Ativo', v: t => { const a = OS.get('assets', t.asset) || {}; return esc(a.ticker || a.name || '—'); } },
   { l: 'Tipo', v: t => UI.badge(t.type, t.type === 'Compra' ? 'acc' : t.type === 'Venda' ? 'vio' : t.type === 'Taxa' ? 'neg' : 'pos') }, { l: 'Qtd.', cls: 'r', v: t => t.qty ? `<span class="mono">${U.nf(t.qty, 4)}</span>` : '' },
   { l: 'Preço', cls: 'r', v: t => t.price ? `<span class="mono">${U.nf(t.price, 2)}</span>` : '' }, { l: 'Valor', cls: 'r', v: t => `<span class="mono">${U.nf(['Compra', 'Venda'].includes(t.type) ? U.num(t.qty) * U.num(t.price) : U.num(t.amount), 2)}</span>` },
-  { l: 'Comissões', cls: 'r', v: t => t.fees ? `<span class="mono">${U.eur(t.fees)}</span>` : '' }, { l: 'Conta', v: t => esc(accN(t.account)) }] });
+  { l: 'Comissões', cls: 'r', v: t => t.fees ? `<span class="mono">${U.eur(t.fees)}</span>` : '' }, { l: 'Conta', v: t => esc(accN(t.account)) }] }); };
 INV.cotacoes = () => {
   const fx = OS.one('profile').fx || {}, P = Inv.providers;
   return `<div class="pn"><div class="pn-h"><h3>${UI.ic('sync')}Fonte das cotações</h3></div>${Object.values(P).map(p => `<div class="li"><div class="li-t"><b>${p.name}</b><small>${esc(p.note)}</small></div>${UI.badge(p.available ? 'ativa' : 'indisponível aqui', p.available ? 'pos' : '')}</div>`).join('')}

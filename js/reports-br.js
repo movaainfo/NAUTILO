@@ -22,10 +22,10 @@ const DESC_SIMPL = 16754.34, DEP = 2275.08, EDU = 3561.50;
 
 RP.irpf = y => { const { E } = h(), R = RP.range('a', String(y)), M = RP.money(R), I = RP.inv(R), cfg = OS.one('tax'), out = { y, R, M, I, warn: [] };
   // tributáveis de pessoa jurídica (salários): fonte pagadora, rendimento, INSS e IRRF
-  const sal = M.I.filter(t => t.cat === 'Salário'), pj = Object.values(U.groupBy(sal, t => (t.payer || t.desc || 'Fonte pagadora').trim())).map(a => ({ payer: (a[0].payer || a[0].desc || 'Fonte pagadora').trim(), gross: U.sum(a, t => RP.cv(t, n(t.gross) || n(t.amount))), inss: U.sum(a, t => RP.cv(t, t.ss)), irrf: U.sum(a, t => RP.cv(t, t.wht)), liq: a.filter(t => !n(t.gross)).length }));
+  const sal = M.I.filter(t => t.cat === 'Salário'), pj = Object.values(U.groupBy(sal, t => (t.payer || t.desc || 'Fonte pagadora').trim())).map(a => ({ payer: (a[0].payer || a[0].desc || 'Fonte pagadora').trim(), gross: U.sum(a, t => (n(t.gross) ? RP.cv(t, t.gross) : RP.amt(t))), inss: U.sum(a, t => RP.cv(t, t.ss)), irrf: U.sum(a, t => RP.cv(t, t.wht)), liq: a.filter(t => !n(t.gross)).length }));
   if (pj.some(r => r.liq)) out.warn.push('Alguns salários estão só com o valor líquido: indica o bruto, o INSS e o IRRF (estão no informe de rendimentos da empresa).');
   // tributáveis de pessoa física e do exterior (carnê-leão): serviços próprios e aluguéis recebidos de pessoas físicas
-  const pfT = M.I.filter(t => t.cat === 'Serviços próprios' || t.cat === 'Rendas' || t.prop), months = R.months.map(ym => { const b = U.sum(pfT.filter(t => U.ym(t.date) === ym), t => RP.cv(t, n(t.gross) || n(t.amount))); return { ym, b, t: b ? RP.carneM(ym, b) : 0 }; });
+  const pfT = M.I.filter(t => t.cat === 'Serviços próprios' || t.cat === 'Rendas' || t.prop), months = R.months.map(ym => { const b = U.sum(pfT.filter(t => U.ym(t.date) === ym), t => (n(t.gross) ? RP.cv(t, t.gross) : RP.amt(t))); return { ym, b, t: b ? RP.carneM(ym, b) : 0 }; });
   const pfG = U.sum(months, m => m.b), carne = U.sum(months, m => m.t);
   // isentos e exclusivos (ativos do Brasil)
   const br = I.provRows.filter(r => r.a.currency === 'BRL'), ex = I.provRows.filter(r => r.a.currency !== 'BRL');
@@ -67,7 +67,7 @@ RP.irpfBlock = (y, short) => { const { sec, kpis, tbl, td, E, ES, P, tone, csvBt
   return head + f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10; };
 
 // impostos do mês/trimestre no Brasil: carnê-leão, DARF da renda variável, IR retido e o que guardar para a declaração
-RP.taxMonthBR = (R, I, M) => { const { sec, kpis, E } = h(), pf = M.I.filter(t => t.cat === 'Serviços próprios' || t.cat === 'Rendas' || t.prop), carne = U.sum(R.months, ym => { const b = U.sum(pf.filter(t => U.ym(t.date) === ym), t => RP.cv(t, n(t.gross) || n(t.amount))); return b ? RP.carneM(ym, b) : 0; });
+RP.taxMonthBR = (R, I, M) => { const { sec, kpis, E } = h(), pf = M.I.filter(t => t.cat === 'Serviços próprios' || t.cat === 'Rendas' || t.prop), carne = U.sum(R.months, ym => { const b = U.sum(pf.filter(t => U.ym(t.date) === ym), t => (n(t.gross) ? RP.cv(t, t.gross) : RP.amt(t))); return b ? RP.carneM(ym, b) : 0; });
   const B = RP.br(R.from.slice(0, 4)), darf = U.sum(B.months.filter(m => R.months.includes(m.ym)), m => m.ir), ex = I.provRows.filter(r => r.a.currency !== 'BRL'), exG = U.sum(I.sales.filter(s => s.a.currency !== 'BRL'), s => s.gainE), guard = Math.max(0, (Math.max(0, exG) + U.sum(ex, r => r.gross)) * .15 - U.sum(ex, r => Math.min(r.tax, r.gross * .15)));
   const venc = U.fmtD(RP.lastBiz(U.addMonths(R.to.slice(0, 7), 1)));
   return sec('Impostos deste período (Brasil)', '', kpis([['Carnê-leão', E(carne), carne ? 'DARF 0190 · paga até ' + venc : 'sem rendimentos de pessoas físicas'], ['DARF renda variável', E(darf), darf ? 'código 6015 · paga até ' + venc : 'sem imposto de vendas'], ['IR retido na fonte', E(I.provTax), 'JCP e outros'], ['Guardar para a declaração', E(guard), '15% de ganhos e rendimentos no exterior']])); };

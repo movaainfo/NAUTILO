@@ -107,7 +107,7 @@ function fieldHTML(f, rec) {
   let inp;
   switch (f.t) {
     case 'area': inp = `<textarea id="${id}" name="${f.k}" rows="${f.rows || 3}" placeholder="${esc(f.ph || '')}"${req}>${esc(v)}</textarea>`; break;
-    case 'num': case 'money': case 'pct': inp = `<div class="inp-wrap">${f.t === 'money' ? '<span>€</span>' : ''}<input id="${id}" name="${f.k}" type="number" step="${f.step || 'any'}" inputmode="decimal" value="${v ?? ''}" placeholder="${esc(f.ph || '')}"${req}>${f.t === 'pct' ? '<span>%</span>' : ''}${f.unit ? `<span>${f.unit}</span>` : ''}</div>`; break;
+    case 'num': case 'money': case 'pct': inp = `<div class="inp-wrap">${f.t === 'money' ? `<span>${esc((U.SYM || {})[f.cur && f.cur(rec)] || (f.cur && f.cur(rec)) || '€')}</span>` : ''}<input id="${id}" name="${f.k}" type="number" step="${f.step || 'any'}" inputmode="decimal" value="${v ?? ''}" placeholder="${esc(f.ph || '')}"${req}>${f.t === 'pct' ? '<span>%</span>' : ''}${f.unit ? `<span>${f.unit}</span>` : ''}</div>`; break;
     case 'date': inp = `<input id="${id}" name="${f.k}" type="date" value="${v || ''}"${req}>`; break;
     case 'time': inp = `<input id="${id}" name="${f.k}" type="time" value="${v || ''}"${req}>`; break;
     case 'dur': inp = `<input id="${id}" name="${f.k}" value="${v ? OS.U.mmss(v) : ''}" placeholder="${f.ph || 'mm:ss ou h:mm:ss'}" pattern="[0-9:]*"${req}>`; break;

@@ -24,8 +24,8 @@ OS.on('ready', () => { try { ctyTrack(); } catch (e) { } }); OS.on('one:profile'
 const bf = () => RC === 'BRL' ? (Inv.fx('BRL') || 1) : 1; // os investimentos são calculados em euros: no Brasil passam a reais
 // movimentos: no Brasil, contas em reais ficam como estão e as outras passam a reais ao câmbio (em Portugal fica tudo como sempre)
 const accCur = t => { const a = t && t.account && OS.get('accounts', t.account); return (a && a.currency) || 'EUR'; };
-const cv = (t, v) => { const x = Number(v) || 0; if (RC !== 'BRL') return x; const c = accCur(t); return c === 'BRL' ? x : x * (Inv.fx(c) || 1) / bf(); };
-const amt = t => cv(t, n(t.amount));
+const cv = (t, v) => { const x = Number(v) || 0, c = accCur(t); if (RC !== 'BRL') return c === 'EUR' ? x : x * (Inv.fx(c) || 1); return c === 'BRL' ? x : x * (Inv.fx(c) || 1) / bf(); };
+const amt = t => cv(t, n(t.amountOrig != null ? t.amountOrig : t.amount));
 RP.cv = cv; RP.amt = amt;
 const E = (v, d = 2) => { const x = Number(v) || 0; if (RC !== 'BRL') return U.eur(x, { dec: d }); return (x < 0 ? '−' : '') + 'R$ ' + Math.abs(x).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); }, ES = v => (v > 0 ? '+' : '') + E(v), P = (v, d = 0) => U.pct(v, d), tone = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
 OS.ONE_DEF.tax = { res: 'PT', brRes: false, born: '', firstWork: '', civil: 'Solteiro', deps: 0, deps6: 0, indep: false, coef: 0.75, englobar: false };

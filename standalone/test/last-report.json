@@ -1,5 +1,539 @@
 [
  {
+  "p": "iPhone",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "486 ms"
+ },
+ {
+  "p": "iPhone",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v2.17"
+ },
+ {
+  "p": "iPhone",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "iPhone",
+  "name": "modo leve conforme o aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "iPhone",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "iPhone",
+  "name": "165 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 116 ms"
+ },
+ {
+  "p": "iPhone",
+  "name": "567 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "iPhone",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 1479 elementos"
+ },
+ {
+  "p": "iPhone",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "490 ms"
+ },
+ {
+  "p": "Android tel",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v2.17"
+ },
+ {
+  "p": "Android tel",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Android tel",
+  "name": "modo leve ligado (Android)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Android tel",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Android tel",
+  "name": "165 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 160 ms"
+ },
+ {
+  "p": "Android tel",
+  "name": "567 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Android tel",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 1479 elementos"
+ },
+ {
+  "p": "Android tel",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "3202 ms"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v2.17"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "modo leve ligado (Android)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "165 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "páginas rápidas (processador 6× mais lento)",
+  "pass": true,
+  "info": "máx 680 ms"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "574 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 1061 elementos"
+ },
+ {
+  "p": "Tablet horiz",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "385 ms"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v2.17"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "modo leve ligado (Android)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "165 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 188 ms"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "578 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "rodar o ecrã 8 vezes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 1479 elementos"
+ },
+ {
+  "p": "Tablet vert",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "abre o ecrã do código",
+  "pass": true,
+  "info": "484 ms"
+ },
+ {
+  "p": "Computador",
+  "name": "versão visível no ecrã do código",
+  "pass": true,
+  "info": "MIND CONTROL · v2.17"
+ },
+ {
+  "p": "Computador",
+  "name": "sem pedido biométrico em modo de teste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "campo do código sem gestor de palavras-passe",
+  "pass": true,
+  "info": "{\"t\":\"text\",\"sec\":\"disc\",\"bg\":\"rgba(0, 0, 0, 0)\",\"ac\":\"off\"}"
+ },
+ {
+  "p": "Computador",
+  "name": "modo leve conforme o aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "código errado é recusado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "código certo abre a Visão Geral",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "sem animações infinitas nem desfoque de fundo",
+  "pass": true,
+  "info": "{\"inf\":0,\"bf\":0,\"fixedBg\":\"scroll\"}"
+ },
+ {
+  "p": "Computador",
+  "name": "parado não se redesenha (Visão Geral)",
+  "pass": true,
+  "info": "0 renders em 4 s"
+ },
+ {
+  "p": "Computador",
+  "name": "165 páginas abrem com conteúdo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "nada sai para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "páginas rápidas",
+  "pass": true,
+  "info": "máx 194 ms"
+ },
+ {
+  "p": "Computador",
+  "name": "576 botões carregados sem erro",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "com o menu aberto só o menu rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "com um formulário aberto a página de trás não rola",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Computador",
+  "name": "sem fugas de memória (200 mudanças de página)",
+  "pass": true,
+  "info": "heap +0 MB · 1479 elementos"
+ },
+ {
+  "p": "Computador",
+  "name": "sem erros de JavaScript nesta sessão",
+  "pass": true,
+  "info": ""
+ },
+ {
   "p": "Geral",
   "name": "os 75 formulários gravam",
   "pass": true,
@@ -87,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 13/10/2026 · Trabalho: as horas do mês e da semana ago"
+  "info": "Atualizado · versão 9.9 · 13/10/2026 · Check-up completo da app: as 146 páginas "
  },
  {
   "p": "Geral",
@@ -447,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"256clbu5iq1\",\"_c\":1791905305609,\"_u\":1791905305609,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"wbn2rcvxn7k\",\"_c\":1791908297408,\"_u\":1791908297408,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -597,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"mdpb53u5zw1\",\"_c\":1791905327857,\"_u\":1791905327857,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"btcllevy3ym\",\"_c\":1791908319118,\"_u\":1791908319118,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1752,6 +2286,654 @@
   "info": ""
  },
  {
+  "p": "Novidades",
+  "name": "Face ID: ao abrir a app o Face ID começa sozinho e entra",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: não pergunta \"Ativar o Face ID?\" outra vez",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: se cancelares fica o botão e uma mensagem calma (sem repetir sozinho)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: não fica a pedir em ciclo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: tocar no botão entra",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Face ID)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: sem dizer o nome dele não responde (só \"Spyke, …\")",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com o nome responde logo",
+  "pass": true,
+  "info": "São 16:21."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: conversa seguida (depois de responder volta a ouvir sozinho)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Spike, bom dia\" dá o resumo do dia (escrito \"Spike\", como o iPhone ouve)",
+  "pass": true,
+  "info": "Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro. A agenda está livre de compr"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Bom dia, Spike\" (nome no fim) também dá o resumo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: só \"Spike\" não fala nada (som e fica à espera do pedido)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
+  "pass": true,
+  "info": "São 16:21."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com uma pausa depois do nome (\"Spike… que dia é hoje\") faz o pedido",
+  "pass": true,
+  "info": "Hoje é terça-feira, 13 de outubro."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: depois de responder, sem o nome volta a ignorar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: fora da conversa ignora o que não é para ele",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Spyke, …\" funciona sempre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: frase sem \"fim\" é apanhada pela pausa (iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o eco da própria voz não conta como pedido",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o iPhone fecha o microfone e ele reabre sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"para de ouvir\" desliga e não reabre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: tocar no microfone volta a ouvir",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: enquanto fala o microfone descansa (não ouve a própria voz nem corta o som)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: acabou de falar e volta a ouvir sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com \"Interromper por voz\" ligado, dizer \"Spyke\" enquanto fala interrompe e ouve",
+  "pass": true,
+  "info": "Sim?"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: duas palmas chamam o Spyke",
+  "pass": true,
+  "info": "{\"two\":1,\"one\":0,\"voice\":0,\"far\":0,\"soft9\":1,\"soft1\":0}"
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: uma palma sozinha não chama",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: voz ou música contínua não chamam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: palmas muito afastadas não contam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Spyke a ouvir)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: quando o iPhone apaga o 3D, ele refaz-se sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: se o 3D falhar mostra \"A abrir o 3D…\" (não fica preso no erro)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: tenta outra vez sozinha e volta a mostrar a árvore 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Floresta)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: o Spyke analisa (prós, contras, riscos, perguntas, para onde apontam os dados)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: \"Preencher a matriz\" estima só o que está vazio",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: perguntas ao Spyke ficam guardadas na decisão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: próximo passo vira tarefa",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: mostra os segundos enquanto espera",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: sem resposta desiste, explica e oferece \"Tentar outra vez\" (sem ficar em ciclo)",
+  "pass": true,
+  "info": "VISÃO GERAL\nJornal\n\nAs notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do di"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (decisões e jornal)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: mostra o que falta (script, notícias, e-mail) e leva a Definições → Script Google (sem partes para copiar no Spyke)",
+  "pass": true,
+  "info": "{\"bad\":4,\"guide\":true,\"noCopy\":true}"
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)",
+  "pass": true,
+  "info": "{\"ok\":[\"Cérebro (IA)\",\"Script Google\",\"Notícias\"],\"guide\":false}"
+ },
+ {
+  "p": "Novidades",
+  "name": "script atualizado: o Jornal mostra as notícias",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (estado do Spyke)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script v10: Definições → Script Google pede a Parte 3, num ficheiro novo (sem apagar as partes 1 e 2)",
+  "pass": true,
+  "info": "[\"p3\"]"
+ },
+ {
+  "p": "Novidades",
+  "name": "script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Parte 3)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
+  "pass": true,
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 13/10, 16:22\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail: nada abre fora da app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail formatado: num quadro isolado, sem scripts (o código malicioso de um e-mail não corre)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: nenhum botão leva ao Gmail",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: \"Abrir\" abre o e-mail dentro da app (sem Responder nem Gmail)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: tocar na própria notificação também abre o leitor",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: a notícia abre dentro da app com o texto completo do jornal",
+  "pass": true,
+  "info": "Jornal de Notícias · agora Notícia aberta pelo jornal TEXTO DE JORNAL DE NOTÍCIAS Primeiro parágrafo da notícia completa, com os factos principais do que aconteceu hoje em Aveiro e no resto do país. Segundo parágrafo com as declarações dos envolvidos e o contexto do que levou a esta situação inesper"
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: texto do jornal entra só como texto (sem código a correr)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: jornal que bloqueia → o Spyke escreve a notícia completa com as fontes, dentro da app",
+  "pass": true,
+  "info": "Público · há 1 min Notícia de jornal fechado NOTÍCIA COMPLETA ESCRITA PELO SPYKE A PARTIR DE PESQUISA NA INTERNET O Spyke escreveu o primeiro parágrafo. Segundo parágrafo escrito. Terceiro parágrafo escrito. Fontes consultadas: publico.pt · rtp.pt Spyke, lê-me Se mesmo assim quiseres, abrir no site "
+ },
+ {
+  "p": "Novidades",
+  "name": "agenda Google pelo script: os eventos aparecem no Calendário",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "agenda Google: o Spyke consegue marcar eventos na agenda Google",
+  "pass": true,
+  "info": "{\"k\":\"k\",\"op\":\"ce\",\"t\":\"Dentista\",\"d\":\"2026-10-18\",\"h\":\"10:00\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (leitores)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "nome da app: OCEANUM no ecrã principal, no título e no manifesto",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Segurança",
+  "name": "segurança: código malicioso gravado em todos os campos de 75 tipos de registo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Segurança",
+  "name": "segurança: nenhuma página executa código malicioso guardado nos dados (148 páginas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Segurança",
+  "name": "segurança: os formulários de edição mostram o código como texto",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Segurança",
+  "name": "segurança: e-mail (texto e formatado), notícia aberta, conversa com o Spyke e endereços com código não executam nada",
+  "pass": true,
+  "info": "{\"em\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"nw\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"sp\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"hs\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0}}"
+ },
+ {
+  "p": "Segurança",
+  "name": "segurança: sem o código/Face ID não aparece nenhum dado (mesmo abrindo o endereço de uma página)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Segurança",
+  "name": "sem erros de JavaScript (segurança)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "iPhone: app instalada (a funcionar com a cópia guardada)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "iPhone: ao abrir a app depois de publicar, abre logo a versão nova",
+  "pass": true,
+  "info": "versão 9.1"
+ },
+ {
+  "p": "Atualização",
+  "name": "iPhone: ao voltar à app, atualiza-se sozinha em poucos segundos",
+  "pass": true,
+  "info": "1.7 s"
+ },
+ {
+  "p": "Atualização",
+  "name": "iPhone: sem erros de JavaScript (atualização)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Android tel: app instalada (a funcionar com a cópia guardada)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Android tel: ao abrir a app depois de publicar, abre logo a versão nova",
+  "pass": true,
+  "info": "versão 9.1"
+ },
+ {
+  "p": "Atualização",
+  "name": "Android tel: ao voltar à app, atualiza-se sozinha em poucos segundos",
+  "pass": true,
+  "info": "1.7 s"
+ },
+ {
+  "p": "Atualização",
+  "name": "Android tel: sem erros de JavaScript (atualização)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet horiz: app instalada (a funcionar com a cópia guardada)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet horiz: ao abrir a app depois de publicar, abre logo a versão nova",
+  "pass": true,
+  "info": "versão 9.1"
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet horiz: ao voltar à app, atualiza-se sozinha em poucos segundos",
+  "pass": true,
+  "info": "2.3 s"
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet horiz: sem erros de JavaScript (atualização)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet vert: app instalada (a funcionar com a cópia guardada)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet vert: ao abrir a app depois de publicar, abre logo a versão nova",
+  "pass": true,
+  "info": "versão 9.1"
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet vert: ao voltar à app, atualiza-se sozinha em poucos segundos",
+  "pass": true,
+  "info": "1.7 s"
+ },
+ {
+  "p": "Atualização",
+  "name": "Tablet vert: sem erros de JavaScript (atualização)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Computador: app instalada (a funcionar com a cópia guardada)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "Computador: ao abrir a app depois de publicar, abre logo a versão nova",
+  "pass": true,
+  "info": "versão 9.1"
+ },
+ {
+  "p": "Atualização",
+  "name": "Computador: ao voltar à app, atualiza-se sozinha em poucos segundos",
+  "pass": true,
+  "info": "1.7 s"
+ },
+ {
+  "p": "Atualização",
+  "name": "Computador: sem erros de JavaScript (atualização)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: mesmo com um ficheiro da instalação a falhar, a versão nova entra",
+  "pass": true,
+  "info": "ficou 9.3"
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: se recarregar não chegar, limpa a cópia guardada e entra a nova",
+  "pass": true,
+  "info": "ficou 9.4"
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: os dados ficam depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: com um formulário a meio, espera (não perde o que escreves)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: depois de fechar o formulário, atualiza sozinha",
+  "pass": true,
+  "info": "ficou 9.5"
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: com rede muito lenta, abre em menos de 5 s com a cópia guardada",
+  "pass": true,
+  "info": "4.3 s"
+ },
+ {
+  "p": "Atualização",
+  "name": "atualização: sem internet a app abre na mesma",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "IA",
+  "name": "IA: descobre sozinha os modelos que o Google tem hoje (sem voz, imagem nem embeddings)",
+  "pass": true,
+  "info": "gemini-3.5-flash, gemini-3.5-flash-lite, gemini-2.0-flash-lite, gemma-3-27b-it"
+ },
+ {
+  "p": "IA",
+  "name": "IA: cota de um modelo esgotada → passa logo ao seguinte, sem esperar",
+  "pass": true,
+  "info": "google · gemini-3.5-flash > gemini-3.5-flash-lite"
+ },
+ {
+  "p": "IA",
+  "name": "IA: modelo desligado pelo Google (como o gemini-2.0) fica de lado e usa outro",
+  "pass": true,
+  "info": "google · gemini-3.5-flash-lite > gemini-2.0-flash-lite > gemma-3-27b-it"
+ },
+ {
+  "p": "IA",
+  "name": "IA: com toda a cota do Google esgotada responde a IA grátis de reserva (sem esperar)",
+  "pass": true,
+  "info": "reserva"
+ },
+ {
+  "p": "IA",
+  "name": "IA: texto (resumos) também passa à reserva",
+  "pass": true,
+  "info": "Primeiro parágrafo do resumo da reserva.\n\nSegundo parágrafo "
+ },
+ {
+  "p": "IA",
+  "name": "IA: o Spyke continua a pensar e a agir com a reserva (criou a tarefa)",
+  "pass": true,
+  "info": "Criei a tarefa, chefe. | Tarefa: Tarefa criada pela reserva"
+ },
+ {
+  "p": "IA",
+  "name": "IA: notícia bloqueada e Google sem cota → o Spyke faz o resumo com o que os jornais publicaram (não mostra erro em inglês)",
+  "pass": true,
+  "info": "Estadão · agora Notícia bloqueada RESUMO FEITO PELO SPYKE COM O QUE 2 JORNAIS PUBLICARAM Primeiro parágrafo do resumo da reserva. Segundo parágrafo do resumo. Fontes consultadas: Estadão · O Globo Spy"
+ },
+ {
+  "p": "IA",
+  "name": "IA: se desligares a reserva, nada vai para fora do Google",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "IA",
+  "name": "sem erros de JavaScript (IA)",
+  "pass": true,
+  "info": ""
+ },
+ {
   "p": "Novos",
   "name": "Painel: Visão Geral e Painel são uma só página \"Painel\" (o endereço antigo leva lá)",
   "pass": true,
@@ -1971,7 +3153,7 @@
   "p": "Novos",
   "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
   "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"a4tlmoua8xq\"}"
+  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"d66ioaw6ybb\"}"
  },
  {
   "p": "Novos",
@@ -2012,6 +3194,750 @@
  {
   "p": "Novos",
   "name": "sem erros de JavaScript (novos)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "B3: botão \"Importar da B3\" nos Movimentos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "B3: painel com os passos da Área do Investidor",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "B3: lê Negociação + Movimentação + Posição (9 movimentos; liquidação e atualização ficam de fora)",
+  "pass": true,
+  "info": "{\"n\":9,\"liq\":true,\"upd\":true,\"err\":\"\"}"
+ },
+ {
+  "p": "Extras",
+  "name": "B3: conferência com a posição aparece",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "B3: PETR4 criado como Ação, PETR4.SA, BRL, corretora BTG Pactual",
+  "pass": true,
+  "info": "PETR4.SA|Ação|BRL|BTG Pactual|12"
+ },
+ {
+  "p": "Extras",
+  "name": "B3: desdobro calculado (10 − 4 = 6 → 12 ações)",
+  "pass": true,
+  "info": "PETR4.SA|Ação|BRL|BTG Pactual|12 fator 2"
+ },
+ {
+  "p": "Extras",
+  "name": "B3: MXRF11 é FII, BOVA11 é ETF, Tesouro Selic 2029 no Tesouro Direto",
+  "pass": true,
+  "info": "{\"pe\":\"PETR4.SA|Ação|BRL|BTG Pactual|12\",\"mx\":\"FII\",\"bo\":\"ETF\",\"td\":\"Tesouro Selic 2029\",\"jcp\":\"1.2/0.18\",\"sp\":\"2\",\"rend\":1}"
+ },
+ {
+  "p": "Extras",
+  "name": "B3: JCP guardado bruto com os 15% retidos (1,02 líquido → 1,20 bruto)",
+  "pass": true,
+  "info": "1.2/0.18"
+ },
+ {
+  "p": "Extras",
+  "name": "B3: importar outra vez não duplica nada e a conferência bate",
+  "pass": true,
+  "info": "{\"f\":0,\"d\":9}"
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: Universidade → Materiais tem \"Guardar ficheiros\" em cada disciplina",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: sem a Parte 5, explica como a colar (com botão para copiar)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: \"Verificar\" deteta a Parte 5",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: PDF de 7 MB enviado em 4 partes para Universidade/Contabilidade ZZ no Drive",
+  "pass": true,
+  "info": "Resumo cap 3|PDF|uni|7340032|F1 {\"n\":4,\"pasta\":\"Universidade/Contabilidade ZZ\"}"
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: aparece na disciplina com Abrir / descarregar / apagar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: \"Abrir\" abre o ficheiro no Google Drive",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: cada curso tem \"Guardar PDFs / ficheiros\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: \"Atualizar lista\" recupera do Drive o que foi guardado noutro aparelho (na disciplina certa)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Ficheiros: apagar tira da lista e manda para o lixo do Drive",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Definições → Script Google lista a Parte 5 (ficheiros na nuvem)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Parte 5: código válido com op_fup, op_fdl, op_frm, op_fls",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Metas: meta com categoria própria (\"Pessoal\") aparece",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "sem erros de JavaScript (extras)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Investimentos → Visão: \"Tudo o que tens investido\" junta mercado e imóveis",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Investimentos → Visão: gráficos por classe, setor, país e moeda",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Investimentos: separadores Imóveis e Renda passiva",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Carteira: divisão por setor com % e imóveis incluídos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Carteira: divisão por país (EUA, Irlanda, Portugal)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Imóveis: capital próprio, rendimento líquido, cash flow e rentabilidade",
+  "pass": true,
+  "info": "{\"eq\":100000,\"noi\":9450,\"cf\":2250,\"gy\":0.054,\"realIn\":7200}"
+ },
+ {
+  "p": "Extras",
+  "name": "Imóveis: o real das Finanças (rendas ligadas ao imóvel) aparece",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Património líquido inclui o imóvel (valor − crédito)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Renda passiva: por mês, despesas cobertas, liberdade financeira e fontes",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Dinheiro → Relatórios: mensal, trimestral e anual com prazos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Relatório anual: anexos A, F, G, H, J e simulação do imposto",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "IRS: salário bruto, retenções e rendas (anexo F) somados",
+  "pass": true,
+  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
+ },
+ {
+  "p": "Extras",
+  "name": "IRS: vendas no anexo J com código (G01 ações, G20 ETF) e país",
+  "pass": true,
+  "info": "G01:EUA:144 G20:Irlanda:25"
+ },
+ {
+  "p": "Extras",
+  "name": "IRS: deduções (rendas 15% até ao limite, saúde 15%) e contas no estrangeiro (Revolut → Lituânia)",
+  "pass": true,
+  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
+ },
+ {
+  "p": "Extras",
+  "name": "IRS: rendimento coletável com dedução específica (sem IRS Jovem fora do prazo)",
+  "pass": true,
+  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
+ },
+ {
+  "p": "Extras",
+  "name": "IRS Jovem: 6.º ano de rendimentos = 50% isento (até 55 × IAS)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Relatório: tabelas para descarregar em CSV (para o contabilista)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Relatório: descarregar o relatório completo (para PDF)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Relatório mensal enxuto: resumo, receitas e despesas, investimentos e impostos do mês",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Relatórios gerados sozinhos quando o mês, o trimestre e o ano fecham (Arquivo)",
+  "pass": true,
+  "info": "{\"k\":3,\"per\":\"a,m,q\"}"
+ },
+ {
+  "p": "Extras",
+  "name": "Arquivo lista os relatórios novos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Definições → Impostos: país dos relatórios, IRS Jovem, dependentes, englobamento",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "País: a app guarda quando mudaste de país (Portugal → Brasil hoje)",
+  "pass": true,
+  "info": "[[\"\",\"PT\"],[\"2026-10-13\",\"BR\"]]"
+ },
+ {
+  "p": "Extras",
+  "name": "Brasil: relatório anual no formato do IRPF (fichas, bens e direitos, completa x simplificada) em reais",
+  "pass": true,
+  "info": "[true,true,true,true,true,true,true,\"(R$)\\nMACA\\tAção\\tTrading 212\\tEUA\\t6\\tUS$ 900,00\\tR$ 4.764,71\\nMUND\\tETF\\tXTB\\tIrlanda\\t15\\t€ 1500,00\\tR$ 8.823,53\\nTotal aplicado\\tR$ \"]"
+ },
+ {
+  "p": "Extras",
+  "name": "Brasil: salário da conta em reais fica em reais; rendas em euros passam a reais (carnê-leão)",
+  "pass": true,
+  "info": "{\"pj\":5000,\"irrf\":300,\"inss\":500,\"pf\":31765,\"k\":6.000000000000001,\"carne\":true,\"best\":\"simplificada\"}"
+ },
+ {
+  "p": "Extras",
+  "name": "Brasil: DARF e carnê-leão vencem no último dia útil do mês",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Brasil: relatório deste mês com carnê-leão, DARF da renda variável e IR retido",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Os relatórios que já passaram ficam como estavam (ano anterior continua no formato do IRS, em euros)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "O mês passado (já arquivado) continua no formato de Portugal",
+  "pass": true,
+  "info": "[true,false,true,[\"to), em formato pronto para a declaração de IRPF (Brasil). Seguem o país que escolhest\"]]"
+ },
+ {
+  "p": "Extras",
+  "name": "Arquivo: cada relatório mostra o país com que foi gerado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Relatórios: o topo segue o Brasil (\"Completo (IRPF)\", prazos do Brasil); o mês já fechado continua em euros",
+  "pass": true,
+  "info": "[true,true,true,true,true,true,true]pleto (IRPF)\nReceitas e despesas\nInvestimentos\nArquivo\nMENSAL · RESUMIDO\nset 26\nEntrou\n€ 900\nSaiu\n€ 0\nPoupado\n+€ 900,00\n\nReceitas, despesas, poupança, investimentos e o que guardar para impostos.\n\nAbrir relatório\nTRIMESTRAL · COMPLETO\n3.º trimestre 2026\nEntrou\n€ 2700\nSaiu\n€ 0\nPoupado\n+€ 2700,00\n\nTudo do mês, mais mês a mês, subcategorias, contas, investimentos completos e IRS acumulado.\n\nAbrir relatório\nANUAL · DECLARAÇÃO DE IRPF\nAno 2026\nEntrou\nR$ 35.965\nSaiu\nR$ 0\nPoupado\n+R$ 35.964,71\n\nIRPF 2027: a restituir ~R$ 939 (estimativa), com todas as fichas.\n\nAbrir relatório\nPróximos prazos\n30/10/20"
+ },
+ {
+  "p": "Extras",
+  "name": "Períodos que fecharam antes da mudança de país são gerados no país de então (Portugal)",
+  "pass": true,
+  "info": "a:PT,m:PT,q:PT"
+ },
+ {
+  "p": "Extras",
+  "name": "Definições → Impostos no Brasil: país, dependentes (sem campos do IRS português)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Outro país: relatório completo de receitas, despesas e investimentos (sem formato fiscal português ou brasileiro)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Movimento de salário com bruto, retenção e Segurança Social",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Empresa: preço de longo prazo, retornos e dividendos por ano",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Empresa: últimos trimestres e escolha 5/10 anos nas demonstrações",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Empresa: 10 anos de demonstrações financeiras",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Empresa: a história completa (fundação, fundadores, linha do tempo, crises, líderes, fontes)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Empresa: tudo sobre a empresa (modelo, segmentos, concorrentes, cenários, tese)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Empresa: história e dossiê ficam guardados (não gasta IA outra vez)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Entrevista: mais de 500 perguntas em 37 capítulos (mente e emoções, perdas, valores, identidade, sentidos, cartas…)",
+  "pass": true,
+  "info": "{\"n\":537,\"parts\":37}"
+ },
+ {
+  "p": "Extras",
+  "name": "Minha Evolução: o antigo Longo prazo abre aqui (mesmo visual) e o menu tem só \"Minha Evolução\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Minha Evolução: evolução por área (dinheiro, estudos, desporto, carreira, metas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Minha Evolução: o Spyke analisa a evolução (nota, por área, foco para 30 dias)",
+  "pass": true,
+  "info": "DIREÇÃO\nMinha Evolução\n\nTudo o que te aproxima dos teus objetivos, numa página: desporto, estudos, carreira, dinheiro, hábitos e metas. Onde estás, quanto evoluíste (hoje contra 30 dias, 3 meses e 1 a"
+ },
+ {
+  "p": "Extras",
+  "name": "Decisões: \"Pensar com o Spyke\" no topo da página",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi",
+  "pass": true,
+  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"s14hcow7xyy\"}"
+ },
+ {
+  "p": "Extras",
+  "name": "Decisões: \"Usar estes pesos\" aplica os pesos sugeridos à matriz",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Extras",
+  "name": "sem erros de JavaScript (extras 2)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Voz",
+  "name": "Voz Gemini: o pedido leva só o texto do resumo (nenhuma instrução para ler em voz alta)",
+  "pass": true,
+  "info": "[\"Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro.\",\"A agenda está livre de compromissos com hora. Treino de hoje\"]"
+ },
+ {
+  "p": "Voz",
+  "name": "Voz Gemini: a língua vai na configuração da voz (pt-BR) e a voz é a mesma",
+  "pass": true,
+  "info": "{\"at\":40,\"text\":\"Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
+ },
+ {
+  "p": "Voz",
+  "name": "Resumo: o 1.º pedaço é só a saudação (começa a falar em segundos) e o resto é pedido logo a seguir, em paralelo",
+  "pass": true,
+  "info": "[[40,51],[43,218]]"
+ },
+ {
+  "p": "Voz",
+  "name": "Resumo: nada do texto se perde ao dividir em pedaços",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Voz",
+  "name": "sem erros de JavaScript (voz)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Agenda",
+  "name": "Script: a Parte 5 fica igual (só ficheiros), a agenda vem na Parte 6 e as cores na Parte 7 (ficheiros novos, sem repetir nenhuma função das outras partes)",
+  "pass": true,
+  "info": "{\"p5ok\":true,\"p6ok\":true,\"p5cal\":false,\"p6\":true,\"p5v\":true,\"n\":7,\"p7ok\":true,\"p7\":true,\"dup\":[]}"
+ },
+ {
+  "p": "Agenda",
+  "name": "Definições → Script Google: com as partes 1 a 5 instaladas, pede só a Parte 7 (ficheiro novo, com as cores, sem mexer nas outras)",
+  "pass": true,
+  "info": "SISTEMA\nDefinições\n\nO teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.\n\nGeral\nE-mail\nLigações\nAtalhos do iPhone\nSpyke (assistente)\nImpostos\nScript Google\nParte 7 · copiar e colar (3 minutos)\nfalta\n\nA Parte 7 é um ficheiro novo no mesmo projeto: não apagas nem mudas nada das outras partes. Põe tudo o que está no Calendário do Oceanum no teu Google Calendar e no Calendár"
+ },
+ {
+  "p": "Agenda",
+  "name": "Definições → Ligações: tudo o que está no Calendário (trabalho, folgas, aulas, tarefas, rotina…) marcado por omissão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Agenda",
+  "name": "Parte 6 colada: a app reconhece-a e liga a agenda sozinha (sem carregar em nada)",
+  "pass": true,
+  "info": "[\"ping\",\"put\",\"c6ping\",\"c7ping\",\"cal6\",\"gm\"]"
+ },
+ {
+  "p": "Agenda",
+  "name": "Vai tudo para fora: trabalho, folgas, compromissos, aulas, provas, tarefas e rotina",
+  "pass": true,
+  "info": "[\"Aula: Contabilidade\",\"Trabalho · Loja\",\"Ginásio da manhã\",\"Aula: Contabilidade\",\"Folga\",\"Dentista\",\"Tarefa: Entregar trabalho\",\"Teste: Contabilidade\",\"Ginásio da manhã\",\"Aula: Contabilidade\",\"Ginásio da manhã\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\",\"Aula: Contabilidade\"]"
+ },
+ {
+  "p": "Agenda",
+  "name": "Trabalho de noite (22:00–06:00) acaba no dia seguinte; aula com hora e sala; folga e prova sem hora ficam \"dia inteiro\"",
+  "pass": true,
+  "info": "{\"sh\":{\"id\":\"shifts:meklc0w815v@2026-10-13\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-13T22:00:00.000Z\",\"e\":\"2026-10-14T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:ua5appw815w@2026-10-14\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-14\",\"e\":\"2026-10-14\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:7nnlbtw815w@2026-10-16\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-16\",\"e\":\"2026-10-16\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:5pqh4cw815w@2026-10-07\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-07T09:00:00.000Z\",\"e\":\"2026-10-07T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
+ },
+ {
+  "p": "Agenda",
+  "name": "Alterar o turno na app atualiza o MESMO evento lá fora (sem duplicar)",
+  "pass": true,
+  "info": "{\"up2\":[[\"Trabalho · Loja\",\"E2\"]],\"total\":25,\"nG\":25}"
+ },
+ {
+  "p": "Agenda",
+  "name": "Apagar na app apaga lá fora",
+  "pass": true,
+  "info": "[{\"up\":[],\"del\":[\"E6\"]}]"
+ },
+ {
+  "p": "Agenda",
+  "name": "Sem mudanças não envia nada (não gasta o script)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Agenda",
+  "name": "Escala importada: o trabalho (09:00–17:00) e a folga aparecem no Calendário da app e vão logo para o Google Calendar",
+  "pass": true,
+  "info": "[[\"Trabalho · Loja\",\"2026-10-17T09:00:00.000Z\"],[\"Folga\",\"2026-10-18\"]]"
+ },
+ {
+  "p": "Agenda",
+  "name": "Uma folga nova vai sozinha para fora, poucos segundos depois de a registar",
+  "pass": true,
+  "info": "[{\"up\":[{\"id\":\"dayoffs:dmdpb6w8759@2026-10-22\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-22\",\"e\":\"2026-10-22\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
+ },
+ {
+  "p": "Agenda",
+  "name": "Desmarcar um tipo (Rotina) tira-o do calendário de fora",
+  "pass": true,
+  "info": "[3]"
+ },
+ {
+  "p": "Agenda",
+  "name": "Parte 7: Trabalho, Folgas e Tarefas vão cada um para o seu calendário, com cor pastel própria",
+  "pass": true,
+  "info": "{\"cals\":{\"trabalho\":[\"Oceanum · Trabalho\",\"#A9C8F0\"],\"folgas\":[\"Oceanum · Folgas\",\"#B8E6C9\"],\"tarefas\":[\"Oceanum · Tarefas\",\"#FBE7A1\"],\"estudos\":[\"Oceanum · Estudos\",\"#D6C8F2\"],\"compromissos\":[\"Oceanum · Compromissos\",\"#F7C3D6\"],\"treino\":[\"Oceanum · Treino e rotina\",\"#FFD1B3\"],\"outros\":[\"Oceanum\",\"#E3DCCF\"]},\"sh\":\"trabalho\",\"off\":\"folgas\",\"tk\":\"tarefas\"}"
+ },
+ {
+  "p": "Agenda",
+  "name": "Parte 7: os eventos que já estavam no calendário \"Oceanum\" mudam para o da sua cor sem duplicar (o antigo é apagado)",
+  "pass": true,
+  "info": "{\"before\":24,\"after\":24}"
+ },
+ {
+  "p": "Agenda",
+  "name": "Parte 7: uma tarefa nova vai logo para o calendário Tarefas (amarelo pastel)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Agenda",
+  "name": "As cores são só lá fora: o Calendário da app continua com as cores de sempre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Agenda",
+  "name": "A app não lê de volta o calendário \"Oceanum\" (nada aparece duas vezes)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Agenda",
+  "name": "Horas reais: turno futuro conta 0, a decorrer conta só o que já passou, acabado conta inteiro (também o da noite e com pausa)",
+  "pass": true,
+  "info": "{\"antes\":0,\"meio\":4,\"depois\":8,\"noite\":4,\"noiteFim\":8,\"pausa\":7}"
+ },
+ {
+  "p": "Agenda",
+  "name": "Trabalho: \"Horas trabalhadas este mês\" mostra só o que já trabalhaste e as marcadas à parte",
+  "pass": true,
+  "info": "{\"real\":0,\"marc\":16.5} Horas trabalhadas este mês\n0,0 h\nde 16,5 h marcadas no mês\nGanhos até hoje (mês)\n€ 0,0"
+ },
+ {
+  "p": "Agenda",
+  "name": "sem erros de JavaScript (agenda)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Revisão semanal: hábitos, horas trabalhadas, desporto e foco; o jogo e o livro terminado aparecem nos acontecimentos",
+  "pass": true,
+  "info": "DIREÇÃO\nRevisões\n\nSemanal (domingo, 20 minutos) e mensal (auditoria completa). O sistema prepara os números; tu respondes às perguntas.\n\nSemanal\nMensal\nHistórico\nSemana de 5 out a 11 out\nTarefas feitas\n0\nFicaram por fazer\n0\nAtrasadas agora\n0\nEstudo\n0,0 h\nTreinos · corrida\n0 · 0,0 km\nFinanças da sema"
+ },
+ {
+  "p": "Direção",
+  "name": "Revisão mensal: \"Equilíbrio da vida\" (desporto, foco, dieta, Fé, leitura) e investimentos do mês",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Estrela-guia: \"onde foi o teu tempo\" inclui desporto e foco (Floresta)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Minha Evolução: também Fé, desporto, foco, dieta, leitura e horas trabalhadas",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Próximos passos: devocional, leitura e proteína do dia entram nos passos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Spyke e Centro de decisões sabem tudo: património, investimentos, estudo, projetos, desporto, dieta, Fé, leitura, tendências e aniversários certos",
+  "pass": true,
+  "info": "Agora: terça-feira, 13 de outubro às 16:26 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Costas & Bíceps; amanhã Pernas\nAlertas: Treino: 6 dias sem treinar (Último "
+ },
+ {
+  "p": "Direção",
+  "name": "Contas: painel \"Saldo inicial · o que já tens\" com a moeda de cada conta",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Saldo inicial: € 1500 (os testes antigos não contam), R$ 5000 e US$ 200; total disponível em euros ao câmbio",
+  "pass": true,
+  "info": "{\"e\":1500,\"r\":5000,\"rc\":\"BRL\",\"w\":200,\"wc\":\"USD\",\"liq\":2480}"
+ },
+ {
+  "p": "Direção",
+  "name": "Contas: saldo de cada conta na sua moeda (R$ 5.000,00 ≈ € 800,00)",
+  "pass": true,
+  "info": "R$ real"
+ },
+ {
+  "p": "Direção",
+  "name": "Movimento numa conta em reais: tira R$ 100 do saldo em reais e conta € 16 nas despesas do mês",
+  "pass": true,
+  "info": "{\"bal\":4900,\"exp\":16}"
+ },
+ {
+  "p": "Direção",
+  "name": "Movimentos: o gasto em reais aparece em R$ com o equivalente em euros",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Formulário: o valor mostra R$ quando a conta é em reais",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Movimentos: \"Selecionar para apagar\" → selecionar todos → apagar (com confirmação)",
+  "pass": true,
+  "info": "{\"n0\":6,\"n1\":0}"
+ },
+ {
+  "p": "Direção",
+  "name": "Movimentos: \"Repor\" traz de volta os que apagaste",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "Movimentos: tocar numa linha seleciona-a (em vez de abrir)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Direção",
+  "name": "sem erros de JavaScript (Direção e Finanças)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "pass": true,
+  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (146 visitadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: nenhuma página recarrega a app sozinha",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: sem erros de JavaScript em toda a app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "pass": true,
+  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (146 visitadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: nenhuma página recarrega a app sozinha",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: sem erros de JavaScript em toda a app",
   "pass": true,
   "info": ""
  },
@@ -2432,6 +4358,30 @@
  {
   "p": "Aparelhos · Computador",
   "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Stress",
+  "name": "dados de teste criados",
+  "pass": true,
+  "info": "7665 registos"
+ },
+ {
+  "p": "Stress",
+  "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
+  "pass": true,
+  "info": "máx 2388 ms"
+ },
+ {
+  "p": "Stress",
+  "name": "guardar tudo é rápido",
+  "pass": true,
+  "info": "140 ms"
+ },
+ {
+  "p": "Stress",
+  "name": "sem erros de JavaScript",
   "pass": true,
   "info": ""
  }

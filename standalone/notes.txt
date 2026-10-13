@@ -1,3 +1,5 @@
-Trabalho: as horas do mês e da semana agora são as horas REAIS que já trabalhaste. Os turnos que ainda vêm não contam, e o turno de hoje só conta o que já passou. As horas marcadas aparecem por baixo, à parte ("de X h marcadas no mês").
-Os ganhos também passam a ser "até hoje", com o previsto do mês por baixo. O Painel, a Estrela-guia e as revisões usam as mesmas horas reais.
-Cores pastel por tipo no Google Calendar e no iPhone (Parte 7 do script, ficheiro novo).
+Check-up completo da app: as 146 páginas e abas e os 147 formulários foram testados com dados em todas as áreas, no computador e no iPhone — sem erros, sem valores partidos e sem travar.
+A Direção agora vê a app inteira: Revisões (semanal e mensal), Minha Evolução, Estrela-guia e Próximos passos incluem também trabalho, desporto, dieta, foco (Floresta), Fé, leitura e investimentos. O Spyke e o Centro de decisões também.
+Finanças: "Selecionar para apagar" nos movimentos (um, vários ou todos, com "Repor" logo a seguir), também nos movimentos de investimento.
+Saldo inicial · o que já tens (Finanças → Contas): quanto tens hoje em cada conta e em que moeda (euro, real, dólar…). Cada conta mostra o saldo na sua moeda e os totais aparecem em euros ao câmbio do dia.
+Correções: aniversários das pessoas e dados dos investimentos no Spyke; simulados registados à mão na Universidade.
