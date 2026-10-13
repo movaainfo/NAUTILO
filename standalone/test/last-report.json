@@ -1,5 +1,401 @@
 [
  {
+  "p": "Novidades",
+  "name": "Face ID: ao abrir a app o Face ID começa sozinho e entra",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: não pergunta \"Ativar o Face ID?\" outra vez",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: se cancelares fica o botão e uma mensagem calma (sem repetir sozinho)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: não fica a pedir em ciclo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Face ID: tocar no botão entra",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Face ID)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: sem dizer o nome dele não responde (só \"Spyke, …\")",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com o nome responde logo",
+  "pass": true,
+  "info": "São 01:04."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: conversa seguida (depois de responder volta a ouvir sozinho)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Spike, bom dia\" dá o resumo do dia (escrito \"Spike\", como o iPhone ouve)",
+  "pass": true,
+  "info": "Bom dia, Ryan. Hoje é terça-feira, 13 de outubro. A agenda está livre de comprom"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Bom dia, Spike\" (nome no fim) também dá o resumo",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: só \"Spike\" não fala nada (som e fica à espera do pedido)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
+  "pass": true,
+  "info": "São 01:04."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com uma pausa depois do nome (\"Spike… que dia é hoje\") faz o pedido",
+  "pass": true,
+  "info": "Hoje é terça-feira, 13 de outubro."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: depois de responder, sem o nome volta a ignorar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: fora da conversa ignora o que não é para ele",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Spyke, …\" funciona sempre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: frase sem \"fim\" é apanhada pela pausa (iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o eco da própria voz não conta como pedido",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o iPhone fecha o microfone e ele reabre sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"para de ouvir\" desliga e não reabre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: tocar no microfone volta a ouvir",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: enquanto fala o microfone descansa (não ouve a própria voz nem corta o som)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: acabou de falar e volta a ouvir sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com \"Interromper por voz\" ligado, dizer \"Spyke\" enquanto fala interrompe e ouve",
+  "pass": true,
+  "info": "Sim?"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: duas palmas chamam o Spyke",
+  "pass": true,
+  "info": "{\"two\":1,\"one\":0,\"voice\":0,\"far\":0,\"soft9\":1,\"soft1\":0}"
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: uma palma sozinha não chama",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: voz ou música contínua não chamam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: palmas muito afastadas não contam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Spyke a ouvir)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: quando o iPhone apaga o 3D, ele refaz-se sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: se o 3D falhar mostra \"A abrir o 3D…\" (não fica preso no erro)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: tenta outra vez sozinha e volta a mostrar a árvore 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Floresta)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: o Spyke analisa (prós, contras, riscos, perguntas, para onde apontam os dados)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: \"Preencher a matriz\" estima só o que está vazio",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: perguntas ao Spyke ficam guardadas na decisão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: próximo passo vira tarefa",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: mostra os segundos enquanto espera",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: sem resposta desiste, explica e oferece \"Tentar outra vez\" (sem ficar em ciclo)",
+  "pass": true,
+  "info": "VISÃO GERAL\nJornal\n\nAs notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do di"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (decisões e jornal)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: mostra o que falta (script, notícias, e-mail) com o passo a passo e a implantação certa",
+  "pass": true,
+  "info": "{\"bad\":5,\"guide\":true,\"tail\":true}"
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)",
+  "pass": true,
+  "info": "{\"ok\":[\"Cérebro (IA)\",\"Script Google\",\"Notícias\"],\"guide\":false}"
+ },
+ {
+  "p": "Novidades",
+  "name": "script atualizado: o Jornal mostra as notícias",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (estado do Spyke)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script v10: o guia pede só as Partes 3 e 4, em ficheiros novos (não apagar as partes 1 e 2)",
+  "pass": true,
+  "info": "[\"p3\",\"p4\"]"
+ },
+ {
+  "p": "Novidades",
+  "name": "script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Parte 3)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
+  "pass": true,
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 13/10, 01:05\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail: nada abre fora da app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail formatado: num quadro isolado, sem scripts (o código malicioso de um e-mail não corre)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: nenhum botão leva ao Gmail",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: \"Abrir\" abre o e-mail dentro da app (sem Responder nem Gmail)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: tocar na própria notificação também abre o leitor",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: a notícia abre dentro da app com o texto completo do jornal",
+  "pass": true,
+  "info": "Jornal de Notícias · agora Notícia aberta pelo jornal TEXTO DE JORNAL DE NOTÍCIAS Primeiro parágrafo da notícia completa, com os factos principais do que aconteceu hoje em Aveiro e no resto do país. Segundo parágrafo com as declarações dos envolvidos e o contexto do que levou a esta situação inesper"
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: texto do jornal entra só como texto (sem código a correr)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: jornal que bloqueia → o Spyke escreve a notícia completa com as fontes, dentro da app",
+  "pass": true,
+  "info": "Público · há 1 min Notícia de jornal fechado NOTÍCIA COMPLETA ESCRITA PELO SPYKE A PARTIR DE PESQUISA NA INTERNET O Spyke escreveu o primeiro parágrafo. Segundo parágrafo escrito. Terceiro parágrafo escrito. Fontes consultadas: publico.pt · rtp.pt Spyke, lê-me Se mesmo assim quiseres, abrir no site "
+ },
+ {
+  "p": "Novidades",
+  "name": "agenda Google pelo script: os eventos aparecem no Calendário",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "agenda Google: o Spyke consegue marcar eventos na agenda Google",
+  "pass": true,
+  "info": "{\"k\":\"k\",\"op\":\"ce\",\"t\":\"Dentista\",\"d\":\"2026-10-18\",\"h\":\"10:00\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (leitores)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "nome da app: OCEANUM no ecrã principal, no título e no manifesto",
+  "pass": true,
+  "info": ""
+ },
+ {
   "p": "Segurança",
   "name": "segurança: código malicioso gravado em todos os campos de 75 tipos de registo",
   "pass": true,
@@ -36,620 +432,86 @@
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Painel: Visão Geral e Painel são uma só página \"Painel\" (o endereço antigo leva lá)",
+  "p": "IA",
+  "name": "IA: descobre sozinha os modelos que o Google tem hoje (sem voz, imagem nem embeddings)",
   "pass": true,
-  "info": "[\"\",\"OCEANUM\",\"Definições\",\"Painel\",\"Hoje\",\"Jornal\"]"
+  "info": "gemini-3.5-flash, gemini-3.5-flash-lite, gemini-2.0-flash-lite, gemma-3-27b-it"
  },
  {
-  "p": "Novos",
-  "name": "Painel: tem tudo (estado das áreas, centro de controlo, cartões, dinheiro em 6 meses, universidade) sem cartões repetidos",
+  "p": "IA",
+  "name": "IA: cota de um modelo esgotada → passa logo ao seguinte, sem esperar",
   "pass": true,
-  "info": "{\"hash\":\"#visao\",\"nav\":[\"\",\"OCEANUM\",\"Definições\",\"Painel\",\"Hoje\",\"Jornal\",\"E-mail e LinkedIn\",\"Calendário\",\"Tarefas\",\"Hábitos e rotina\",\"Bloco de foco\",\"Projetos\",\"Metas\",\"Quem sou eu\",\"Fé & Devoção\",\"Gasto rápido\",\"Finanças\",\"Investimentos\",\"Relatórios\",\"Compras\",\"Simuladores\",\"Universidade\",\"Floresta (foco)\",\"Cursos\",\"Certificações\",\"Leituras\",\"Trilhas e competências\",\"Base de conhecimento\",\"Visão do corpo\",\"Treino\",\"Dieta\",\"Corrida\",\"Desporto\",\"Trabalho\",\"Carreira e contactos\",\"Capital Profissional\",\"Oportunidades\",\"Próximos passos\",\"Estrela-guia\",\"Roteiro da vida\",\"Minha Evolução\",\"Centro de decisões\",\"Revisões\"],\"ctrl\":true,\"life\":true,\"grid\":true,\"money\":true,\"uni\":true,\"agendaDup\":false}"
+  "info": "google · gemini-3.5-flash > gemini-3.5-flash-lite"
  },
  {
-  "p": "Novos",
-  "name": "nomes: nenhum separador em inglês no menu",
+  "p": "IA",
+  "name": "IA: modelo desligado pelo Google (como o gemini-2.0) fica de lado e usa outro",
   "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Próximos passos: está na Direção, com as áreas da vida e os passos do pequeno ao grande",
-  "pass": true,
-  "info": "DireçãoPróximos passosEstrela-guiaRoteiro da vidaMinha EvoluçãoCentro de decisõesRevisões"
- },
- {
-  "p": "Novos",
-  "name": "Próximos passos: o Spyke faz o plano com novos passos ligados às metas",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Próximos passos: a aba \"Agora\" mantém a próxima ação de sempre",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: sem nada configurado, não há passos de configuração (só o botão para Definições → E-mail)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "E-mail: o separador \"Ligar contas\" saiu da página E-mail",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "E-mail: o endereço antigo \"Ligar contas\" abre Definições → E-mail",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: \"Entrar com a conta da faculdade\" abre o login da Microsoft",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → E-mail: mostra \"Outlook ligado\" com o botão Desligar",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: ligada, só e-mails e matérias (nenhum passo de configuração)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: ligado, lê os e-mails da faculdade",
-  "pass": true,
-  "info": "[\"Todas · 4\",\"Contabilidade · 2\",\"Marketing · 1\",\"Geral · 1\"]"
- },
- {
-  "p": "Novos",
-  "name": "Outlook: separa por matéria (código da cadeira, professor, IA e Geral)",
-  "pass": true,
-  "info": "{\"o1\":\"Contabilidade\",\"o2\":\"Contabilidade\",\"o3\":\"Marketing\",\"o4\":\"Geral\"}"
- },
- {
-  "p": "Novos",
-  "name": "Outlook: filtrar por matéria",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: mudar a matéria à mão também ensina o remetente",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: abre o e-mail inteiro dentro da app",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: responder vai pelo Outlook da faculdade",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → E-mail: guarda o domínio e mostra que o reencaminhamento funciona",
-  "pass": true,
-  "info": "E-mail da faculdade\nOutlook ligado\n\nOs e-mails aparecem em E-mail → Faculdade, separados por matéria.\n\nOutlook ligado diretamente\nryan@ua.pt\nDesligar\nPelo Gmail (reencaminhamento)\n✓ A funcionar: 1 e-mail de @ua.pt no Gmail.\nGuardar\nComo reencaminhar o Outlook para o Gmail"
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: uma sigla curta (EST) só conta como palavra inteira, não dentro de \"prestação\"",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: a linha do e-mail mostra o remetente e o assunto com a largura toda",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: o e-mail reencaminhado pelo Gmail aparece na matéria certa",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições: o Spyke saiu do menu principal",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)",
-  "pass": true,
-  "info": "{\"h\":\"#definicoes.spyke\",\"tabs\":[\"Geral\",\"E-mail\",\"Ligações\",\"Atalhos do iPhone\",\"Spyke (assistente)\",\"Impostos\",\"Script Google\"],\"st\":true,\"h1\":\"Definições\",\"side\":true}"
- },
- {
-  "p": "Novos",
-  "name": "Definições → Spyke: o estado mostra a Parte 4 instalada",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Script Google: as 5 partes com botão de copiar e a parte que falta (5) em destaque",
-  "pass": true,
-  "info": "[\"p5\",\"p1\",\"p2\",\"p3\",\"p4\",\"p5\"]"
- },
- {
-  "p": "Novos",
-  "name": "Definições → Script Google: \"Copiar parte 4\" copia a Parte 4 (Outlook), sem mexer nas outras",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Script Google: sem a Parte 4 diz \"falta\" e mostra os passos",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Spyke: sem a Parte 4 o estado leva-te ao botão de copiar",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Geral: mantém perfil, segurança, sincronização e atalho",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "\"Ver mais\": tocar mostra os itens escondidos na hora",
-  "pass": true,
-  "info": "Ver mais 2|2"
- },
- {
-  "p": "Novos",
-  "name": "Hábitos (iPhone): nomes e etiquetas cabem na coluna, o dia de hoje está à vista e a página não sai para o lado",
-  "pass": true,
-  "info": "{\"over\":0,\"rows\":2,\"today\":true,\"page\":true}"
- },
- {
-  "p": "Novos",
-  "name": "Finanças: botões para juntar conta por banco (BTG, Santander, Revolut, Caixa Geral, Wise)",
-  "pass": true,
-  "info": "Caixa Geral de Depósitos, Millennium BCP, Santander, Novo Banco, BPI, ActivoBank, Crédito Agrícola, Montepio"
- },
- {
-  "p": "Novos",
-  "name": "Finanças: tocar no banco abre a nova conta já com o banco",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
-  "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"yel8cyx7hhd\"}"
- },
- {
-  "p": "Novos",
-  "name": "Finanças: ao registar um gasto, a conta mostra o banco",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Gasto rápido: \"Pago com\" mostra o banco de cada conta",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições: nenhuma página fora das Definições tem passos de configuração (40 páginas)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Atalhos do iPhone: bloquear apps, gasto rápido e relógio (o endereço antigo do Bloco de foco leva lá)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Ligações: agenda Google, cotações (com a chave Finnhub e o câmbio) e alertas de preço",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Geral: sem o painel antigo \"Integrações\"",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "sem erros de JavaScript (novos)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "B3: botão \"Importar da B3\" nos Movimentos",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "B3: painel com os passos da Área do Investidor",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "B3: lê Negociação + Movimentação + Posição (9 movimentos; liquidação e atualização ficam de fora)",
-  "pass": true,
-  "info": "{\"n\":9,\"liq\":true,\"upd\":true,\"err\":\"\"}"
- },
- {
-  "p": "Extras",
-  "name": "B3: conferência com a posição aparece",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "B3: PETR4 criado como Ação, PETR4.SA, BRL, corretora BTG Pactual",
-  "pass": true,
-  "info": "PETR4.SA|Ação|BRL|BTG Pactual|12"
- },
- {
-  "p": "Extras",
-  "name": "B3: desdobro calculado (10 − 4 = 6 → 12 ações)",
-  "pass": true,
-  "info": "PETR4.SA|Ação|BRL|BTG Pactual|12 fator 2"
- },
- {
-  "p": "Extras",
-  "name": "B3: MXRF11 é FII, BOVA11 é ETF, Tesouro Selic 2029 no Tesouro Direto",
-  "pass": true,
-  "info": "{\"pe\":\"PETR4.SA|Ação|BRL|BTG Pactual|12\",\"mx\":\"FII\",\"bo\":\"ETF\",\"td\":\"Tesouro Selic 2029\",\"jcp\":\"1.2/0.18\",\"sp\":\"2\",\"rend\":1}"
- },
- {
-  "p": "Extras",
-  "name": "B3: JCP guardado bruto com os 15% retidos (1,02 líquido → 1,20 bruto)",
-  "pass": true,
-  "info": "1.2/0.18"
- },
- {
-  "p": "Extras",
-  "name": "B3: importar outra vez não duplica nada e a conferência bate",
-  "pass": true,
-  "info": "{\"f\":0,\"d\":9}"
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: Universidade → Materiais tem \"Guardar ficheiros\" em cada disciplina",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: sem a Parte 5, explica como a colar (com botão para copiar)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: \"Verificar\" deteta a Parte 5",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: PDF de 7 MB enviado em 4 partes para Universidade/Contabilidade ZZ no Drive",
-  "pass": true,
-  "info": "Resumo cap 3|PDF|uni|7340032|F1 {\"n\":4,\"pasta\":\"Universidade/Contabilidade ZZ\"}"
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: aparece na disciplina com Abrir / descarregar / apagar",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: \"Abrir\" abre o ficheiro no Google Drive",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: cada curso tem \"Guardar PDFs / ficheiros\"",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: \"Atualizar lista\" recupera do Drive o que foi guardado noutro aparelho (na disciplina certa)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: apagar tira da lista e manda para o lixo do Drive",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Definições → Script Google lista a Parte 5 (ficheiros na nuvem)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Parte 5: código válido com op_fup, op_fdl, op_frm, op_fls",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Metas: meta com categoria própria (\"Pessoal\") aparece",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "sem erros de JavaScript (extras)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Investimentos → Visão: \"Tudo o que tens investido\" junta mercado e imóveis",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Investimentos → Visão: gráficos por classe, setor, país e moeda",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Investimentos: separadores Imóveis e Renda passiva",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Carteira: divisão por setor com % e imóveis incluídos",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Carteira: divisão por país (EUA, Irlanda, Portugal)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Imóveis: capital próprio, rendimento líquido, cash flow e rentabilidade",
-  "pass": true,
-  "info": "{\"eq\":100000,\"noi\":9450,\"cf\":2250,\"gy\":0.054,\"realIn\":7200}"
- },
- {
-  "p": "Extras",
-  "name": "Imóveis: o real das Finanças (rendas ligadas ao imóvel) aparece",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Património líquido inclui o imóvel (valor − crédito)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Renda passiva: por mês, despesas cobertas, liberdade financeira e fontes",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Dinheiro → Relatórios: mensal, trimestral e anual com prazos",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Relatório anual: anexos A, F, G, H, J e simulação do imposto",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "IRS: salário bruto, retenções e rendas (anexo F) somados",
-  "pass": true,
-  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
- },
- {
-  "p": "Extras",
-  "name": "IRS: vendas no anexo J com código (G01 ações, G20 ETF) e país",
-  "pass": true,
-  "info": "G01:EUA:144 G20:Irlanda:25"
- },
- {
-  "p": "Extras",
-  "name": "IRS: deduções (rendas 15% até ao limite, saúde 15%) e contas no estrangeiro (Revolut → Lituânia)",
-  "pass": true,
-  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
- },
- {
-  "p": "Extras",
-  "name": "IRS: rendimento coletável com dedução específica (sem IRS Jovem fora do prazo)",
-  "pass": true,
-  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
- },
- {
-  "p": "Extras",
-  "name": "IRS Jovem: 6.º ano de rendimentos = 50% isento (até 55 × IAS)",
-  "pass": true,
-  "info": ""
+  "info": "google · gemini-3.5-flash-lite > gemini-2.0-flash-lite > gemma-3-27b-it"
  },
  {
-  "p": "Extras",
-  "name": "Relatório: tabelas para descarregar em CSV (para o contabilista)",
+  "p": "IA",
+  "name": "IA: com toda a cota do Google esgotada responde a IA grátis de reserva (sem esperar)",
   "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Relatório: descarregar o relatório completo (para PDF)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Relatório mensal enxuto: resumo, receitas e despesas, investimentos e impostos do mês",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Relatórios gerados sozinhos quando o mês, o trimestre e o ano fecham (Arquivo)",
-  "pass": true,
-  "info": "{\"k\":3,\"per\":\"a,m,q\"}"
- },
- {
-  "p": "Extras",
-  "name": "Arquivo lista os relatórios novos",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Definições → Impostos: residência, IRS Jovem, dependentes, englobamento",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Movimento de salário com bruto, retenção e Segurança Social",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Empresa: preço de longo prazo, retornos e dividendos por ano",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Empresa: últimos trimestres e escolha 5/10 anos nas demonstrações",
-  "pass": true,
-  "info": ""
+  "info": "reserva"
  },
  {
-  "p": "Extras",
-  "name": "Empresa: 10 anos de demonstrações financeiras",
+  "p": "IA",
+  "name": "IA: texto (resumos) também passa à reserva",
   "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Empresa: a história completa (fundação, fundadores, linha do tempo, crises, líderes, fontes)",
-  "pass": true,
-  "info": ""
+  "info": "Primeiro parágrafo do resumo da reserva.\n\nSegundo parágrafo "
  },
  {
-  "p": "Extras",
-  "name": "Empresa: tudo sobre a empresa (modelo, segmentos, concorrentes, cenários, tese)",
+  "p": "IA",
+  "name": "IA: o Spyke continua a pensar e a agir com a reserva (criou a tarefa)",
   "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Empresa: história e dossiê ficam guardados (não gasta IA outra vez)",
-  "pass": true,
-  "info": ""
+  "info": "Criei a tarefa, chefe. | Tarefa: Tarefa criada pela reserva"
  },
  {
-  "p": "Extras",
-  "name": "Entrevista: mais de 500 perguntas em 37 capítulos (mente e emoções, perdas, valores, identidade, sentidos, cartas…)",
+  "p": "IA",
+  "name": "IA: notícia bloqueada e Google sem cota → o Spyke faz o resumo com o que os jornais publicaram (não mostra erro em inglês)",
   "pass": true,
-  "info": "{\"n\":537,\"parts\":37}"
+  "info": "Estadão · agora Notícia bloqueada RESUMO FEITO PELO SPYKE COM O QUE 2 JORNAIS PUBLICARAM Primeiro parágrafo do resumo da reserva. Segundo parágrafo do resumo. Fontes consultadas: Estadão · O Globo Spy"
  },
  {
-  "p": "Extras",
-  "name": "Minha Evolução: o antigo Longo prazo abre aqui (mesmo visual) e o menu tem só \"Minha Evolução\"",
+  "p": "IA",
+  "name": "IA: se desligares a reserva, nada vai para fora do Google",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Minha Evolução: evolução por área (dinheiro, estudos, desporto, carreira, metas)",
+  "p": "IA",
+  "name": "sem erros de JavaScript (IA)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Minha Evolução: o Spyke analisa a evolução (nota, por área, foco para 30 dias)",
+  "p": "Voz",
+  "name": "Voz Gemini: o pedido leva só o texto do resumo (nenhuma instrução para ler em voz alta)",
   "pass": true,
-  "info": "DIREÇÃO\nMinha Evolução\n\nTudo o que te aproxima dos teus objetivos, numa página: desporto, estudos, carreira, dinheiro, hábitos e metas. Onde estás, quanto evoluíste (hoje contra 30 dias, 3 meses e 1 a"
+  "info": "[\"Bom dia, Ryan. Hoje é terça-feira, 13 de outubro.\",\"A agenda está livre de compromissos com hora. Treino de hoje\"]"
  },
  {
-  "p": "Extras",
-  "name": "Decisões: \"Pensar com o Spyke\" no topo da página",
+  "p": "Voz",
+  "name": "Voz Gemini: a língua vai na configuração da voz (pt-BR) e a voz é a mesma",
   "pass": true,
-  "info": ""
+  "info": "{\"at\":21,\"text\":\"Bom dia, Ryan. Hoje é terça-feira, 13 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
  },
  {
-  "p": "Extras",
-  "name": "Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi",
+  "p": "Voz",
+  "name": "Resumo: o 1.º pedaço é só a saudação (começa a falar em segundos) e o resto é pedido logo a seguir, em paralelo",
   "pass": true,
-  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"yw5jnjx88x9\"}"
+  "info": "[[21,49],[21,218]]"
  },
  {
-  "p": "Extras",
-  "name": "Decisões: \"Usar estes pesos\" aplica os pesos sugeridos à matriz",
+  "p": "Voz",
+  "name": "Resumo: nada do texto se perde ao dividir em pedaços",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "sem erros de JavaScript (extras 2)",
+  "p": "Voz",
+  "name": "sem erros de JavaScript (voz)",
   "pass": true,
   "info": ""
  }

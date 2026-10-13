@@ -96,12 +96,22 @@ const wav = ({ b64, rate }) => { const bin = atob(b64), n = bin.length, buf = ne
   w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n, true);
   const u8 = new Uint8Array(buf, 44); for (let i = 0; i < n; i++) u8[i] = bin.charCodeAt(i); return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })); };
 const ttsModels = async key => { const c = U.ls.get('os2ttsl', null); if (c && Date.now() - c.at < 864e5 && c.k === key.slice(-6)) return c.m; try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`), j = await r.json(); const m = (j.models || []).filter(x => /tts/i.test(x.name) && (x.supportedGenerationMethods || ['generateContent']).includes('generateContent')).map(x => x.name.replace(/^models\//, '')).sort((a, b) => (/flash/.test(b) - /flash/.test(a)) || (/preview/.test(a) - /preview/.test(b)) || (b > a ? 1 : -1)); U.ls.set('os2ttsl', { at: Date.now(), m, k: key.slice(-6) }); return m; } catch (e) { return []; } };
-const STYLE = 'Fala SEMPRE em português, nunca em inglês. Voz masculina grave, quente e natural, de pessoa real, calma e confiante, ritmo tranquilo, nada robótica.';
+// A língua vai na configuração da voz (languageCode), não no texto: antes as instruções iam escritas no pedido e o modelo às vezes
+// lia-as em voz alta ("fala sempre em português…") antes do resumo. Agora o pedido leva SÓ o texto a dizer.
+const TTSTO = 40000; let noLang = U.ls.get('os2ttsnl', 0);
 const gemClip = async text => { const key = OS.AI && OS.AI.key(); if (!key) throw new Error('sem chave da IA'); const c = cfg(), ck = 'g' + c.voice + c.accent + text; if (cache.has(ck)) return cache.get(ck);
-  const lang = c.accent === 'PT' ? 'European Portuguese (Portugal)' : 'Brazilian Portuguese';
+  const lang = c.accent === 'PT' ? 'pt-PT' : 'pt-BR';
   const best = U.ls.get('os2ttsm', ''), found = await ttsModels(key), all = found.concat(TTS.filter(m => !found.includes(m))), list = best ? [best].concat(all.filter(m => m !== best)) : all; let last = '';
-  for (const m of list) { if (OS.AI.blocked && OS.AI.blocked(m)) continue; let r; try { r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: `${STYLE} Sotaque: ${c.accent === 'PT' ? 'português de Portugal' : 'português do Brasil'}. Lê exatamente este texto e mais nada:\n${text}` }] }], generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: c.voice } } } } }) }); } catch (e) { last = 'sem internet'; continue; }
-    const j = await r.json().catch(() => ({})); if (!r.ok) { const msg = (j.error && j.error.message) || ('erro ' + r.status); last = msg; if (/API key/i.test(msg)) throw new Error('a chave da IA não é válida'); if (r.status === 429) { if (OS.AI.markLimit) OS.AI.markLimit(m, msg); last = 'cota grátis de voz gasta'; continue; } continue; }
+  const call = async (m, withLang) => { const ctl = window.AbortController ? new AbortController() : null, to = ctl ? setTimeout(() => ctl.abort(), TTSTO) : 0;
+    try { return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ contents: [{ parts: [{ text }] }], generationConfig: { responseModalities: ['AUDIO'], speechConfig: Object.assign({ voiceConfig: { prebuiltVoiceConfig: { voiceName: c.voice } } }, withLang ? { languageCode: lang } : {}) } }) }); }
+    finally { clearTimeout(to); } };
+  for (const m of list) { if (OS.AI.blocked && OS.AI.blocked(m)) continue; let r, j;
+    try { r = await call(m, !noLang); j = await r.json().catch(() => ({}));
+      // modelo que não aceita a língua na configuração: volta a pedir sem ela (e lembra-se)
+      if (!r.ok && r.status === 400 && /language/i.test((j.error && j.error.message) || '')) { noLang = 1; U.ls.set('os2ttsnl', 1); r = await call(m, false); j = await r.json().catch(() => ({})); } }
+    catch (e) { last = e && e.name === 'AbortError' ? 'demorou demasiado' : 'sem internet'; continue; }
+    if (!r.ok) { const msg = (j.error && j.error.message) || ('erro ' + r.status); last = msg; if (/API key/i.test(msg)) throw new Error('a chave da IA não é válida'); if (r.status === 429) { if (OS.AI.markLimit) OS.AI.markLimit(m, msg); last = 'cota grátis de voz gasta'; continue; } continue; }
     const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [], d = parts.map(p => p.inlineData || p.inline_data).find(Boolean); if (!d || !d.data) { last = 'sem áudio'; continue; }
     if (best !== m) U.ls.set('os2ttsm', m);
     const rate = +(((d.mimeType || d.mime_type || '').match(/rate=(\d+)/) || [0, 24000])[1]), bin = atob(d.data);
@@ -131,6 +141,11 @@ const MALE = /felipe|daniel|duarte|ricardo|thiago|tiago|joaquim|ant[oó]nio|jorg
 const sysVoice = () => { try { const vs = speechSynthesis.getVoices().filter(v => /^pt/i.test(v.lang)), pref = cfg().accent === 'PT' ? /pt[-_]PT/i : /pt[-_]BR/i, rank = v => (MALE.test(v.name) ? 4 : 0) + (GOOD.test(v.name) ? 2 : 0) + (pref.test(v.lang) ? 1 : 0); return vs.sort((a, b) => rank(b) - rank(a))[0] || null; } catch (e) { return null; } };
 const sysSay = (text, my) => new Promise(res => { try { if (!window.speechSynthesis || my !== tok) return res('none'); outSession(); const u = new SpeechSynthesisUtterance(text), v = sysVoice(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR'; u.rate = (+cfg().speed || 1) * .98; u.pitch = v && MALE.test(v.name) ? 1 : .9;
   let started = false; const to = setTimeout(() => res(started ? 'ok' : 'blocked'), Math.max(5000, text.length * 95)); u.onstart = () => { started = true; engine = 'voz do aparelho' + (v ? ' · ' + v.name : ''); orb(); }; u.onboundary = () => { lvlBump = .9; }; u.onend = () => { clearTimeout(to); res('ok'); }; u.onerror = e => { clearTimeout(to); res(e && /not-allowed/.test(e.error || '') ? 'blocked' : 'erro'); }; speechSynthesis.speak(u); } catch (e) { res('erro'); } });
+// primeiro pedaço curto (a 1.ª frase, ou as duas primeiras se forem curtas) para a voz começar logo; o resto em pedaços grandes
+// (1.º pedaço: 1 ou 2 frases; 2.º: até ~350 letras; depois pedaços grandes — cada um fica pronto antes de o anterior acabar de tocar)
+const first = (t, max) => { const all = String(t).trim(), s = all.match(/[^.!?]+[.!?]*\s*/g) || [all]; let head = s[0] || ''; if (head.length < 70 && s[1]) head += s[1]; head = head.trim();
+  let rest = all.slice(all.indexOf(head) + head.length).trim(); if (!rest) return [head]; const p2 = parts(rest, 350)[0] || ''; rest = rest.slice(rest.indexOf(p2) + p2.length).trim();
+  return [head, p2].concat(rest ? parts(rest, max) : []).filter(Boolean); };
 const parts = (t, max) => { const s = String(t).match(/[^.!?]+[.!?]*\s*/g) || [t], out = []; let cur = ''; s.forEach(x => { if ((cur + x).length > max && cur) { out.push(cur.trim()); cur = ''; } cur += x; }); if (cur.trim()) out.push(cur.trim()); return out; };
 S.stop = () => { tok++; try { playing && playing.stop(); } catch (e) { } playing = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { } try { rec && rec.abort(); } catch (e) { } setSt('idle'); };
 const order = () => { const c = cfg(), has = { azure: !!c.azKey, eleven: !!c.elKey, gemini: !!(OS.AI && OS.AI.key()), device: true }, pref = c.eng === 'gemini' ? ['gemini', 'azure', 'eleven', 'device'] : c.eng === 'eleven' ? ['eleven', 'azure', 'gemini', 'device'] : c.eng === 'device' ? ['device'] : ['azure', 'eleven', 'gemini', 'device']; return pref.filter(e => has[e]); };
@@ -139,7 +154,10 @@ S.say = async (text, o = {}) => { if (!text) return; S.stop(); const my = ++tok;
   const ord = o.eng ? [o.eng].concat(order().filter(x => x !== o.eng)) : order();
   for (const e of ord) { if (my !== tok) return; if ((e === 'eleven' && !cfg().elKey) || (e === 'azure' && !cfg().azKey)) continue;
     if (e === 'device') { setSt('speaking'); res = await sysSay(text, my); if (res === 'ok' || res === 'blocked') break; voiceErr += (voiceErr ? ' · ' : '') + 'a voz do aparelho não respondeu'; continue; }
-    try { const P = e === 'gemini' ? parts(text, 1400) : parts(text, 2400), get = e === 'gemini' ? gemClip : e === 'azure' ? azClip : elClip; let nx = get(P[0]); for (let i = 0; i < P.length; i++) { const cur = await nx; if (i + 1 < P.length) { nx = get(P[i + 1]); nx.catch(() => { }); } if (my !== tok) return; setSt('speaking'); res = await playClip(cur, my); engine = cur.eng; if (res !== 'ok') break; } }
+    try { const P = e === 'gemini' ? first(text, 1400) : first(text, 2400), get = e === 'gemini' ? gemClip : e === 'azure' ? azClip : elClip;
+      // todos os pedaços começam a ser gerados já (o 1.º é curto, por isso a voz arranca em poucos segundos); toca-os por ordem
+      const Q = P.map((x, i) => i < 3 ? get(x) : null); Q.forEach(q => q && q.catch(() => { }));
+      for (let i = 0; i < P.length; i++) { if (!Q[i]) { Q[i] = get(P[i]); Q[i].catch(() => { }); } if (i + 3 < P.length && !Q[i + 3]) { Q[i + 3] = get(P[i + 3]); Q[i + 3].catch(() => { }); } const cur = await Q[i]; if (my !== tok) return; setSt('speaking'); res = await playClip(cur, my); engine = cur.eng; if (res !== 'ok') break; } }
     catch (er) { voiceErr += (voiceErr ? ' · ' : '') + (er.message || 'erro'); res = 'erro'; }
     if (res === 'ok' || res === 'blocked' || res === 'stop') break; }
   if (my !== tok || res === 'stop') return;

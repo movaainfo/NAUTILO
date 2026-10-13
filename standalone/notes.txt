@@ -1,9 +1,2 @@
-Investimentos → Visão: tudo o que tens investido (mercado + imóveis), património líquido, renda passiva e "Todos os números": aplicado, ganhos, proventos, yield on cost, aportes, renda fixa e variável, cripto, diversificação, volatilidade, Sharpe, maior queda, melhores e piores ativos, e gráficos por classe, setor, país e moeda.
-Carteira dividida por tipo, classe, setor, país, moeda ou corretora, com gráfico e a percentagem de cada parte. O setor e o país das ações preenchem-se sozinhos.
-Imóveis: a tua casa e os imóveis para arrendar entram no património (valor, crédito, capital próprio, valorização, rendas, despesas, rentabilidade e cash flow). Rendas e despesas das Finanças ligam-se ao imóvel.
-Renda passiva: dividendos, JCP, FII, juros, rendas e negócios por mês e por fonte, despesas cobertas, meta e anos até à liberdade financeira.
-Dinheiro → Relatórios: mensal (resumido), trimestral e anual (completo) no formato da declaração de IRS — anexos A, B, E, F, G, G1, H e J, deduções, simulação com IRS Jovem — e Brasil (IRPF). Gerados sozinhos quando o período fecha; imprimir/PDF e CSV para o contabilista. A tua situação fiscal fica em Definições → Impostos.
-Análise de empresas: a história completa (fundação, fundadores, linha do tempo, crises, aquisições, líderes), tudo sobre a empresa (negócio, segmentos, concorrentes, gestão, riscos, cenários, tese), 10 anos de contas, trimestres, preço de longo prazo e dividendos por ano.
-Minha Evolução junta o Longo prazo: evolução por área (dinheiro, estudos, desporto, carreira, hábitos e metas) e o Spyke analisa e diz o foco dos próximos 30 dias.
-Centro de decisões: "Pensar com o Spyke" — escreves a decisão como te vem à cabeça e ele organiza e analisa: pontos fortes e fracos com peso, o que pesa mais para ti, comentário ao que escreveste e pesos sugeridos.
-Entrevista da biografia: mais de 500 perguntas em 37 capítulos (mente e emoções, perdas, valores, identidade, os sentidos da memória, cartas…). As respostas antigas ficam.
+Spyke: no resumo do dia já não lê as instruções da voz ("fala sempre em português…") — vai direto ao resumo.
+Spyke começa a falar em poucos segundos: a primeira frase é gerada à parte e o resto em paralelo, enquanto ele fala. A voz é a mesma.

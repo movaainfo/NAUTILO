@@ -1596,11 +1596,29 @@ async function extras2Tests(b) { cur = 'Extras'; console.log('\n=== Investimento
   await E(p, () => OS.UI.closeDrawer && OS.UI.closeDrawer());
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (extras 2)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
+/* ---------- Spyke: a voz Gemini não lê instruções e o resumo começa logo (1.º pedaço curto, os outros em paralelo) ---------- */
+async function voiceTests(b) { cur = 'Voz'; console.log('\n=== Voz do Spyke (resumo do dia) ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const tts = []; let t0 = 0;
+  const pcm = Buffer.alloc(2400 * 2).toString('base64'); // 0,1 s de silêncio a 24 kHz
+  await ctx.route(/generativelanguage/, async rt => { const u = rt.request().url(), b2 = rt.request().postData() || '';
+    if (/\/models\?/.test(u)) return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [{ name: 'models/gemini-3.5-flash', supportedGenerationMethods: ['generateContent'] }, { name: 'models/gemini-2.5-flash-preview-tts', supportedGenerationMethods: ['generateContent'] }] }) });
+    if (/tts/.test(u)) { const j = JSON.parse(b2); tts.push({ at: Date.now() - t0, text: j.contents[0].parts[0].text, lang: (j.generationConfig.speechConfig || {}).languageCode, voice: ((j.generationConfig.speechConfig || {}).voiceConfig || {}).prebuiltVoiceConfig }); await sleep(300); return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'audio/L16;codec=pcm;rate=24000', data: pcm } }] } }] }) }); }
+    return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }) }); });
+  await p.goto(BASE); await unlock(p);
+  await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); localStorage.removeItem('os2ttsm'); localStorage.removeItem('os2ttsl'); localStorage.removeItem('os2ttsnl'); const c = OS.one('spyke'); c.eng = 'gemini'; OS.touch('spyke'); });
+  const brief = await E(p, () => OS.Spyke.brief()); t0 = Date.now();
+  await E(p, () => { OS.Spyke.say(OS.Spyke.brief()); }); await p.waitForFunction(() => !/speaking|thinking/.test(document.body.className + ' ' + ((OS.Spyke.state && OS.Spyke.state()) || '')), null, { timeout: 15000 }).catch(() => { }); await sleep(800);
+  ok('Voz Gemini: o pedido leva só o texto do resumo (nenhuma instrução para ler em voz alta)', tts.length >= 1 && tts.every(x => !/Fala SEMPRE|Voz masculina|Lê exatamente|Sotaque/i.test(x.text)), JSON.stringify(tts.map(x => x.text.slice(0, 60))));
+  ok('Voz Gemini: a língua vai na configuração da voz (pt-BR) e a voz é a mesma', tts.length && tts[0].lang === 'pt-BR' && !!(tts[0].voice && tts[0].voice.voiceName), JSON.stringify(tts[0] || {}));
+  ok('Resumo: o 1.º pedaço é só a saudação (começa a falar em segundos) e o resto é pedido logo a seguir, em paralelo', tts.length >= 2 && tts[0].text.length <= 160 && /^(Bom dia|Boa tarde|Boa noite)/.test(tts[0].text) && tts[1].at - tts[0].at < 1500, JSON.stringify(tts.map(x => [x.at, x.text.length])));
+  ok('Resumo: nada do texto se perde ao dividir em pedaços', tts.map(x => x.text).join(' ').replace(/\s+/g, ' ').trim() === brief.replace(/\s+/g, ' ').trim());
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (voz)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 (async () => {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);
