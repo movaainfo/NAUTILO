@@ -1,10 +1,10 @@
 {
- "n": 115,
- "hash": "403223ecca36",
+ "n": 116,
+ "hash": "7690f7f847f2",
  "notes": [
-  "Cores na agenda lá fora (Google Calendar e Calendário do iPhone): cada tipo tem o seu calendário com uma cor pastel — Trabalho azul, Folgas verde, Tarefas amarelo, Estudos lavanda, Compromissos rosa, Treino e rotina pêssego. A app fica com as cores de sempre.",
-  "As cores vêm na Parte 7 do script, um ficheiro novo: não precisas de mexer na Parte 5 nem na Parte 6. Depois de a colares, liga-se sozinha e o que já estava no Google Calendar muda para a cor certa, sem duplicar.",
-  "Tudo o que está no Calendário do Oceanum vai para fora (trabalho, folgas, compromissos, aulas, provas, tarefas, rotina…), e a escala importada por foto também."
+  "Trabalho: as horas do mês e da semana agora são as horas REAIS que já trabalhaste. Os turnos que ainda vêm não contam, e o turno de hoje só conta o que já passou. As horas marcadas aparecem por baixo, à parte (\"de X h marcadas no mês\").",
+  "Os ganhos também passam a ser \"até hoje\", com o previsto do mês por baixo. O Painel, a Estrela-guia e as revisões usam as mesmas horas reais.",
+  "Cores pastel por tipo no Google Calendar e no iPhone (Parte 7 do script, ficheiro novo)."
  ],
  "date": "13/10/2026"
 }

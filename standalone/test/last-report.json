@@ -87,7 +87,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 13/10/2026 · Cores na agenda lá fora (Google Calendar "
+  "info": "Atualizado · versão 9.9 · 13/10/2026 · Trabalho: as horas do mês e da semana ago"
  },
  {
   "p": "Geral",
@@ -447,7 +447,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Almoço\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"bliyzorx69u\",\"_c\":1791901556994,\"_u\":1791901556994,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"256clbu5iq1\",\"_c\":1791905305609,\"_u\":1791905305609,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -597,7 +597,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Almoço\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"h4wl5mrxna5\",\"_c\":1791901579037,\"_u\":1791901579037,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"mdpb53u5zw1\",\"_c\":1791905327857,\"_u\":1791905327857,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1506,200 +1506,248 @@
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: código malicioso gravado em todos os campos de 75 tipos de registo",
+  "p": "Áreas",
+  "name": "finanças: saldo da conta = abertura + receitas − despesas − transferências (1279,50 €)",
+  "pass": true,
+  "info": "{\"a\":1279.5,\"c\":100,\"inc\":500,\"exp\":1119.5,\"up\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "finanças: transferência entra na conta de destino (100 €)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: nenhuma página executa código malicioso guardado nos dados (148 páginas)",
+  "p": "Áreas",
+  "name": "finanças: mês soma receitas e despesas (despesa futura ainda não conta no saldo)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: os formulários de edição mostram o código como texto",
+  "p": "Áreas",
+  "name": "finanças: despesa agendada aparece nos próximos pagamentos",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: e-mail (texto e formatado), notícia aberta, conversa com o Spyke e endereços com código não executam nada",
+  "p": "Áreas",
+  "name": "finanças: compra em 3 parcelas cria 3 movimentos de 100 € em meses seguidos",
   "pass": true,
-  "info": "{\"em\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"nw\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"sp\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"hs\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0}}"
+  "info": "[[100,1,3,\"2026-10\"],[100,2,3,\"2026-11\"],[100,3,3,\"2026-12\"]]"
  },
  {
-  "p": "Segurança",
-  "name": "segurança: sem o código/Face ID não aparece nenhum dado (mesmo abrindo o endereço de uma página)",
+  "p": "Áreas",
+  "name": "finanças: recorrente aparece antes de pagar e desaparece depois de pago",
   "pass": true,
-  "info": ""
+  "info": "{\"before\":true,\"paid\":true,\"after\":false}"
  },
  {
-  "p": "Segurança",
-  "name": "sem erros de JavaScript (segurança)",
+  "p": "Áreas",
+  "name": "finanças: pagar 200 € de uma dívida de 1000 € deixa 800 € (património igual)",
   "pass": true,
-  "info": ""
+  "info": "{\"bal\":800,\"nwDelta\":0}"
  },
  {
-  "p": "Atualização",
-  "name": "iPhone: app instalada (a funcionar com a cópia guardada)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Atualização",
-  "name": "iPhone: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "iPhone: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "iPhone: sem erros de JavaScript (atualização)",
+  "p": "Áreas",
+  "name": "finanças: orçamento soma o gasto da categoria no mês",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Android tel: app instalada (a funcionar com a cópia guardada)",
+  "p": "Áreas",
+  "name": "tarefas: \"Rever balanço @Universidade !1 amanhã\" → título, prioridade 1, amanhã, área",
+  "pass": true,
+  "info": "[\"Rever balanço\",\"1\",true,\"Universidade\",\"Próxima\"]"
+ },
+ {
+  "p": "Áreas",
+  "name": "tarefas: concluir tarefa diária marca a data e cria a de amanhã",
+  "pass": true,
+  "info": "{\"done\":true,\"next\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "tarefas: prazo passado conta como atrasada",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Android tel: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Android tel: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "Android tel: sem erros de JavaScript (atualização)",
+  "p": "Áreas",
+  "name": "próxima ação: prioridade 1 com prazo hoje vem antes da prioridade 4",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Tablet horiz: app instalada (a funcionar com a cópia guardada)",
+  "p": "Áreas",
+  "name": "hábitos: 3 dias seguidos = sequência de 3",
+  "pass": true,
+  "info": "{\"streak\":3,\"wkend\":false,\"auto\":true,\"past\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "hábitos: \"dias úteis\" não conta ao sábado",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Tablet horiz: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet horiz: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "2.5 s"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet horiz: sem erros de JavaScript (atualização)",
+  "p": "Áreas",
+  "name": "hábitos: automático (registar um gasto) marca-se sozinho",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Tablet vert: app instalada (a funcionar com a cópia guardada)",
+  "p": "Áreas",
+  "name": "hábitos: não deixa marcar dias passados",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Tablet vert: ao abrir a app depois de publicar, abre logo a versão nova",
+  "p": "Áreas",
+  "name": "metas: manual 5 de 10 = 50%",
   "pass": true,
-  "info": "versão 9.1"
+  "info": "[0.5,0.5,0.25,\"Atrás do ritmo\"]"
  },
  {
-  "p": "Atualização",
-  "name": "Tablet vert: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.7 s"
- },
- {
-  "p": "Atualização",
-  "name": "Tablet vert: sem erros de JavaScript (atualização)",
+  "p": "Áreas",
+  "name": "metas: 2 de 4 passos = 50%",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Computador: app instalada (a funcionar com a cópia guardada)",
+  "p": "Áreas",
+  "name": "metas: meta ligada a uma conta segue o saldo (100 de 400 = 25%)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "Computador: ao abrir a app depois de publicar, abre logo a versão nova",
-  "pass": true,
-  "info": "versão 9.1"
- },
- {
-  "p": "Atualização",
-  "name": "Computador: ao voltar à app, atualiza-se sozinha em poucos segundos",
-  "pass": true,
-  "info": "1.9 s"
- },
- {
-  "p": "Atualização",
-  "name": "Computador: sem erros de JavaScript (atualização)",
+  "p": "Áreas",
+  "name": "metas: atrás do ritmo é detetado",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "atualização: mesmo com um ficheiro da instalação a falhar, a versão nova entra",
+  "p": "Áreas",
+  "name": "universidade: média ponderada 40%×12 + 60%×16 = 14,4",
   "pass": true,
-  "info": "ficou 9.3"
+  "info": "{\"avg\":14.4,\"due1\":true,\"r1\":true,\"next\":true}"
  },
  {
-  "p": "Atualização",
-  "name": "atualização: se recarregar não chegar, limpa a cópia guardada e entra a nova",
-  "pass": true,
-  "info": "ficou 9.4"
- },
- {
-  "p": "Atualização",
-  "name": "atualização: os dados ficam depois de atualizar",
+  "p": "Áreas",
+  "name": "universidade: revisão de ontem está para hoje e a seguinte é a 7 dias",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "atualização: com um formulário a meio, espera (não perde o que escreves)",
+  "p": "Áreas",
+  "name": "calendário: evento semanal repete-se daqui a 7 dias",
+  "pass": true,
+  "info": "{\"ev0\":true,\"ev7\":true,\"shift\":true,\"exam\":true}"
+ },
+ {
+  "p": "Áreas",
+  "name": "calendário: turnos e avaliações aparecem",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Atualização",
-  "name": "atualização: depois de fechar o formulário, atualiza sozinha",
+  "p": "Áreas",
+  "name": "decisões: filtro Alpha (24 h, 3 dias, passado)",
   "pass": true,
-  "info": "ficou 9.5"
+  "info": "[\"Responde às 5 perguntas\",\"Esperar 24 h\",\"Filtro passado\",\"Esperar 3 dias\",\"Filtro passado\"]"
  },
  {
-  "p": "Atualização",
-  "name": "atualização: com rede muito lenta, abre em menos de 5 s com a cópia guardada",
+  "p": "Áreas",
+  "name": "segurança: mudar o código pede o atual e 6+ caracteres",
   "pass": true,
-  "info": "4.3 s"
+  "info": "[\"O código atual não está certo.\",\"O novo código precisa de pelo menos 6 caracteres.\",null,null,\"Código incorreto.\",null]"
  },
  {
-  "p": "Atualização",
-  "name": "atualização: sem internet a app abre na mesma",
+  "p": "Áreas",
+  "name": "segurança: depois de mudar, o novo código entra e o antigo não",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "segurança: o código nunca fica guardado em texto",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "segurança: 5 códigos errados bloqueiam 30 s (mesmo com o certo)",
+  "pass": true,
+  "info": "[\"Código errado 5 vezes. Espera 30 s.\",\"Muitas tentativas. Espera 30 s.\"]"
+ },
+ {
+  "p": "Áreas",
+  "name": "clima: frase com cidade, graus, sensação e chuva",
+  "pass": true,
+  "info": "Em Aveiro estão 18 graus, sensação de 14, chuva fraca. Máxima de 21 e mínima de 13, 70% de probabilidade de chuva: leva guarda-chuva."
+ },
+ {
+  "p": "Áreas",
+  "name": "clima: amanhã e ícone sem emojis",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "mudança: recuperar recusa endereço errado e aceita o do script (tira as aspas da chave)",
+  "pass": true,
+  "info": "{\"bad\":null,\"ok\":true,\"done\":1}"
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as 165 páginas: cada botão tem função",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as páginas: cada formulário tem função",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as páginas: \"editar\" aponta para dados que existem",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "todas as páginas: sem \"undefined\", \"NaN\" ou \"[object Object]\" no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: nenhuma página tem o cartão antigo \"Ligar a IA\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: o cartão do Spyke aparece onde a IA faz falta",
+  "pass": true,
+  "info": "investimentos.ia, universidade.flashcards, universidade.simulados, universidade.questoes, universidade.tutor, trabalho.foto"
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: a página do Spyke tem o cérebro (IA) com os passos",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "IA unificada: ligar uma vez liga a app inteira",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Áreas",
+  "name": "sem erros de JavaScript (áreas)",
   "pass": true,
   "info": ""
  },
@@ -1923,7 +1971,7 @@
   "p": "Novos",
   "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
   "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"q15zdcs4200\"}"
+  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"a4tlmoua8xq\"}"
  },
  {
   "p": "Novos",
@@ -1968,428 +2016,422 @@
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "B3: botão \"Importar da B3\" nos Movimentos",
+  "p": "Aparelhos · iPhone",
+  "name": "abre e entra com o código",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "B3: painel com os passos da Área do Investidor",
+  "p": "Aparelhos · iPhone",
+  "name": "Definições: sem o painel antigo do Firebase",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "B3: lê Negociação + Movimentação + Posição (9 movimentos; liquidação e atualização ficam de fora)",
-  "pass": true,
-  "info": "{\"n\":9,\"liq\":true,\"upd\":true,\"err\":\"\"}"
- },
- {
-  "p": "Extras",
-  "name": "B3: conferência com a posição aparece",
+  "p": "Aparelhos · iPhone",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "B3: PETR4 criado como Ação, PETR4.SA, BRL, corretora BTG Pactual",
-  "pass": true,
-  "info": "PETR4.SA|Ação|BRL|BTG Pactual|12"
- },
- {
-  "p": "Extras",
-  "name": "B3: desdobro calculado (10 − 4 = 6 → 12 ações)",
-  "pass": true,
-  "info": "PETR4.SA|Ação|BRL|BTG Pactual|12 fator 2"
- },
- {
-  "p": "Extras",
-  "name": "B3: MXRF11 é FII, BOVA11 é ETF, Tesouro Selic 2029 no Tesouro Direto",
-  "pass": true,
-  "info": "{\"pe\":\"PETR4.SA|Ação|BRL|BTG Pactual|12\",\"mx\":\"FII\",\"bo\":\"ETF\",\"td\":\"Tesouro Selic 2029\",\"jcp\":\"1.2/0.18\",\"sp\":\"2\",\"rend\":1}"
- },
- {
-  "p": "Extras",
-  "name": "B3: JCP guardado bruto com os 15% retidos (1,02 líquido → 1,20 bruto)",
-  "pass": true,
-  "info": "1.2/0.18"
- },
- {
-  "p": "Extras",
-  "name": "B3: importar outra vez não duplica nada e a conferência bate",
-  "pass": true,
-  "info": "{\"f\":0,\"d\":9}"
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: Universidade → Materiais tem \"Guardar ficheiros\" em cada disciplina",
+  "p": "Aparelhos · iPhone",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: sem a Parte 5, explica como a colar (com botão para copiar)",
+  "p": "Aparelhos · iPhone",
+  "name": "Face ID disponível (só no iPhone)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: \"Verificar\" deteta a Parte 5",
+  "p": "Aparelhos · iPhone",
+  "name": "Definições não saem para o lado",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: PDF de 7 MB enviado em 4 partes para Universidade/Contabilidade ZZ no Drive",
-  "pass": true,
-  "info": "Resumo cap 3|PDF|uni|7340032|F1 {\"n\":4,\"pasta\":\"Universidade/Contabilidade ZZ\"}"
- },
- {
-  "p": "Extras",
-  "name": "Ficheiros: aparece na disciplina com Abrir / descarregar / apagar",
+  "p": "Aparelhos · iPhone",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: \"Abrir\" abre o ficheiro no Google Drive",
+  "p": "Aparelhos · iPhone",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar (ao ouvir o nome)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: cada curso tem \"Guardar PDFs / ficheiros\"",
+  "p": "Aparelhos · iPhone",
+  "name": "Spyke: o painel cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: \"Atualizar lista\" recupera do Drive o que foi guardado noutro aparelho (na disciplina certa)",
+  "p": "Aparelhos · iPhone",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Ficheiros: apagar tira da lista e manda para o lixo do Drive",
+  "p": "Aparelhos · iPhone",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · iPhone",
+  "name": "atualização: os dados continuam lá depois de atualizar",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Definições → Script Google lista a Parte 5 (ficheiros na nuvem)",
+  "p": "Aparelhos · iPhone",
+  "name": "sem erros de JavaScript neste aparelho",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Parte 5: código válido com op_fup, op_fdl, op_frm, op_fls",
+  "p": "Aparelhos · Android tel",
+  "name": "abre e entra com o código",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Metas: meta com categoria própria (\"Pessoal\") aparece",
+  "p": "Aparelhos · Android tel",
+  "name": "Definições: sem o painel antigo do Firebase",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "sem erros de JavaScript (extras)",
+  "p": "Aparelhos · Android tel",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Investimentos → Visão: \"Tudo o que tens investido\" junta mercado e imóveis",
+  "p": "Aparelhos · Android tel",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Investimentos → Visão: gráficos por classe, setor, país e moeda",
+  "p": "Aparelhos · Android tel",
+  "name": "sem Face ID (só existe no iPhone)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Investimentos: separadores Imóveis e Renda passiva",
+  "p": "Aparelhos · Android tel",
+  "name": "Definições não saem para o lado",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Carteira: divisão por setor com % e imóveis incluídos",
+  "p": "Aparelhos · Android tel",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Carteira: divisão por país (EUA, Irlanda, Portugal)",
+  "p": "Aparelhos · Android tel",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar (ao ouvir o nome)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Imóveis: capital próprio, rendimento líquido, cash flow e rentabilidade",
-  "pass": true,
-  "info": "{\"eq\":100000,\"noi\":9450,\"cf\":2250,\"gy\":0.054,\"realIn\":7200}"
- },
- {
-  "p": "Extras",
-  "name": "Imóveis: o real das Finanças (rendas ligadas ao imóvel) aparece",
+  "p": "Aparelhos · Android tel",
+  "name": "Spyke: o painel cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Património líquido inclui o imóvel (valor − crédito)",
+  "p": "Aparelhos · Android tel",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Renda passiva: por mês, despesas cobertas, liberdade financeira e fontes",
+  "p": "Aparelhos · Android tel",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Android tel",
+  "name": "atualização: os dados continuam lá depois de atualizar",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Dinheiro → Relatórios: mensal, trimestral e anual com prazos",
+  "p": "Aparelhos · Android tel",
+  "name": "sem erros de JavaScript neste aparelho",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Relatório anual: anexos A, F, G, H, J e simulação do imposto",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "abre e entra com o código",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "IRS: salário bruto, retenções e rendas (anexo F) somados",
-  "pass": true,
-  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
- },
- {
-  "p": "Extras",
-  "name": "IRS: vendas no anexo J com código (G01 ações, G20 ETF) e país",
-  "pass": true,
-  "info": "G01:EUA:144 G20:Irlanda:25"
- },
- {
-  "p": "Extras",
-  "name": "IRS: deduções (rendas 15% até ao limite, saúde 15%) e contas no estrangeiro (Revolut → Lituânia)",
-  "pass": true,
-  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
- },
- {
-  "p": "Extras",
-  "name": "IRS: rendimento coletável com dedução específica (sem IRS Jovem fora do prazo)",
-  "pass": true,
-  "info": "{\"aG\":15000,\"aW\":1200,\"fG\":10800,\"fD\":300,\"j\":[\"G01:EUA:144\",\"G20:Irlanda:25\"],\"e\":1,\"acc\":\"Lituânia\",\"hab\":540,\"sau\":90,\"rc\":10538,\"jp\":0}"
- },
- {
-  "p": "Extras",
-  "name": "IRS Jovem: 6.º ano de rendimentos = 50% isento (até 55 × IAS)",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições: sem o painel antigo do Firebase",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Relatório: tabelas para descarregar em CSV (para o contabilista)",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Relatório: descarregar o relatório completo (para PDF)",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Relatório mensal enxuto: resumo, receitas e despesas, investimentos e impostos do mês",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "sem Face ID (só existe no iPhone)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Relatórios gerados sozinhos quando o mês, o trimestre e o ano fecham (Arquivo)",
-  "pass": true,
-  "info": "{\"k\":3,\"per\":\"a,m,q\"}"
- },
- {
-  "p": "Extras",
-  "name": "Arquivo lista os relatórios novos",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Definições não saem para o lado",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Definições → Impostos: país dos relatórios, IRS Jovem, dependentes, englobamento",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "País: a app guarda quando mudaste de país (Portugal → Brasil hoje)",
-  "pass": true,
-  "info": "[[\"\",\"PT\"],[\"2026-10-13\",\"BR\"]]"
- },
- {
-  "p": "Extras",
-  "name": "Brasil: relatório anual no formato do IRPF (fichas, bens e direitos, completa x simplificada) em reais",
-  "pass": true,
-  "info": "[true,true,true,true,true,true,true,\"(R$)\\nMACA\\tAção\\tTrading 212\\tEUA\\t6\\tUS$ 900,00\\tR$ 4.764,71\\nMUND\\tETF\\tXTB\\tIrlanda\\t15\\t€ 1500,00\\tR$ 8.823,53\\nTotal aplicado\\tR$ \"]"
- },
- {
-  "p": "Extras",
-  "name": "Brasil: salário da conta em reais fica em reais; rendas em euros passam a reais (carnê-leão)",
-  "pass": true,
-  "info": "{\"pj\":5000,\"irrf\":300,\"inss\":500,\"pf\":31765,\"k\":6.000000000000001,\"carne\":true,\"best\":\"simplificada\"}"
- },
- {
-  "p": "Extras",
-  "name": "Brasil: DARF e carnê-leão vencem no último dia útil do mês",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar (ao ouvir o nome)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Brasil: relatório deste mês com carnê-leão, DARF da renda variável e IR retido",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Spyke: o painel cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Os relatórios que já passaram ficam como estavam (ano anterior continua no formato do IRS, em euros)",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Tablet horiz",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "O mês passado (já arquivado) continua no formato de Portugal",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
   "pass": true,
-  "info": "[true,false,true,[\"to), em formato pronto para a declaração de IRPF (Brasil). Seguem o país que escolhest\"]]"
+  "info": "versão 9.9"
  },
  {
-  "p": "Extras",
-  "name": "Arquivo: cada relatório mostra o país com que foi gerado",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Relatórios: o topo segue o Brasil (\"Completo (IRPF)\", prazos do Brasil); o mês já fechado continua em euros",
-  "pass": true,
-  "info": "[true,true,true,true,true,true,true]pleto (IRPF)\nReceitas e despesas\nInvestimentos\nArquivo\nMENSAL · RESUMIDO\nset 26\nEntrou\n€ 900\nSaiu\n€ 0\nPoupado\n+€ 900,00\n\nReceitas, despesas, poupança, investimentos e o que guardar para impostos.\n\nAbrir relatório\nTRIMESTRAL · COMPLETO\n3.º trimestre 2026\nEntrou\n€ 2700\nSaiu\n€ 0\nPoupado\n+€ 2700,00\n\nTudo do mês, mais mês a mês, subcategorias, contas, investimentos completos e IRS acumulado.\n\nAbrir relatório\nANUAL · DECLARAÇÃO DE IRPF\nAno 2026\nEntrou\nR$ 35.965\nSaiu\nR$ 0\nPoupado\n+R$ 35.964,71\n\nIRPF 2027: a restituir ~R$ 939 (estimativa), com todas as fichas.\n\nAbrir relatório\nPróximos prazos\n30/10/20"
- },
- {
-  "p": "Extras",
-  "name": "Períodos que fecharam antes da mudança de país são gerados no país de então (Portugal)",
-  "pass": true,
-  "info": "a:PT,m:PT,q:PT"
- },
- {
-  "p": "Extras",
-  "name": "Definições → Impostos no Brasil: país, dependentes (sem campos do IRS português)",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "atualização: os dados continuam lá depois de atualizar",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Outro país: relatório completo de receitas, despesas e investimentos (sem formato fiscal português ou brasileiro)",
+  "p": "Aparelhos · Tablet horiz",
+  "name": "sem erros de JavaScript neste aparelho",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Movimento de salário com bruto, retenção e Segurança Social",
+  "p": "Aparelhos · Tablet vert",
+  "name": "abre e entra com o código",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Empresa: preço de longo prazo, retornos e dividendos por ano",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições: sem o painel antigo do Firebase",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Empresa: últimos trimestres e escolha 5/10 anos nas demonstrações",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Empresa: 10 anos de demonstrações financeiras",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Empresa: a história completa (fundação, fundadores, linha do tempo, crises, líderes, fontes)",
+  "p": "Aparelhos · Tablet vert",
+  "name": "sem Face ID (só existe no iPhone)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Empresa: tudo sobre a empresa (modelo, segmentos, concorrentes, cenários, tese)",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Definições não saem para o lado",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Empresa: história e dossiê ficam guardados (não gasta IA outra vez)",
+  "p": "Aparelhos · Tablet vert",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Entrevista: mais de 500 perguntas em 37 capítulos (mente e emoções, perdas, valores, identidade, sentidos, cartas…)",
-  "pass": true,
-  "info": "{\"n\":537,\"parts\":37}"
- },
- {
-  "p": "Extras",
-  "name": "Minha Evolução: o antigo Longo prazo abre aqui (mesmo visual) e o menu tem só \"Minha Evolução\"",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar (ao ouvir o nome)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Minha Evolução: evolução por área (dinheiro, estudos, desporto, carreira, metas)",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Spyke: o painel cabe no ecrã",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "Minha Evolução: o Spyke analisa a evolução (nota, por área, foco para 30 dias)",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Floresta: árvore em 3D",
   "pass": true,
-  "info": "DIREÇÃO\nMinha Evolução\n\nTudo o que te aproxima dos teus objetivos, numa página: desporto, estudos, carreira, dinheiro, hábitos e metas. Onde estás, quanto evoluíste (hoje contra 30 dias, 3 meses e 1 a"
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
  },
  {
-  "p": "Extras",
-  "name": "Decisões: \"Pensar com o Spyke\" no topo da página",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Extras",
-  "name": "Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi",
-  "pass": true,
-  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"tgxql7s516k\"}"
- },
- {
-  "p": "Extras",
-  "name": "Decisões: \"Usar estes pesos\" aplica os pesos sugeridos à matriz",
+  "p": "Aparelhos · Tablet vert",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Extras",
-  "name": "sem erros de JavaScript (extras 2)",
+  "p": "Aparelhos · Tablet vert",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Tablet vert",
+  "name": "sem erros de JavaScript neste aparelho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "abre e entra com o código",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições: sem o painel antigo do Firebase",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições: \"Sincronizar aparelhos\" com \"Recuperar os meus dados\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições: versão visível e botão \"Procurar atualização\"",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "sem Face ID (só existe no iPhone)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Definições não saem para o lado",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "recuperar: abre o formulário (endereço do script + chave) e cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Spyke: começa a ouvir sozinho e responde sem tocar (ao ouvir o nome)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Spyke: o painel cabe no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Floresta: árvore em 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "Decision Center: abre com o Spyke (IA) e a tabela",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "atualização: aparelho atrasado atualiza-se sozinho (mesmo com o service worker preso)",
+  "pass": true,
+  "info": "versão 9.9"
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "atualização: os dados continuam lá depois de atualizar",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Aparelhos · Computador",
+  "name": "sem erros de JavaScript neste aparelho",
   "pass": true,
   "info": ""
  }

@@ -1696,6 +1696,13 @@ async function calTests(b) { cur = 'Agenda'; console.log('\n=== Agenda fora da a
   ok('As cores são só lá fora: o Calendário da app continua com as cores de sempre', await E(p, () => OS.Cal.src.shift[1] === 'var(--c4)' && OS.Cal.src.task[1] === 'var(--c1)'));
   await E(p, () => { OS.setOne('integ', { gcal: true }); OS.gcalStart && OS.gcalStart(); }); await sleep(1200);
   ok('A app não lê de volta o calendário "Oceanum" (nada aparece duas vezes)', await E(p, () => OS.Cal.gcal.some(g => g.title === 'Jantar com a família') && !OS.Cal.gcal.some(g => /Trabalho · Loja/.test(g.title))));
+  // Trabalho: horas reais (só o que já passou), não as marcadas
+  const wh = await E(p, () => { const C = OS.Car, d = '2026-03-10', at = h => new Date(d + 'T' + h + ':00'), sh = { date: d, start: '09:00', end: '17:00', breakMin: 0 }, nt = { date: d, start: '22:00', end: '06:00' };
+    return { antes: C.workedHours(sh, at('08:00')), meio: C.workedHours(sh, at('13:00')), depois: C.workedHours(sh, at('20:00')), noite: C.workedHours(nt, new Date('2026-03-11T02:00:00')), noiteFim: C.workedHours(nt, new Date('2026-03-11T07:00:00')), pausa: C.workedHours({ date: d, start: '09:00', end: '17:00', breakMin: 60 }, at('18:00')) }; });
+  ok('Horas reais: turno futuro conta 0, a decorrer conta só o que já passou, acabado conta inteiro (também o da noite e com pausa)', wh.antes === 0 && wh.meio === 4 && wh.depois === 8 && wh.noite === 4 && wh.noiteFim === 8 && wh.pausa === 7, JSON.stringify(wh));
+  const hm = await E(p, () => { const U = OS.U, T = U.today(), ym = T.slice(0, 7), S = OS.all('shifts').filter(s => U.ym(s.date) === ym), now = new Date(); return { real: U.sum(S, s => OS.Car.workedHours(s, now)), marc: U.sum(S, OS.Car.shiftHours) }; });
+  await E(p, () => location.hash = 'trabalho'); await sleep(700); v = await E(p, () => document.getElementById('view').innerText);
+  ok('Trabalho: "Horas trabalhadas este mês" mostra só o que já trabalhaste e as marcadas à parte', /Horas trabalhadas este mês/i.test(v) && hm.marc > hm.real && new RegExp('de ' + hm.marc.toLocaleString('pt-PT', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).replace('.', '\\.') + ' h marcadas no mês').test(v) && /Horas trabalhadas esta semana/i.test(v), JSON.stringify(hm) + ' ' + (v.match(/Horas trabalhadas este mês[\s\S]{0,60}/i) || [''])[0]);
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (agenda)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
 (async () => {

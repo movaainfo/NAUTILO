@@ -548,6 +548,11 @@ Run.weeks = n => Array.from({ length: n }, (_, i) => U.addDays(U.monday(U.today(
 const Car = OS.Car = {};
 Car.shiftHours = s => { const a = U.t2m(s.start), b = U.t2m(s.end); if (a == null || b == null) return 0; let m = b - a; if (m < 0) m += 1440; return Math.max(0, (m - U.num(s.breakMin)) / 60); };
 Car.shiftPay = s => Car.shiftHours(s) * (U.num(s.rate) || U.num(OS.one('profile').hourly));
+// horas REALMENTE trabalhadas até agora: turno que já acabou conta inteiro, o que está a decorrer só o que já passou, os futuros não contam
+Car.workedHours = (s, now = new Date()) => { const full = Car.shiftHours(s), a = U.t2m(s.start), b = U.t2m(s.end); if (!full || a == null || b == null || !s.date) return 0;
+  const st = new Date(s.date + 'T' + s.start + ':00'), len = (((b - a) % 1440 + 1440) % 1440 || 1440) * 6e4, en = st.getTime() + len, n = +now;
+  return n >= en ? full : n <= +st ? 0 : full * (n - st) / len; };
+Car.workedPay = (s, now) => Car.workedHours(s, now) * (U.num(s.rate) || U.num(OS.one('profile').hourly));
 Car.capital = (asOf = U.today()) => {
   const before = r => { const d = r.date || r.start || r.last || (r._c ? U.iso(new Date(r._c)) : ''); return !d || d <= asOf; };
   const skills = OS.all('skills').filter(before), certs = OS.all('learn').filter(l => l.kind === 'Certificação' && l.status === 'Concluído' && (!l.end || l.end <= asOf)).concat(OS.all('certs').filter(c => c.status === 'Obtida' && (!c.date || c.date <= asOf)));

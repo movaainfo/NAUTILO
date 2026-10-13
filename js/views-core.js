@@ -93,14 +93,14 @@ OS.PainelParts = () => {
   const goals = OS.all('goals').filter(g => g.status === 'Ativa').map(g => Object.assign({ g }, Goal.info(g)));
   const onPace = goals.filter(x => !x.late && !x.behind).length;
   const na = I.next().slice(0, 3);
-  const SH = OS.all('shifts'), wH = U.sum(SH.filter(s => s.date >= wk && s.date <= U.addDays(wk, 6)), OS.Car.shiftHours), wNext = U.sortBy(SH.filter(s => s.date > t || (s.date === t && (s.end || '99') > U.hm())), s => s.date + s.start)[0];
+  const SH = OS.all('shifts'), wH = U.sum(SH.filter(s => s.date >= wk && s.date <= U.addDays(wk, 6)), s => OS.Car.workedHours(s)), wNext = U.sortBy(SH.filter(s => s.date > t || (s.date === t && (s.end || '99') > U.hm())), s => s.date + s.start)[0];
   const months = Fin.months(6);
   const life = [
     ['financas', 'Dinheiro', 'Finanças', U.eur(liq, { dec: 0 }), `disponível · patrimônio ${U.eurK(nw)}`],
     ['universidade', 'Estudos', 'Universidade', U.nf(studyWk, 1) + (studyTgt ? '/' + studyTgt : '') + ' h', 'esta semana' + (St.gpa() ? ' · média ' + St.gpa() : '')],
     ['treino', 'Corpo', 'Treino', wkW + '/' + (p.trainTarget || 4) + ' treinos', U.nf(kmW, 1) + ' km corridos esta semana'],
     ['capital', 'Carreira', 'Carreira', U.nf(cap.score) + ' pts', 'capital profissional ' + (cap.score >= capPrev.score ? '+' : '') + (cap.score - capPrev.score) + ' em 30d'],
-    ['trabalho', 'Trabalho', 'Trabalho', U.nf(wH, 1) + ' h', 'esta semana' + (wNext ? ' · próximo turno ' + (wNext.date === t ? 'hoje' : U.fmtDS(wNext.date)) + ' ' + (wNext.start || '') : '')],
+    ['trabalho', 'Trabalho', 'Trabalho', U.nf(wH, 1) + ' h', 'trabalhadas esta semana' + (wNext ? ' · próximo turno ' + (wNext.date === t ? 'hoje' : U.fmtDS(wNext.date)) + ' ' + (wNext.start || '') : '')],
     ['metas', 'Metas', 'Metas', onPace + '/' + goals.length, 'metas no ritmo']
   ];
   const lifeTone = k => k === 'Finanças' ? areaTone('Finanças') : k === 'Universidade' ? areaTone('Universidade') : k === 'Treino' ? (areaTone('Treino') === 'pos' && areaTone('Corrida') === 'pos' ? 'pos' : 'warn') : k === 'Carreira' ? (areaTone('Oportunidades') === 'neg' || areaTone('Carreira') === 'neg' ? 'neg' : areaTone('Oportunidades') === 'warn' ? 'warn' : 'pos') : k === 'Mova' ? areaTone('Mova') : areaTone('Metas');
