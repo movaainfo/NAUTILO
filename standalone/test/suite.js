@@ -689,9 +689,9 @@ async function sharedTests(b) {
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
     ok('google script completo é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
     const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
-      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] }; });
-    ok('script em 5 partes: 1 e 2 = núcleo, 3, 4 e 5 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 5 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
-    ok('script em 5 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
+      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4] + P[5]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] && OS.Inbox.addon6() === P[5] }; });
+    ok('script em 6 partes: 1 e 2 = núcleo, 3, 4, 5 e 6 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 6 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
+    ok('script em 6 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
     { // como o Apps Script: cada ficheiro é carregado à parte, pela ordem; a Parte 3 substitui o doGet e liga-se às funções das partes 1 e 2
       const vm = require('vm'), ctx = vm.createContext({ ContentService: { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 1 } } });
       Object.assign(ctx, { PropertiesService: { getScriptProperties: () => ({ getProperty: () => null }) }, ScriptApp: { getScriptId: () => 'ID' } });
@@ -1045,8 +1045,8 @@ async function newFeatureTests(b) {
     await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 1 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); OS.News.cache = {}; location.hash = 'jornal'; }); await sleep(1500);
     ok('script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google', await E(p, () => /versão antiga/.test(document.getElementById('view').innerText) && !!document.querySelector('#view a[href="#definicoes.script"]')));
     await E(p, () => location.hash = 'spyke'); await sleep(400);
-    const st = await E(p, () => ({ bad: document.querySelectorAll('#spyState .spy-chk.bad').length, guide: !!document.querySelector('#spyState .spy-upd [data-act=ibCopy]'), tail: /TESTE123\/exec/.test(document.querySelector('#spyState .spy-upd').innerText) }));
-    ok('estado do Spyke: mostra o que falta (script, notícias, e-mail) com o passo a passo e a implantação certa', st.bad >= 3 && st.guide && st.tail, JSON.stringify(st));
+    const st = await E(p, () => ({ bad: document.querySelectorAll('#spyState .spy-chk.bad').length, guide: !!document.querySelector('#spyState .spy-upd a[href="#definicoes.script"]'), noCopy: !document.querySelector('#spyState [data-act=ibCopy]') }));
+    ok('estado do Spyke: mostra o que falta (script, notícias, e-mail) e leva a Definições → Script Google (sem partes para copiar no Spyke)', st.bad >= 3 && st.guide && st.noCopy, JSON.stringify(st));
     NEWV = true; await E(p, () => document.querySelector('#spyState [data-act=spyCheckAll]').click()); await sleep(2500);
     const st2 = await E(p, () => ({ ok: [...document.querySelectorAll('#spyState .spy-chk.ok b')].map(x => x.textContent), guide: !!document.querySelector('#spyState .spy-upd') }));
     ok('estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)', ['Cérebro (IA)', 'Script Google', 'Notícias'].every(t => st2.ok.includes(t)) && !st2.guide, JSON.stringify(st2));
@@ -1056,11 +1056,11 @@ async function newFeatureTests(b) {
   // script v10 → só falta a Parte 3 (um ficheiro novo, sem apagar nada)
   { const { ctx, p, errs } = await newPage(b, PROFILES[0]);
     await ctx.route(/script\.google\.com/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, v: 10, items: [], docs: {} }) }));
-    await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 10 }); location.hash = 'spyke'; }); await sleep(600);
-    const g = await E(p, () => { const u = document.querySelector('#spyState .spy-upd'); return u ? { t: u.innerText, btns: [...u.querySelectorAll('[data-act=ibCopy]')].map(x => x.dataset.t) } : null; });
-    ok('script v10: o guia pede só as Partes 3 e 4, em ficheiros novos (não apagar as partes 1 e 2)', g && /só faltam as Partes 3 e 4/.test(g.t) && /Não apagues nada/.test(g.t) && g.btns.join() === 'p3,p4', JSON.stringify(g && g.btns));
+    await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE123/exec', key: 'k', ver: 10 }); location.hash = 'definicoes.script'; }); await sleep(700);
+    const g = await E(p, () => { const u = document.getElementById('parte4'); return u ? { t: u.innerText, btns: [...u.querySelectorAll('[data-act=ibCopy]')].map(x => x.dataset.t) } : null; });
+    ok('script v10: Definições → Script Google pede a Parte 3, num ficheiro novo (sem apagar as partes 1 e 2)', g && /Parte 3 · copiar e colar/.test(g.t) && /ficheiro novo/.test(g.t) && g.btns.join() === 'p3', JSON.stringify(g && g.btns));
     await p.evaluate(() => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
-    await p.click('#spyState .spy-upd [data-act=ibCopy]'); await sleep(300);
+    await p.click('#parte4 [data-act=ibCopy]'); await sleep(300);
     ok('script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)', await E(p, () => /PARTE 3/.test(window.__clip) && /function doGet/.test(window.__clip) && !/const KEY/.test(window.__clip)));
     ok('sem erros de JavaScript (Parte 3)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
   // leitores dentro da app: e-mail inteiro, notícia completa (texto do jornal ou escrita pelo Spyke) e agenda Google pelo script
@@ -1181,17 +1181,17 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   await E(p, () => location.hash = 'spyke'); await sleep(700);
   const sp = await E(p, () => ({ h: location.hash, tabs: [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()), st: !!document.getElementById('spyState'), h1: (document.querySelector('#view h1') || {}).textContent, side: !!document.querySelector('#side .side-set.on') }));
   ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google' && sp.side, JSON.stringify(sp));
-  ok('Definições → Spyke: o estado mostra a Parte 4 instalada', await E(p, () => /Parte 4 do script[\s\S]*instalada/.test(document.getElementById('spyState').innerText)));
+  ok('Definições → Spyke: a Parte 4 já não aparece no Spyke (só em Definições → Script Google)', await E(p, () => !/Parte 4/.test(document.getElementById('spyState').innerText) && !document.querySelector('#spyState [data-act=ibCopy]')));
   await E(p, () => location.hash = 'definicoes.script'); await sleep(700);
   const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].map(x => x.dataset.t) }));
-  ok('Definições → Script Google: as 5 partes com botão de copiar e a parte que falta (5) em destaque', /Parte 4/.test(sc.t) && /Parte 5/.test(sc.t) && ['p1', 'p2', 'p3', 'p4', 'p5'].every(x => sc.b.includes(x)) && sc.b[0] === 'p5' && /Parte 5 · copiar e colar/.test(sc.t), JSON.stringify(sc.b));
+  ok('Definições → Script Google: as 6 partes com botão de copiar e a parte que falta (5) em destaque', /Parte 4/.test(sc.t) && /Parte 5/.test(sc.t) && /Parte 6/.test(sc.t) && ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'].every(x => sc.b.includes(x)) && sc.b[0] === 'p5' && /Parte 5 · copiar e colar/.test(sc.t), JSON.stringify(sc.b));
   await E(p, () => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
   await p.click('#view .sc-parts [data-act=ibCopy][data-t=p4]'); await sleep(300);
   ok('Definições → Script Google: "Copiar parte 4" copia a Parte 4 (Outlook), sem mexer nas outras', await E(p, () => /function op_olinfo/.test(window.__clip) && !/function doGet/.test(window.__clip)));
   await E(p, () => { OS.UniMail._set(null, { has4: false }); OS.request(); }); await sleep(500);
   ok('Definições → Script Google: sem a Parte 4 diz "falta" e mostra os passos', await E(p, () => { const t = document.getElementById('parte4').innerText; return /copiar e colar/.test(t) && /falta/.test(t) && /Parte4/.test(t) && /Nova versão/.test(t); }));
   await E(p, () => location.hash = 'definicoes.spyke'); await sleep(500);
-  ok('Definições → Spyke: sem a Parte 4 o estado leva-te ao botão de copiar', await E(p, () => !!document.querySelector('#spyState a[href="#definicoes.script"]')));
+  ok('Definições → Spyke: mesmo sem a Parte 4, o Spyke não fala dela (está só em Script Google)', await E(p, () => !/Parte 4/.test(document.getElementById('spyState').innerText)));
   await E(p, () => location.hash = 'definicoes'); await sleep(600);
   ok('Definições → Geral: mantém perfil, segurança, sincronização e atalho', await E(p, () => !!document.getElementById('syncPn') && !!document.getElementById('inboxPn') && !document.getElementById('spyState') && /Perfil/.test(document.getElementById('view').innerText) && document.querySelectorAll('#view .tabs').length === 1 && document.querySelectorAll('#view h1').length === 1));
   // "Ver mais": o botão mostra logo o que estava escondido (a página não é redesenhada se não mudou)
@@ -1490,7 +1490,7 @@ async function extrasTests(b) { cur = 'Extras'; console.log('\n=== Importador B3
   await E(p, () => { OS.UI.ask = (t, d, l, fn) => fn(); }); const fid = await E(p, () => OS.all('files').find(f => f.fid === 'F1').id); await p.click(`[data-act="fDel"][data-id="${fid}"]`); await sleep(500);
   ok('Ficheiros: apagar tira da lista e manda para o lixo do Drive', await E(p, () => !OS.all('files').some(f => f.fid === 'F1')) && !drive.F1);
   v = await go('definicoes.script', 700); ok('Definições → Script Google lista a Parte 5 (ficheiros na nuvem)', /Parte 5 · ficheiro Parte5/.test(v));
-  const code5 = await E(p, () => OS.Inbox.parts('k').slice(-1)[0]); let syn = ''; try { new Function(code5); } catch (e) { syn = e.message; }
+  const code5 = await E(p, () => OS.Inbox.parts('k')[4]); let syn = ''; try { new Function(code5); } catch (e) { syn = e.message; }
   ok('Parte 5: código válido com op_fup, op_fdl, op_frm, op_fls', !syn && /function op_fup/.test(code5) && /function op_fdl/.test(code5) && /function op_frm/.test(code5) && /function op_fls/.test(code5), syn);
   // ---- metas com categoria fora da lista ----
   await E(p, () => OS.add('goals', { title: 'Meta Pessoal ZZ', cat: 'Pessoal', horizon: '1 ano', metric: 'manual', target: 5, status: 'Ativa', start: OS.U.today() }));
@@ -1639,36 +1639,53 @@ async function voiceTests(b) { cur = 'Voz'; console.log('\n=== Voz do Spyke (res
   ok('Resumo: nada do texto se perde ao dividir em pedaços', tts.map(x => x.text).join(' ').replace(/\s+/g, ' ').trim() === brief.replace(/\s+/g, ' ').trim());
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (voz)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
-/* ---------- a agenda do Oceanum fora da app (Google Calendar e iPhone) ---------- */
+/* ---------- a agenda do Oceanum fora da app (Google Calendar e iPhone): TUDO o que está no Calendário, pela Parte 6 ---------- */
 async function calTests(b) { cur = 'Agenda'; console.log('\n=== Agenda fora da app (Google Calendar e iPhone) ===');
-  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const calls = []; const G = {}; let nid = 0;
-  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.assign(Object.fromEntries(u.searchParams), Object.fromEntries(new URLSearchParams(rt.request().postData() || ''))), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
-    if (P.op === 'ping') return J({ ok: true, v: 11 }); if (P.op === 'olinfo') return J({ ok: true, v: 12 }); if (P.op === 'fping') return J({ ok: true, v: 6, pasta: 'https://drive.google.com/x' });
-    if (P.op === 'calsync') { const j = JSON.parse(P.j); calls.push(j); const map = {}; (j.del || []).forEach(e => { delete G[e]; }); (j.up || []).forEach(it => { const e = it.eid && G[it.eid] ? it.eid : 'E' + (++nid); G[e] = it; map[it.id] = e; }); return J({ ok: true, v: 6, map, n: (j.up || []).length }); }
-    if (P.op === 'cl') return J({ ok: true, ev: [{ id: 'x1', t: 'Jantar com a família', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Pessoal' }, { id: 'x2', t: 'Turno · Loja', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Oceanum' }] });
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const calls = [], ops = []; const G = {}; let nid = 0, P6 = false;
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.assign(Object.fromEntries(u.searchParams), Object.fromEntries(new URLSearchParams(rt.request().postData() || ''))), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) }); ops.push(P.op);
+    if (P.op === 'ping') return J({ ok: true, v: 11 }); if (P.op === 'olinfo') return J({ ok: true, v: 12 }); if (P.op === 'fping') return J({ ok: true, v: 5, pasta: 'https://drive.google.com/x' });
+    if (P.op === 'c6ping') return J(P6 ? { ok: true, v: 1, cal: 'Oceanum' } : { ok: false, msg: 'Valor inválido' });
+    if (P.op === 'cal6' && P6) { const j = JSON.parse(P.j); calls.push(j); const map = {}; (j.del || []).forEach(e => { delete G[e]; }); (j.up || []).forEach(it => { const e = it.eid && G[it.eid] ? it.eid : 'E' + (++nid); G[e] = it; map[it.id] = e; }); return J({ ok: true, v: 1, map, n: (j.up || []).length }); }
+    if (P.op === 'cl') return J({ ok: true, ev: [{ id: 'x1', t: 'Jantar com a família', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Pessoal' }, { id: 'x2', t: 'Trabalho · Loja', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Oceanum' }] });
+    if (P.op === 'calsync' || P.op === 'cal6') return J({ ok: false, msg: 'Valor inválido' });
     return J({ ok: true, items: [], docs: {} }); });
   await p.goto(BASE); await unlock(p);
   const T = await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); return OS.U.today(); });
-  await E(p, () => OS.Files.check()); ok('Agenda: o script com a Parte 5 nova (versão 6) é reconhecido', await E(p, () => OS.Files.has6()));
-  const ids = await E(p, T => { const U = OS.U; const sh = OS.add('shifts', { date: T, start: '22:00', end: '06:00', place: 'Loja' }); const off = OS.add('dayoffs', { date: U.addDays(T, 1), kind: 'Folga' }); const ev = OS.add('events', { title: 'Dentista', date: U.addDays(T, 2), start: '10:00', end: '11:00', location: 'Aveiro' }); const s0 = OS.add('subjects', { name: 'Contabilidade', status: 'Em curso' }); const ex = OS.add('assessments', { title: 'Contabilidade', type: 'Teste', date: U.addDays(T, 3), subject: s0.id }); OS.add('tasks', { title: 'Tarefa privada', sched: T, status: 'Próxima' }); return { sh: sh.id, ev: ev.id }; }, T);
-  let v = await (async () => { await E(p, () => location.hash = 'definicoes.ligacoes'); await sleep(700); return E(p, () => document.getElementById('view').innerText); })();
-  ok('Definições → Ligações: "A tua agenda também fora da app" com turnos, folgas, compromissos e provas', /A tua agenda também fora da app/.test(v) && /Turnos de trabalho/.test(v) && /Folgas/.test(v) && /Calendário do iPhone/.test(v));
-  await p.click('#cpSet [data-act=cpOn]'); await p.waitForFunction(() => OS.one('calx').n > 0, null, { timeout: 8000 }).catch(() => { }); await sleep(300);
+  // a Parte 5 fica como está (só ficheiros) e a agenda vem numa Parte 6 nova
+  const code = await E(p, () => { const v = t => { try { new Function(t); return true; } catch (e) { return false; } }, p5 = OS.Inbox.addon5(), p6 = OS.Inbox.addon6(); return { p5ok: v(p5), p6ok: v(p6), p5cal: /CalendarApp/.test(p5), p6: /function op_cal6/.test(p6) && /function op_c6ping/.test(p6) && /CalendarApp/.test(p6) && !/function op_calsync|function ocCal_|function op_fping/.test(p6), p5v: /v: 5, pasta/.test(p5), n: OS.Inbox.parts('x').length }; });
+  ok('Script: a Parte 5 fica igual (só ficheiros, não precisas de a mudar) e a agenda vem numa Parte 6 nova, sem nomes repetidos', code.p5ok && code.p6ok && !code.p5cal && code.p6 && code.p5v && code.n === 6, JSON.stringify(code));
+  await E(p, () => location.hash = 'definicoes.script'); await sleep(1200);
+  let v = await E(p, () => document.getElementById('view').innerText);
+  ok('Definições → Script Google: com as partes 1 a 5 instaladas, pede só a Parte 6 (ficheiro novo, sem mexer nas outras)', /Parte 6 · copiar e colar/.test(v) && /ficheiro novo/.test(v) && /Parte 6 · ficheiro Parte6/.test(v) && await E(p, () => [...document.querySelectorAll('#parte4 [data-act=ibCopy]')].map(x => x.dataset.t).join() === 'p6'), v.slice(0, 400));
+  const ids = await E(p, T => { const U = OS.U; const sh = OS.add('shifts', { date: T, start: '22:00', end: '06:00', place: 'Loja' }); const off = OS.add('dayoffs', { date: U.addDays(T, 1), kind: 'Folga' }); const ev = OS.add('events', { title: 'Dentista', date: U.addDays(T, 2), start: '10:00', end: '11:00', location: 'Aveiro' }); const s0 = OS.add('subjects', { name: 'Contabilidade', status: 'Em curso' }); OS.add('classes', { subject: s0.id, wday: String(U.parse(U.addDays(T, 1)).getDay()), start: '09:00', end: '11:00', room: 'Sala 2', kind: 'Teórica' }); const ex = OS.add('assessments', { title: 'Contabilidade', type: 'Teste', date: U.addDays(T, 3), subject: s0.id }); OS.add('tasks', { title: 'Entregar trabalho', sched: U.addDays(T, 2), status: 'Próxima' }); OS.add('routine', { title: 'Ginásio da manhã', start: '07:00', end: '08:00', days: [String(U.parse(U.addDays(T, 1)).getDay())] }); return { sh: sh.id, ev: ev.id }; }, T);
+  v = await (async () => { await E(p, () => location.hash = 'definicoes.ligacoes'); await sleep(700); return E(p, () => document.getElementById('view').innerText); })();
+  ok('Definições → Ligações: tudo o que está no Calendário (trabalho, folgas, aulas, tarefas, rotina…) marcado por omissão', /A tua agenda também fora da app/.test(v) && /Trabalho \(turnos\)/.test(v) && /Calendário do iPhone/.test(v) && await E(p, () => [...document.querySelectorAll('#cpSet .cp-types .chip')].every(c => c.classList.contains('on')) && document.querySelectorAll('#cpSet .cp-types .chip').length >= 12) && /Parte 6/.test(v));
+  // colar a Parte 6 → a app reconhece e liga sozinha
+  P6 = true; await E(p, () => OS.CalPush.check()); await p.waitForFunction(() => OS.one('calx').n > 0, null, { timeout: 9000 }).catch(() => { }); await sleep(300);
+  ok('Parte 6 colada: a app reconhece-a e liga a agenda sozinha (sem carregar em nada)', await E(p, () => OS.CalPush.has6() && OS.one('calx').on === true && OS.one('calx').n > 0) && ops.includes('cal6') && !ops.includes('calsync'), JSON.stringify(ops.slice(-6)));
   const up = calls.flatMap(c => c.up || []), by = t => up.find(x => x.t === t);
-  const sh = by('Turno · Loja'), off = by('Folga'), ev = by('Dentista'), ex = up.find(x => /Teste: Contabilidade/.test(x.t));
-  ok('Liga com um toque e envia turnos, folgas, compromissos e provas (sem tarefas, por omissão)', !!sh && !!off && !!ev && !!ex && !up.some(x => /Tarefa privada/.test(x.t)), JSON.stringify(up.map(x => x.t)));
-  ok('Turno da noite (22:00–06:00) acaba no dia seguinte; folga e prova sem hora ficam "dia inteiro"', sh && new Date(sh.e) - new Date(sh.s) === 8 * 36e5 && off.all === true && ex.all === true && ev && new Date(ev.e) - new Date(ev.s) === 36e5, JSON.stringify({ sh, off, ex }));
-  const eidSh = await E(p, id => { const m = OS.one('calx').map; const k = Object.keys(m).find(x => x.startsWith('shifts:' + id)); return k && m[k].e; }, ids.sh);
+  const sh = by('Trabalho · Loja'), off = by('Folga'), ev = by('Dentista'), ex = up.find(x => /Teste: Contabilidade/.test(x.t)), cl = up.find(x => /^Aula: Contabilidade/.test(x.t)), tk = by('Tarefa: Entregar trabalho'), ro = by('Ginásio da manhã');
+  ok('Vai tudo para fora: trabalho, folgas, compromissos, aulas, provas, tarefas e rotina', !!sh && !!off && !!ev && !!ex && !!cl && !!tk && !!ro, JSON.stringify(up.map(x => x.t)));
+  ok('Trabalho de noite (22:00–06:00) acaba no dia seguinte; aula com hora e sala; folga e prova sem hora ficam "dia inteiro"', sh && new Date(sh.e) - new Date(sh.s) === 8 * 36e5 && off.all === true && ex.all === true && ev && new Date(ev.e) - new Date(ev.s) === 36e5 && cl && new Date(cl.e) - new Date(cl.s) === 2 * 36e5 && /Sala 2/.test(cl.l), JSON.stringify({ sh, off, ex, cl }));
+  const eidSh = await E(p, id => { const m = OS.one('calx').map; const k = Object.keys(m).find(x => x.startsWith('shifts:' + id)); return k && m[k].e; }, ids.sh), nG = Object.keys(G).length;
   calls.length = 0; await E(p, id => { OS.upd('shifts', id, { start: '21:00' }); }, ids.sh); await E(p, () => OS.CalPush.sync(true)); await sleep(200);
   const up2 = calls.flatMap(c => c.up || []);
-  ok('Alterar o turno na app atualiza o MESMO evento lá fora (sem duplicar)', up2.length === 1 && up2[0].eid === eidSh && /T\d\d:00:00/.test(up2[0].s) && Object.keys(G).length === 4, JSON.stringify({ up2: up2.map(x => [x.t, x.eid]), total: Object.keys(G).length }));
+  ok('Alterar o turno na app atualiza o MESMO evento lá fora (sem duplicar)', up2.length === 1 && up2[0].eid === eidSh && /T\d\d:00:00/.test(up2[0].s) && Object.keys(G).length === nG, JSON.stringify({ up2: up2.map(x => [x.t, x.eid]), total: Object.keys(G).length, nG }));
   calls.length = 0; await E(p, id => OS.del('events', id), ids.ev); await E(p, () => OS.CalPush.sync(true)); await sleep(200);
   ok('Apagar na app apaga lá fora', calls.some(c => (c.del || []).length === 1) && !Object.values(G).some(x => x.t === 'Dentista'), JSON.stringify(calls));
   calls.length = 0; await E(p, () => OS.CalPush.sync(true)); ok('Sem mudanças não envia nada (não gasta o script)', calls.length === 0);
-  calls.length = 0; await E(p, T => OS.add('dayoffs', { date: OS.U.addDays(T, 5), kind: 'Férias' }), T); await sleep(13500);
+  // importar a escala da semana (foto): os turnos aparecem no Trabalho, no Calendário da app e lá fora, logo a seguir
+  calls.length = 0; const d1 = await E(p, T => OS.U.addDays(T, 4), T), d2 = await E(p, T => OS.U.addDays(T, 5), T);
+  await E(p, ([d1, d2]) => { OS.WorkSched._res([{ date: d1, start: '09:00', end: '17:00', breakMin: 30, place: 'Loja' }, { date: d2, off: true, kind: 'Folga' }]); OS.act.wsApply(); }, [d1, d2]); await sleep(4000);
+  const imp = calls.flatMap(c => c.up || []), inApp = await E(p, d1 => { const it = OS.Cal.items(d1, d1); return it.some(x => x.src === 'shift' && x.start === '09:00' && x.end === '17:00'); }, d1);
+  await E(p, d1 => { OS.setUI('calView', 'semana'); OS.setUI('calDate', d1); location.hash = 'calendario'; }, d1); await sleep(700);
+  ok('Escala importada: o trabalho (09:00–17:00) e a folga aparecem no Calendário da app e vão logo para o Google Calendar', inApp && await E(p, () => /Turno · Loja/.test(document.getElementById('view').innerText)) && imp.some(x => x.t === 'Trabalho · Loja' && x.s === new Date(d1 + 'T09:00:00').toISOString() && x.e === new Date(d1 + 'T17:00:00').toISOString()) && imp.some(x => x.t === 'Folga' && x.s === d2 && x.all), JSON.stringify(imp.map(x => [x.t, x.s])));
+  calls.length = 0; await E(p, T => OS.add('dayoffs', { date: OS.U.addDays(T, 9), kind: 'Férias' }), T); await sleep(13500);
   ok('Uma folga nova vai sozinha para fora, poucos segundos depois de a registar', calls.some(c => (c.up || []).some(x => x.t === 'Férias' && x.all)), JSON.stringify(calls));
+  calls.length = 0; await E(p, () => { OS.setOne('calx', { types: Object.assign({}, OS.one('calx').types, { routine: 0 }) }); }); await E(p, () => OS.CalPush.sync(true));
+  ok('Desmarcar um tipo (Rotina) tira-o do calendário de fora', calls.some(c => (c.del || []).length >= 1) && !Object.values(G).some(x => x.t === 'Ginásio da manhã'), JSON.stringify(calls.map(c => (c.del || []).length)));
   await E(p, () => { OS.setOne('integ', { gcal: true }); OS.gcalStart && OS.gcalStart(); }); await sleep(1200);
-  ok('A app não lê de volta o calendário "Oceanum" (nada aparece duas vezes)', await E(p, () => OS.Cal.gcal.some(g => g.title === 'Jantar com a família') && !OS.Cal.gcal.some(g => /Turno · Loja/.test(g.title))));
+  ok('A app não lê de volta o calendário "Oceanum" (nada aparece duas vezes)', await E(p, () => OS.Cal.gcal.some(g => g.title === 'Jantar com a família') && !OS.Cal.gcal.some(g => /Trabalho · Loja/.test(g.title))));
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (agenda)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
 (async () => {

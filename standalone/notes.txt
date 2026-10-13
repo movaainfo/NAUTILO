@@ -1,3 +1,4 @@
-Relatórios no país que escolheste: no Brasil saem no formato do IRPF (fichas da declaração, bens e direitos, completa x simplificada, carnê-leão e DARF), em reais; em Portugal continuam no formato do IRS. Os relatórios que já passaram ficam como estavam.
-A tua agenda do Oceanum também fora da app: turnos, folgas, compromissos e provas (e, se quiseres, aulas e tarefas) vão sozinhos para um calendário "Oceanum" no teu Google Calendar e aparecem no Calendário do iPhone. Alteras ou apagas na app, muda lá também.
-Para ligar: Definições → Ligações → "Pôr a minha agenda no Google Calendar". Precisa da Parte 5 nova do script (Definições → Script Google: copia e substitui o conteúdo da Parte5).
+Tudo o que está no Calendário do Oceanum vai para o teu Google Calendar e para o Calendário do iPhone: trabalho, folgas, compromissos, aulas, provas, tarefas, prazos, rotina, treinos, contas e aniversários. Quando alteras ou apagas na app, muda lá também.
+A escala que importas por foto (Trabalho → Importar escala) aparece logo no Calendário da app e no Google Calendar / iPhone.
+A agenda agora vem numa Parte 6 do script, num ficheiro novo: não precisas de mexer na Parte 5 nem nas outras. Depois de colares a Parte 6, liga-se sozinha.
+O Spyke já não mostra a Parte 4 do script: as partes estão todas só em Definições → Script Google.

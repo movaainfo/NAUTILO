@@ -325,7 +325,7 @@ function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = 
   const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Oceanum do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
 // o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
-IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4() + (IB.addon5 ? '\n' + IB.addon5() : '');
+IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4() + (IB.addon5 ? '\n' + IB.addon5() : '') + (IB.addon6 ? '\n' + IB.addon6() : '');
 
 /* ---- adivinhar categoria e conta ---- */
 const KW = [[/uber|bolt|taxi|táxi|metro|comboio|autocarro|gasolina|combust|portagem|estaciona|cp |carris/i, ['Transporte', 'Carro']], [/caf[eé]|restaurante|almo[cç]o|jantar|lanche|mercado|continente|pingo|lidl|aldi|mercadona|supermercado|padaria|pizza|burger|mcdonald|kfc|glovo|uber ?eats|bolt ?food|a[cç]a[ií]/i, ['Alimentação', 'Restauração', 'Supermercado']],
@@ -439,7 +439,7 @@ IB.MAXP = 12000;
 // as partes 1 e 2 (o núcleo, igual desde a versão 10) cortam-se ao meio numa linha de topo; a parte 3 é o ficheiro das novidades
 IB.parts = key => { const L = IB.core(key).split('\n'), half = L.join('\n').length / 2, out = []; let cur = [], n = 0, cut = false;
   L.forEach(l => { if (!cut && n > half && /^(function |\/\/ ---- |const )/.test(l)) { out.push(cur); cur = []; cut = true; } cur.push(l); n += l.length + 1; });
-  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4(), IB.addon5 ? IB.addon5() : []); };
+  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4(), IB.addon5 ? IB.addon5() : [], IB.addon6 ? IB.addon6() : []); };
 IB.partsHelp = () => { const n = IB.parts(cfg().key || 'x').length; return { n, files: Array.from({ length: n }, (_, i) => i ? 'Parte' + (i + 1) : 'Código.gs') }; };
 const partsBtns = (cls = 'btn pri', from = 0, to = 99) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from || i > to ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
 IB.partsBtns = partsBtns;
@@ -455,28 +455,33 @@ IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.ke
   if (on && OS.Files && !OS.Files.has5() && !IB._p5) { IB._p5 = 1; setTimeout(() => OS.Files.check().then(() => { IB._p5d = 1; OS.request(); }), 60); }
   const has4 = !!(I && I.has4), tail = esc(String(c.url || '').slice(-16));
   const st = (ok, wait) => `<span class="bdg ${ok ? 'pos' : wait ? '' : 'warn'}">${ok ? '✓ instalada' : wait ? 'a verificar…' : 'falta'}</span>`;
+  const CP = OS.CalPush, has6 = !!(CP && CP.has6 && CP.has6());
+  if (on && CP && CP.check && !has6 && !IB._p6) { IB._p6 = 1; setTimeout(() => CP.check().then(() => { IB._p6d = 1; OS.request(); }), 90); }
   const P = [[0, 'Parte 1 · Código.gs', 'O núcleo: atalho de gastos, sincronização entre aparelhos, notícias e a Siri.', on && v >= 10],
     [1, 'Parte 2 · ficheiro Parte2', 'O resto do núcleo (o "colar" do telemóvel corta textos grandes, por isso vai em dois).', on && v >= 10],
     [2, 'Parte 3 · ficheiro Parte3', 'E-mail completo dentro da app, Agenda Google e leitor de notícias.', on && v >= 11],
     [3, 'Parte 4 · ficheiro Parte4', 'Outlook da faculdade (separado por matéria) e IA sem limites nas perguntas pela Siri.', has4],
-    [4, 'Parte 5 · ficheiro Parte5', 'Ficheiros na nuvem (PDFs da Universidade e dos Cursos no teu Google Drive) e a tua agenda do Oceanum no Google Calendar e no iPhone.', !!(OS.Files && OS.Files.has6())]];
-  const has5 = !!(OS.Files && OS.Files.has6()), old5 = !!(OS.Files && OS.Files.has5()) && !has5, nx = !has4 ? 4 : !has5 ? 5 : 4, done = nx === 4 ? has4 : has5;
-  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ As partes 4 e 5 já estão no teu script' : nx === 5 && old5 ? 'Atualizar a Parte 5 (2 minutos)' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : !IB._p5d) : ''}</div>
+    [4, 'Parte 5 · ficheiro Parte5', 'Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos no teu Google Drive.', !!(OS.Files && OS.Files.has5())],
+    [5, 'Parte 6 · ficheiro Parte6', 'A tua agenda do Oceanum no Google Calendar e no Calendário do iPhone: tudo o que está no Calendário (trabalho, folgas, compromissos, aulas, provas…).', has6]];
+  const has5 = !!(OS.Files && OS.Files.has5()), nx = on && v < 11 ? 3 : !has4 ? 4 : !has5 ? 5 : !has6 ? 6 : 0, done = !nx;
+  const WHY = { 3: 'Traz o e-mail completo, a Agenda Google e as notícias.', 4: 'Traz o Outlook da faculdade e a IA sem limites na Siri.', 5: 'Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive.', 6: 'Põe tudo o que está no Calendário do Oceanum no teu Google Calendar e no Calendário do iPhone (o trabalho da escala importada também). Depois de a colares, liga-se sozinho.' };
+  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ O teu script tem todas as partes' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : nx === 5 ? !IB._p5d : nx === 6 ? !IB._p6d : false) : ''}</div>
     ${!on ? `<p class="mut" style="margin:0 0 8px">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ''}
-    ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nada das outras partes.${nx === 5 ? (old5 ? ' A tua Parte 5 é a antiga: copia-a outra vez e <b>substitui o conteúdo</b> do ficheiro Parte5. A nova põe também a tua agenda do Oceanum no Google Calendar e no iPhone.' : ' Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive e para pores a tua agenda do Oceanum no Google Calendar e no iPhone.') : ''}</p>
+    ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nem mudas nada das outras partes. ${WHY[nx] || ''}</p>
     <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', nx - 1, nx - 1)}</div></li>
       <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Oceanum (no iPhone: <b>aA → Pedir site para computador</b>).</li>
       <li><b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte${nx}</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte${nx} já existir, abre-a e substitui o conteúdo.</li>
-      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}${nx === 5 ? ' Se pedir, autoriza o acesso ao Google Drive e à Agenda.' : ''}</li>
+      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}${nx === 5 ? ' Se pedir, autoriza o acesso ao Google Drive.' : nx === 6 ? ' Se pedir, autoriza o acesso à Agenda (Google Calendar).' : ''}</li>
       <li>Volta aqui e toca em <b>Verificar</b>. Se continuar a dizer "falta", a Parte${nx} tem de ficar <b>por baixo</b> da Parte${nx - 1} na lista de ficheiros (⋮ → Mover para baixo) e repete o passo 4.</li></ol>`}
     <div class="row gap8" style="flex-wrap:wrap"><button class="btn sm" data-act="scVer" ${on ? '' : 'disabled'}>${UI.ic('sync')}Verificar</button>${has4 ? '<a class="btn sm ghost" href="#email.faculdade">Ligar o Outlook da faculdade</a>' : ''}${has5 ? '<a class="btn sm ghost" href="#universidade.materiais">Guardar ficheiros da Universidade</a>' : ''}</div></div>
-  <div class="pn"><div class="pn-h"><h3>Todas as partes do script</h3>${on ? `<span class="mut" style="font-size:12px">versão ${v || '?'}${has4 ? ' + Parte 4' : ''}${has5 ? ' + Parte 5' : ''}</span>` : ''}</div>
+  <div class="pn"><div class="pn-h"><h3>Todas as partes do script</h3>${on ? `<span class="mut" style="font-size:12px">versão ${v || '?'}${has4 ? ' + Parte 4' : ''}${has5 ? ' + Parte 5' : ''}${has6 ? ' + Parte 6' : ''}</span>` : ''}</div>
     <p class="mut" style="margin:0 0 10px">Cada parte fica no seu ficheiro, no mesmo projeto do Apps Script, por esta ordem. Só precisas de copiar outra vez uma parte quando aqui disser "falta".</p>
-    <div class="list sc-parts">${P.map(([i, t, d, ok]) => `<div class="li"><div class="li-t"><b>${t}</b><small>${d}</small></div><div class="li-r row gap8">${on ? st(ok, (i === 3 && !I) || (i === 4 && !ok && !IB._p5d)) : ''}${partsBtns('btn sm', i, i).replace(/Copiar parte \d+ \([^)]*\)/, 'Copiar')}</div></div>`).join('')}</div>
+    <div class="list sc-parts">${P.map(([i, t, d, ok]) => `<div class="li"><div class="li-t"><b>${t}</b><small>${d}</small></div><div class="li-r row gap8">${on ? st(ok, (i === 3 && !I) || (i === 4 && !ok && !IB._p5d) || (i === 5 && !ok && !IB._p6d)) : ''}${partsBtns('btn sm', i, i).replace(/Copiar parte \d+ \([^)]*\)/, 'Copiar')}</div></div>`).join('')}</div>
     <small class="mut">O endereço e a chave nunca mudam: os outros aparelhos continuam ligados sem fazer nada.</small></div>`; };
-A.scVer = async () => { UI.toast('A verificar…'); try { await IB.check(); } catch (e) { } const UM = OS.UniMail, i = UM && UM.check ? await UM.check() : null; if (OS.Files) await OS.Files.check(); OS.request();
-  const f5 = OS.Files && OS.Files.has6(), o5 = OS.Files && OS.Files.has5() && !f5; if (i && i.has4 && f5) return UI.toast('Partes 4 e 5 instaladas ✓', 'pos'); if (i && i.has4 && !f5) return UI.toast(o5 ? 'A Parte 5 é a antiga: copia-a outra vez e substitui o conteúdo do ficheiro Parte5 (depois Nova versão).' : 'Parte 4 ✓ · ainda não vejo a Parte 5: confirma a "Nova versão" ao implantar.', 'warn');
-  UI.toast(i && i.has4 ? 'Parte 4 instalada ✓' : (+(cfg().ver || 0) < 11 ? 'Falta atualizar o script (versão ' + (cfg().ver || 'antiga') + ').' : 'Ainda não vejo a Parte 4: confirma a "Nova versão" ao implantar.'), i && i.has4 ? 'pos' : 'warn'); };
+A.scVer = async () => { UI.toast('A verificar…'); try { await IB.check(); } catch (e) { } const UM = OS.UniMail, i = UM && UM.check ? await UM.check() : null; if (OS.Files) await OS.Files.check(); const c6 = OS.CalPush && OS.CalPush.check ? await OS.CalPush.check() : false; IB._p5d = IB._p6d = 1; OS.request();
+  const v = +(cfg().ver || 0), f5 = !!(OS.Files && OS.Files.has5()), miss = [v < 11 ? 3 : 0, i && i.has4 ? 0 : 4, f5 ? 0 : 5, c6 ? 0 : 6].filter(Boolean);
+  if (!miss.length) return UI.toast('Todas as partes instaladas ✓' + (OS.one('calx').on ? ' · a agenda já vai para o Google Calendar' : ''), 'pos');
+  UI.toast(`Falta${miss.length > 1 ? 'm' : ''} a${miss.length > 1 ? 's partes' : ' Parte'} ${miss.join(', ')}. Se já a colaste, confirma a "Nova versão" ao implantar.`, 'warn'); };
 A.ibCopy = async b => { const c = cfg(); if (!c.key) { c.key = genKey(); OS.touch('inbox'); }
   if (b.dataset.t === 'code') return partsModal();
   const pi = /^p(\d+)$/.test(b.dataset.t || '') ? +b.dataset.t.slice(1) - 1 : -1, P = pi >= 0 ? IB.parts(c.key) : null;
