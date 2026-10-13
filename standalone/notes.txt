@@ -1,4 +1,3 @@
-Tudo o que está no Calendário do Oceanum vai para o teu Google Calendar e para o Calendário do iPhone: trabalho, folgas, compromissos, aulas, provas, tarefas, prazos, rotina, treinos, contas e aniversários. Quando alteras ou apagas na app, muda lá também.
-A escala que importas por foto (Trabalho → Importar escala) aparece logo no Calendário da app e no Google Calendar / iPhone.
-A agenda agora vem numa Parte 6 do script, num ficheiro novo: não precisas de mexer na Parte 5 nem nas outras. Depois de colares a Parte 6, liga-se sozinha.
-O Spyke já não mostra a Parte 4 do script: as partes estão todas só em Definições → Script Google.
+Cores na agenda lá fora (Google Calendar e Calendário do iPhone): cada tipo tem o seu calendário com uma cor pastel — Trabalho azul, Folgas verde, Tarefas amarelo, Estudos lavanda, Compromissos rosa, Treino e rotina pêssego. A app fica com as cores de sempre.
+As cores vêm na Parte 7 do script, um ficheiro novo: não precisas de mexer na Parte 5 nem na Parte 6. Depois de a colares, liga-se sozinha e o que já estava no Google Calendar muda para a cor certa, sem duplicar.
+Tudo o que está no Calendário do Oceanum vai para fora (trabalho, folgas, compromissos, aulas, provas, tarefas, rotina…), e a escala importada por foto também.
