@@ -68,7 +68,7 @@ cat > "$OUT/manifest.webmanifest" <<'JSON'
   ]
 }
 JSON
-FILES=$(cd "$OUT" && find . -type f ! -name sw.js ! -name config.js ! -name _headers ! -name netlify.toml ! -name _redirects ! -name firestore.rules ! -name LANCAR.md | sort | sed 's#^\./##' | awk 'BEGIN{printf "[\"./\""} {printf ",\"%s\"", $0} END{printf "]"}')
+FILES=$(cd "$OUT" && find . -type f ! -name sw.js ! -name config.js ! -name 'xlsx.full.min.js' ! -name _headers ! -name netlify.toml ! -name _redirects ! -name firestore.rules ! -name LANCAR.md | sort | sed 's#^\./##' | awk 'BEGIN{printf "[\"./\""} {printf ",\"%s\"", $0} END{printf "]"}')
 VER=$(cd "$OUT" && cat $(find . -type f ! -name sw.js | sort) | sha1sum | cut -c1-10)
 sed -e "s#__VERSION__#$VER#" -e "s#__FILES__#$FILES#" standalone/sw.js > "$OUT/sw.js"
 cp standalone/_headers standalone/firestore.rules standalone/LANCAR.md "$OUT/"

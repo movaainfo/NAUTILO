@@ -689,9 +689,9 @@ async function sharedTests(b) {
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
     ok('google script completo é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
     const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
-      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2] + P[3]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] }; });
-    ok('script em 4 partes: 1 e 2 = núcleo, 3 e 4 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 4 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
-    ok('script em 4 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
+      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] }; });
+    ok('script em 5 partes: 1 e 2 = núcleo, 3, 4 e 5 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 5 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
+    ok('script em 5 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
     { // como o Apps Script: cada ficheiro é carregado à parte, pela ordem; a Parte 3 substitui o doGet e liga-se às funções das partes 1 e 2
       const vm = require('vm'), ctx = vm.createContext({ ContentService: { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 1 } } });
       Object.assign(ctx, { PropertiesService: { getScriptProperties: () => ({ getProperty: () => null }) }, ScriptApp: { getScriptId: () => 'ID' } });
@@ -963,8 +963,21 @@ async function newFeatureTests(b) {
     ok('Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)', await E(p, () => OS.Spyke.earOn() && document.documentElement.classList.contains('spy-ear')));
     const u00 = await users(); await E(p, () => window.__cur.say('que horas são')); await sleep(900); ok('Spyke: sem dizer o nome dele não responde (só "Spyke, …")', await users() === u00 && !/^São \d/.test(await last()), await last());
     await E(p, () => window.__cur.say('Spyke que horas são')); await sleep(900); ok('Spyke: com o nome responde logo', /^São \d/.test(await last()), await last());
-    const n1 = await E(p, () => window.__srN); await E(p, () => window.__cur.say('Spyke que dia é hoje')); await sleep(900);
-    ok('Spyke: conversa seguida no mesmo microfone (não volta a pedir autorização)', /Hoje é/.test(await last()) && await E(p, () => window.__srN) === n1);
+    await E(p, () => window.__cur.say('Spyke que dia é hoje')); await sleep(1200);
+    ok('Spyke: conversa seguida (depois de responder volta a ouvir sozinho)', /Hoje é/.test(await last()) && await E(p, () => OS.Spyke.earOn()));
+    // os pedidos do Ryan, tal como os diz
+    const spk = () => E(p, () => document.querySelectorAll('#spy .spy-m.spyke').length);
+    await E(p, () => OS.Spyke._endConv()); await E(p, () => window.__cur.say('Spike, bom dia')); await sleep(1300);
+    ok('Spyke: "Spike, bom dia" dá o resumo do dia (escrito "Spike", como o iPhone ouve)', /Hoje é/.test(await last()) && /(Bom dia|Boa tarde|Boa noite)/.test(await last()), (await last()).slice(0, 80));
+    await E(p, () => OS.Spyke._endConv()); await E(p, () => window.__cur.say('que horas são')); await sleep(900);
+    await E(p, () => window.__cur.say('Bom dia, Spike')); await sleep(1300);
+    ok('Spyke: "Bom dia, Spike" (nome no fim) também dá o resumo', /Hoje é/.test(await last()) && /(Bom dia|Boa tarde|Boa noite)/.test(await last()));
+    await E(p, () => OS.Spyke._endConv()); const s0 = await spk(); await E(p, () => window.__cur.say('Spike')); await sleep(900);
+    ok('Spyke: só "Spike" não fala nada (som e fica à espera do pedido)', await spk() === s0 && await E(p, () => OS.Spyke.earOn()));
+    await E(p, () => window.__cur.say('que horas são')); await sleep(1200);
+    ok('Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado', /^São \d/.test(await last()), await last());
+    await E(p, () => OS.Spyke._endConv()); await E(p, () => window.__cur.interim('Spike')); await sleep(1800); await E(p, () => window.__cur.interim('Spike que dia é hoje')); await sleep(1900);
+    ok('Spyke: com uma pausa depois do nome ("Spike… que dia é hoje") faz o pedido', /Hoje é/.test(await last()), await last());
     await E(p, () => window.__cur.say('e amanhã vai chover')); await sleep(900); ok('Spyke: depois de responder, sem o nome volta a ignorar', !/chover|Amanhã/i.test(await E(p, () => [...document.querySelectorAll('#spy .spy-m.user:not(.live)')].map(x => x.textContent).join('|'))));
     await E(p, () => OS.Spyke._endConv()); const u0 = await users(); await E(p, () => window.__cur.say('isto é a televisão a falar')); await sleep(800);
     ok('Spyke: fora da conversa ignora o que não é para ele', await users() === u0);
@@ -976,8 +989,12 @@ async function newFeatureTests(b) {
     const n2 = await E(p, () => window.__srN); await E(p, () => window.__cur.end()); await sleep(900); ok('Spyke: o iPhone fecha o microfone e ele reabre sozinho', await E(p, () => window.__srN) === n2 + 1 && await E(p, () => OS.Spyke.earOn()));
     await E(p, () => window.__cur.say('Spyke para de ouvir')); await sleep(1500); ok('Spyke: "para de ouvir" desliga e não reabre', !(await E(p, () => OS.Spyke.earOn())));
     await E(p, () => OS.Spyke.listen()); await sleep(400); ok('Spyke: tocar no microfone volta a ouvir', await E(p, () => OS.Spyke.earOn()));
-    E(p, () => OS.Spyke.say('Esta é uma frase comprida que estou a dizer agora mesmo, sem parar, para testar a interrupção.')); await sleep(250);
-    await E(p, () => window.__cur.interim('Spyke')); await sleep(400); ok('Spyke: dizer "Spyke" enquanto fala interrompe e ouve', await last() === 'Sim?', await last());
+    E(p, () => OS.Spyke.say('Esta é uma frase comprida que estou a dizer agora mesmo, sem parar, para testar a interrupção.')); await sleep(150);
+    ok('Spyke: enquanto fala o microfone descansa (não ouve a própria voz nem corta o som)', !(await E(p, () => OS.Spyke.earOn())));
+    await sleep(900); ok('Spyke: acabou de falar e volta a ouvir sozinho', await E(p, () => OS.Spyke.earOn()));
+    await E(p, () => OS.setOne('spyke', { barge: true })); await sleep(300); E(p, () => OS.Spyke.say('Esta é outra frase comprida que estou a dizer agora mesmo, sem parar, para testar a interrupção.')); await sleep(250);
+    await E(p, () => window.__cur && window.__cur.interim('Spyke')); await sleep(400); ok('Spyke: com "Interromper por voz" ligado, dizer "Spyke" enquanto fala interrompe e ouve', await last() === 'Sim?', await last());
+    await E(p, () => OS.setOne('spyke', { barge: false })); await sleep(300);
     await E(p, () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(300); const off = !(await E(p, () => OS.Spyke.earOn()));
     await E(p, () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => false }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(1200);
     ok('Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho', off && await E(p, () => OS.Spyke.earOn()));
@@ -1129,7 +1146,7 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Faculdade: sem nada configurado, não há passos de configuração (só o botão para Definições → E-mail)', await E(p, () => !document.querySelector('#view .ol-f, #view [data-act=olAuth], #view [data-form=olDom], #view .ol-set') && !!document.querySelector('#view a[href="#definicoes.email"]')));
   ok('E-mail: o separador "Ligar contas" saiu da página E-mail', await E(p, () => ![...document.querySelectorAll('#view .tabs a')].some(a => /Ligar contas/.test(a.textContent))));
   await E(p, () => location.hash = 'email.contas'); await sleep(900);
-  ok('E-mail: o endereço antigo "Ligar contas" abre Definições → E-mail', await E(p, () => location.hash === '#definicoes.email' && /Gmail principal/.test(document.getElementById('view').innerText) && !!document.getElementById('uniSet') && [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()).join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Script Google'));
+  ok('E-mail: o endereço antigo "Ligar contas" abre Definições → E-mail', await E(p, () => location.hash === '#definicoes.email' && /Gmail principal/.test(document.getElementById('view').innerText) && !!document.getElementById('uniSet') && [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()).join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google'));
   ok('Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar', await E(p, () => /usercallback/.test(document.getElementById('view').innerText) && /Registos de aplicações/.test(document.getElementById('view').innerText)));
   await p.fill('#view .ol-f [name=id]', '11111111-2222-3333-4444-555555555555'); await p.fill('#view .ol-f [name=ten]', '22222222-3333-4444-5555-666666666666'); await p.fill('#view .ol-f [name=sec]', 'segredo-de-teste-123'); await p.click('#view .ol-f button'); await sleep(800);
   ok('Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)', posts.some(x => x.op === 'olcfg' && x.sec === 'segredo-de-teste-123' && x.id.length === 36));
@@ -1163,13 +1180,13 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Definições: o Spyke saiu do menu principal', !(await E(p, () => [...document.querySelectorAll('#side a, .tn-dd a')].some(a => a.getAttribute('href') === '#spyke'))));
   await E(p, () => location.hash = 'spyke'); await sleep(700);
   const sp = await E(p, () => ({ h: location.hash, tabs: [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()), st: !!document.getElementById('spyState'), h1: (document.querySelector('#view h1') || {}).textContent, side: !!document.querySelector('#side .side-set.on') }));
-  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Script Google' && sp.side, JSON.stringify(sp));
+  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google' && sp.side, JSON.stringify(sp));
   ok('Definições → Spyke: o estado mostra a Parte 4 instalada', await E(p, () => /Parte 4 do script[\s\S]*instalada/.test(document.getElementById('spyState').innerText)));
   await E(p, () => location.hash = 'definicoes.script'); await sleep(700);
   const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].map(x => x.dataset.t) }));
-  ok('Definições → Script Google: as 4 partes com botão de copiar e a Parte 4 em destaque', /Parte 4/.test(sc.t) && ['p1', 'p2', 'p3', 'p4'].every(x => sc.b.includes(x)) && sc.b[0] === 'p4' && /já está no teu script/.test(sc.t), JSON.stringify(sc.b));
+  ok('Definições → Script Google: as 5 partes com botão de copiar e a parte que falta (5) em destaque', /Parte 4/.test(sc.t) && /Parte 5/.test(sc.t) && ['p1', 'p2', 'p3', 'p4', 'p5'].every(x => sc.b.includes(x)) && sc.b[0] === 'p5' && /Parte 5 · copiar e colar/.test(sc.t), JSON.stringify(sc.b));
   await E(p, () => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
-  await p.click('#parte4 [data-act=ibCopy]'); await sleep(300);
+  await p.click('#view .sc-parts [data-act=ibCopy][data-t=p4]'); await sleep(300);
   ok('Definições → Script Google: "Copiar parte 4" copia a Parte 4 (Outlook), sem mexer nas outras', await E(p, () => /function op_olinfo/.test(window.__clip) && !/function doGet/.test(window.__clip)));
   await E(p, () => { OS.UniMail._set(null, { has4: false }); OS.request(); }); await sleep(500);
   ok('Definições → Script Google: sem a Parte 4 diz "falta" e mostra os passos', await E(p, () => { const t = document.getElementById('parte4').innerText; return /copiar e colar/.test(t) && /falta/.test(t) && /Parte4/.test(t) && /Nova versão/.test(t); }));
@@ -1416,11 +1433,174 @@ async function stress(b) {
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close();
 }
 
+/* ---------- extras: importador da B3, ficheiros na nuvem (Parte 5), metas com categoria própria ---------- */
+async function extrasTests(b) { cur = 'Extras'; console.log('\n=== Importador B3, ficheiros na nuvem e metas ===');
+  const X = require(path.join(__dirname, '..', 'vendor', 'xlsx.full.min.js')), TMP = require('os').tmpdir() + '/oc-extras-' + Date.now(); fs.mkdirSync(TMP, { recursive: true });
+  const wx = (rows, name, file) => { const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet(rows), name); fs.writeFileSync(TMP + '/' + file, X.write(wb, { type: 'buffer', bookType: 'xlsx' })); return TMP + '/' + file; };
+  const F = [wx([['Data do Negócio', 'Tipo de Movimentação', 'Mercado', 'Prazo/Vencimento', 'Instituição', 'Código de Negociação', 'Quantidade', 'Preço', 'Valor'], ['10/03/2025', 'Compra', 'Mercado Fracionário', '-', 'BTG PACTUAL CTVM S.A.', 'PETR4F', 10, '37,50', '375,00'], ['12/05/2025', 'Compra', 'Mercado à Vista', '-', 'BTG PACTUAL CTVM S.A.', 'MXRF11', 100, 10.2, 1020], ['20/06/2025', 'Venda', 'Mercado Fracionário', '-', 'BTG PACTUAL CTVM S.A.', 'PETR4F', 4, 39, 156], ['02/07/2025', 'Compra', 'Mercado à Vista', '-', 'BTG PACTUAL CTVM S.A.', 'BOVA11', 5, 130, 650]], 'Negociacao', 'negociacao.xlsx'),
+    wx([['Entrada/Saída', 'Data', 'Movimentação', 'Produto', 'Instituição', 'Quantidade', 'Preço unitário', 'Valor da Operação'], ['Credito', '12/03/2025', 'Transferência - Liquidação', 'PETR4 - PETROLEO BRASILEIRO S.A. PETROBRAS', 'BTG PACTUAL CTVM S.A.', 10, 37.5, 375], ['Credito', '15/06/2025', 'Rendimento', 'MXRF11 - MAXI RENDA FUNDO DE INVESTIMENTO IMOBILIARIO - FII', 'BTG PACTUAL CTVM S.A.', 100, 0.1, 10], ['Credito', '20/08/2025', 'Dividendo', 'PETR4 - PETROLEO BRASILEIRO S.A. PETROBRAS', 'BTG PACTUAL CTVM S.A.', 6, 0.5, 3], ['Credito', '20/08/2025', 'Juros Sobre Capital Próprio', 'PETR4 - PETROLEO BRASILEIRO S.A. PETROBRAS', 'BTG PACTUAL CTVM S.A.', 6, 0.2, '1,02'], ['Credito', '01/09/2025', 'Desdobro', 'PETR4 - PETROLEO BRASILEIRO S.A. PETROBRAS', 'BTG PACTUAL CTVM S.A.', 6, '-', '-'], ['Credito', '03/09/2025', 'Atualização', 'PETR4 - PETROLEO BRASILEIRO S.A. PETROBRAS', 'BTG PACTUAL CTVM S.A.', 6, '-', '-'], ['Debito', '10/09/2025', 'Resgate', 'Tesouro Selic 2029', 'BTG PACTUAL CTVM S.A.', 0.5, '15000', '7500']], 'Movimentacao', 'movimentacao.xlsx'),
+    wx([['Produto', 'Instituição', 'Conta', 'Código de Negociação', 'CNPJ da Empresa', 'Código ISIN / Distribuição', 'Tipo', 'Escriturador', 'Quantidade', 'Quantidade Disponível', 'Quantidade Indisponível', 'Motivo', 'Preço de Fechamento', 'Valor Atualizado'], ['PETR4 - PETROLEO BRASILEIRO S.A. PETROBRAS', 'BTG PACTUAL CTVM S.A.', '123', 'PETR4', '', '', 'PN', '', 12, 12, 0, '-', 38, 456], ['MXRF11 - MAXI RENDA', 'BTG PACTUAL CTVM S.A.', '123', 'MXRF11', '', '', 'Cotas', '', 100, 100, 0, '-', 10, 1000]], 'Acoes', 'posicao.xlsx')];
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const drive = {}; let nid = 0, five = false;
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.assign(Object.fromEntries(u.searchParams), Object.fromEntries(new URLSearchParams(rt.request().postData() || ''))), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+    if (P.op === 'ping') return J({ ok: true, v: 11 }); if (P.op === 'olinfo') return J({ ok: true, v: 12, redirect: '', cfg: false, linked: false });
+    if (!five && /^f/.test(P.op || '')) return J({ ok: false, msg: 'Valor inválido' });
+    if (P.op === 'fping') return J({ ok: true, v: 5, pasta: 'https://drive.google.com/drive/folders/RAIZ' });
+    if (P.op === 'fup') { drive.ch = drive.ch || {}; (drive.ch[P.up] = drive.ch[P.up] || [])[+P.i] = P.d; if (+P.i < +P.n - 1) return J({ ok: true, i: +P.i }); const id = 'F' + (++nid); drive[id] = { b64: drive.ch[P.up].join(''), pasta: P.pasta, mime: P.mime, nome: P.nome, n: +P.n }; return J({ ok: true, id, url: 'https://drive.google.com/file/d/' + id + '/view', size: Buffer.from(drive[id].b64, 'base64').length }); }
+    if (P.op === 'fdl') { const f = drive[P.id]; return J({ ok: true, n: 1, d: f.b64, mime: f.mime, nome: f.nome }); }
+    if (P.op === 'frm') { delete drive[P.id]; return J({ ok: true }); }
+    if (P.op === 'fls') return J({ ok: true, f: [{ id: 'FX', n: 'Exame 2024.pdf', s: 1234, m: 'application/pdf', u: 'https://drive.google.com/file/d/FX/view', p: 'Universidade/Contabilidade ZZ', t: Date.now() }] });
+    return J({ ok: true, items: [], docs: {} }); });
+  await p.goto(BASE); await unlock(p);
+  await E(p, () => { window.open = u => { window.__opened = u || 'blank'; return null; }; OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); });
+  const view = () => E(p, () => document.getElementById('view').innerText), go = async (h, ms = 600) => { await E(p, h => location.hash = h, h); await sleep(ms); return view(); };
+  // ---- B3 ----
+  let v = await go('investimentos.movimentos'); ok('B3: botão "Importar da B3" nos Movimentos', /Importar da B3/.test(v));
+  await p.click('#view [data-act="b3Open"]'); await sleep(300); ok('B3: painel com os passos da Área do Investidor', /Extratos → Negociação/.test(await view()) && /Extratos → Movimentação/.test(await view()));
+  let [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click('[data-act="b3Pick"]')]); await fc.setFiles(F); await p.waitForFunction(() => OS.B3.state() && OS.B3.state().rows, null, { timeout: 10000 }).catch(() => { }); await sleep(300);
+  const st = await E(p, () => { const s = OS.B3.state(); return { n: (s.fresh || []).length, liq: !!(s.skip || {})['liquidação (já vem na Negociação)'], upd: !!(s.skip || {})['Atualização'], err: s.err }; });
+  ok('B3: lê Negociação + Movimentação + Posição (9 movimentos; liquidação e atualização ficam de fora)', st.n === 9 && st.liq && st.upd && !st.err, JSON.stringify(st));
+  ok('B3: conferência com a posição aparece', /Conferência com a posição da B3/.test(await view()));
+  await p.click('[data-act="b3Go"]'); await sleep(700);
+  const r = await E(p, () => { const A = OS.all('assets'), P = t => A.find(a => a.ticker === t), pe = P('PETR4'); return { pe: pe && [pe.sym, pe.cls, pe.currency, pe.broker, OS.Inv.pos(pe).qty].join('|'), mx: (P('MXRF11') || {}).cls, bo: (P('BOVA11') || {}).cls, td: A.filter(a => a.cls === 'Tesouro Direto').map(a => a.td).join(), jcp: OS.all('invtx').filter(t => t.type === 'JCP').map(t => t.amount + '/' + t.tax).join(), sp: OS.all('invtx').filter(t => t.type === 'Desdobramento/Grupamento').map(t => t.ratio).join(), rend: OS.all('invtx').filter(t => t.type === 'Rendimento').length }; });
+  ok('B3: PETR4 criado como Ação, PETR4.SA, BRL, corretora BTG Pactual', r.pe && r.pe.startsWith('PETR4.SA|Ação|BRL|BTG Pactual'), r.pe);
+  ok('B3: desdobro calculado (10 − 4 = 6 → 12 ações)', r.pe && r.pe.endsWith('|12') && r.sp === '2', r.pe + ' fator ' + r.sp);
+  ok('B3: MXRF11 é FII, BOVA11 é ETF, Tesouro Selic 2029 no Tesouro Direto', r.mx === 'FII' && r.bo === 'ETF' && /Tesouro Selic 2029/.test(r.td), JSON.stringify(r));
+  ok('B3: JCP guardado bruto com os 15% retidos (1,02 líquido → 1,20 bruto)', r.jcp === '1.2/0.18' && r.rend === 1, r.jcp);
+  await p.click('#view [data-act="b3Open"]'); await sleep(200); [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click('[data-act="b3Pick"]')]); await fc.setFiles(F); await sleep(1500);
+  const st2 = await E(p, () => ({ f: OS.B3.state().fresh.length, d: OS.B3.state().dup })); v = await view();
+  ok('B3: importar outra vez não duplica nada e a conferência bate', st2.f === 0 && st2.d === 9 && /2 de 2 batem/.test(v), JSON.stringify(st2));
+  await E(p, () => OS.act.b3Open());
+  // ---- ficheiros na nuvem ----
+  await E(p, () => { OS.add('subjects', { name: 'Contabilidade ZZ', status: 'Em curso' }); OS.add('learn', { title: 'Curso de Excel ZZ', kind: 'Curso', status: 'Em curso', unit: 'aulas' }); });
+  v = await go('universidade.materiais', 700); const sid = await E(p, () => OS.all('subjects').find(s => s.name === 'Contabilidade ZZ').id);
+  ok('Ficheiros: Universidade → Materiais tem "Guardar ficheiros" em cada disciplina', /Guardar ficheiros/.test(v) && !!(await p.$(`[data-act="fPick"][data-ref="${sid}"]`)));
+  await p.click(`[data-act="fPick"][data-ref="${sid}"]`); await sleep(500);
+  ok('Ficheiros: sem a Parte 5, explica como a colar (com botão para copiar)', await E(p, () => /Parte 5/.test((document.querySelector('#modal') || document.body).innerText) && !!document.querySelector('#modal [data-act=ibCopy]')));
+  five = true; await p.click('#modal [data-act="fVer"]'); await sleep(600); ok('Ficheiros: "Verificar" deteta a Parte 5', await E(p, () => OS.Files.has5()));
+  await E(p, () => OS.UI.closeModal && OS.UI.closeModal());
+  const pdf = TMP + '/Resumo cap 3.pdf'; fs.writeFileSync(pdf, Buffer.alloc(7 * 1048576, 66));
+  [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click(`[data-act="fPick"][data-ref="${sid}"]`)]); await fc.setFiles([pdf]);
+  await p.waitForFunction(() => OS.all('files').length > 0, null, { timeout: 20000 }).catch(() => { }); await sleep(500);
+  const f1 = await E(p, () => OS.all('files').map(f => [f.name, f.kind, f.area, f.size, f.fid].join('|')));
+  ok('Ficheiros: PDF de 7 MB enviado em 4 partes para Universidade/Contabilidade ZZ no Drive', f1.length === 1 && f1[0] === `Resumo cap 3|PDF|uni|${7 * 1048576}|F1` && drive.F1 && drive.F1.n === 4 && drive.F1.pasta === 'Universidade/Contabilidade ZZ', f1.join() + ' ' + JSON.stringify(drive.F1 && { n: drive.F1.n, pasta: drive.F1.pasta }));
+  v = await go('universidade.materiais', 600); ok('Ficheiros: aparece na disciplina com Abrir / descarregar / apagar', /Resumo cap 3/.test(v) && /no Drive/.test(v) && !!(await p.$('[data-act=fOpen]')) && !!(await p.$('[data-act=fDown]')) && !!(await p.$('[data-act=fDel]')));
+  await p.click('#view .f-act [data-act=fOpen]'); await sleep(200); ok('Ficheiros: "Abrir" abre o ficheiro no Google Drive', await E(p, () => /drive\.google\.com\/file\/d\/F1/.test(window.__opened || '')));
+  v = await go('cursos', 600); ok('Ficheiros: cada curso tem "Guardar PDFs / ficheiros"', /Guardar PDFs \/ ficheiros/.test(v));
+  await go('universidade.materiais', 500); await p.click('[data-act=fSync]'); await sleep(700); ok('Ficheiros: "Atualizar lista" recupera do Drive o que foi guardado noutro aparelho (na disciplina certa)', await E(p, () => OS.all('files').some(f => f.fid === 'FX' && f.area === 'uni' && OS.get('subjects', f.ref) && OS.get('subjects', f.ref).name === 'Contabilidade ZZ')));
+  await E(p, () => { OS.UI.ask = (t, d, l, fn) => fn(); }); const fid = await E(p, () => OS.all('files').find(f => f.fid === 'F1').id); await p.click(`[data-act="fDel"][data-id="${fid}"]`); await sleep(500);
+  ok('Ficheiros: apagar tira da lista e manda para o lixo do Drive', await E(p, () => !OS.all('files').some(f => f.fid === 'F1')) && !drive.F1);
+  v = await go('definicoes.script', 700); ok('Definições → Script Google lista a Parte 5 (ficheiros na nuvem)', /Parte 5 · ficheiro Parte5/.test(v));
+  const code5 = await E(p, () => OS.Inbox.parts('k').slice(-1)[0]); let syn = ''; try { new Function(code5); } catch (e) { syn = e.message; }
+  ok('Parte 5: código válido com op_fup, op_fdl, op_frm, op_fls', !syn && /function op_fup/.test(code5) && /function op_fdl/.test(code5) && /function op_frm/.test(code5) && /function op_fls/.test(code5), syn);
+  // ---- metas com categoria fora da lista ----
+  await E(p, () => OS.add('goals', { title: 'Meta Pessoal ZZ', cat: 'Pessoal', horizon: '1 ano', metric: 'manual', target: 5, status: 'Ativa', start: OS.U.today() }));
+  v = await go('metas', 600); ok('Metas: meta com categoria própria ("Pessoal") aparece', /Meta Pessoal ZZ/.test(v));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (extras)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
+/* ---------- extras 2: investimentos completos (imóveis, renda passiva, visão, carteira), relatórios de IRS e análise de empresas ---------- */
+async function extras2Tests(b) { cur = 'Extras'; console.log('\n=== Investimentos completos, Relatórios (IRS) e empresas ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const aiP = [];
+  const T0 = Math.floor(Date.now() / 1000), mh = () => { const t = [], c = []; for (let i = 180; i >= 0; i--) { t.push(T0 - i * 30 * 86400); c.push(Math.round(20 * Math.pow(1.012, 180 - i) * 100) / 100); } const div = []; for (let y = 0; y < 8; y++) div.push([T0 - (y * 365 + 100) * 86400, 1 + (7 - y) * .1]); return { cur: 'USD', t, c, div, spl: [] }; };
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), op = u.searchParams.get('op'), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+    if (op === 'ping') return J({ ok: true, v: 11 }); if (op === 'h') return J({ ok: true, h: mh() }); if (op === 'q') return J({ ok: true, q: {} });
+    if (op === 'f') return J({ ok: true, f: { sum: { assetProfile: { longBusinessSummary: 'Makes things.', sector: 'Technology', industry: 'Consumer Electronics', country: 'United States' }, price: { longName: 'Maçã Inc', currency: 'USD', regularMarketPrice: { raw: 200 }, marketCap: { raw: 3e12 } }, summaryDetail: {}, financialData: {}, defaultKeyStatistics: {} },
+      ts: Object.assign({ quarterlyTotalRevenue: [['2025-03-31', 9e10, 'USD'], ['2025-06-30', 9.4e10, 'USD'], ['2025-09-30', 1.02e11, 'USD'], ['2025-12-31', 1.24e11, 'USD']], quarterlyNetIncome: [['2025-03-31', 2.4e10, 'USD'], ['2025-06-30', 2.3e10, 'USD'], ['2025-09-30', 2.7e10, 'USD'], ['2025-12-31', 3.6e10, 'USD']] },
+        { annualTotalRevenue: Array.from({ length: 10 }, (_, i) => [(2015 + i) + '-09-30', (2 + i * .2) * 1e11, 'USD']), annualNetIncome: Array.from({ length: 10 }, (_, i) => [(2015 + i) + '-09-30', (5 + i) * 1e10, 'USD']) }) } });
+    return J({ ok: true, items: [], docs: {} }); });
+  await ctx.route(/generativelanguage/, rt => { const u = rt.request().url(), b2 = rt.request().postData() || ''; if (/\/models\?/.test(u)) return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ models: [{ name: 'models/gemini-3.5-flash', supportedGenerationMethods: ['generateContent'] }] }) }); aiP.push(b2);
+    const R = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: '```json\n' + JSON.stringify(o) + '\n```' }] }, groundingMetadata: { groundingChunks: [{ web: { title: 'Fonte oficial', uri: 'https://example.com/fonte' } }] } }] }) });
+    if (/HISTÓRIA COMPLETA/.test(b2)) return R({ fundacao: '1976, Cupertino, EUA', fundadores: ['Steve Teste — cofundador'], origem: 'Começou numa garagem.\n\nCresceu com computadores pessoais.', marcos: [{ ano: '1976', t: 'Fundação na garagem', d: 'Primeiro computador.' }, { ano: '2007', t: 'Lança o telefone', d: 'Muda tudo.' }], aquisicoes: [{ ano: '2014', nome: 'Batidas', valor: '3 mM', porque: 'música' }], crises: [{ ano: '1997', t: 'Quase falência', d: 'O fundador volta.' }], lideres: [{ nome: 'Tim Teste', cargo: 'CEO', de: '2011', ate: 'hoje' }], ipo: '1980, NASDAQ', hoje: 'Uma das maiores do mundo.', curiosidades: ['O logótipo era outro.'] });
+    if (/Analisa a EVOLUÇÃO/.test(b2)) return R({ resumo: 'Estás a evoluir nos estudos e a correr menos.', nota: 7, por_area: [{ area: 'Estudos', nota: 8, comentario: 'Mais horas que no mês passado.' }, { area: 'Desporto e corpo', nota: 5, comentario: 'Menos km.' }], a_melhorar: ['Estudo diário'], a_piorar: ['Corrida'], foco: ['Correr 3 vezes por semana', 'Manter 2 h de estudo', 'Poupar 10%'], alerta: '' });
+    if (/escreveu isto sobre uma decisão/.test(b2)) return R({ titulo: 'Trabalho ao fim de semana', contexto: 'Ganhar mais dinheiro contra ter menos tempo para estudar.', prazo: '', alternativas: [{ nome: 'Aceitar', notas: 'mais 400 € por mês' }, { nome: 'Não aceitar', notas: 'mais tempo para estudar' }] });
+    if (/Analisa o que ele ESCREVEU/.test(b2)) return R({ resumo: 'Dinheiro contra notas.', sobre_o_que_escreveste: 'Não disseste quantas horas por semana.', alternativas: [{ nome: 'Aceitar', fortes: [{ t: 'Mais 400 € por mês', peso: 5 }, { t: 'Experiência', peso: 2 }], fracos: [{ t: 'Menos estudo', peso: 4 }], oportunidades: ['Contactos'], ameacas: ['Exames em janeiro'], encaixe: 'Ajuda a meta da reserva.' }, { nome: 'Não aceitar', fortes: [{ t: 'Notas', peso: 4 }], fracos: [{ t: 'Sem dinheiro extra', peso: 3 }] }], pesa_mais: [{ fator: 'As notas deste semestre', porque: 'A tua meta é média 15.', peso: 5 }, { fator: 'Reserva de emergência', porque: 'Tens 1 mês.', peso: 4 }], pesos: { cost: 2, benefit: 4, risk: 3, time: 5, fin: 4, goals: 5, routine: 3 }, pesos_porque: 'O tempo e as metas pesam mais.', riscos: ['Cansaço'], perguntas: ['Quantas horas?'], nova: 'Trabalhar só nas férias', inclinacao: { nome: 'Não aceitar', porque: 'As notas pesam mais agora.', confianca: 'média' }, emocao: '', passo: 'Perguntar o horário exato.' });
+    if (/DOSSIÊ COMPLETO/.test(b2)) return R({ resumo: 'Vende telefones e serviços.', modelo: 'Hardware com margens altas e serviços recorrentes.', segmentos: [{ nome: 'Telefones', pct: 52, d: '' }, { nome: 'Serviços', pct: 24 }], geografia: [{ regiao: 'Américas', pct: 43 }], produtos: ['Telefone'], concorrentes: [{ nome: 'Rival SA', ticker: 'RIV', nota: 'Mais barata' }], fosso: ['Ecossistema'], riscos: ['China'], catalisadores: ['IA no telefone'], cenarios: { pessimista: 'Vendas caem', base: 'Cresce 5%', otimista: 'Serviços disparam' }, tese: 'Qualidade a preço alto.', perguntas: ['O crescimento dos serviços continua?'], data: 'out 2026' });
+    return rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }) }); });
+  await p.goto(BASE); await unlock(p);
+  await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11 }); OS.setOne('diet', { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' }); localStorage.removeItem('os2aiQuota'); });
+  const view = () => E(p, () => document.getElementById('view').innerText), go = async (h, ms = 700) => { await E(p, h => location.hash = h, h); await sleep(ms); return view(); };
+  // ---- dados: carteira, imóvel arrendado com crédito, rendas e despesas ligadas, salário com bruto ----
+  const ids = await E(p, () => { const U = OS.U, T = U.today(), d = k => U.addDays(T, -k), Y = String(+T.slice(0, 4) - 1);
+    const acc = OS.add('accounts', { name: 'Conta', inst: 'Santander', type: 'Conta à ordem', currency: 'EUR', opening: 1000, openDate: Y + '-01-01' }); OS.add('accounts', { name: 'Conta', inst: 'Revolut', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: Y + '-01-01' });
+    OS.one('profile').fx = { USD: 0.9, BRL: 0.17 }; OS.touch('profile');
+    const ap = OS.add('assets', { name: 'Maçã Inc', ticker: 'MACA', sym: 'MACA', cls: 'Ação', currency: 'USD', price: 200, priceDate: T, broker: 'Trading 212', country: 'EUA', sector: 'Tecnologia' });
+    const et = OS.add('assets', { name: 'ETF Mundo', ticker: 'MUND', cls: 'ETF', currency: 'EUR', price: 110, priceDate: T, broker: 'XTB', country: 'Irlanda' });
+    OS.add('invtx', { asset: ap.id, type: 'Compra', date: Y + '-02-01', qty: 10, price: 150 }); OS.add('invtx', { asset: ap.id, type: 'Venda', date: Y + '-06-10', qty: 4, price: 190 }); OS.add('invtx', { asset: ap.id, type: 'Dividendo', date: Y + '-05-15', amount: 10, tax: 1.5 });
+    OS.add('invtx', { asset: et.id, type: 'Compra', date: Y + '-03-01', qty: 20, price: 100 }); OS.add('invtx', { asset: et.id, type: 'Venda', date: Y + '-11-20', qty: 5, price: 105 });
+    const h = OS.add('props', { name: 'T1 Teste', tipo: 'Para arrendar', uso: 'Arrendado', city: 'Aveiro', country: 'Portugal', share: 100, currency: 'EUR', value: 200000, buyPrice: 150000, buyCosts: 10000, buyDate: '2020-01-01', loanBal: 100000, loanRate: 3, loanPay: 600, rent: 900, occ: 12, imi: 300, condo: 50, ins: 150, maint: 300 });
+    for (let m = 1; m <= 12; m++) { const mm = U.pad(m); OS.add('transactions', { type: 'Receita', amount: 900, date: Y + '-' + mm + '-05', desc: 'Renda T1', account: acc.id, cat: 'Rendas', sub: 'Renda recebida', prop: h.id, tags: [] }); OS.add('transactions', { type: 'Receita', amount: 1000, gross: 1250, wht: 100, ss: 137.5, payer: 'Empresa Teste', date: Y + '-' + mm + '-25', desc: 'Salário', account: acc.id, cat: 'Salário', sub: 'Salário', tags: [] }); OS.add('transactions', { type: 'Despesa', amount: 300, date: Y + '-' + mm + '-10', desc: 'Renda casa', account: acc.id, cat: 'Casa', sub: 'Renda', tags: [] }); OS.add('transactions', { type: 'Despesa', amount: 50, date: Y + '-' + mm + '-12', desc: 'Farmácia', account: acc.id, cat: 'Saúde', sub: 'Farmácia', tags: [] }); }
+    OS.add('transactions', { type: 'Despesa', amount: 300, date: Y + '-05-20', desc: 'IMI', account: acc.id, cat: 'Casa', sub: 'IMI', prop: h.id, tags: [] });
+    for (let i = 0; i < 6; i++) OS.add('transactions', { type: 'Receita', amount: 900, date: d(i * 30 + 2), desc: 'Renda T1', account: acc.id, cat: 'Rendas', sub: 'Renda recebida', prop: h.id, tags: [] });
+    return { h: h.id, Y }; });
+  // ---- Investimentos: visão de tudo, carteira dividida, imóveis e renda passiva ----
+  let v = await go('investimentos', 900);
+  ok('Investimentos → Visão: "Tudo o que tens investido" junta mercado e imóveis', /Tudo o que tens investido/.test(v) && /imóveis/.test(v) && /Todos os números/.test(v) && /Yield on cost/.test(v) && /Diversificação efetiva/.test(v));
+  ok('Investimentos → Visão: gráficos por classe, setor, país e moeda', ['Por classe', 'Por setor', 'Por país', 'Por moeda'].every(x => v.includes(x)));
+  ok('Investimentos: separadores Imóveis e Renda passiva', await E(p, () => [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent).join('|').includes('Carteira|Imóveis|Renda passiva')));
+  await E(p, () => OS.setUI('invGrp', 'sector')); v = await go('investimentos.carteira', 700);
+  ok('Carteira: divisão por setor com % e imóveis incluídos', /Divisão da carteira por setor/.test(v) && /Tecnologia/.test(v) && /Imóveis/.test(v) && /%/.test(v) && !!(await p.$('#view .inv-dt')));
+  await E(p, () => OS.setUI('invGrp', 'country')); v = await go('investimentos.carteira', 500); ok('Carteira: divisão por país (EUA, Irlanda, Portugal)', /Divisão da carteira por país/.test(v) && /EUA/.test(v) && /Irlanda/.test(v) && /Portugal/.test(v));
+  v = await go('investimentos.imoveis', 700);
+  const pr = await E(p, id => { const x = OS.InvX.prop(OS.get('props', id)); return { eq: x.eq, noi: Math.round(x.noi), cf: Math.round(x.cf), gy: +x.gy.toFixed(4), realIn: x.realIn }; }, ids.h);
+  ok('Imóveis: capital próprio, rendimento líquido, cash flow e rentabilidade', pr.eq === 100000 && pr.noi === 10800 - (300 + 600 + 150 + 300) && pr.cf === 9450 - 7200 && pr.gy === .054 && /Capital próprio/.test(v) && /Rentabilidade líquida/.test(v), JSON.stringify(pr));
+  ok('Imóveis: o real das Finanças (rendas ligadas ao imóvel) aparece', pr.realIn >= 5400 && /Real 12 meses/.test(v));
+  ok('Património líquido inclui o imóvel (valor − crédito)', await E(p, () => { const R = OS.InvX.realEstate(); return Math.abs(OS.Fin.netWorth() - (OS.Fin.cashTotal() + OS.Inv.value() - OS.Fin.debtsTotal() + R.val - R.loanOut)) < 1 && R.val - R.loanOut === 100000; }));
+  v = await go('investimentos.renda', 700); ok('Renda passiva: por mês, despesas cobertas, liberdade financeira e fontes', /Renda passiva por mês/.test(v) && /Despesas cobertas/.test(v) && /Liberdade financeira/.test(v) && /Rendas de imóveis/.test(v));
+  // ---- Relatórios ----
+  v = await go('relatorios', 800); ok('Dinheiro → Relatórios: mensal, trimestral e anual com prazos', /Mensal · resumido/i.test(v) && /Trimestral · completo/i.test(v) && /Anual · declaração de IRS/i.test(v) && /Próximos prazos/.test(v));
+  await E(p, () => OS.setOne('tax', { born: 2004, firstWork: 2012, res: 'PT' })); await E(p, Y => { OS.setUI('rpPer', 'a'); OS.setUI('rpRef_a', Y); }, ids.Y);
+  v = await go('relatorios.completo', 1200);
+  ok('Relatório anual: anexos A, F, G, H, J e simulação do imposto', ['Anexo A', 'Anexo F', 'Anexo G', 'Anexo J', 'Anexo H', 'Simulação do imposto', 'Quadro 9.2A', 'Quadro 8A', 'Quadro 11'].every(x => v.includes(x)), ['Anexo A', 'Anexo F', 'Anexo G', 'Anexo J', 'Anexo H', 'Simulação do imposto'].filter(x => !v.includes(x)).join());
+  const X = await E(p, Y => { const r = OS.Reports.irs(Y); return { aG: r.aG, aW: r.aW, fG: r.fG, fD: r.fD, j: r.jSales.map(s => r.code(s) + ':' + s.a.country + ':' + Math.round(s.gainE)), e: r.eForeign.length, acc: r.accF.map(a => a.cty).join(), hab: Math.round(r.D2.habitacao), sau: Math.round(r.D2.saude), rc: Math.round(r.rc), jp: r.jp }; }, ids.Y);
+  ok('IRS: salário bruto, retenções e rendas (anexo F) somados', X.aG === 15000 && X.aW === 1200 && X.fG === 10800 && X.fD === 300, JSON.stringify(X));
+  ok('IRS: vendas no anexo J com código (G01 ações, G20 ETF) e país', X.j.includes('G01:EUA:144') && X.j.some(x => /^G20:Irlanda:/.test(x)), X.j.join(' '));
+  ok('IRS: deduções (rendas 15% até ao limite, saúde 15%) e contas no estrangeiro (Revolut → Lituânia)', X.hab === Math.min(Math.round(.15 * 3600), 700) && X.sau === 90 && /Lituânia/.test(X.acc), JSON.stringify(X));
+  ok('IRS: rendimento coletável com dedução específica (sem IRS Jovem fora do prazo)', X.jp === 0 && X.rc === Math.round(15000 - Math.max(8.54 * 522.5, 1650)), JSON.stringify(X));
+  await E(p, () => { window.__dl = []; const oc = URL.createObjectURL; URL.createObjectURL = bl => { window.__dl.push(bl.type); return oc(bl); }; }); await p.click('#view [data-act=rpCsv][data-id=rpJ92]'); await sleep(200);
+  ok('IRS Jovem: 6.º ano de rendimentos = 50% isento (até 55 × IAS)', await E(p, Y => { OS.setOne('tax', { born: 2004, firstWork: +Y - 5 }); const r = OS.Reports.irs(Y); OS.setOne('tax', { firstWork: 2012 }); return r.jp === .5 && Math.round(r.jEx) === 7500; }, ids.Y));
+  ok('Relatório: tabelas para descarregar em CSV (para o contabilista)', await E(p, () => window.__dl.includes('text/csv')));
+  await p.click('#view [data-act=rpDown]'); await sleep(200); ok('Relatório: descarregar o relatório completo (para PDF)', await E(p, () => window.__dl.includes('text/html')));
+  await E(p, () => { OS.setUI('rpPer', 'm'); OS.setUI('rpRef_m', OS.U.addMonths(OS.U.today().slice(0, 7), -1)); }); v = await go('relatorios.completo', 800);
+  ok('Relatório mensal enxuto: resumo, receitas e despesas, investimentos e impostos do mês', /Resumo/.test(v) && /Receitas e despesas/.test(v) && /Impostos deste período/.test(v) && !/Anexo J/.test(v));
+  const ag = await E(p, () => { OS.all('reports').slice().forEach(r => OS.del('reports', r.id)); const k = OS.Reports.autogen(); return { k, per: OS.all('reports').map(r => r.per).sort().join(',') }; });
+  ok('Relatórios gerados sozinhos quando o mês, o trimestre e o ano fecham (Arquivo)', ag.k === 3 && ag.per === 'a,m,q', JSON.stringify(ag));
+  v = await go('relatorios.arquivo', 600); ok('Arquivo lista os relatórios novos', /novo/.test(v) && /Mensal/.test(v));
+  v = await go('definicoes.impostos', 600); ok('Definições → Impostos: residência, IRS Jovem, dependentes, englobamento', /Residência fiscal/.test(v) && /Ano de nascimento/.test(v) && /primeiro rendimento de trabalho/.test(v) && /Englobar/.test(v));
+  ok('Movimento de salário com bruto, retenção e Segurança Social', await E(p, () => ['gross', 'wht', 'ss', 'payer'].every(k => OS.S.transactions.fields.some(f => f.k === k)) && OS.S.transactions.fields.some(f => f.k === 'prop')));
+  // ---- Análise de empresas: história, dossiê, longo prazo, 10 anos, trimestres ----
+  await E(p, () => { OS.setUI('invCo', 'MACA'); location.hash = 'investimentos.empresas'; }); await sleep(1500); v = await view();
+  ok('Empresa: preço de longo prazo, retornos e dividendos por ano', /Preço de longo prazo e dividendos/.test(v) && /10 anos/.test(v) && /Dividendos por ação, por ano/.test(v));
+  ok('Empresa: últimos trimestres e escolha 5/10 anos nas demonstrações', /Últimos trimestres/.test(v) && !!(await p.$('[data-act=coYrs][data-v="10"]')));
+  await p.click('[data-act=coYrs][data-v="10"]'); await sleep(700); ok('Empresa: 10 anos de demonstrações financeiras', await E(p, () => [...document.querySelectorAll('.co-t thead th')].length === 11));
+  await p.click('#view [data-act=coHist]'); await p.waitForFunction(() => /Linha do tempo/.test(document.getElementById('view').innerText), null, { timeout: 8000 }).catch(() => { }); v = await view();
+  ok('Empresa: a história completa (fundação, fundadores, linha do tempo, crises, líderes, fontes)', /Fundação/.test(v) && /Cupertino/.test(v) && /Linha do tempo/.test(v) && /Quase falência/.test(v) && /Tim Teste/.test(v) && /Fontes/.test(v) && aiP.some(x => /HISTÓRIA COMPLETA/.test(x) && /google_search/.test(x)));
+  await p.click('#view [data-act=coDos]'); await p.waitForFunction(() => /Concorrentes/.test(document.getElementById('view').innerText), null, { timeout: 8000 }).catch(() => { }); v = await view();
+  ok('Empresa: tudo sobre a empresa (modelo, segmentos, concorrentes, cenários, tese)', /Como ganha dinheiro/.test(v) && /Segmentos/.test(v) && /Rival SA/.test(v) && /Pessimista/.test(v) && /Tese de investimento/.test(v));
+  ok('Empresa: história e dossiê ficam guardados (não gasta IA outra vez)', await E(p, () => !!(JSON.parse(localStorage.getItem('oc_cohist') || '{}').MACA) && !!(JSON.parse(localStorage.getItem('oc_codos') || '{}').MACA)));
+  // ---- Entrevista profunda ----
+  const iv2 = await E(p, () => ({ n: OS.Me.qList().length, parts: OS.Me.PARTS.length, names: OS.Me.PARTS.map(x => x.n).join('|'), keep: OS.Me.PARTS.find(x => x.k === 'raizes').q[0] }));
+  ok('Entrevista: mais de 500 perguntas em 37 capítulos (mente e emoções, perdas, valores, identidade, sentidos, cartas…)', iv2.n >= 500 && iv2.parts >= 37 && ['Mente e emoções', 'Perdas e luto', 'Valores e crenças', 'Identidade e cultura', 'Os sentidos da memória', 'Cartas', 'A família que quero construir'].every(x => iv2.names.includes(x)) && /avós do lado da mãe/.test(iv2.keep), JSON.stringify({ n: iv2.n, parts: iv2.parts }));
+  // ---- Minha Evolução (juntou o Longo prazo) ----
+  await E(p, () => { location.hash = 'longterm'; }); await sleep(900); v = await view();
+  ok('Minha Evolução: o antigo Longo prazo abre aqui (mesmo visual) e o menu tem só "Minha Evolução"', (await E(p, () => location.hash)) === '#evolucao' && /Minha Evolução/.test(v) && await E(p, () => { const t = document.getElementById('view').textContent; return /Patrimônio · projeção/.test(t) && /Grandes metas/.test(t) && /Life Analytics/.test(t); }) && await E(p, () => { const t = [...document.querySelectorAll('#side .nav-g a')].map(a => a.textContent).join('|'); return /Minha Evolução/.test(t) && !/Longo prazo/.test(t); }));
+  ok('Minha Evolução: evolução por área (dinheiro, estudos, desporto, carreira, metas)', /Evolução por área/.test(v) && /Dinheiro/.test(v) && /Metas/.test(v));
+  await p.click('#view [data-act=evoAI]'); await p.waitForFunction(() => /Foco para os próximos 30 dias/i.test(document.getElementById('view').innerText), null, { timeout: 8000 }).catch(() => { }); v = await view();
+  ok('Minha Evolução: o Spyke analisa a evolução (nota, por área, foco para 30 dias)', /7\s*\/10/.test(v) && /Correr 3 vezes por semana/.test(v) && /Parado ou a piorar/i.test(v), v.slice(0, 200));
+  // ---- Centro de decisões com o Spyke ----
+  v = await go('decisoes', 600); ok('Decisões: "Pensar com o Spyke" no topo da página', /Pensar com o Spyke/.test(v) && !!(await p.$('#decThinkT')));
+  await p.fill('#decThinkT', 'Estou a pensar aceitar um trabalho ao fim de semana para juntar dinheiro, mas tenho medo de baixar as notas'); await p.click('#view [data-form=decThink] button');
+  await p.waitForFunction(() => /O que pesa mais/.test((document.querySelector('#drawer') || document.body).innerText), null, { timeout: 10000 }).catch(() => { });
+  const dd = await E(p, () => { const d = OS.all('decisions').find(x => x.title === 'Trabalho ao fim de semana'); const t = (document.querySelector('#drawer') || document.body).innerText; return { ok: !!d, alts: d ? d.alts.map(a => a.name).join('|') : '', an: !!(d && d.ai && d.ai.r), t: /Pontos fortes/i.test(t) && /Pontos fracos/i.test(t) && /Sobre o que escreveste/.test(t) && /As notas deste semestre/.test(t) && /Os dados apontam para: Não aceitar/.test(t), id: d && d.id }; });
+  ok('Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi', dd.ok && dd.alts === 'Aceitar|Não aceitar' && dd.an && dd.t, JSON.stringify(dd));
+  await p.click('#drawer [data-act=decWts]').catch(() => { }); await sleep(400);
+  ok('Decisões: "Usar estes pesos" aplica os pesos sugeridos à matriz', await E(p, id => { const w = (OS.get('decisions', id) || {}).weights || {}; return w.time === 5 && w.goals === 5 && w.cost === 2; }, dd.id));
+  await E(p, () => OS.UI.closeDrawer && OS.UI.closeDrawer());
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (extras 2)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 (async () => {
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

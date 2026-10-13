@@ -30,7 +30,7 @@ L.RUNT = ['Regenerativa', 'Rodagem', 'Longa', 'Fartlek', 'Intervalado', 'Tempo /
 L.WEEK = [['1', 'Segunda'], ['2', 'Terça'], ['3', 'Quarta'], ['4', 'Quinta'], ['5', 'Sexta'], ['6', 'Sábado'], ['0', 'Domingo']];
 L.TRACK = ['Conteúdos', 'Estudo', 'Exercícios', 'Projeto', 'Avaliação', 'Domínio'];
 L.SEM = ['1.º Semestre 26/27', '2.º Semestre 26/27', '1.º Semestre 27/28', '2.º Semestre 27/28', '1.º Semestre 28/29', '2.º Semestre 28/29', 'Por definir'];
-L.METRICS = [['manual', 'Manual (atualizo eu)'], ['account', 'Saldo de uma conta'], ['networth', 'Patrimônio líquido'], ['invested', 'Valor da carteira'], ['studyHours', 'Horas de estudo (desde o início)'], ['avgGrade', 'Média ponderada das disciplinas'], ['runKm', 'Km corridos (desde o início)'], ['run5k', 'Melhor tempo em 5 km (min)'], ['workouts', 'Treinos (desde o início)'], ['books', 'Livros concluídos (desde o início)'], ['movaRevenue', 'Receita da Mova (desde o início)'], ['contacts', 'Contactos na rede'], ['certs', 'Certificações concluídas'], ['steps', '% das etapas concluídas']];
+L.METRICS = [['manual', 'Manual (atualizo eu)'], ['account', 'Saldo de uma conta'], ['networth', 'Patrimônio líquido'], ['invested', 'Valor da carteira'], ['studyHours', 'Horas de estudo (desde o início)'], ['avgGrade', 'Média ponderada das disciplinas'], ['runKm', 'Km corridos (desde o início)'], ['run5k', 'Melhor tempo em 5 km (min)'], ['workouts', 'Treinos (desde o início)'], ['books', 'Livros concluídos (desde o início)'], ['movaRevenue', 'Receita da Mova (desde o início)'], ['contacts', 'Contactos na rede'], ['certs', 'Certificações concluídas'], ['steps', '% das etapas concluídas'], ['linked', '% das tarefas e projetos ligados a esta meta']];
 L.QUOTES = ["A dor da disciplina pesa gramas. A dor do arrependimento pesa toneladas.", "Ninguém vem te salvar. Ou você se levanta, ou continua exatamente onde está.", "Não é falta de tempo. É falta de prioridade.", "A prova não é o dia do exame. A prova é cada dia antes dele.", "Quem não revê, esquece. Quem esquece, estudou para nada.", "Quem não controla o dinheiro é controlado por ele.", "Rico não é quem ganha muito. É quem gasta menos do que ganha, durante muito tempo.", "Cada compra por impulso é um voto contra o teu futuro.", "Ninguém se arrepende de um treino. Todos se arrependem de faltar.", "Tu não és o que dizes que vais fazer. És o que fazes quando ninguém está a ver.", "Motivação faz-te começar. Hábito faz-te continuar.", "Um dia ou dia um. Tu decides.", "Tu não sobes ao nível dos teus objetivos; desces ao nível da tua rotina.", "O Ryan de daqui a 5 anos está a ver o que fazes hoje.", "Sê implacável com as tuas desculpas e paciente com o teu progresso.", "Enquanto Deus continuar a te despertar a cada manhã, é porque Ele ainda tem planos para a sua vida.", "Não vos conformeis com este século, mas transformai-vos pela renovação da vossa mente.", "Disciplina ou arrependimento. Escolha a sua dor.", "Consistência supera intensidade.", "Ascensão é obrigatória. Estagnação não é opção."];
 
 /* ================= SINGLETONS ================= */
@@ -98,7 +98,7 @@ S.goals = { label: 'Meta', title: r => r.title, fields: [
   F('title', 'Meta', 'text', { req: 1, wide: 1 }), F('cat', 'Categoria', 'sel', { o: L.GCAT, req: 1 }), F('horizon', 'Horizonte', 'sel', { o: L.HORIZON, req: 1 }),
   F('start', 'Início', 'date'), F('due', 'Prazo', 'date'), F('importance', 'Importância', 'rating'),
   F('metric', 'Como medir', 'sel', { o: L.METRICS, req: 1 }), rel('account', 'Conta', 'accounts', { show: r => r.metric === 'account' }),
-  F('target', 'Alvo', 'num', { show: r => r.metric !== 'steps' }), F('base', 'Valor inicial', 'num', { show: r => r.metric === 'manual' || r.metric === 'run5k', h: 'Ponto de partida' }),
+  F('target', 'Alvo', 'num', { show: r => r.metric !== 'steps' && r.metric !== 'linked' }), F('base', 'Valor inicial', 'num', { show: r => r.metric === 'manual' || r.metric === 'run5k', h: 'Ponto de partida' }),
   F('cur', 'Valor atual', 'num', { show: r => r.metric === 'manual' }), F('unit', 'Unidade', 'text', { show: r => r.metric === 'manual', ph: 'ex.: livros, €, kg' }),
   F('status', 'Estado', 'sel', { o: ['Ativa', 'Pausada', 'Concluída', 'Abandonada'] }),
   F('steps', 'Etapas', 'steps'), F('why', 'Porquê', 'area', { rows: 2 })
@@ -595,11 +595,14 @@ Goal.value = g => {
     case 'contacts': return OS.all('contacts').length;
     case 'certs': return OS.all('learn').filter(l => l.kind === 'Certificação' && l.status === 'Concluído').length + OS.all('certs').filter(c => c.status === 'Obtida').length;
     case 'steps': { const s = g.steps || []; return s.length ? U.r1(s.filter(x => x.done).length / s.length * 100) : 0; }
+    // progresso pelas tarefas e projetos ligados à meta (tarefas de um projeto já ligado contam dentro do projeto)
+    case 'linked': { const P = OS.all('projects').filter(x => x.goal === g.id && x.status !== 'Cancelado'), inP = new Set(P.map(x => x.id)), T = OS.all('tasks').filter(t => t.goal === g.id && !inP.has(t.project));
+      const v = T.map(t => t.status === 'Feita' ? 1 : 0).concat(P.map(x => x.status === 'Concluído' ? 1 : OS.Proj.info(x).prog)); return v.length ? U.r1(U.avg(v) * 100) : 0; }
     default: return U.num(g.cur);
   }
 };
 Goal.info = g => {
-  const cur = Goal.value(g), tgt = g.metric === 'steps' ? 100 : U.num(g.target);
+  const cur = Goal.value(g), tgt = g.metric === 'steps' || g.metric === 'linked' ? 100 : U.num(g.target);
   let p;
   if (Goal.lower(g)) { const base = U.num(g.base) || (cur != null ? cur * 1.2 : 0); p = cur == null ? 0 : base === tgt ? (cur <= tgt ? 1 : 0) : U.clamp((base - cur) / (base - tgt), 0, 1); }
   else { const base = g.metric === 'manual' ? U.num(g.base) : 0; p = tgt - base ? U.clamp((U.num(cur) - base) / (tgt - base), 0, 1) : 0; }
@@ -611,7 +614,7 @@ Goal.info = g => {
   const tasks = OS.all('tasks').filter(t => t.goal === g.id), projects = OS.all('projects').filter(x => x.goal === g.id);
   return { cur, tgt, p, exp, late, behind, st, tasks, projects };
 };
-Goal.fmt = (g, v) => { if (v == null) return '—'; if (['account', 'networth', 'invested', 'movaRevenue'].includes(g.metric)) return U.eur(v, { dec: 0 }); if (g.metric === 'run5k') return U.mmss(v * 60); if (g.metric === 'studyHours') return U.nf(v, 1) + ' h'; if (g.metric === 'runKm') return U.nf(v, 1) + ' km'; if (g.metric === 'steps') return Math.round(v) + '%'; return U.nf(v, v % 1 ? 1 : 0) + (g.unit ? ' ' + g.unit : ''); };
+Goal.fmt = (g, v) => { if (v == null) return '—'; if (['account', 'networth', 'invested', 'movaRevenue'].includes(g.metric)) return U.eur(v, { dec: 0 }); if (g.metric === 'run5k') return U.mmss(v * 60); if (g.metric === 'studyHours') return U.nf(v, 1) + ' h'; if (g.metric === 'runKm') return U.nf(v, 1) + ' km'; if (g.metric === 'steps' || g.metric === 'linked') return Math.round(v) + '%'; return U.nf(v, v % 1 ? 1 : 0) + (g.unit ? ' ' + g.unit : ''); };
 
 /* ---- Projetos ---- */
 const Proj = OS.Proj = {};

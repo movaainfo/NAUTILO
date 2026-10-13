@@ -7,7 +7,7 @@
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
-OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: true, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false };
+OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false };
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
@@ -15,7 +15,13 @@ const S = OS.Spyke = {};
 OS.S.spymem = { label: 'Memória do Spyke', title: r => String(r.text || '').slice(0, 60), fields: [{ k: 'text', l: 'O que o Spyke sabe', t: 'area', req: 1, rows: 3 }, { k: 'date', l: 'Desde', t: 'date' }] , defaults: () => ({ date: U.today(), src: 'manual' }) };
 OS.S.spyroutines = { label: 'Rotina de voz', title: r => r.phrase || 'Rotina', fields: [{ k: 'phrase', l: 'Quando eu disser', t: 'text', req: 1, ph: 'ex.: modo leitura' }, { k: 'steps', l: 'O Spyke faz (um comando por linha)', t: 'area', rows: 5, req: 1, ph: 'abre as Leituras\nclima\nnotícias' }, { k: 'reply', l: 'E diz no fim (opcional)', t: 'text' }] };
 const N = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w\s€.,:%-]/g, ' ').replace(/\s+/g, ' ').trim();
-const WAKE = /\b(e?sp[aey]i?[ck]+e?|spike|spyke|spaik|spaiki|espaique|espaike|espique|spaique)\b/;
+// o nome dele como o ditado do iPhone o escreve: Spyke, Spike, Spaik, Espaique, Spike's, Speak…
+const WAKE = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|espa[iy]\w*|espi[ck]\w*|speak|spai|spy)\b/;
+const WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
+const FILLW = new Set(['ei', 'hey', 'oi', 'ola', 'ok', 'okay', 'e', 'ai', 'eai', 'fala', 'o', 'ah', 'eh']);
+// tira o nome (e o "ei", "olá", "e aí" logo antes) e devolve o resto, com acentos: "Bom dia, Spike" → "Bom dia"; "Spike" → ""; sem nome → null
+const wakeSplit = raw => { const T = String(raw || '').split(/\s+/).filter(Boolean), w = x => N(x).replace(/[^\w]/g, ''), k = T.findIndex(x => WAKET.test(w(x))); if (k < 0) return null;
+  let a = k; while (a > 0 && FILLW.has(w(T[a - 1]))) a--; return T.slice(0, a).concat(T.slice(k + 1)).join(' ').replace(/^[\s,.:;!?-]+|[\s,;:-]+$/g, '').trim(); };
 const name = () => OS.one('profile').short || 'Ryan';
 const eurS = v => { const n = Math.abs(U.num(v)); return (Math.abs(n - Math.round(n)) < .005 ? Math.round(n) : n.toFixed(2).replace('.', ',')) + ' euros'; };
 const listS = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1];
@@ -174,18 +180,21 @@ S.listen = async (lo = {}) => { if (!SR) { open(); setSt('idle'); cap('spyke', '
 let earConf = 1, ear = null, appIn = false, earStopped = false, earBlock = 0, earTaps = 0, earErr = '', earFull = '', earBase = '', earT = 0, earFails = 0, earAt = 0, curSay = '', sayEnd = 0, bgPaused = 0;
 const SAYSTOP = /^(?:e?sp\w*\s+)?(?:para|pare|parar|chega|cala|silencio|stop)\b/;
 const EARSTOP = /\b(para|pare|parar|deixa|deixe|desliga|desligue|desativa|desative)\s+(?:de\s+)?(ouvir|escutar|o microfone|a escuta|microfone)\b|\b(vai|pode ir) dormir\b/;
-const earWanted = () => !!SR && appIn && !earStopped && !earBlock && !document.hidden && !bgPaused && !!cfg().always && (!navigator.webdriver || !!window.__spyEar);
+let hush = false; // true enquanto o Spyke prepara a resposta e fala (o microfone descansa)
+const earWanted = () => !!SR && appIn && !earStopped && !earBlock && !hush && !document.hidden && !bgPaused && !!cfg().always && (!navigator.webdriver || !!window.__spyEar);
 const earMark = () => { clearTimeout(earT); earBase = earFull; };
 const cut = full => { if (full.startsWith(earBase)) return full.slice(earBase.length); let i = 0; const m = Math.min(full.length, earBase.length); while (i < m && full[i] === earBase[i]) i++; return full.slice(i); };
 // o que o Spyke acabou de dizer e o microfone apanhou não conta como pedido teu
 const echo = n => { if (!curSay || Date.now() - sayEnd > 3500 && st !== 'speaking') return false; const w = n.split(' ').filter(x => x.length > 2); return w.length > 0 && w.filter(x => curSay.includes(x)).length / w.length >= .7; };
-const rawAfterWake = s => { const m = s.match(/^.*?\b(e?sp[aeiy]+[ck]+[eiy]?|spike|spyke|spaik\w*|espa[iy]\w*|espique)\b[\s,.:!?]*/i); return m ? s.slice(m[0].length).trim() : ''; };
+let armed = 0; // depois de ouvir só "Spyke", a frase seguinte (até 10 s) é o comando
 const earPhrase = s => { const n = N(s); if (!n || echo(n)) return; if (earConf > 0 && earConf < .3 && !WAKE.test(n)) return; // barulho mal reconhecido
-  if (EARSTOP.test(n)) { push('user', s); return earQuit(true); }
-  const m = n.match(WAKE), inConv = st === 'listening' || (cfg().cont && convOn());
-  if (m) { const cmd = n.slice(m.index + m[0].length).replace(/^[\s,.:]+/, ''); S.wakeFx(); convGo(); clearTimeout(lsT);
-    if (cmd.length > 2) { S.handle(rawAfterWake(s) || cmd); } else { push('user', s); S.say(pickR(['Sim, ' + name() + '?', 'Às ordens.', 'Diz.', 'Estou a ouvir.']), { listen: true }); } return; }
-  if (inConv) { convGo(); clearTimeout(lsT); S.handle(s); } };
+  if (EARSTOP.test(n) && (WAKE.test(n) || armed > Date.now() || st === 'listening')) { push('user', s); armed = 0; return earQuit(true); }
+  const cmd = wakeSplit(s), inConv = st === 'listening' || armed > Date.now() || (cfg().cont && convOn());
+  if (cmd !== null) { S.wakeFx(); convGo(); clearTimeout(lsT);
+    if (N(cmd).length > 1) { armed = 0; S.handle(cmd); return; }
+    // só o nome: um som curto e fica à espera do pedido (sem falar)
+    armed = Date.now() + 10000; setSt('listening'); const l = el && el.querySelector('.spy-st'); if (l) l.textContent = 'Diz o que precisas…'; lsT = setTimeout(() => { if (st === 'listening' && armed <= Date.now()) setSt('idle'); }, 10500); return; }
+  if (inConv) { armed = 0; convGo(); clearTimeout(lsT); S.handle(s); } };
 const earTake = () => { clearTimeout(earT); const s = cut(earFull).trim(); earBase = earFull; const n0 = msgs.length; if (s && st !== 'speaking' && st !== 'thinking') earPhrase(s); if (live && msgs.length === n0) { live = ''; renderChat(); } };
 const earStart = () => { if (ear || !earWanted()) return; let r; try { r = new SR(); } catch (e) { return; }
   r.lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1; earFull = earBase = ''; let got = false;
@@ -193,7 +202,7 @@ const earStart = () => { if (ear || !earWanted()) return; let r; try { r = new S
     if (st === 'speaking' || st === 'thinking') { const n = N(fresh); if (!cfg().barge || echo(n)) return;
       if (WAKE.test(n)) { earMark(); S.stop(); convGo(); push('spyke', 'Sim?'); S.listen({ follow: true }); } else if (SAYSTOP.test(n)) { earMark(); S.stop(); } return; }
     if ((st === 'listening' || convOn()) && el && !el.hidden && !echo(N(fresh))) cap('user', fresh);
-    clearTimeout(earT); if (e.results[e.results.length - 1].isFinal) earTake(); else earT = setTimeout(earTake, 1200); };
+    clearTimeout(earT); if (e.results[e.results.length - 1].isFinal) earTake(); else earT = setTimeout(earTake, 1500); };
   r.onerror = e => { earErr = e.error || ''; if (earErr === 'not-allowed' || earErr === 'service-not-allowed') { earBlock = Date.now(); earNeedTap(earErr); } };
   r.onend = () => { if (ear !== r) return; ear = null; if (earT) earTake(); setEarCls(); const quick = !got && Date.now() - earAt < 2500; earFails = quick ? earFails + 1 : 0;
     if (earWanted()) setTimeout(earStart, quick ? Math.min(15000, 400 * Math.pow(2, earFails)) : 250); else outSession(); };
@@ -243,6 +252,13 @@ const bgSync = () => { if (document.hidden) { earOff(); stopClap(); return; } if
 S._bgSync = () => bgSync();
 document.addEventListener('visibilitychange', () => setTimeout(bgSync, document.hidden ? 0 : 500));
 OS.on('one:spyke', () => setTimeout(bgSync, 100));
+// vigia: se uma resposta encravar (rede, IA, voz), o microfone nunca fica desligado — ao fim de 75 s volta a ouvir sozinho
+let stAt = Date.now(), stWas = '';
+setInterval(() => { if (st !== stWas) { stWas = st; stAt = Date.now(); }
+  if (hush && st !== 'speaking' && st !== 'thinking') { hush = false; bgSync(); }
+  else if ((st === 'thinking' || st === 'speaking') && Date.now() - stAt > 75000 && !(st === 'speaking' && (playing || (window.speechSynthesis && window.speechSynthesis.speaking)))) { try { S.stop(); } catch (e) { } setSt('idle'); } }, 3000);
+// uma vez: escuta sempre ligada, só responde ao nome e sem "interromper falando" (no iPhone ele ouvia a própria voz e interrompia-se)
+OS.on('ready', () => { const c = OS.one('spyke'); if (c.fix3 !== 1) OS.setOne('spyke', { always: true, convWin: -1, barge: false, fix3: 1 }); });
 // ao entrar (depois do Face ID ou do código) começa logo a ouvir: podes falar sem tocar em nada
 OS.on('unlock', () => { appIn = true; earStopped = false; earBlock = 0; earTaps = 0; if (cfg().always && SR && !strict() && (!navigator.webdriver || window.__spyEar)) convGo(Math.max(60000, win())); bgSync(); });
 
@@ -375,7 +391,9 @@ const bargeOn = () => { if (ear || !cfg().barge || !SR || barge || st !== 'speak
   r.onresult = e => { for (let i = e.resultIndex; i < e.results.length; i++) { if (WAKE.test(N(e.results[i][0].transcript))) { bargeOff(); S.stop(); convGo(); push('spyke', 'Sim?'); setTimeout(() => S.listen({ follow: true }), 200); return; } } };
   r.onerror = () => { }; r.onend = () => { if (barge === r) { barge = null; if (st === 'speaking') setTimeout(bargeOn, 250); } }; barge = r; try { r.start(); } catch (e) { barge = null; } };
 const idleTxt = () => ear ? (convOn() ? 'A ouvir. Fala à vontade.' : 'A ouvir. Diz "Spyke" para chamar.') : earStopped ? 'Microfone desligado. Toca no microfone para falar.' : 'Toca no microfone e fala';
-const setSt = s => { if ((st === 'speaking') !== (s === 'speaking')) { earMark(); if (st === 'speaking') sayEnd = Date.now(); } st = s; if (s === 'speaking') setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
+const setSt = s => { if ((st === 'speaking') !== (s === 'speaking')) { earMark(); if (st === 'speaking') sayEnd = Date.now(); }
+  const talk = s === 'speaking' || s === 'thinking'; if (talk && !hush && !cfg().barge) { hush = true; earOff(); } else if (!talk && hush) { hush = false; setTimeout(bgSync, 350); }
+  st = s; if (s === 'speaking') setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
 const bubbles = () => msgs.map(m => `<div class="spy-m ${m.r}"><div class="spy-bb">${esc(m.t)}${m.tap ? `<button class="btn xs pri spy-tap" data-act="spyTap">${UI.ic('play')}Ouvir</button>` : ''}</div></div>`).join('') + (live ? `<div class="spy-m user live"><div class="spy-bb">${esc(live)}</div></div>` : '');
 const renderChat = () => { if (!el) return; const c = el.querySelector('.spy-chat'); if (!c) return; c.innerHTML = bubbles() || `<div class="spy-empty">Diz "Bom dia", pede uma tarefa ou pergunta qualquer coisa.</div>`; c.scrollTop = c.scrollHeight; if (st === 'speaking') setSt('speaking'); };
 const push = (r, t) => { live = ''; msgs.push({ r, t: String(t) }); if (msgs.length > 40) msgs = msgs.slice(-40); renderChat(); };
@@ -510,7 +528,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     ${SR ? '' : '<p class="neg" style="font-size:12.5px;margin:8px 0 0">Este navegador não tem reconhecimento de voz: usa o Safari no iPhone ou o Chrome.</p>'}</div>
   <div class="pn"><div class="pn-h"><h3>Conversa</h3></div>
     <label class="switch"><input type="checkbox" data-bind="spyke.cont" ${c.cont ? 'checked' : ''}><span></span>Conversa contínua: depois de responder continua a ouvir sem dizeres o nome outra vez</label>
-    <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.barge" ${c.barge ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Interromper: diz "Spyke" enquanto ele fala e ele para e ouve-te</label>
+    <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.barge" ${c.barge ? 'checked' : ''} ${SR ? '' : 'disabled'}><span></span>Interromper por voz: diz "Spyke, para" enquanto ele fala (no iPhone pode ouvir a própria voz e interromper-se; deixa desligado se isso acontecer — podes sempre tocar no ecrã para o parar)</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.alerts" ${c.alerts ? 'checked' : ''}><span></span>Avisos falados: 30 e 10 min antes dos compromissos, contas do dia, tarefas às 18h, prova amanhã, inegociáveis às 21h (nunca entre as 23h e as 8h)</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.newsBrief" ${c.newsBrief ? 'checked' : ''}><span></span>Três notícias no resumo do dia</label>
     <label class="switch" style="margin-top:8px"><input type="checkbox" data-bind="spyke.jarvisStart" ${c.jarvisStart ? 'checked' : ''}><span></span>Abrir o modo Jarvis quando abro a app</label></div>

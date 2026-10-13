@@ -167,6 +167,7 @@ const answer = r => { const a = r.ans, nv = NV[a.nivel] || NV.neutro;
     ${r.ver && !r.ver.ok && r.ver.prob.length ? `<details class="tog"><summary>O que o verificador corrigiu</summary><ul>${r.ver.prob.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''}
     ${r.src && r.src.length ? `<div class="ia-src"><b>Fontes da pesquisa</b>${r.src.map(s => `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t || s.u)}</a>`).join('')}</div>` : ''}</div>`; };
 IA.render = r => answer(r);
+IA.raw = raw; IA.textOf = textOf; IA.parseJ = parseJ;
 const lst = (t, a, c) => a.length ? `<div class="sai-l ${c}"><b>${t}</b><ul>${a.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
 document.addEventListener('input', e => { if (e.target.id === 'iaQ') ST.q = e.target.value; if (e.target.id === 'iaAmt') ST.amt = e.target.value; });
 document.addEventListener('change', e => { if (e.target.id === 'iaWeb') OS.ui.iaWeb = e.target.checked; });
