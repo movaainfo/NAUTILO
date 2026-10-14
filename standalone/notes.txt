@@ -1,5 +1,5 @@
-Spyke sem barulho de microfone: deixou de usar o ditado do iPhone (que fazia som ao entrar e ao sair da app). Agora ouve em silêncio, com o microfone aberto uma vez.
-Espera que acabes de falar: só responde depois de uma pausa a sério (1,2 s; podes mudar em Definições → Spyke → "Espera antes de responder") e não corta a frase a meio.
-Interromper falando: se começares a falar enquanto ele fala, ele pára logo, ouve-te e continua a conversa a partir do que disseste. Se era só o eco da voz dele, continua de onde estava.
-Percebe melhor: transcreve a frase inteira com a IA (Google, ou Microsoft se tiveres a chave).
-Sabe tudo: leva o resumo completo da tua vida em cada pergunta, procura em toda a app (notas, livros, biografia, movimentos…) e pesquisa na internet. Responde mais depressa.
+Spyke só acorda com o nome: conversa à volta (televisão, outras pessoas) já não o abre nem o faz falar. Chamar é dizer "Spyke" no início ou no fim da frase.
+A transcrição já não "inventa" o nome a partir de ruído, e o Spyke deixa de ficar à escuta para sempre depois de uma conversa.
+Avisos (compromissos, contas, tarefas…) aparecem no ecrã em silêncio; tocas para ouvir. Se quiseres que os leia sozinho: Definições → Spyke.
+Palmas desligadas (só o nome chama o Spyke); podes voltar a ligá-las em Definições → Spyke.
+Verificação em todos os aparelhos (iPhone, Android, tablet ao alto e deitado, computador): corrigidos o Orçamento, a Inteligência das Finanças, a Alocação dos investimentos e as barras das metas, que saíam do ecrã no telemóvel.

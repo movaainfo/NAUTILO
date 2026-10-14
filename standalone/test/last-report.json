@@ -3,13 +3,13 @@
   "p": "iPhone",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "939 ms"
+  "info": "416 ms"
  },
  {
   "p": "iPhone",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.18"
+  "info": "MIND CONTROL · v2.19"
  },
  {
   "p": "iPhone",
@@ -69,11 +69,11 @@
   "p": "iPhone",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 169 ms"
+  "info": "máx 173 ms"
  },
  {
   "p": "iPhone",
-  "name": "567 botões carregados sem erro",
+  "name": "566 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -111,13 +111,13 @@
   "p": "Android tel",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "438 ms"
+  "info": "396 ms"
  },
  {
   "p": "Android tel",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.18"
+  "info": "MIND CONTROL · v2.19"
  },
  {
   "p": "Android tel",
@@ -177,11 +177,11 @@
   "p": "Android tel",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 170 ms"
+  "info": "máx 130 ms"
  },
  {
   "p": "Android tel",
-  "name": "567 botões carregados sem erro",
+  "name": "566 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -219,13 +219,13 @@
   "p": "Tablet horiz",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "3044 ms"
+  "info": "2987 ms"
  },
  {
   "p": "Tablet horiz",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.18"
+  "info": "MIND CONTROL · v2.19"
  },
  {
   "p": "Tablet horiz",
@@ -271,7 +271,7 @@
  },
  {
   "p": "Tablet horiz",
-  "name": "164 páginas abrem com conteúdo",
+  "name": "165 páginas abrem com conteúdo",
   "pass": true,
   "info": ""
  },
@@ -285,11 +285,11 @@
   "p": "Tablet horiz",
   "name": "páginas rápidas (processador 6× mais lento)",
   "pass": true,
-  "info": "máx 636 ms"
+  "info": "máx 479 ms"
  },
  {
   "p": "Tablet horiz",
-  "name": "565 botões carregados sem erro",
+  "name": "573 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -315,7 +315,7 @@
   "p": "Tablet horiz",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1045 elementos"
+  "info": "heap +0 MB · 1062 elementos"
  },
  {
   "p": "Tablet horiz",
@@ -327,13 +327,13 @@
   "p": "Tablet vert",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "472 ms"
+  "info": "404 ms"
  },
  {
   "p": "Tablet vert",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.18"
+  "info": "MIND CONTROL · v2.19"
  },
  {
   "p": "Tablet vert",
@@ -393,11 +393,11 @@
   "p": "Tablet vert",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 180 ms"
+  "info": "máx 135 ms"
  },
  {
   "p": "Tablet vert",
-  "name": "578 botões carregados sem erro",
+  "name": "577 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -435,13 +435,13 @@
   "p": "Computador",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "454 ms"
+  "info": "385 ms"
  },
  {
   "p": "Computador",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.18"
+  "info": "MIND CONTROL · v2.19"
  },
  {
   "p": "Computador",
@@ -501,11 +501,11 @@
   "p": "Computador",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 200 ms"
+  "info": "máx 146 ms"
  },
  {
   "p": "Computador",
-  "name": "576 botões carregados sem erro",
+  "name": "575 botões carregados sem erro",
   "pass": true,
   "info": ""
  },
@@ -621,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 13/10/2026 · Spyke sem barulho de microfone: deixou de"
+  "info": "Atualizado · versão 9.9 · 14/10/2026 · Spyke só acorda com o nome: conversa à vo"
  },
  {
   "p": "Geral",
@@ -885,7 +885,7 @@
   "p": "Geral",
   "name": "terminar: treino guardado com as séries feitas",
   "pass": true,
-  "info": "{\"n\":1,\"sets\":[{\"t\":\"N\",\"kg\":60,\"reps\":10},{\"t\":\"N\",\"kg\":62.5,\"reps\":8}],\"title\":\"Costas & Bíceps\",\"dur\":1}"
+  "info": "{\"n\":1,\"sets\":[{\"t\":\"N\",\"kg\":60,\"reps\":10},{\"t\":\"N\",\"kg\":62.5,\"reps\":8}],\"title\":\"Pernas\",\"dur\":1}"
  },
  {
   "p": "Geral",
@@ -981,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"khxjvr0vqa3\",\"_c\":1791916606155,\"_u\":1791916606155,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-14\",\"meal\":\"Pequeno-almoço\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"ey1zn4e8lfm\",\"_c\":1791939041410,\"_u\":1791939041410,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1131,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-13\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"ix57sd0w6zw\",\"_c\":1791916627820,\"_u\":1791916627820,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-14\",\"meal\":\"Pequeno-almoço\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"wmw4gfe91zv\",\"_c\":1791939062875,\"_u\":1791939062875,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1365,13 +1365,13 @@
   "p": "Geral",
   "name": "todos os tipos: venda a descoberto (ganha quando o preço cai, perde quando sobe)",
   "pass": true,
-  "info": "{\"qty\":-10,\"avg\":10,\"cost\":-100,\"value\":-120,\"pl\":-20,\"ret\":-0.2,\"realized\":0,\"divs\":0,\"gross\":0,\"taxW\":0,\"fees\":0,\"total\":-20,\"exposure\":120,\"short\":true,\"lev\":null,\"price\":12,\"stale\":false,\"hasPrice\":true,\"first\":\"2026-09-13\"}"
+  "info": "{\"qty\":-10,\"avg\":10,\"cost\":-100,\"value\":-120,\"pl\":-20,\"ret\":-0.2,\"realized\":0,\"divs\":0,\"gross\":0,\"taxW\":0,\"fees\":0,\"total\":-20,\"exposure\":120,\"short\":true,\"lev\":null,\"price\":12,\"stale\":false,\"hasPrice\":true,\"first\":\"2026-09-14\"}"
  },
  {
   "p": "Geral",
   "name": "todos os tipos: opções com multiplicador e CFD alavancado (margem + resultado)",
   "pass": true,
-  "info": "[{\"qty\":2,\"avg\":3,\"cost\":600,\"value\":800,\"pl\":200,\"ret\":0.3333333333333333,\"realized\":0,\"divs\":0,\"gross\":0,\"taxW\":0,\"fees\":0,\"total\":200,\"exposure\":800,\"short\":false,\"lev\":null,\"price\":4,\"stale\":false,\"hasPrice\":true,\"first\":\"2026-10-03\"},{\"qty\":10,\"avg\":100,\"cost\":100,\"value\":200,\"pl\":100,\"ret\":1,\"realized\":0,\"divs\":0,\"gross\":0,\"taxW\":0,\"fees\":0,\"total\":100,\"exposure\":1100,\"short\":false,\"lev\":11,\"price\":110,\"stale\":false,\"hasPrice\":true,\"first\":\"2026-10-03\"}]"
+  "info": "[{\"qty\":2,\"avg\":3,\"cost\":600,\"value\":800,\"pl\":200,\"ret\":0.3333333333333333,\"realized\":0,\"divs\":0,\"gross\":0,\"taxW\":0,\"fees\":0,\"total\":200,\"exposure\":800,\"short\":false,\"lev\":null,\"price\":4,\"stale\":false,\"hasPrice\":true,\"first\":\"2026-10-04\"},{\"qty\":10,\"avg\":100,\"cost\":100,\"value\":200,\"pl\":100,\"ret\":1,\"realized\":0,\"divs\":0,\"gross\":0,\"taxW\":0,\"fees\":0,\"total\":100,\"exposure\":1100,\"short\":false,\"lev\":11,\"price\":110,\"stale\":false,\"hasPrice\":true,\"first\":\"2026-10-04\"}]"
  },
  {
   "p": "Geral",
@@ -1383,7 +1383,7 @@
   "p": "Geral",
   "name": "todos os tipos: desdobramento, bonificação, transferências, amortização e JCP líquido",
   "pass": true,
-  "info": "{\"qty\":200,\"avg\":4.76,\"cost\":952,\"value\":1000,\"pl\":48,\"ret\":0.05042016806722689,\"realized\":0,\"divs\":85,\"gross\":100,\"taxW\":15,\"fees\":0,\"total\":133,\"exposure\":1000,\"short\":false,\"lev\":null,\"price\":5,\"stale\":false,\"hasPrice\":true,\"first\":\"2025-09-08\"}"
+  "info": "{\"qty\":200,\"avg\":4.76,\"cost\":952,\"value\":1000,\"pl\":48,\"ret\":0.05042016806722689,\"realized\":0,\"divs\":85,\"gross\":100,\"taxW\":15,\"fees\":0,\"total\":133,\"exposure\":1000,\"short\":false,\"lev\":null,\"price\":5,\"stale\":false,\"hasPrice\":true,\"first\":\"2025-09-09\"}"
  },
  {
   "p": "Geral",
@@ -2337,7 +2337,7 @@
   "p": "Novidades",
   "name": "Spyke: com o nome responde logo",
   "pass": true,
-  "info": "São 18:40."
+  "info": "São 00:53."
  },
  {
   "p": "Novidades",
@@ -2349,7 +2349,7 @@
   "p": "Novidades",
   "name": "Spyke: \"Spike, bom dia\" dá o resumo do dia (escrito \"Spike\", como o iPhone ouve)",
   "pass": true,
-  "info": "Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro. A agenda está livre de compr"
+  "info": "Bom dia, Ryan. Hoje é quarta-feira, 14 de outubro. A agenda está livre de compro"
  },
  {
   "p": "Novidades",
@@ -2367,13 +2367,13 @@
   "p": "Novidades",
   "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
   "pass": true,
-  "info": "São 18:40."
+  "info": "São 00:54."
  },
  {
   "p": "Novidades",
   "name": "Spyke: com uma pausa depois do nome (\"Spike… que dia é hoje\") faz o pedido",
   "pass": true,
-  "info": "Hoje é terça-feira, 13 de outubro."
+  "info": "Hoje é quarta-feira, 14 de outubro."
  },
  {
   "p": "Novidades",
@@ -2607,7 +2607,7 @@
   "p": "Novidades",
   "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
   "pass": true,
-  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 13/10, 18:41\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 14/10, 00:54\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
  },
  {
   "p": "Novidades",
@@ -2667,7 +2667,7 @@
   "p": "Novidades",
   "name": "agenda Google: o Spyke consegue marcar eventos na agenda Google",
   "pass": true,
-  "info": "{\"k\":\"k\",\"op\":\"ce\",\"t\":\"Dentista\",\"d\":\"2026-10-18\",\"h\":\"10:00\"}"
+  "info": "{\"k\":\"k\",\"op\":\"ce\",\"t\":\"Dentista\",\"d\":\"2026-10-19\",\"h\":\"10:00\"}"
  },
  {
   "p": "Novidades",
@@ -3153,7 +3153,7 @@
   "p": "Novos",
   "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
   "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"3rfrr514v6g\"}"
+  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"cem1x7ehm8i\"}"
  },
  {
   "p": "Novos",
@@ -3465,7 +3465,7 @@
   "p": "Extras",
   "name": "País: a app guarda quando mudaste de país (Portugal → Brasil hoje)",
   "pass": true,
-  "info": "[[\"\",\"PT\"],[\"2026-10-13\",\"BR\"]]"
+  "info": "[[\"\",\"PT\"],[\"2026-10-14\",\"BR\"]]"
  },
  {
   "p": "Extras",
@@ -3609,7 +3609,7 @@
   "p": "Extras",
   "name": "Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi",
   "pass": true,
-  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"eltkf715ujb\"}"
+  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"0zv3s9eil3m\"}"
  },
  {
   "p": "Extras",
@@ -3627,19 +3627,19 @@
   "p": "Voz",
   "name": "Voz Gemini: o pedido leva só o texto do resumo (nenhuma instrução para ler em voz alta)",
   "pass": true,
-  "info": "[\"Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro.\",\"A agenda está livre de compromissos com hora. Treino de hoje\"]"
+  "info": "[\"Bom dia, Ryan. Hoje é quarta-feira, 14 de outubro.\",\"A agenda está livre de compromissos com hora. Treino de hoje\"]"
  },
  {
   "p": "Voz",
   "name": "Voz Gemini: a língua vai na configuração da voz (pt-BR) e a voz é a mesma",
   "pass": true,
-  "info": "{\"at\":49,\"text\":\"Boa tarde, Ryan. Hoje é terça-feira, 13 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
+  "info": "{\"at\":33,\"text\":\"Bom dia, Ryan. Hoje é quarta-feira, 14 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
  },
  {
   "p": "Voz",
   "name": "Resumo: o 1.º pedaço é só a saudação (começa a falar em segundos) e o resto é pedido logo a seguir, em paralelo",
   "pass": true,
-  "info": "[[49,51],[49,218]]"
+  "info": "[[33,50],[33,164]]"
  },
  {
   "p": "Voz",
@@ -3663,13 +3663,13 @@
   "p": "Ouvido",
   "name": "Fala → espera que acabes (pausa de ~1,2 s) → transcreve a frase inteira → responde",
   "pass": true,
-  "info": "{\"n\":1,\"espera\":1254}"
+  "info": "{\"n\":1,\"espera\":1261}"
  },
  {
   "p": "Ouvido",
   "name": "Transcrição pelo modelo mais rápido (lite)",
   "pass": true,
-  "info": "{\"at\":1791917086019,\"model\":\"gemini-3.5-flash-lite\"}"
+  "info": "{\"at\":1791939515078,\"model\":\"gemini-3.5-flash-lite\",\"pr\":\"Transcreve exatamente o que a pessoa diz neste áudio (português do Brasil). Pode estar a chamar um assistente chamado Spyke (diz-se \\\"spaique\\\"): só escreves \\\"Spyke\\\" se esse nome for mesmo dito, nunca o acrescentes. Não completes nem inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -\"}"
  },
  {
   "p": "Ouvido",
@@ -3703,6 +3703,36 @@
  },
  {
   "p": "Ouvido",
+  "name": "Só com o nome: conversa à volta sem o nome (ou com o nome perdido a meio) não abre o Spyke nem o faz falar",
+  "pass": true,
+  "info": "{\"q0\":{\"plays\":8,\"n\":8},\"q1\":{\"plays\":8,\"n\":8,\"open\":false,\"st\":\"idle\"},\"stt\":2}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Chamar = dizer o nome no início ou no fim da frase",
+  "pass": true,
+  "info": "true,true,true,false"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Avisos: aparecem no ecrã em silêncio (o Spyke não fala sozinho; tocas no aviso para ouvir)",
+  "pass": true,
+  "info": "{\"banner\":\"Aviso do SpykeRyan, daqui a 20 minutos tens Reunião de teste do aviso, às 01:18.×\",\"plays\":0,\"st\":\"idle\",\"open\":false}"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Transcrição sem \"inventar\" o nome: a IA só escreve Spyke se o nome for mesmo dito",
+  "pass": true,
+  "info": "Transcreve exatamente o que a pessoa diz neste áudio (português do Brasil). Pode estar a chamar um assistente chamado Spyke (diz-se \"spaique\"): só escreves \"Spyke\" se esse nome for mesmo dito, nunca o"
+ },
+ {
+  "p": "Ouvido",
+  "name": "Uma vez: palmas desligadas, responde só com o nome, avisos sem voz",
+  "pass": true,
+  "info": "{\"clap\":false,\"convWin\":-1,\"alertVoz\":false,\"fix5\":1}"
+ },
+ {
+  "p": "Ouvido",
   "name": "Spyke sabe tudo: procura em TODA a app (ex.: uma nota) e lê qualquer área (ex.: livros)",
   "pass": true,
   "info": "[{\"area\":\"Nota\",\"titulo\":\"Ideia do restaurante\",\"Conteúdo\":\"Abrir um food truck de açaí em Aveiro\"}]"
@@ -3717,7 +3747,7 @@
   "p": "Ouvido",
   "name": "Cérebro: leva o resumo completo da tua vida (não cortado), pode pesquisar na internet e procurar em toda a app",
   "pass": true,
-  "info": "6544 carateres"
+  "info": "6564 carateres"
  },
  {
   "p": "Ouvido",
@@ -3759,7 +3789,7 @@
   "p": "Agenda",
   "name": "Trabalho de noite (22:00–06:00) acaba no dia seguinte; aula com hora e sala; folga e prova sem hora ficam \"dia inteiro\"",
   "pass": true,
-  "info": "{\"sh\":{\"id\":\"shifts:f3o57316doz@2026-10-13\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-13T22:00:00.000Z\",\"e\":\"2026-10-14T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:88y4zo16dp0@2026-10-14\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-14\",\"e\":\"2026-10-14\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:fb9nv316dp0@2026-10-16\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-16\",\"e\":\"2026-10-16\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:jan50616dp0@2026-10-07\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-07T09:00:00.000Z\",\"e\":\"2026-10-07T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
+  "info": "{\"sh\":{\"id\":\"shifts:pk7hgkeja5t@2026-10-14\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-14T22:00:00.000Z\",\"e\":\"2026-10-15T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:49phoheja5u@2026-10-15\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-15\",\"e\":\"2026-10-15\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:91vov6eja5u@2026-10-17\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-17\",\"e\":\"2026-10-17\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:ph2ezeeja5u@2026-10-08\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-08T09:00:00.000Z\",\"e\":\"2026-10-08T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
  },
  {
   "p": "Agenda",
@@ -3783,13 +3813,13 @@
   "p": "Agenda",
   "name": "Escala importada: o trabalho (09:00–17:00) e a folga aparecem no Calendário da app e vão logo para o Google Calendar",
   "pass": true,
-  "info": "[[\"Trabalho · Loja\",\"2026-10-17T09:00:00.000Z\"],[\"Folga\",\"2026-10-18\"]]"
+  "info": "[[\"Trabalho · Loja\",\"2026-10-18T09:00:00.000Z\"],[\"Folga\",\"2026-10-19\"]]"
  },
  {
   "p": "Agenda",
   "name": "Uma folga nova vai sozinha para fora, poucos segundos depois de a registar",
   "pass": true,
-  "info": "[{\"up\":[{\"id\":\"dayoffs:c71qrj16jny@2026-10-22\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-22\",\"e\":\"2026-10-22\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
+  "info": "[{\"up\":[{\"id\":\"dayoffs:gs8pntejg40@2026-10-23\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-23\",\"e\":\"2026-10-23\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
  },
  {
   "p": "Agenda",
@@ -3879,7 +3909,7 @@
   "p": "Direção",
   "name": "Spyke e Centro de decisões sabem tudo: património, investimentos, estudo, projetos, desporto, dieta, Fé, leitura, tendências e aniversários certos",
   "pass": true,
-  "info": "Agora: terça-feira, 13 de outubro às 18:45 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Costas & Bíceps; amanhã Pernas\nAlertas: Treino: 6 dias sem treinar (Último "
+  "info": "Agora: quarta-feira, 14 de outubro às 00:59 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Pernas; amanhã Ombros & Core\nAlertas: Treino: 7 dias sem treinar (Último r"
  },
  {
   "p": "Direção",
@@ -3967,7 +3997,19 @@
  },
  {
   "p": "Check-up Computador",
+  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
   "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Computador",
+  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
   "pass": true,
   "info": ""
  },
@@ -4003,12 +4045,168 @@
  },
  {
   "p": "Check-up iPhone",
+  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
   "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
   "pass": true,
   "info": ""
  },
  {
   "p": "Check-up iPhone",
+  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up iPhone",
+  "name": "Check-up: sem erros de JavaScript em toda a app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "pass": true,
+  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (141 visitadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Android tel",
+  "name": "Check-up: sem erros de JavaScript em toda a app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "pass": true,
+  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (141 visitadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet vert",
+  "name": "Check-up: sem erros de JavaScript em toda a app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "pass": true,
+  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (141 visitadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
+  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Check-up Tablet horiz",
   "name": "Check-up: sem erros de JavaScript em toda a app",
   "pass": true,
   "info": ""
@@ -4443,13 +4641,13 @@
   "p": "Stress",
   "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
   "pass": true,
-  "info": "máx 2263 ms"
+  "info": "máx 2024 ms"
  },
  {
   "p": "Stress",
   "name": "guardar tudo é rápido",
   "pass": true,
-  "info": "122 ms"
+  "info": "114 ms"
  },
  {
   "p": "Stress",

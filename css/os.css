@@ -195,7 +195,7 @@ details.tog[open]>summary .chev{transform:rotate(180deg)}
 .fld input:focus,.fld select:focus,.fld textarea:focus,.field:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accentBg)}
 .inp-wrap{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding-inline:10px}
 .inp-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accentBg)}
-.inp-wrap input{border:0!important;box-shadow:none!important;padding-inline:4px!important;background:transparent!important}
+.inp-wrap input{border:0!important;box-shadow:none!important;padding-inline:4px!important;background:transparent!important;min-width:0;width:100%;flex:1 1 auto}.inp-wrap{min-width:0;max-width:100%;box-sizing:border-box}
 .inp-wrap span{color:var(--mut);font-size:13px}
 select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%)!important;background-position:calc(100% - 13px) 55%,calc(100% - 8px) 55%!important;background-size:5px 5px!important;background-repeat:no-repeat!important;padding-right:26px!important}
 select option{background:#0D141D}
