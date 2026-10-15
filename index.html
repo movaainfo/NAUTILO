@@ -2032,6 +2032,7 @@ html.spy-open,html.spy-open body{overflow:hidden}
 .ml-sum p{margin:0 0 6px;font-size:14.5px;line-height:1.55}
 .ml-f{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}.ml-f .chip{white-space:nowrap}
 .ml-setup{border-color:rgba(245,158,11,.35)}
+.ml-page{display:flex;flex-direction:column;gap:16px;min-width:0}.ml-page>*{margin-top:0;margin-bottom:0;min-width:0}
 .ml-page .pn-h{flex-wrap:wrap;gap:6px}
 /* ícones no lugar dos emojis */
 .ml-ic{width:9px;height:9px;border-radius:50%;margin:7px auto 0;background:#64748b}
@@ -2298,6 +2299,17 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .si-rows{display:flex;flex-direction:column;gap:8px}.si-row{display:grid;grid-template-columns:minmax(0,1fr) 130px 160px;gap:8px;align-items:center}.si-n{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}.si-n small{flex-basis:100%;font-size:12px}.si-new .si-n input{width:100%}
 @media (max-width:640px){.si-row{grid-template-columns:1fr 1fr}.si-n{grid-column:1/-1}}
 
+/* Começar do zero */
+.rs-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;padding-right:2px}
+.rs-g{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.02)}
+.rs-g input{margin-top:3px;flex:0 0 auto;width:18px;height:18px;accent-color:#ef4444}
+.rs-g span{display:flex;flex-direction:column;min-width:0}.rs-g b{font-weight:560;font-size:14px}.rs-g small{color:var(--mut);font-size:12px}
+.rs-cf{display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:13.5px}
+.rs-undo{border:1px solid rgba(92,200,230,.3);border-radius:10px;padding:8px 10px;margin-top:8px}
+/* painéis seguidos dentro de páginas sem grelha: espaço entre eles (antes ficavam colados uns aos outros) */
+:is(.fb-page,.spy-page,.fe,.inv,.bk,.g-main>div:not([class]),section:not([class])) > :is(.pn,.kpis) + :is(.pn,.kpis){margin-top:16px}
+.rsz{display:block}
+
 </style>
 <style>
 /* OCEANUM — tema Mar: azuis do abismo à espuma. Navegação no topo, cartões em gradiente, jogo num botão flutuante. */
@@ -2530,7 +2542,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.19", "date": "14/10/2026", "notes": ["Spyke só acorda com o nome: conversa à volta (televisão, outras pessoas) já não o abre nem o faz falar. Chamar é dizer \"Spyke\" no início ou no fim da frase.", "A transcrição já não \"inventa\" o nome a partir de ruído, e o Spyke deixa de ficar à escuta para sempre depois de uma conversa.", "Avisos (compromissos, contas, tarefas…) aparecem no ecrã em silêncio; tocas para ouvir. Se quiseres que os leia sozinho: Definições → Spyke.", "Palmas desligadas (só o nome chama o Spyke); podes voltar a ligá-las em Definições → Spyke.", "Verificação em todos os aparelhos (iPhone, Android, tablet ao alto e deitado, computador): corrigidos o Orçamento, a Inteligência das Finanças, a Alocação dos investimentos e as barras das metas, que saíam do ecrã no telemóvel."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.20", "date": "15/10/2026", "notes": ["Começar do zero (Definições → Dados): apaga os dados de teste das áreas que escolheres e mantém o código, o Face ID, o script Google, as chaves da IA, o Spyke, o e-mail e o perfil. Guarda uma cópia: podes desfazer durante 30 dias. Os outros aparelhos e o Google Calendar também ficam limpos.", "Spyke já não abre sozinho quando falas com outras pessoas: a IA que transcreve deixou de saber o nome dele (antes \"isso aí que…\" virava \"Spyke\") e só as formas do nome contam (Spike, Spyke, Espaique…).", "Em Definições → Spyke vês o que o fez acordar nas últimas vezes.", "E-mail: os cartões e os painéis da visão geral já não ficam colados uns aos outros.", "Também corrigido o espaço entre painéis no Foco, Roadmap, Fé, Investimentos, Leituras e Definições → Spyke."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -2787,6 +2799,9 @@ OS.del = (c, id) => {
   OS.emit('del:' + c, r); OS.emit('change', c, r);
   OS.request();
 };
+// troca o conteúdo inteiro de uma coleção (reset e desfazer): grava todos os fragmentos, os antigos ficam vazios, e a sincronização leva isso aos outros aparelhos
+OS.setColl = (c, items, opt = {}) => { const sh = new Set(OS.all(c).map(r => r._s || 0)); OS.D[c] = items; items.forEach(r => sh.add(r._s || 0)); delete IDX[c]; sh.forEach(s => mark(c + '~' + s)); if (!opt.silent) OS.emit('change', c); OS.request(); return items.length; };
+OS.clearColl = (c, opt) => { const n = OS.all(c).length; if (n) OS.setColl(c, [], opt); return n; };
 OS.one = k => OS.ONE[k] || (OS.ONE[k] = U.clone(OS.ONE_DEF[k] || {}));
 OS.setOne = (k, patch) => { Object.assign(OS.one(k), patch); OS.touch(k); };
 OS.touch = k => { mark('one~' + k); OS.emit('one:' + k); OS.request(); };
@@ -10369,7 +10384,8 @@ const clean = t => { const s = String(t || '').replace(/^["“'\s]+|["”'\s]+$/
 const azure = async (b64, lang) => { const c = cfg(), bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
   const r = await fetch(`https://${encodeURIComponent((c.azRegion || 'westeurope').trim().toLowerCase())}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${lang}&format=simple`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': c.azKey.trim(), 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000', Accept: 'application/json' }, body: u8 });
   if (!r.ok) throw new Error('Microsoft ' + r.status); const j = await r.json().catch(() => ({})); return j.RecognitionStatus && j.RecognitionStatus !== 'Success' ? '' : clean(j.DisplayText); };
-const PROMPT = lang => `Transcreve exatamente o que a pessoa diz neste áudio (${lang === 'pt-PT' ? 'português de Portugal' : 'português do Brasil'}). Pode estar a chamar um assistente chamado Spyke (diz-se "spaique"): só escreves "Spyke" se esse nome for mesmo dito, nunca o acrescentes. Não completes nem inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -`;
+// sem dizer à IA o nome do assistente: quando o sabia, "ouvia-o" em frases normais ("isso aí que…" virava "Spyke")
+const PROMPT = lang => `Transcreve exatamente o que a pessoa diz neste áudio (${lang === 'pt-PT' ? 'português de Portugal' : 'português do Brasil'}), palavra por palavra. Não completes, não corrijas e não inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -`;
 const gemini = async (b64, lang) => { const key = OS.AI && OS.AI.key(); if (!key) throw new Error('sem chave da IA'); try { await OS.AI.discover(); } catch (e) { }
   // os modelos "lite" respondem mais depressa (a transcrição é simples)
   const L = (OS.AI.gemini ? OS.AI.gemini() : []).slice().sort((a, b) => (/lite/.test(b) - /lite/.test(a))); let last = '';
@@ -10406,8 +10422,12 @@ OS.S.spymem = { label: 'Memória do Spyke', title: r => String(r.text || '').sli
 OS.S.spyroutines = { label: 'Rotina de voz', title: r => r.phrase || 'Rotina', fields: [{ k: 'phrase', l: 'Quando eu disser', t: 'text', req: 1, ph: 'ex.: modo leitura' }, { k: 'steps', l: 'O Spyke faz (um comando por linha)', t: 'area', rows: 5, req: 1, ph: 'abre as Leituras\nclima\nnotícias' }, { k: 'reply', l: 'E diz no fim (opcional)', t: 'text' }] };
 const N = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w\s€.,:%-]/g, ' ').replace(/\s+/g, ' ').trim();
 // o nome dele como o ditado do iPhone o escreve: Spyke, Spike, Spaik, Espaique, Spike's, Speak…
-const WAKE = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|e?spa[iy]\w*|espi[ck]\w*|speak|spy)\b/;
-const WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
+const WAKE_L = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|e?spa[iy]\w*|espi[ck]\w*|speak|spy)\b/;
+// com o ouvido silencioso a transcrição escreve o que ouviu (Spike, Spyke, Spaik, Espaique…): só essas formas contam, nada de palavras parecidas
+const WAKE_S = /\b(e?spaik\w*|e?spaiq\w*|e?spaic\w*|e?spyk\w*|e?spikes?|e?spaiky?)\b/;
+let WAKE = WAKE_L, WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
+const wakeMode = strict => { const r = strict ? WAKE_S : WAKE_L; if (r !== WAKE) { WAKE = r; WAKET = new RegExp('^' + r.source.replace(/\\b/g, '') + '$'); } };
+S._wakeMode = wakeMode; S._isWake = t => WAKE.test(N(t));
 const FILLW = new Set(['ei', 'hey', 'oi', 'ola', 'ok', 'okay', 'e', 'ai', 'eai', 'fala', 'o', 'ah', 'eh']);
 // tira o nome (e o "ei", "olá", "e aí" logo antes) e devolve o resto, com acentos: "Bom dia, Spike" → "Bom dia"; "Spike" → ""; sem nome → null
 const wakeSplit = raw => { const T = String(raw || '').split(/\s+/).filter(Boolean), w = x => N(x).replace(/[^\w]/g, ''), k = T.findIndex(x => WAKET.test(w(x))); if (k < 0) return null;
@@ -10616,17 +10636,21 @@ const cut = full => { if (full.startsWith(earBase)) return full.slice(earBase.le
 // o que o Spyke acabou de dizer e o microfone apanhou não conta como pedido teu
 const echo = n => { if (!curSay || Date.now() - sayEnd > 3500 && st !== 'speaking') return false; const w = n.split(' ').filter(x => x.length > 2); return w.length > 0 && w.filter(x => curSay.includes(x)).length / w.length >= .7; };
 let armed = 0; // depois de ouvir só "Spyke", a frase seguinte (até 10 s) é o comando
+// registo (só neste aparelho) das últimas frases que acordaram o Spyke: se alguma não foste tu a chamar, vês aqui o que ele percebeu
+const wakeLog = t => { try { const L = U.ls.get('os2spWake', []); L.unshift({ at: Date.now(), t: String(t).slice(0, 140), e: silent() ? (OS.Ear.engine() || 'IA') : 'ditado' }); U.ls.set('os2spWake', L.slice(0, 12)); } catch (e) { } };
+S.wakeLog = () => U.ls.get('os2spWake', []);
 const earPhrase = s => { const n = N(s); if (!n || echo(n)) return; if (earConf > 0 && earConf < .3 && !WAKE.test(n)) return; // barulho mal reconhecido
   if (EARSTOP.test(n) && (WAKE.test(n) || armed > Date.now() || st === 'listening')) { push('user', s); armed = 0; return earQuit(true); }
   const cmd = wakeSplit(s), inConv = st === 'listening' || armed > Date.now() || (cfg().cont && convOn());
   if (cmd !== null && !inConv && !vocative(s)) return;
+  if (cmd !== null && !inConv) wakeLog(s);
   if (cmd !== null) { S.wakeFx(); convGo(); clearTimeout(lsT);
     if (N(cmd).length > 1) { armed = 0; S.handle(cmd); return; }
     // só o nome: um som curto e fica à espera do pedido (sem falar)
     armed = Date.now() + 10000; setSt('listening'); const l = el && el.querySelector('.spy-st'); if (l) l.textContent = 'Diz o que precisas…'; lsT = setTimeout(() => { if (st === 'listening' && armed <= Date.now()) setSt('idle'); }, 10500); return; }
   if (inConv) { armed = 0; convGo(); clearTimeout(lsT); S.handle(s); } };
 const earTake = () => { clearTimeout(earT); const s = cut(earFull).trim(); earBase = earFull; const n0 = msgs.length; if (s && st !== 'speaking' && st !== 'thinking') earPhrase(s); if (live && msgs.length === n0) { live = ''; renderChat(); } };
-const earStart = () => { if (ear || !earWanted()) return; if (silent()) return earSilent(); let r; try { r = new SR(); } catch (e) { return; }
+const earStart = () => { if (ear || !earWanted()) return; if (silent()) return earSilent(); wakeMode(false); let r; try { r = new SR(); } catch (e) { return; }
   r.lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1; earFull = earBase = ''; let got = false;
   r.onresult = e => { if (ear !== r) return; got = true; earFails = 0; let full = ''; for (const x of e.results) full += x[0].transcript; earFull = full; const lr = e.results[e.results.length - 1]; earConf = lr && lr[0] && typeof lr[0].confidence === 'number' ? lr[0].confidence : 1; const fresh = cut(full).trim(); if (!fresh) return;
     if (st === 'speaking' || st === 'thinking') { const n = N(fresh); if (!cfg().barge || echo(n)) return;
@@ -10640,7 +10664,7 @@ const earStart = () => { if (ear || !earWanted()) return; if (silent()) return e
 /* ---------- ouvido silencioso ---------- */
 let bargeP = false, sttBusy = 0, echoN = 0, echoTok = -1, noisy = [], quietUntil = 0;
 const stLbl = t => { const l = el && el.querySelector('.spy-st'); if (l) l.textContent = t; };
-const earSilent = () => { const E = OS.Ear; E.hang = Math.round((+cfg().pausa || 1.2) * 1000); ear = E; earAt = Date.now(); setEarCls(); session('play-and-record');
+const earSilent = () => { wakeMode(true); const E = OS.Ear; E.hang = Math.round((+cfg().pausa || 1.2) * 1000); ear = E; earAt = Date.now(); setEarCls(); session('play-and-record');
   E.start({ onStart: () => { if (st === 'speaking') { if (echoTok !== tok) { echoTok = tok; echoN = 0; } if (cfg().bargeS !== false && echoN < 2 && S.pauseVoice()) { bargeP = true; stLbl('A ouvir-te…'); } return; }
       if (el && !el.hidden && (st === 'listening' || convOn() || armed > Date.now())) { live = '…'; renderChat(); stLbl('A ouvir-te…'); } },
     onDrop: () => { if (bargeP) { bargeP = false; S.resumeVoice(); stLbl(STL.speaking); } if (live === '…') { live = ''; renderChat(); } },
@@ -10971,6 +10995,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     <label class="switch"><input type="checkbox" data-bind="spyke.always" ${c.always ? 'checked' : ''} ${SR || silent() ? '' : 'disabled'}><span></span>Ouvir sempre com a app aberta: começa a ouvir sozinho quando entras (sem tocar em nada) e só para quando disseres <b>"para de ouvir"</b></label>
     <div class="ws-form" style="margin-top:8px"><label>Quando responde<select class="field" data-bind="spyke.convWin">${[['-1', 'Só quando digo "Spyke" (recomendado)'], ['30', 'Sem o nome durante 30 s depois de falar comigo'], ['120', 'Sem o nome durante 2 minutos'], ['0', 'Sempre (responde a tudo o que ouvir)']].map(([v, l]) => `<option value="${v}"${String(c.convWin) === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
     <small class="mut">Com "Só quando digo Spyke" ele ignora barulho, televisão e conversas: diz <b>"Spyke, …"</b> e o pedido na mesma frase (ou só "Spyke" e espera pelo "Sim?"). Tocar no microfone também o faz ouvir a próxima frase.</small>
+    ${(() => { const L = S.wakeLog(); return L.length ? `<details class="spy-wl" style="margin-top:8px"><summary class="mut" style="font-size:12.5px;cursor:pointer">O que o fez acordar (últimas ${L.length} vezes)</summary><ul style="margin:6px 0 0;padding-left:18px;font-size:12.5px">${L.map(x => `<li><span class="mut">${esc(new Date(x.at).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))} · ${esc(x.e)}:</span> “${esc(x.t)}”</li>`).join('')}</ul><small class="mut">É o que ele percebeu em cada vez. Se alguma não foste tu a chamar, aqui vês porquê.</small></details>` : ''; })()}
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.clap" ${c.clap ? 'checked' : ''}><span></span>Duas palmas para chamar</label>
     ${c.clap ? `<div class="ws-form" style="margin-top:8px"><label>Sensibilidade das palmas<input type="range" min="1" max="9" data-bind="spyke.sens" value="${c.sens}"></label></div><button class="btn sm" data-act="spyClapTest" style="margin-top:6px">${UI.ic('mic')}Testar o microfone e as palmas</button>` : ''}
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.morning" ${c.morning ? 'checked' : ''}><span></span>De manhã, ao abrir a app pela primeira vez, o Spyke dá o resumo do dia</label>
@@ -11955,16 +11980,116 @@ V.definicoes = () => {
     <form class="row gap8" data-form="codeChange" style="margin-top:12px"><input class="field" style="flex:1;min-width:160px" type="password" name="cur" placeholder="Código atual" autocomplete="current-password" aria-label="Código atual"><input class="field" style="flex:1;min-width:160px" type="password" name="nw" placeholder="Novo código (6+ caracteres)" autocomplete="new-password" aria-label="Novo código"><button class="btn sm">Mudar código</button></form>
     <div class="note" style="margin-top:10px">Só o hash do código fica guardado, nunca o código. A app bloqueia ao abrir e depois de 5 minutos em segundo plano; 5 tentativas erradas impõem 30 s de espera. É uma proteção de privacidade no dispositivo: quem garante que ninguém abre a página é a tua conta claude.ai, onde este artifact é privado.${OS.one('security').changed ? ' Código alterado a ' + U.fmtD(OS.one('security').changed) + '.' : ' Como partilhaste o código na conversa, considera mudá-lo aqui.'}</div></div>
   <div class="pn"><div class="pn-h"><h3>Contextos</h3></div><div class="row gap4">${L.CTX.map(c => UI.badge(c, 'acc')).join('')}</div><div class="note" style="margin-top:8px">Usa-os nas tarefas para filtrar em Próximos passos pelo sítio onde estás. Na captura rápida basta escrever @Casa, @Rua, @Mova…</div></div>
-  <div class="pn"><div class="pn-h"><h3>Dados</h3></div><div class="row gap8"><button class="btn" data-act="exportData">${UI.ic('arrowDown')}Exportar cópia (.json)</button><label class="btn" for="impData">${UI.ic('arrowUp')}Importar cópia</label><input type="file" id="impData" accept=".json,application/json" hidden><button class="btn danger ghost" data-act="wipeData">${UI.ic('trash')}Apagar tudo</button></div>
-    <div class="note" style="margin-top:10px">Registos: ${Object.keys(OS.D).map(c => OS.all(c).length).reduce((a, b) => a + b, 0)} em ${Object.keys(OS.D).filter(c => OS.all(c).length).length} coleções.</div></div>
+  ${OS.Reset ? OS.Reset.panel() : ''}
   <div class="pn"><div class="pn-h"><h3>Arquitetura</h3></div><div class="tx2" style="font-size:13px;display:flex;flex-direction:column;gap:6px">
     <div><b>core.js</b> · armazenamento em coleções, sincronização com a base de dados (documentos fragmentados), rotas, eventos.</div><div><b>data.js</b> · esquemas, sementes, migração da v1 e lógica de domínio (finanças, investimentos, estudos, treino, corrida, carreira, Mova, metas, calendário).</div><div><b>intel.js</b> · Control Room, Next Action, inteligência financeira, tendências.</div><div><b>ui.js</b> · componentes, formulários, gráficos.</div><div><b>views-*.js</b> · páginas.</div><div><b>dominus.js</b> · o jogo, com estado próprio, que só lê os dados da vida real.</div></div></div>`;
 };
 A.exportData = async () => { const name = 'oceanum-' + U.today() + '.json', txt = JSON.stringify(OS.exportAll());
   try { const f = new File([txt], name, { type: 'application/json' }); if (navigator.canShare && navigator.canShare({ files: [f] }) && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: 'Oceanum · cópia dos dados' }); UI.toast('Cópia pronta. Guarda-a em Ficheiros.', 'pos'); return; } } catch (e) { if (e && e.name === 'AbortError') return UI.toast('Exportação cancelada'); }
   let dl = null; try { dl = window.claude && await window.claude.use('downloads'); } catch (e) { } if (!dl) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(OS.exportAll())], { type: 'application/json' })); a.download = 'oceanum-' + U.today() + '.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); UI.toast('Cópia exportada', 'pos'); } catch (e) { UI.toast('Exportação indisponível nesta vista', 'warn'); } return; } try { await dl.save({ filename: 'oceanum-' + U.today() + '.json', data: JSON.stringify(OS.exportAll()) }); UI.toast('Cópia exportada', 'pos'); } catch (e) { UI.toast('Exportação cancelada'); } };
-A.wipeData = () => UI.ask('Apagar todos os dados?', 'Tudo o que registaste no Oceanum é apagado em todos os dispositivos. Exporta uma cópia antes.', 'Apagar tudo', () => { Object.keys(OS.D).forEach(c => { [...OS.all(c)].forEach(r => OS.del(c, r.id)); }); Object.keys(OS.ONE).forEach(k => { OS.ONE[k] = U.clone(OS.ONE_DEF[k] || {}); OS.touch(k); }); UI.toast('Dados apagados'); });
 document.addEventListener('change', e => { if (e.target.id !== 'impData' || !e.target.files[0]) return; const fr = new FileReader(); fr.onload = () => { try { OS.importAll(JSON.parse(fr.result)); UI.toast('Cópia importada', 'pos'); } catch (er) { UI.toast('Ficheiro inválido: escolhe um .json exportado do Oceanum', 'neg'); } }; fr.readAsText(e.target.files[0]); });
+})();
+
+</script>
+<script>
+/* OCEANUM — Começar do zero (Definições → Dados).
+   Apaga os dados de teste das áreas que escolheres e mantém as configurações (código, Face ID, script Google, chaves da IA,
+   Spyke, e-mail, perfil, categorias). Antes de apagar guarda uma cópia neste aparelho para poderes desfazer durante 30 dias.
+   O apagar vai pela sincronização normal, por isso os outros aparelhos ligados também ficam limpos; no Google Calendar
+   saem os eventos que vinham dos registos apagados. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
+const R = OS.Reset = {};
+// [chave, nome, coleções, partes guardadas fora das coleções, marcado à partida]
+const G = [
+  ['agenda', 'Tarefas, agenda e notas', ['tasks', 'events', 'routine', 'routines', 'notes', 'focusblocks'], [], 1],
+  ['metas', 'Projetos, metas, decisões e revisões', ['projects', 'milestones', 'goals', 'decisions', 'reviews_w', 'reviews_m'], [], 1],
+  ['habdias', 'Hábitos: os dias que marcaste (a lista de hábitos fica)', ['habits#log'], [], 1],
+  ['habitos', 'Hábitos: a própria lista de hábitos', ['habits'], [], 0],
+  ['fin', 'Finanças: contas, movimentos, orçamentos, dívidas, relatórios', ['transactions', 'accounts', 'recurring', 'budgets', 'debts', 'wishlist', 'snapshots', 'reports'], [], 1],
+  ['inv', 'Investimentos e imóveis', ['assets', 'invtx', 'palerts', 'props'], [], 1],
+  ['estudos', 'Estudos: aulas, avaliações, sessões, revisões, cartões, ficheiros', ['classes', 'topics', 'assessments', 'sessions', 'reviews', 'errors', 'cards', 'quizzes', 'qbank', 'qlog', 'materials', 'files', 'learn'], [], 1],
+  ['disc', 'Disciplinas (a lista de cadeiras do curso)', ['subjects'], [], 0],
+  ['leitura', 'Leitura e Fé', ['books', 'rchal', 'devos', 'prayers', 'bmarks', 'bread'], [], 1],
+  ['corpo', 'Corpo e treino: treinos, corridas, medidas, desafios', ['workouts', 'runs', 'runplan', 'body', 'checkins', 'bchal', 'bgoals', 'stretches'], [], 1],
+  ['dieta', 'Alimentação: refeições e alimentos que criaste', ['meals', 'mealtpl', 'foods'], [], 1],
+  ['desporto', 'Desporto', ['sports', 'sportlog'], [], 1],
+  ['trabalho', 'Trabalho e carreira: turnos, folgas, candidaturas, contactos', ['shifts', 'dayoffs', 'applications', 'contacts', 'experiences', 'opps', 'skills', 'certs'], [], 1],
+  ['mova', 'Mova (vendas, despesas, clientes, produtos, marketing)', ['mvsales', 'mvexp', 'mvclients', 'mvproducts', 'mvmkt'], [], 1],
+  ['pessoas', 'Pessoas', ['people'], [], 1],
+  ['jogo', 'Floresta, recompensas e o jogo (árvores, moedas, pontos, níveis)', ['trees', 'forewards', 'rewards'], ['dominus', 'forest'], 1],
+  ['spyke', 'Memória e rotinas do Spyke', ['spymem', 'spyroutines'], [], 1],
+  ['direcao', 'Textos da Direção: visão, valores, plano da semana e do mês', [], ['northstar', 'plan', 'lifeplan'], 0],
+  ['bio', 'Biografia: entrevista, livro e momentos da vida', ['lifeev'], ['me', 'mever'], 0],
+  ['mail', 'Compromissos tirados dos e-mails', ['mailevents'], [], 0],
+  ['exlib', 'Biblioteca de exercícios (a lista que vem com a app)', ['exercises'], [], 0]];
+const KNOWN = new Set(G.flatMap(g => g[2]));
+// o que nunca se apaga: são configurações, não dados
+const KEEP = 'o teu código e o Face ID, o script Google, as chaves da IA, o Spyke, o e-mail, o perfil e as categorias';
+const groups = () => { const extra = Object.keys(OS.D).filter(c => !KNOWN.has(c) && OS.all(c).length && OS.S[c]);
+  return extra.length ? G.concat([['outros', 'Outros registos (' + extra.map(c => OS.S[c].label).join(', ') + ')', extra, [], 1]]) : G; };
+// "habits#log" = só as marcações dos hábitos (h.log), não os hábitos
+const logN = () => OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}).length, 0);
+const size = c => c === 'habits#log' ? logN() : OS.all(c).length;
+const count = g => g[2].reduce((n, c) => n + size(c), 0);
+// partes fora das coleções: voltam ao início, mas as preferências da Floresta (tempo, som, modo) ficam
+const blank = k => { const d = U.clone(OS.ONE_DEF[k] || {}); if (k !== 'forest') return d; const cur = OS.one('forest'); return Object.assign({}, cur, { coins: d.coins || 0, owned: d.owned || [], sp: d.sp }); };
+const oneUsed = k => JSON.stringify(OS.one(k)) !== JSON.stringify(blank(k));
+
+/* ---------- cópia para desfazer (IndexedDB: cabe muito mais do que o localStorage) ---------- */
+const DB = () => new Promise((ok, ko) => { const r = indexedDB.open('oceanum-reset', 1); r.onupgradeneeded = () => r.result.createObjectStore('s'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+const tx = async (mode, f) => { const d = await DB(); try { return await new Promise((ok, ko) => { const t = d.transaction('s', mode), q = f(t.objectStore('s')); t.oncomplete = () => ok(q && q.result); t.onerror = () => ko(t.error); t.onabort = () => ko(t.error); }); } finally { d.close(); } };
+const putSnap = v => tx('readwrite', s => s.put(v, 'last'));
+const getSnap = () => tx('readonly', s => s.get('last'));
+const dropSnap = () => tx('readwrite', s => s.delete('last')).catch(() => { });
+const INFO = 'os2resetInfo', DAYS = 30;
+const info = () => { const i = U.ls.get(INFO, null); if (i && Date.now() - i.at > DAYS * 864e5) { U.ls.set(INFO, null); dropSnap(); return null; } return i; };
+
+/* ---------- painel em Definições → Dados ---------- */
+R.panel = () => { const i = info(), total = Object.keys(OS.D).map(c => OS.all(c).length).reduce((a, b) => a + b, 0);
+  return `<div class="pn" id="dataPn"><div class="pn-h"><h3>Dados</h3></div>
+    <div class="li"><div class="li-t"><b>Começar do zero</b><small>Apaga os dados de teste: escolhes as áreas. Ficam ${KEEP}.</small></div><button class="btn sm danger" data-act="rsOpen">${UI.ic('trash')}Começar do zero</button></div>
+    ${i ? `<div class="li rs-undo"><div class="li-t"><b>Desfazer o último "Começar do zero"</b><small>Feito a ${esc(new Date(i.at).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }))} · ${i.n} registos apagados · podes desfazer até ${esc(U.fmtD(U.iso(new Date(i.at + DAYS * 864e5))))} neste aparelho</small></div><button class="btn sm" data-act="rsUndo">${UI.ic('sync')}Desfazer</button></div>` : ''}
+    <div class="row gap8" style="margin-top:12px;flex-wrap:wrap"><button class="btn" data-act="exportData">${UI.ic('arrowDown')}Exportar cópia (.json)</button><label class="btn" for="impData">${UI.ic('arrowUp')}Importar cópia</label><input type="file" id="impData" accept=".json,application/json" hidden></div>
+    <div class="note" style="margin-top:10px">Registos: ${total} em ${Object.keys(OS.D).filter(c => OS.all(c).length).length} coleções.</div></div>`; };
+
+A.rsOpen = () => { const L = groups().map(g => ({ g, n: count(g), one: g[3].filter(oneUsed).length })).filter(x => x.n || x.one);
+  if (!L.length) return UI.toast('Não há dados para apagar: a app já está vazia.');
+  UI.modal(`<div class="rsz"><div class="pn-h"><h3>Começar do zero</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+    <p class="mut" style="margin:0 0 10px">Escolhe o que apagar. Ficam ${KEEP}.</p>
+    <div class="rs-list">${L.map(({ g, n, one }) => `<label class="rs-g"><input type="checkbox" name="rsg" value="${g[0]}"${g[4] ? ' checked' : ''}><span><b>${esc(g[1])}</b><small>${n ? n + (g[0] === 'habdias' ? (n === 1 ? ' dia marcado' : ' dias marcados') : n === 1 ? ' registo' : ' registos') : ''}${n && one ? ' · ' : ''}${one ? 'textos e progresso' : ''}</small></span></label>`).join('')}</div>
+    <div class="row gap8" style="margin:8px 0 12px"><button type="button" class="btn xs ghost" data-act="rsAll">Marcar tudo</button><button type="button" class="btn xs ghost" data-act="rsNone">Desmarcar tudo</button></div>
+    <div class="note">Antes de apagar guardo uma cópia neste aparelho: podes <b>desfazer durante ${DAYS} dias</b> em Definições → Dados. Os outros aparelhos ligados também ficam limpos, e no Google Calendar saem os eventos que vinham destes registos.</div>
+    <label class="rs-cf"><span>Para confirmar, escreve <b>APAGAR</b></span><input id="rsConf" class="field" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Escreve APAGAR para confirmar"></label>
+    <div class="row gap8 end" style="margin-top:12px"><button type="button" class="btn ghost" data-mclose>Cancelar</button><button type="button" class="btn danger" data-act="rsGo">${UI.ic('trash')}Apagar o que escolhi</button></div></div>`, 'tall'); };
+const boxes = () => [...document.querySelectorAll('#modal input[name=rsg]')];
+A.rsAll = () => boxes().forEach(b => { b.checked = true; });
+A.rsNone = () => boxes().forEach(b => { b.checked = false; });
+
+let busy = false;
+A.rsGo = async () => { if (busy) return; const cf = document.getElementById('rsConf');
+  if (!cf || cf.value.trim().toUpperCase() !== 'APAGAR') { UI.toast('Escreve APAGAR para confirmar', 'warn'); cf && cf.focus(); return; }
+  const keys = boxes().filter(b => b.checked).map(b => b.value); if (!keys.length) return UI.toast('Escolhe pelo menos uma área', 'warn');
+  const sel = groups().filter(g => keys.includes(g[0])), all = [...new Set(sel.flatMap(g => g[2]))], ones = [...new Set(sel.flatMap(g => g[3]))].filter(oneUsed);
+  const colls = all.filter(c => !c.includes('#') && OS.all(c).length), logs = all.includes('habits#log') && !colls.includes('habits') && logN() > 0;
+  busy = true; const n = colls.reduce((a, c) => a + OS.all(c).length, 0) + (logs ? logN() : 0);
+  // 1 · a cópia primeiro: sem cópia não se apaga nada
+  const snap = { at: Date.now(), keys, D: {}, ONE: {} }; colls.concat(logs ? ['habits'] : []).forEach(c => { snap.D[c] = U.clone(OS.all(c)); }); ones.forEach(k => { snap.ONE[k] = U.clone(OS.one(k)); });
+  try { await putSnap(snap); } catch (e) { busy = false; UI.toast('Não consegui guardar a cópia para desfazer, por isso não apaguei nada. Exporta uma cópia (.json) e tenta outra vez.', 'neg'); return; }
+  // 2 · apagar (vai pela sincronização para os outros aparelhos)
+  colls.forEach(c => OS.clearColl(c)); if (logs) OS.setColl('habits', OS.all('habits').map(h => Object.assign({}, h, { log: {}, _u: Date.now() })));
+  ones.forEach(k => { OS.ONE[k] = blank(k); OS.touch(k); });
+  U.ls.set(INFO, { at: snap.at, n, keys });
+  if (OS.CalPush) { OS.CalPush.purge = true; OS.CalPush.soon(1500); }
+  busy = false; UI.closeModal(); OS.request(); UI.toast(`Pronto: ${n} registos apagados. Se te enganaste, Definições → Dados → Desfazer.`, 'pos'); };
+
+A.rsUndo = () => UI.ask('Desfazer o "Começar do zero"?', 'Os registos apagados voltam (o que registaste depois fica). Os outros aparelhos também os recebem.', 'Desfazer', async () => {
+  let s = null; try { s = await getSnap(); } catch (e) { } if (!s) { U.ls.set(INFO, null); OS.request(); return UI.toast('A cópia já não existe neste aparelho.', 'warn'); }
+  let n = 0; Object.entries(s.D || {}).forEach(([c, items]) => { const ids = new Set(items.map(r => r.id)); n += items.length; OS.setColl(c, items.concat(OS.all(c).filter(r => !ids.has(r.id)))); });
+  Object.entries(s.ONE || {}).forEach(([k, v]) => { OS.ONE[k] = v; OS.touch(k); });
+  await dropSnap(); U.ls.set(INFO, null); if (OS.CalPush) OS.CalPush.soon(1500); OS.request(); UI.toast(`Desfeito: ${n} registos voltaram.`, 'pos'); }, 'pri');
+R._groups = groups; R._snap = getSnap;
 })();
 
 </script>
@@ -15796,11 +15921,13 @@ CP.items = () => { const T = cfg().types || {}, out = [], seen = new Set();
   return out; };
 const H = it => U.hash ? U.hash([it.t, it.s, it.e, it.all ? 1 : 0, it.l, it.d].join('|')).toString(36) : JSON.stringify([it.t, it.s, it.e, it.all, it.l, it.d]);
 const catOf = (x, op) => op === 'cal7' ? x.c : 'outros';   // sem a Parte 7 vai tudo para o calendário "Oceanum"
+// depois de "Começar do zero": também apaga lá fora os eventos já passados cujo registo deixou de existir na app
+const gone = id => { const k = String(id).split('@')[0], i = k.indexOf(':'); if (i < 0) return false; const c = k.slice(0, i); return Array.isArray(OS.D[c]) && !OS.get(c, k.slice(i + 1)); };
 CP.plan = (op = OP()) => { const c = cfg(), map = c.map || {}, cur = CP.items(), ids = new Set(cur.map(x => x.id));
   const up = []; cur.forEach(x => { const m = map[x.id], mc = (m && m.c) || 'outros', nc = catOf(x, op);
     if (m && m.e && mc !== nc) up.push(Object.assign({}, x, { c: nc, eid: '', x: m.e, xc: mc }));          // muda para o calendário da sua cor (sem duplicar)
     else if (!m || !m.e || m.h !== H(x)) up.push(Object.assign({}, x, { c: nc, eid: (m || {}).e || '' })); });
-  const del = Object.entries(map).filter(([id, m]) => { if (ids.has(id) || !m || !m.e) return false; if (!m.d) return true; const [a, b] = win(m.k); return m.d >= a && m.d <= b; }).map(([id, m]) => ({ id, e: m.e, c: m.c || 'outros' }));
+  const del = Object.entries(map).filter(([id, m]) => { if (ids.has(id) || !m || !m.e) return false; if (!m.d || (CP.purge && gone(id))) return true; const [a, b] = win(m.k); return m.d >= a && m.d <= b; }).map(([id, m]) => ({ id, e: m.e, c: m.c || 'outros' }));
   return { up, del, n: cur.length }; };
 
 /* ---------- enviar ---------- */
@@ -15818,6 +15945,7 @@ CP.sync = async (quiet = true) => { const c = cfg(); if (!c.on) return 0; if (!r
       const old = U.addDays(U.today(), -(BACK + 30)); Object.keys(map).forEach(k => { if (map[k] && map[k].d && map[k].d < old) delete map[k]; }); // o que já é passado fica lá, só deixa de ser seguido
       const okN = up.filter(x => (j.map || {})[x.id]).length; sent += okN + del.length;
       OS.setOne('calx', { map, at: Date.now(), n: Object.keys(map).length, err: '' }); if ((!okN && !del.length) || j.parar) break; }
+    CP.purge = false;
     CP.state.msg = ''; if (!quiet) UI.toast(sent ? `Google Calendar atualizado (${sent} alteração${sent === 1 ? '' : 'ões'})` : 'O Google Calendar já está igual à app ✓', 'pos'); }
   catch (e) { OS.setOne('calx', { err: e.message || 'erro', at: Date.now() }); if (!quiet) UI.toast('Não consegui atualizar o Google Calendar: ' + (e.message || e), 'neg'); }
   busy = false; OS.request(); if (again) { again = false; CP.soon(3000); } return sent; };
