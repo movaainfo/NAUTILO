@@ -16,8 +16,12 @@ OS.S.spymem = { label: 'Memória do Spyke', title: r => String(r.text || '').sli
 OS.S.spyroutines = { label: 'Rotina de voz', title: r => r.phrase || 'Rotina', fields: [{ k: 'phrase', l: 'Quando eu disser', t: 'text', req: 1, ph: 'ex.: modo leitura' }, { k: 'steps', l: 'O Spyke faz (um comando por linha)', t: 'area', rows: 5, req: 1, ph: 'abre as Leituras\nclima\nnotícias' }, { k: 'reply', l: 'E diz no fim (opcional)', t: 'text' }] };
 const N = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w\s€.,:%-]/g, ' ').replace(/\s+/g, ' ').trim();
 // o nome dele como o ditado do iPhone o escreve: Spyke, Spike, Spaik, Espaique, Spike's, Speak…
-const WAKE = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|e?spa[iy]\w*|espi[ck]\w*|speak|spy)\b/;
-const WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
+const WAKE_L = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|e?spa[iy]\w*|espi[ck]\w*|speak|spy)\b/;
+// com o ouvido silencioso a transcrição escreve o que ouviu (Spike, Spyke, Spaik, Espaique…): só essas formas contam, nada de palavras parecidas
+const WAKE_S = /\b(e?spaik\w*|e?spaiq\w*|e?spaic\w*|e?spyk\w*|e?spikes?|e?spaiky?)\b/;
+let WAKE = WAKE_L, WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
+const wakeMode = strict => { const r = strict ? WAKE_S : WAKE_L; if (r !== WAKE) { WAKE = r; WAKET = new RegExp('^' + r.source.replace(/\\b/g, '') + '$'); } };
+S._wakeMode = wakeMode; S._isWake = t => WAKE.test(N(t));
 const FILLW = new Set(['ei', 'hey', 'oi', 'ola', 'ok', 'okay', 'e', 'ai', 'eai', 'fala', 'o', 'ah', 'eh']);
 // tira o nome (e o "ei", "olá", "e aí" logo antes) e devolve o resto, com acentos: "Bom dia, Spike" → "Bom dia"; "Spike" → ""; sem nome → null
 const wakeSplit = raw => { const T = String(raw || '').split(/\s+/).filter(Boolean), w = x => N(x).replace(/[^\w]/g, ''), k = T.findIndex(x => WAKET.test(w(x))); if (k < 0) return null;
@@ -226,17 +230,21 @@ const cut = full => { if (full.startsWith(earBase)) return full.slice(earBase.le
 // o que o Spyke acabou de dizer e o microfone apanhou não conta como pedido teu
 const echo = n => { if (!curSay || Date.now() - sayEnd > 3500 && st !== 'speaking') return false; const w = n.split(' ').filter(x => x.length > 2); return w.length > 0 && w.filter(x => curSay.includes(x)).length / w.length >= .7; };
 let armed = 0; // depois de ouvir só "Spyke", a frase seguinte (até 10 s) é o comando
+// registo (só neste aparelho) das últimas frases que acordaram o Spyke: se alguma não foste tu a chamar, vês aqui o que ele percebeu
+const wakeLog = t => { try { const L = U.ls.get('os2spWake', []); L.unshift({ at: Date.now(), t: String(t).slice(0, 140), e: silent() ? (OS.Ear.engine() || 'IA') : 'ditado' }); U.ls.set('os2spWake', L.slice(0, 12)); } catch (e) { } };
+S.wakeLog = () => U.ls.get('os2spWake', []);
 const earPhrase = s => { const n = N(s); if (!n || echo(n)) return; if (earConf > 0 && earConf < .3 && !WAKE.test(n)) return; // barulho mal reconhecido
   if (EARSTOP.test(n) && (WAKE.test(n) || armed > Date.now() || st === 'listening')) { push('user', s); armed = 0; return earQuit(true); }
   const cmd = wakeSplit(s), inConv = st === 'listening' || armed > Date.now() || (cfg().cont && convOn());
   if (cmd !== null && !inConv && !vocative(s)) return;
+  if (cmd !== null && !inConv) wakeLog(s);
   if (cmd !== null) { S.wakeFx(); convGo(); clearTimeout(lsT);
     if (N(cmd).length > 1) { armed = 0; S.handle(cmd); return; }
     // só o nome: um som curto e fica à espera do pedido (sem falar)
     armed = Date.now() + 10000; setSt('listening'); const l = el && el.querySelector('.spy-st'); if (l) l.textContent = 'Diz o que precisas…'; lsT = setTimeout(() => { if (st === 'listening' && armed <= Date.now()) setSt('idle'); }, 10500); return; }
   if (inConv) { armed = 0; convGo(); clearTimeout(lsT); S.handle(s); } };
 const earTake = () => { clearTimeout(earT); const s = cut(earFull).trim(); earBase = earFull; const n0 = msgs.length; if (s && st !== 'speaking' && st !== 'thinking') earPhrase(s); if (live && msgs.length === n0) { live = ''; renderChat(); } };
-const earStart = () => { if (ear || !earWanted()) return; if (silent()) return earSilent(); let r; try { r = new SR(); } catch (e) { return; }
+const earStart = () => { if (ear || !earWanted()) return; if (silent()) return earSilent(); wakeMode(false); let r; try { r = new SR(); } catch (e) { return; }
   r.lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1; earFull = earBase = ''; let got = false;
   r.onresult = e => { if (ear !== r) return; got = true; earFails = 0; let full = ''; for (const x of e.results) full += x[0].transcript; earFull = full; const lr = e.results[e.results.length - 1]; earConf = lr && lr[0] && typeof lr[0].confidence === 'number' ? lr[0].confidence : 1; const fresh = cut(full).trim(); if (!fresh) return;
     if (st === 'speaking' || st === 'thinking') { const n = N(fresh); if (!cfg().barge || echo(n)) return;
@@ -250,7 +258,7 @@ const earStart = () => { if (ear || !earWanted()) return; if (silent()) return e
 /* ---------- ouvido silencioso ---------- */
 let bargeP = false, sttBusy = 0, echoN = 0, echoTok = -1, noisy = [], quietUntil = 0;
 const stLbl = t => { const l = el && el.querySelector('.spy-st'); if (l) l.textContent = t; };
-const earSilent = () => { const E = OS.Ear; E.hang = Math.round((+cfg().pausa || 1.2) * 1000); ear = E; earAt = Date.now(); setEarCls(); session('play-and-record');
+const earSilent = () => { wakeMode(true); const E = OS.Ear; E.hang = Math.round((+cfg().pausa || 1.2) * 1000); ear = E; earAt = Date.now(); setEarCls(); session('play-and-record');
   E.start({ onStart: () => { if (st === 'speaking') { if (echoTok !== tok) { echoTok = tok; echoN = 0; } if (cfg().bargeS !== false && echoN < 2 && S.pauseVoice()) { bargeP = true; stLbl('A ouvir-te…'); } return; }
       if (el && !el.hidden && (st === 'listening' || convOn() || armed > Date.now())) { live = '…'; renderChat(); stLbl('A ouvir-te…'); } },
     onDrop: () => { if (bargeP) { bargeP = false; S.resumeVoice(); stLbl(STL.speaking); } if (live === '…') { live = ''; renderChat(); } },
@@ -581,6 +589,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     <label class="switch"><input type="checkbox" data-bind="spyke.always" ${c.always ? 'checked' : ''} ${SR || silent() ? '' : 'disabled'}><span></span>Ouvir sempre com a app aberta: começa a ouvir sozinho quando entras (sem tocar em nada) e só para quando disseres <b>"para de ouvir"</b></label>
     <div class="ws-form" style="margin-top:8px"><label>Quando responde<select class="field" data-bind="spyke.convWin">${[['-1', 'Só quando digo "Spyke" (recomendado)'], ['30', 'Sem o nome durante 30 s depois de falar comigo'], ['120', 'Sem o nome durante 2 minutos'], ['0', 'Sempre (responde a tudo o que ouvir)']].map(([v, l]) => `<option value="${v}"${String(c.convWin) === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
     <small class="mut">Com "Só quando digo Spyke" ele ignora barulho, televisão e conversas: diz <b>"Spyke, …"</b> e o pedido na mesma frase (ou só "Spyke" e espera pelo "Sim?"). Tocar no microfone também o faz ouvir a próxima frase.</small>
+    ${(() => { const L = S.wakeLog(); return L.length ? `<details class="spy-wl" style="margin-top:8px"><summary class="mut" style="font-size:12.5px;cursor:pointer">O que o fez acordar (últimas ${L.length} vezes)</summary><ul style="margin:6px 0 0;padding-left:18px;font-size:12.5px">${L.map(x => `<li><span class="mut">${esc(new Date(x.at).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))} · ${esc(x.e)}:</span> “${esc(x.t)}”</li>`).join('')}</ul><small class="mut">É o que ele percebeu em cada vez. Se alguma não foste tu a chamar, aqui vês porquê.</small></details>` : ''; })()}
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.clap" ${c.clap ? 'checked' : ''}><span></span>Duas palmas para chamar</label>
     ${c.clap ? `<div class="ws-form" style="margin-top:8px"><label>Sensibilidade das palmas<input type="range" min="1" max="9" data-bind="spyke.sens" value="${c.sens}"></label></div><button class="btn sm" data-act="spyClapTest" style="margin-top:6px">${UI.ic('mic')}Testar o microfone e as palmas</button>` : ''}
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.morning" ${c.morning ? 'checked' : ''}><span></span>De manhã, ao abrir a app pela primeira vez, o Spyke dá o resumo do dia</label>

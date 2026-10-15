@@ -97,11 +97,13 @@ CP.items = () => { const T = cfg().types || {}, out = [], seen = new Set();
   return out; };
 const H = it => U.hash ? U.hash([it.t, it.s, it.e, it.all ? 1 : 0, it.l, it.d].join('|')).toString(36) : JSON.stringify([it.t, it.s, it.e, it.all, it.l, it.d]);
 const catOf = (x, op) => op === 'cal7' ? x.c : 'outros';   // sem a Parte 7 vai tudo para o calendário "Oceanum"
+// depois de "Começar do zero": também apaga lá fora os eventos já passados cujo registo deixou de existir na app
+const gone = id => { const k = String(id).split('@')[0], i = k.indexOf(':'); if (i < 0) return false; const c = k.slice(0, i); return Array.isArray(OS.D[c]) && !OS.get(c, k.slice(i + 1)); };
 CP.plan = (op = OP()) => { const c = cfg(), map = c.map || {}, cur = CP.items(), ids = new Set(cur.map(x => x.id));
   const up = []; cur.forEach(x => { const m = map[x.id], mc = (m && m.c) || 'outros', nc = catOf(x, op);
     if (m && m.e && mc !== nc) up.push(Object.assign({}, x, { c: nc, eid: '', x: m.e, xc: mc }));          // muda para o calendário da sua cor (sem duplicar)
     else if (!m || !m.e || m.h !== H(x)) up.push(Object.assign({}, x, { c: nc, eid: (m || {}).e || '' })); });
-  const del = Object.entries(map).filter(([id, m]) => { if (ids.has(id) || !m || !m.e) return false; if (!m.d) return true; const [a, b] = win(m.k); return m.d >= a && m.d <= b; }).map(([id, m]) => ({ id, e: m.e, c: m.c || 'outros' }));
+  const del = Object.entries(map).filter(([id, m]) => { if (ids.has(id) || !m || !m.e) return false; if (!m.d || (CP.purge && gone(id))) return true; const [a, b] = win(m.k); return m.d >= a && m.d <= b; }).map(([id, m]) => ({ id, e: m.e, c: m.c || 'outros' }));
   return { up, del, n: cur.length }; };
 
 /* ---------- enviar ---------- */
@@ -119,6 +121,7 @@ CP.sync = async (quiet = true) => { const c = cfg(); if (!c.on) return 0; if (!r
       const old = U.addDays(U.today(), -(BACK + 30)); Object.keys(map).forEach(k => { if (map[k] && map[k].d && map[k].d < old) delete map[k]; }); // o que já é passado fica lá, só deixa de ser seguido
       const okN = up.filter(x => (j.map || {})[x.id]).length; sent += okN + del.length;
       OS.setOne('calx', { map, at: Date.now(), n: Object.keys(map).length, err: '' }); if ((!okN && !del.length) || j.parar) break; }
+    CP.purge = false;
     CP.state.msg = ''; if (!quiet) UI.toast(sent ? `Google Calendar atualizado (${sent} alteração${sent === 1 ? '' : 'ões'})` : 'O Google Calendar já está igual à app ✓', 'pos'); }
   catch (e) { OS.setOne('calx', { err: e.message || 'erro', at: Date.now() }); if (!quiet) UI.toast('Não consegui atualizar o Google Calendar: ' + (e.message || e), 'neg'); }
   busy = false; OS.request(); if (again) { again = false; CP.soon(3000); } return sent; };

@@ -122,6 +122,9 @@ OS.del = (c, id) => {
   OS.emit('del:' + c, r); OS.emit('change', c, r);
   OS.request();
 };
+// troca o conteúdo inteiro de uma coleção (reset e desfazer): grava todos os fragmentos, os antigos ficam vazios, e a sincronização leva isso aos outros aparelhos
+OS.setColl = (c, items, opt = {}) => { const sh = new Set(OS.all(c).map(r => r._s || 0)); OS.D[c] = items; items.forEach(r => sh.add(r._s || 0)); delete IDX[c]; sh.forEach(s => mark(c + '~' + s)); if (!opt.silent) OS.emit('change', c); OS.request(); return items.length; };
+OS.clearColl = (c, opt) => { const n = OS.all(c).length; if (n) OS.setColl(c, [], opt); return n; };
 OS.one = k => OS.ONE[k] || (OS.ONE[k] = U.clone(OS.ONE_DEF[k] || {}));
 OS.setOne = (k, patch) => { Object.assign(OS.one(k), patch); OS.touch(k); };
 OS.touch = k => { mark('one~' + k); OS.emit('one:' + k); OS.request(); };

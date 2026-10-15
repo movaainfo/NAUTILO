@@ -1,5 +1,5 @@
-Spyke só acorda com o nome: conversa à volta (televisão, outras pessoas) já não o abre nem o faz falar. Chamar é dizer "Spyke" no início ou no fim da frase.
-A transcrição já não "inventa" o nome a partir de ruído, e o Spyke deixa de ficar à escuta para sempre depois de uma conversa.
-Avisos (compromissos, contas, tarefas…) aparecem no ecrã em silêncio; tocas para ouvir. Se quiseres que os leia sozinho: Definições → Spyke.
-Palmas desligadas (só o nome chama o Spyke); podes voltar a ligá-las em Definições → Spyke.
-Verificação em todos os aparelhos (iPhone, Android, tablet ao alto e deitado, computador): corrigidos o Orçamento, a Inteligência das Finanças, a Alocação dos investimentos e as barras das metas, que saíam do ecrã no telemóvel.
+Começar do zero (Definições → Dados): apaga os dados de teste das áreas que escolheres e mantém o código, o Face ID, o script Google, as chaves da IA, o Spyke, o e-mail e o perfil. Guarda uma cópia: podes desfazer durante 30 dias. Os outros aparelhos e o Google Calendar também ficam limpos.
+Spyke já não abre sozinho quando falas com outras pessoas: a IA que transcreve deixou de saber o nome dele (antes "isso aí que…" virava "Spyke") e só as formas do nome contam (Spike, Spyke, Espaique…).
+Em Definições → Spyke vês o que o fez acordar nas últimas vezes.
+E-mail: os cartões e os painéis da visão geral já não ficam colados uns aos outros.
+Também corrigido o espaço entre painéis no Foco, Roadmap, Fé, Investimentos, Leituras e Definições → Spyke.

@@ -716,6 +716,7 @@ html.spy-open,html.spy-open body{overflow:hidden}
 .ml-sum p{margin:0 0 6px;font-size:14.5px;line-height:1.55}
 .ml-f{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}.ml-f .chip{white-space:nowrap}
 .ml-setup{border-color:rgba(245,158,11,.35)}
+.ml-page{display:flex;flex-direction:column;gap:16px;min-width:0}.ml-page>*{margin-top:0;margin-bottom:0;min-width:0}
 .ml-page .pn-h{flex-wrap:wrap;gap:6px}
 /* ícones no lugar dos emojis */
 .ml-ic{width:9px;height:9px;border-radius:50%;margin:7px auto 0;background:#64748b}
@@ -981,3 +982,14 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .tx-sel{flex-wrap:wrap;align-items:center;margin:8px 0}.tx-undo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}tr.tx-pick{cursor:pointer}tr.tx-pick.on td{background:color-mix(in srgb,var(--accent) 10%,transparent)}.tx-ck{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line2,var(--line));font-size:12px;font-weight:700}.tx-ck.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .si-rows{display:flex;flex-direction:column;gap:8px}.si-row{display:grid;grid-template-columns:minmax(0,1fr) 130px 160px;gap:8px;align-items:center}.si-n{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}.si-n small{flex-basis:100%;font-size:12px}.si-new .si-n input{width:100%}
 @media (max-width:640px){.si-row{grid-template-columns:1fr 1fr}.si-n{grid-column:1/-1}}
+
+/* Começar do zero */
+.rs-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;padding-right:2px}
+.rs-g{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:rgba(255,255,255,.02)}
+.rs-g input{margin-top:3px;flex:0 0 auto;width:18px;height:18px;accent-color:#ef4444}
+.rs-g span{display:flex;flex-direction:column;min-width:0}.rs-g b{font-weight:560;font-size:14px}.rs-g small{color:var(--mut);font-size:12px}
+.rs-cf{display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:13.5px}
+.rs-undo{border:1px solid rgba(92,200,230,.3);border-radius:10px;padding:8px 10px;margin-top:8px}
+/* painéis seguidos dentro de páginas sem grelha: espaço entre eles (antes ficavam colados uns aos outros) */
+:is(.fb-page,.spy-page,.fe,.inv,.bk,.g-main>div:not([class]),section:not([class])) > :is(.pn,.kpis) + :is(.pn,.kpis){margin-top:16px}
+.rsz{display:block}
