@@ -1841,43 +1841,60 @@ async function direcaoTests(b) { cur = 'Direção'; console.log('\n=== Direção
   ok('Movimentos: tocar numa linha seleciona-a (em vez de abrir)', one === 1 && !(await E(p, () => !!document.querySelector('#osform'))));
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (Direção e Finanças)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
-/* ---------- Começar do zero: apaga os dados de teste escolhidos, mantém as configurações, propaga e permite desfazer ---------- */
-async function resetTests(b) { cur = 'Começar do zero'; console.log('\n=== Começar do zero (Definições → Dados) ===');
+/* ---------- Limpar os dados de teste: separa sozinho o que é teu do que é teste, mostra tudo, mantém as configurações, propaga e permite desfazer ---------- */
+async function resetTests(b) { cur = 'Limpar testes'; console.log('\n=== Limpar os dados de teste (Definições → Dados) ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
   await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); });
-  const before = await E(p, () => { const U = OS.U, T = U.today(); OS.add('tasks', { title: 'Tarefa de teste', status: 'Próxima' }); OS.add('tasks', { title: 'Outra de teste', status: 'Inbox' }); OS.add('events', { title: 'Reunião teste', date: T, start: '10:00' });
-    const ac = OS.all('accounts')[0] || OS.add('accounts', { name: 'Conta', type: 'Conta à ordem', currency: 'EUR' }); OS.add('transactions', { type: 'Despesa', amount: 12, date: T, account: ac.id, cat: 'Alimentação' });
-    OS.add('habits', { name: 'Hábito teste', active: true, log: { [T]: 1 } }); OS.add('spymem', { text: 'Gosto de café', date: T }); OS.setOne('forest', { coins: 77, mins: 50 }); OS.setOne('northstar', { h1y: 'Visão verdadeira' });
-    OS.add('subjects', { name: 'Contabilidade I', status: 'Em curso' }); OS.add('exercises', { name: 'Supino', muscle: 'Peito' }); OS.setOne('meta', { seeded: true, migrated: true });
-    OS.setOne('inbox', { url: 'https://script.google.com/macros/s/TESTE/exec', key: 'KEY_T' }); OS.setOne('spyke', { azKey: 'AZ_TESTE' }); OS.setOne('diet', { aiKey: 'AIzaTESTE' });
-    return { tasks: OS.all('tasks').length, tx: OS.all('transactions').length, ex: OS.all('exercises').length, hab: OS.all('habits').length, sub: OS.all('subjects').length, sec: OS.one('security').hash }; });
+  const before = await E(p, () => { const U = OS.U, T = U.today();
+    // teus: horário importado da foto, disciplina, conta, hábito, plano inicial, B3, e-mails, biografia, memória do Spyke
+    OS.add('shifts', { date: T, start: '09:00', end: '17:00', src: 'foto' }); OS.add('dayoffs', { date: U.addDays(T, 1), kind: 'Folga', src: 'foto' });
+    OS.add('subjects', { name: 'Contabilidade Financeira 1', status: 'Em curso' }); const ac = OS.add('accounts', { name: 'Santander', type: 'Conta à ordem', currency: 'EUR' });
+    OS.add('habits', { name: 'Ler 20 páginas', active: true, log: { [T]: 1 } }); OS.add('goals', { title: 'Inglês B2', status: 'Ativa' }); OS.add('tasks', { title: 'Definir o preço', status: 'Próxima' });
+    const a1 = OS.add('assets', { name: 'PETR4', ticker: 'PETR4', cls: 'Ação' }); OS.add('invtx', { asset: a1.id, type: 'Compra', date: T, qty: 10, price: 30, note: 'Importado da B3' });
+    OS.add('mailevents', { title: 'Reunião da AAUAv', date: T }); OS.add('lifeev', { title: 'Mudei-me para Aveiro', date: '2024-09-01' }); OS.add('spymem', { text: 'Trabalho no McDonald\'s', date: T });
+    OS.setOne('northstar', { h1y: 'Visão verdadeira' }); OS.setOne('me', { qa: { infancia: 'Resposta real' } });
+    // testes: movimentos, tarefas, treino, turno manual, conta com "teste", ativo manual, meta nova, moedas
+    OS.add('transactions', { type: 'Despesa', amount: 12, date: T, account: ac.id, desc: 'Uber' }); OS.add('transactions', { type: 'Receita', amount: 900, date: T, account: ac.id, desc: 'Salário' });
+    OS.add('tasks', { title: 'Comprar pão', status: 'Inbox' }); OS.add('tasks', { title: 'Ligar ao banco', status: 'Inbox' }); OS.add('workouts', { date: T, title: 'Peito' }); OS.add('shifts', { date: U.addDays(T, 2), start: '10:00', end: '18:00' });
+    OS.add('accounts', { name: 'Conta teste', type: 'Conta à ordem' }); const a2 = OS.add('assets', { name: 'Apple', ticker: 'AAPL', cls: 'Ação' }); OS.add('invtx', { asset: a2.id, type: 'Compra', date: T, qty: 1, price: 200 });
+    OS.add('goals', { title: 'Meta inventada', status: 'Ativa' }); OS.setOne('forest', { coins: 77, mins: 50 });
+    OS.setOne('inbox', { url: 'https://script.google.com/macros/s/TESTE/exec', key: 'KEY_T' }); OS.setOne('spyke', { azKey: 'AZ_TESTE' }); OS.setOne('diet', { aiKey: 'AIzaTESTE' }); OS.setOne('meta', { seeded: true, migrated: true });
+    return { sec: OS.one('security').hash }; });
   await E(p, () => { location.hash = 'definicoes'; }); await sleep(600);
-  ok('Definições → Dados: botão "Começar do zero" (e já não há o "Apagar tudo" que apagava também o código e as chaves)', await E(p, () => !!document.querySelector('#dataPn [data-act=rsOpen]') && !document.querySelector('[data-act=wipeData]')));
-  await E(p, () => document.querySelector('#dataPn [data-act=rsOpen]').click()); await sleep(400);
-  const md = await E(p, () => { const L = [...document.querySelectorAll('#modal .rs-g')].map(l => ({ v: l.querySelector('input').value, on: l.querySelector('input').checked, t: l.innerText })); return { L, keep: /código e o Face ID, o script Google, as chaves da IA/.test(document.querySelector('#modal').innerText) }; });
-  const g = k => md.L.find(x => x.v === k) || {};
-  ok('Mostra cada área com quantos registos tem; dados de teste marcados; a lista de hábitos, as disciplinas, a biografia, os textos da Direção e a biblioteca de exercícios desmarcados', g('agenda').on && /3 registos/.test(g('agenda').t) && g('fin').on && g('jogo').on && g('habdias').on && g('habitos').on === false && g('disc').on === false && g('direcao').on === false && g('exlib').on === false && md.keep, JSON.stringify(md.L.map(x => x.v + (x.on ? '✓' : '·'))));
+  ok('Definições → Dados: "Limpar os dados de teste" (e já não há o "Apagar tudo" que apagava também o código e as chaves)', await E(p, () => !!document.querySelector('#dataPn [data-act=rsOpen]') && !document.querySelector('[data-act=wipeData]')));
+  const V = await E(p, () => { const P = OS.Reset.plan(), f = (c, t) => (P.find(x => x.c === c && (x.t.includes(t) || !t)) || {}).keep; return {
+    mine: [(P.find(x => x.c === 'shifts' && x.why === 'Horário do trabalho importado da foto') || {}).keep, f('dayoffs', 'Folga'), f('subjects', 'Contabilidade'), f('accounts', 'Santander'), f('habits', 'Ler'), f('goals', 'Inglês B2'), f('tasks', 'Definir o preço'), f('invtx', ''), f('assets', 'PETR4'), f('mailevents', 'Reunião'), f('lifeev', 'Mudei'), f('spymem', 'Trabalho')],
+    test: [f('transactions', 'Uber'), f('tasks', 'Comprar'), f('workouts', 'Peito'), f('accounts', 'Conta teste'), (P.find(x => x.c === 'assets' && /Apple|AAPL/.test(x.t)) || {}).keep, f('goals', 'Meta inventada'), (P.find(x => x.c === 'habits#log') || { keep: 1 }).keep, (P.find(x => x.c === 'one:forest') || { keep: 1 }).keep] }; });
+  ok('Sabe o que é teu: horário importado da foto, disciplina, conta, hábito, plano inicial, B3, e-mails, biografia, memória do Spyke', V.mine.every(x => x === true), JSON.stringify(V.mine));
+  ok('Sabe o que é teste: movimentos, tarefas, treinos, conta "teste", ativo manual, meta inventada, dias marcados, moedas', V.test.every(x => x === false), JSON.stringify(V.test));
+  await E(p, () => document.querySelector('#dataPn [data-act=rsOpen]').click()); await sleep(500);
+  const md = await E(p, () => ({ out: +document.getElementById('rsOut').textContent, keep: +document.getElementById('rsKeep').textContent, areas: document.querySelectorAll('#modal .rs-a').length, always: /código e o Face ID, o script Google, as chaves da IA.*biografia/.test(document.querySelector('#modal').innerText) }));
+  ok('Mostra quantos saem e quantos ficam, área a área, e o que fica sempre', md.out > 5 && md.keep > 5 && md.areas >= 5 && md.always, JSON.stringify(md));
   // sem escrever APAGAR não apaga nada
   await E(p, () => document.querySelector('#modal [data-act=rsGo]').click()); await sleep(300);
-  ok('Sem escrever APAGAR não apaga nada', await E(p, n => OS.all('tasks').length === n && !!document.querySelector('#modal .rsz'), before.tasks));
-  // desmarca as Finanças e apaga o resto
-  await E(p, () => { document.querySelector('#modal input[value=fin]').checked = false; document.getElementById('rsConf').value = 'apagar'; document.querySelector('#modal [data-act=rsGo]').click(); }); await sleep(1500);
-  const af = await E(p, () => ({ tasks: OS.all('tasks').length, ev: OS.all('events').length, hab: OS.all('habits').length, logs: OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}).length, 0), sub: OS.all('subjects').length, mem: OS.all('spymem').length, tx: OS.all('transactions').length, ex: OS.all('exercises').length,
-    coins: OS.one('forest').coins, mins: OS.one('forest').mins, ns: OS.one('northstar').h1y, sec: OS.one('security').hash, ib: OS.one('inbox').url, az: OS.one('spyke').azKey, ak: OS.one('diet').aiKey, seeded: OS.one('meta').seeded,
-    ls: (JSON.parse(localStorage.getItem('os2:tasks~0') || '{}').items || [1]).length, purge: OS.CalPush && OS.CalPush.purge, undo: !!document.querySelector('#dataPn [data-act=rsUndo]') }));
-  ok('Apaga só o que escolheste (tarefas, agenda, dias marcados dos hábitos, Spyke, moedas) e deixa as Finanças, a lista de hábitos, as disciplinas e a biblioteca de exercícios', af.tasks === 0 && af.ev === 0 && af.logs === 0 && af.hab === before.hab && af.sub === before.sub && af.mem === 0 && af.coins === 0 && af.tx === before.tx && af.ex === before.ex, JSON.stringify(af));
-  ok('Mantém as configurações: código, script Google, chaves da IA, preferências da Floresta e os textos da Direção', af.sec === before.sec && /TESTE/.test(af.ib) && af.az === 'AZ_TESTE' && af.ak === 'AIzaTESTE' && af.mins === 50 && af.ns === 'Visão verdadeira' && af.seeded === true, JSON.stringify(af));
+  ok('Sem escrever APAGAR não apaga nada', await E(p, () => OS.all('transactions').length === 2 && !!document.querySelector('#modal .rsz')));
+  // muda um: a tarefa "Ligar ao banco" afinal é tua
+  await E(p, () => { const x = [...document.querySelectorAll('#modal input[name=rsr]')].find(i => { const t = i.closest('label').textContent; return /Ligar ao banco/.test(t); }); x.checked = false; x.dispatchEvent(new Event('change', { bubbles: true })); });
+  const md2 = await E(p, () => +document.getElementById('rsOut').textContent);
+  ok('Podes mudar qualquer registo (a contagem atualiza)', md2 === md.out - 1, JSON.stringify({ antes: md.out, depois: md2 }));
+  await E(p, () => { document.getElementById('rsConf').value = 'apagar'; document.querySelector('#modal [data-act=rsGo]').click(); }); await sleep(1500);
+  const af = await E(p, () => { const has = (c, t) => OS.all(c).some(r => (OS.S[c] && OS.S[c].title ? String(OS.S[c].title(r)) : r.title || r.name || r.desc || r.text || '').startsWith(t)); return {
+    mine: [OS.all('shifts').some(s => s.src === 'foto'), OS.all('dayoffs').length === 1, has('subjects', 'Contabilidade'), has('accounts', 'Santander'), has('habits', 'Ler'), has('goals', 'Inglês B2'), has('tasks', 'Definir o preço'), OS.all('invtx').some(t => /B3/.test(t.note || '')), has('assets', 'PETR4'), OS.all('mailevents').length === 1, OS.all('lifeev').length === 1, OS.all('spymem').length === 1, has('tasks', 'Ligar ao banco')],
+    gone: [OS.all('transactions').length === 0, !has('tasks', 'Comprar'), OS.all('workouts').length === 0, OS.all('shifts').length === 1, !has('accounts', 'Conta teste'), !has('assets', 'Apple'), !has('goals', 'Meta inventada'), OS.all('habits').every(h => !Object.keys(h.log || {}).length), OS.one('forest').coins === 0],
+    cfg: [OS.one('security').hash, OS.one('inbox').url, OS.one('spyke').azKey, OS.one('diet').aiKey, OS.one('forest').mins, OS.one('northstar').h1y, (OS.one('me').qa || {}).infancia, OS.one('meta').seeded],
+    ls: (JSON.parse(localStorage.getItem('os2:transactions~0') || '{}').items || [1]).length, purge: OS.CalPush && OS.CalPush.purge }; });
+  ok('Fica o que é teu (e o que mudaste para ficar)', af.mine.every(Boolean), JSON.stringify(af.mine));
+  ok('Sai o que era teste', af.gone.every(Boolean), JSON.stringify(af.gone));
+  ok('As configurações ficam: código, script Google, chaves da IA, preferências da Floresta, Direção e biografia', af.cfg[0] === before.sec && /TESTE/.test(af.cfg[1]) && af.cfg[2] === 'AZ_TESTE' && af.cfg[3] === 'AIzaTESTE' && af.cfg[4] === 50 && af.cfg[5] === 'Visão verdadeira' && af.cfg[6] === 'Resposta real' && af.cfg[7] === true, JSON.stringify(af.cfg));
   ok('Fica gravado (e vai para os outros aparelhos e para o Google Calendar)', af.ls === 0 && af.purge === true, JSON.stringify({ ls: af.ls, purge: af.purge }));
-  // recarregar: continua vazio (não volta a pôr os exemplos)
-  await p.reload(); await unlock(p); await sleep(800); const rl = await E(p, () => ({ tasks: OS.all('tasks').length, logs: OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}).length, 0) }));
-  ok('Ao reabrir a app continua limpa (não volta a pôr os exemplos)', rl.tasks === 0 && rl.logs === 0, JSON.stringify(rl));
-  // desfazer
+  await p.reload(); await unlock(p); await sleep(800); const rl = await E(p, () => ({ tx: OS.all('transactions').length, sh: OS.all('shifts').length }));
+  ok('Ao reabrir a app continua limpa (não volta a pôr os exemplos)', rl.tx === 0 && rl.sh === 1, JSON.stringify(rl));
   await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.add('tasks', { title: 'Tarefa nova a sério', status: 'Próxima' }); location.hash = 'definicoes'; }); await sleep(600);
   ok('Mostra "Desfazer" com a data e quantos registos foram apagados', await E(p, () => /registos apagados/.test((document.querySelector('#dataPn .rs-undo') || {}).innerText || '')));
   await E(p, () => document.querySelector('#dataPn [data-act=rsUndo]').click()); await sleep(300); await E(p, () => document.querySelector('#modal [data-mok]').click()); await sleep(1200);
-  const un = await E(p, () => ({ tasks: OS.all('tasks').map(t => t.title), logs: OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}).length, 0), coins: OS.one('forest').coins, undo: !!document.querySelector('#dataPn [data-act=rsUndo]') }));
-  ok('Desfazer: os registos voltam e o que registaste depois fica', un.tasks.includes('Tarefa de teste') && un.tasks.includes('Tarefa nova a sério') && un.logs >= 1 && un.coins === 77 && !un.undo, JSON.stringify(un));
-  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (começar do zero)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+  const un = await E(p, () => ({ tx: OS.all('transactions').length, tasks: OS.all('tasks').map(t => t.title), logs: OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}).length, 0), coins: OS.one('forest').coins, undo: !!document.querySelector('#dataPn [data-act=rsUndo]') }));
+  ok('Desfazer: os registos voltam e o que registaste depois fica', un.tx === 2 && un.tasks.includes('Comprar pão') && un.tasks.includes('Tarefa nova a sério') && un.logs >= 1 && un.coins === 77 && !un.undo, JSON.stringify(un));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (limpar testes)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
 /* ---------- Spyke: ouvido silencioso (sem o som do ditado), espera que acabes de falar, interromper falando, sabe tudo, chat ---------- */
 async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido silencioso, espera, interromper, cérebro ===');
