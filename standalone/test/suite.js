@@ -1896,6 +1896,50 @@ async function resetTests(b) { cur = 'Limpar testes'; console.log('\n=== Limpar 
   ok('Desfazer: os registos voltam e o que registaste depois fica', un.tx === 2 && un.tasks.includes('Comprar pão') && un.tasks.includes('Tarefa nova a sério') && un.logs >= 1 && un.coins === 77 && !un.undo, JSON.stringify(un));
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (limpar testes)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
+/* ---------- Faltas: marcadas sozinhas pelo horário, pela rotina e pelos turnos; corrigir com um toque; limite e avisos ---------- */
+async function attTests(b) { cur = 'Faltas'; console.log('\n=== Faltas por disciplina (automáticas) ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
+  const W = await E(p, () => { const U = OS.U, T = U.today(), d7 = U.addDays(T, -7), d6 = U.addDays(T, -6), wd = d => String(U.parse(d).getDay());
+    OS.all('classes').slice().forEach(c => OS.del('classes', c.id)); OS.all('routine').slice().forEach(r => OS.del('routine', r.id)); OS.all('shifts').slice().forEach(r => OS.del('shifts', r.id));
+    OS.setOne('profile', { semStart: U.addDays(T, -21), semEnd: U.addDays(T, 60), city: 'Aveiro' });
+    const est = OS.add('subjects', { name: 'Estatística', status: 'Em curso', absMax: 3 }), con = OS.add('subjects', { name: 'Contabilidade Financeira', status: 'Em curso', absMax: 2 });
+    const c1 = OS.add('classes', { subject: est.id, wday: wd(d7), start: '10:00', end: '12:00', kind: 'Teórica' }), c2 = OS.add('classes', { subject: con.id, wday: wd(d6), start: '14:00', end: '16:00', kind: 'Prática' });
+    OS.add('routine', { title: 'Faculdade', area: 'Universidade', days: [wd(d7), wd(d6)], start: '09:00', end: '17:00' });
+    OS.add('shifts', { date: d6, start: '13:00', end: '20:00', src: 'foto' });
+    // turno no próximo dia de Contabilidade (vai bater com a aula)
+    let nx = U.addDays(T, 1); while (wd(nx) !== wd(d6)) nx = U.addDays(nx, 1); OS.add('shifts', { date: nx, start: '12:00', end: '18:00' });
+    return { est: est.id, con: con.id, c1: c1.id, c2: c2.id, d6, d7, nx }; });
+  const st = await E(p, w => { const A = OS.Att, e = A.stats(OS.get('subjects', w.est)), c = A.stats(OS.get('subjects', w.con)), l6 = A.all().find(x => x.cls === w.c2 && x.date === w.d6), l7 = A.all().find(x => x.cls === w.c1 && x.date === w.d7);
+    return { e: [e.pres, e.faltas, e.L.length], c: [c.pres, c.faltas, c.L.length], why6: l6 && l6.why, st6: l6 && l6.st, st7: l7 && l7.st, why7: l7 && l7.why }; }, W);
+  ok('Aulas que já passaram contam sozinhas: presença quando a rotina te põe na faculdade', st.st7 === 'Presente' && /Rotina: Faculdade/.test(st.why7) && st.e[1] === 0 && st.e[0] === st.e[2] && st.e[2] >= 3, JSON.stringify(st));
+  ok('Falta sozinha quando estavas a trabalhar à hora da aula (turno do horário importado)', st.st6 === 'Falta' && /trabalhar/.test(st.why6) && st.c[1] === 1, JSON.stringify(st));
+  const hol = await E(p, () => [OS.Att.holiday('2026-10-05'), OS.Att.holiday('2027-03-26'), OS.Att.holiday('2026-05-12'), OS.Att.holiday('2026-10-16')]);
+  ok('Feriados de Portugal (e o de Aveiro) contam como "sem aula"', hol[0] === 'Implantação da República' && hol[1] === 'Sexta-feira Santa' && hol[2] === 'Feriado de Aveiro' && hol[3] === '', JSON.stringify(hol));
+  const nr = await E(p, w => { const r = OS.all('routine')[0]; OS.upd('routine', r.id, { days: [String(OS.U.parse(w.d7).getDay())] }); const x = OS.Att.all().find(o => o.cls === w.c2 && o.date !== w.d6); const out = { st: x && x.st, why: x && x.why }; OS.upd('routine', r.id, { days: [String(OS.U.parse(w.d7).getDay()), String(OS.U.parse(w.d6).getDay())] }); return out; }, W);
+  ok('Falta sozinha quando a tua rotina não te põe na faculdade nesse dia', nr.st === 'Falta' && /rotina não tem faculdade/.test(nr.why), JSON.stringify(nr));
+  // a aba
+  await E(p, () => { location.hash = 'universidade.presencas'; }); await sleep(700);
+  const v = await E(p, () => ({ tab: [...document.querySelectorAll('#view .tabs a')].some(a => a.textContent.trim() === 'Faltas' && /presencas/.test(a.getAttribute('href'))), cards: document.querySelectorAll('#view .att-s').length, chips: document.querySelectorAll('#view .att-c').length, warn: /Aulas que vão bater com o trabalho/.test(document.getElementById('view').innerText), txt: document.getElementById('view').innerText }));
+  ok('Universidade → Faltas: cada disciplina com faltas/limite, presenças e as aulas (com o motivo)', v.tab && v.cards >= 2 && v.chips >= 5 && /1\s*\/\s*2/.test(v.txt) && /podes faltar mais 1/.test(v.txt), JSON.stringify({ tab: v.tab, cards: v.cards, chips: v.chips }));
+  ok('Avisa quando um turno vai bater com uma aula', v.warn, '');
+  // corrigir com um toque: Presente → Falta → Justificada → Sem aula → automático
+  const cyc = await E(p, async w => { const k = w.c1 + '@' + w.d7, out = []; for (let i = 0; i < 5; i++) { const b = [...document.querySelectorAll('#view .att-c')].find(x => x.dataset.k === k); b.click(); await new Promise(r => setTimeout(r, 250)); const o = OS.Att.all().find(x => x.k === k); out.push(o.st + (o.man ? '*' : '')); } return out; }, W);
+  ok('Corrigir com um toque: Presente → Falta → Justificada → Sem aula → volta ao automático', cyc.join() === 'Falta*,Falta justificada*,Sem aula*,Presente,Falta*', cyc.join());
+  const fx = await E(p, w => OS.Att.stats(OS.get('subjects', w.est)).faltas, W);
+  ok('A falta corrigida conta para o limite', fx === 1, String(fx));
+  // avisos no Painel
+  const al = await E(p, () => OS.Intel.alerts().filter(a => a.area === 'Universidade').map(a => a.title));
+  ok('Painel: avisa do limite de faltas e do turno à hora da aula', al.some(t => /Faltas em Contabilidade|Limite de faltas atingido em Contabilidade/.test(t)) && al.some(t => /Turno à hora de Contabilidade/.test(t)), JSON.stringify(al));
+  // Spyke
+  await E(p, async () => { await OS.Spyke.handle('Faltei à aula de estatística'); }); await sleep(600);
+  const sp = await E(p, w => ({ m: OS.Spyke.msgs().map(x => x.t).join(' | '), f: OS.Att.stats(OS.get('subjects', w.est)).faltas, ctx: OS.Spyke.ctx() }), W);
+  ok('Spyke: "faltei à aula de estatística" marca a falta na última aula', /Marquei falta na aula de Estatística/.test(sp.m) && sp.f >= 1, sp.m.slice(-200));
+  await E(p, async () => { await OS.Spyke.handle('quantas faltas tenho'); }); await sleep(500);
+  const sp2 = await E(p, () => OS.Spyke.msgs().slice(-1)[0].t);
+  ok('Spyke: "quantas faltas tenho" e sabe as faltas no resumo da tua vida', /Contabilidade Financeira: \d+ faltas? de 2/.test(sp2) && /Faltas nas aulas/.test(sp.ctx), sp2);
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)|speechSynthesis/.test(e)); ok('sem erros de JavaScript (faltas)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 /* ---------- Spyke: ouvido silencioso (sem o som do ditado), espera que acabes de falar, interromper falando, sabe tudo, chat ---------- */
 async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido silencioso, espera, interromper, cérebro ===');
   const b2 = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }); const { ctx, p, errs } = await newPage(b2, PROFILES[4], { 'os2:one~diet': JSON.stringify({ data: { aiKey: 'AIzaTESTE_TESTE_TESTE_TESTE' } }), 'os2:one~spyke': JSON.stringify({ data: { eng: 'gemini', always: true } }) }); const stt = [], brain = []; let say = [];
@@ -1983,7 +2027,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) await calTests(b); if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) await calTests(b); if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

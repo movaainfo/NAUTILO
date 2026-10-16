@@ -3,13 +3,13 @@
   "p": "iPhone",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "412 ms"
+  "info": "329 ms"
  },
  {
   "p": "iPhone",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.21"
+  "info": "MIND CONTROL · v2.22"
  },
  {
   "p": "iPhone",
@@ -69,7 +69,7 @@
   "p": "iPhone",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 123 ms"
+  "info": "máx 177 ms"
  },
  {
   "p": "iPhone",
@@ -99,7 +99,7 @@
   "p": "iPhone",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1481 elementos"
+  "info": "heap +0 MB · 1482 elementos"
  },
  {
   "p": "iPhone",
@@ -111,13 +111,13 @@
   "p": "Android tel",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "353 ms"
+  "info": "324 ms"
  },
  {
   "p": "Android tel",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.21"
+  "info": "MIND CONTROL · v2.22"
  },
  {
   "p": "Android tel",
@@ -177,7 +177,7 @@
   "p": "Android tel",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 129 ms"
+  "info": "máx 150 ms"
  },
  {
   "p": "Android tel",
@@ -207,7 +207,7 @@
   "p": "Android tel",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1481 elementos"
+  "info": "heap +0 MB · 1482 elementos"
  },
  {
   "p": "Android tel",
@@ -219,13 +219,13 @@
   "p": "Tablet horiz",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "2097 ms"
+  "info": "2184 ms"
  },
  {
   "p": "Tablet horiz",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.21"
+  "info": "MIND CONTROL · v2.22"
  },
  {
   "p": "Tablet horiz",
@@ -285,7 +285,7 @@
   "p": "Tablet horiz",
   "name": "páginas rápidas (processador 6× mais lento)",
   "pass": true,
-  "info": "máx 314 ms"
+  "info": "máx 382 ms"
  },
  {
   "p": "Tablet horiz",
@@ -315,7 +315,7 @@
   "p": "Tablet horiz",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1481 elementos"
+  "info": "heap +0 MB · 1064 elementos"
  },
  {
   "p": "Tablet horiz",
@@ -327,13 +327,13 @@
   "p": "Tablet vert",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "335 ms"
+  "info": "336 ms"
  },
  {
   "p": "Tablet vert",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.21"
+  "info": "MIND CONTROL · v2.22"
  },
  {
   "p": "Tablet vert",
@@ -393,7 +393,7 @@
   "p": "Tablet vert",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 140 ms"
+  "info": "máx 137 ms"
  },
  {
   "p": "Tablet vert",
@@ -423,7 +423,7 @@
   "p": "Tablet vert",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1481 elementos"
+  "info": "heap +0 MB · 1482 elementos"
  },
  {
   "p": "Tablet vert",
@@ -435,13 +435,13 @@
   "p": "Computador",
   "name": "abre o ecrã do código",
   "pass": true,
-  "info": "357 ms"
+  "info": "325 ms"
  },
  {
   "p": "Computador",
   "name": "versão visível no ecrã do código",
   "pass": true,
-  "info": "MIND CONTROL · v2.21"
+  "info": "MIND CONTROL · v2.22"
  },
  {
   "p": "Computador",
@@ -501,7 +501,7 @@
   "p": "Computador",
   "name": "páginas rápidas",
   "pass": true,
-  "info": "máx 178 ms"
+  "info": "máx 137 ms"
  },
  {
   "p": "Computador",
@@ -525,7 +525,7 @@
   "p": "Computador",
   "name": "sem fugas de memória (200 mudanças de página)",
   "pass": true,
-  "info": "heap +0 MB · 1481 elementos"
+  "info": "heap +0 MB · 1482 elementos"
  },
  {
   "p": "Computador",
@@ -535,7 +535,7 @@
  },
  {
   "p": "Geral",
-  "name": "os 75 formulários gravam",
+  "name": "os 76 formulários gravam",
   "pass": true,
   "info": ""
  },
@@ -621,7 +621,7 @@
   "p": "Geral",
   "name": "atualização: depois mostra \"Atualizado\" e a versão nova",
   "pass": true,
-  "info": "Atualizado · versão 9.9 · 16/10/2026 · Limpar os dados de teste (Definições → Da"
+  "info": "Atualizado · versão 9.9 · 16/10/2026 · Faltas por disciplina (Universidade → Fal"
  },
  {
   "p": "Geral",
@@ -981,7 +981,7 @@
   "p": "Geral",
   "name": "dieta: 200 g de frango = macros certas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-16\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"3y0tqk6f8vc\",\"_c\":1792167779496,\"_u\":1792167779496,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-16\",\"meal\":\"Lanche\",\"food\":\"Peito de frango · grelhado\",\"pic\":\"https://i.pinimg.com/474x/bc/e8/8d/bce88dae8a51618b59780eb5391fe3a9.jpg\",\"g\":200,\"qty\":1,\"kcal\":318,\"p\":64,\"c\":0,\"f\":5,\"fib\":0,\"id\":\"je8czm8orym\",\"_c\":1792171583374,\"_u\":1792171583374,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -1131,7 +1131,7 @@
   "p": "Geral",
   "name": "regista com a opção e a marca escolhidas",
   "pass": true,
-  "info": "{\"date\":\"2026-10-16\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"bg0v0b6fpfx\",\"_c\":1792167800973,\"_u\":1792167800973,\"_s\":0}"
+  "info": "{\"date\":\"2026-10-16\",\"meal\":\"Lanche\",\"food\":\"Arroz branco tipo 1 (agulha) — Agulha cigala (Cigala)\",\"pic\":\"https://images.openfoodfacts.org/images/products/560/126/003/7109/front_pt.4.200.jpg\",\"g\":100,\"qty\":1,\"kcal\":355,\"p\":7.5,\"c\":78,\"f\":1,\"fib\":2.4,\"id\":\"72l2g58p8jq\",\"_c\":1792171604870,\"_u\":1792171604870,\"_s\":0}"
  },
  {
   "p": "Geral",
@@ -2337,7 +2337,7 @@
   "p": "Novidades",
   "name": "Spyke: com o nome responde logo",
   "pass": true,
-  "info": "São 16:26."
+  "info": "São 17:29."
  },
  {
   "p": "Novidades",
@@ -2367,7 +2367,7 @@
   "p": "Novidades",
   "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
   "pass": true,
-  "info": "São 16:26."
+  "info": "São 17:29."
  },
  {
   "p": "Novidades",
@@ -2607,7 +2607,7 @@
   "p": "Novidades",
   "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
   "pass": true,
-  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 16/10, 16:27\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 16/10, 17:30\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
  },
  {
   "p": "Novidades",
@@ -2683,7 +2683,7 @@
  },
  {
   "p": "Segurança",
-  "name": "segurança: código malicioso gravado em todos os campos de 75 tipos de registo",
+  "name": "segurança: código malicioso gravado em todos os campos de 76 tipos de registo",
   "pass": true,
   "info": ""
  },
@@ -3153,7 +3153,7 @@
   "p": "Novos",
   "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
   "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"q71miv6o76d\"}"
+  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"fvepku8xpet\"}"
  },
  {
   "p": "Novos",
@@ -3609,7 +3609,7 @@
   "p": "Extras",
   "name": "Decisões: o Spyke organiza o que escrevi (alternativas) e analisa: pontos fortes e fracos com peso, o que pesa mais, sobre o que escrevi",
   "pass": true,
-  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"y6r6c16p5nz\"}"
+  "info": "{\"ok\":true,\"alts\":\"Aceitar|Não aceitar\",\"an\":true,\"t\":true,\"id\":\"gb073n8yntk\"}"
  },
  {
   "p": "Extras",
@@ -3633,13 +3633,13 @@
   "p": "Voz",
   "name": "Voz Gemini: a língua vai na configuração da voz (pt-BR) e a voz é a mesma",
   "pass": true,
-  "info": "{\"at\":30,\"text\":\"Boa tarde, Ryan. Hoje é sexta-feira, 16 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
+  "info": "{\"at\":28,\"text\":\"Boa tarde, Ryan. Hoje é sexta-feira, 16 de outubro.\",\"lang\":\"pt-BR\",\"voice\":{\"voiceName\":\"Charon\"}}"
  },
  {
   "p": "Voz",
   "name": "Resumo: o 1.º pedaço é só a saudação (começa a falar em segundos) e o resto é pedido logo a seguir, em paralelo",
   "pass": true,
-  "info": "[[30,51],[31,159]]"
+  "info": "[[28,51],[28,159]]"
  },
  {
   "p": "Voz",
@@ -3663,13 +3663,13 @@
   "p": "Ouvido",
   "name": "Fala → espera que acabes (pausa de ~1,2 s) → transcreve a frase inteira → responde",
   "pass": true,
-  "info": "{\"n\":1,\"espera\":1295}"
+  "info": "{\"n\":1,\"espera\":1252}"
  },
  {
   "p": "Ouvido",
   "name": "Transcrição pelo modelo mais rápido (lite)",
   "pass": true,
-  "info": "{\"at\":1792168249284,\"model\":\"gemini-3.5-flash-lite\",\"pr\":\"Transcreve exatamente o que a pessoa diz neste áudio (português do Brasil), palavra por palavra. Não completes, não corrijas e não inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -\"}"
+  "info": "{\"at\":1792172051846,\"model\":\"gemini-3.5-flash-lite\",\"pr\":\"Transcreve exatamente o que a pessoa diz neste áudio (português do Brasil), palavra por palavra. Não completes, não corrijas e não inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -\"}"
  },
  {
   "p": "Ouvido",
@@ -3717,7 +3717,7 @@
   "p": "Ouvido",
   "name": "Avisos: aparecem no ecrã em silêncio (o Spyke não fala sozinho; tocas no aviso para ouvir)",
   "pass": true,
-  "info": "{\"banner\":\"Aviso do SpykeRyan, daqui a 20 minutos tens Reunião de teste do aviso, às 16:51.×\",\"plays\":0,\"st\":\"idle\",\"open\":false}"
+  "info": "{\"banner\":\"Aviso do SpykeRyan, daqui a 20 minutos tens Reunião de teste do aviso, às 17:54.×\",\"plays\":0,\"st\":\"idle\",\"open\":false}"
  },
  {
   "p": "Ouvido",
@@ -3789,7 +3789,7 @@
   "p": "Agenda",
   "name": "Parte 6 colada: a app reconhece-a e liga a agenda sozinha (sem carregar em nada)",
   "pass": true,
-  "info": "[\"ping\",\"put\",\"c6ping\",\"c7ping\",\"cal6\",\"gm\"]"
+  "info": "[\"pull\",\"ping\",\"put\",\"c6ping\",\"c7ping\",\"cal6\"]"
  },
  {
   "p": "Agenda",
@@ -3801,7 +3801,7 @@
   "p": "Agenda",
   "name": "Trabalho de noite (22:00–06:00) acaba no dia seguinte; aula com hora e sala; folga e prova sem hora ficam \"dia inteiro\"",
   "pass": true,
-  "info": "{\"sh\":{\"id\":\"shifts:jaxkng6px4f@2026-10-16\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-16T22:00:00.000Z\",\"e\":\"2026-10-17T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:e8ppvd6px4g@2026-10-17\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-17\",\"e\":\"2026-10-17\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:zqb09g6px4g@2026-10-19\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-19\",\"e\":\"2026-10-19\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:iwivb26px4g@2026-10-10\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-10T09:00:00.000Z\",\"e\":\"2026-10-10T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
+  "info": "{\"sh\":{\"id\":\"shifts:ga8x5k8zf30@2026-10-16\",\"eid\":\"\",\"t\":\"Trabalho · Loja\",\"s\":\"2026-10-16T22:00:00.000Z\",\"e\":\"2026-10-17T06:00:00.000Z\",\"all\":false,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Trabalho). Para mudar, altera na app.\"},\"off\":{\"id\":\"dayoffs:ppapcq8zf30@2026-10-17\",\"eid\":\"\",\"t\":\"Folga\",\"s\":\"2026-10-17\",\"e\":\"2026-10-17\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"},\"ex\":{\"id\":\"assessments:lsv9ln8zf31@2026-10-19\",\"eid\":\"\",\"t\":\"Teste: Contabilidade\",\"s\":\"2026-10-19\",\"e\":\"2026-10-19\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Avaliações). Para mudar, altera na app.\"},\"cl\":{\"id\":\"classes:mxi9au8zf31@2026-10-10\",\"eid\":\"\",\"t\":\"Aula: Contabilidade\",\"s\":\"2026-10-10T09:00:00.000Z\",\"e\":\"2026-10-10T11:00:00.000Z\",\"all\":false,\"l\":\"Teórica · Sala 2\",\"d\":\"Criado pelo Oceanum (Aulas). Para mudar, altera na app.\"}}"
  },
  {
   "p": "Agenda",
@@ -3831,7 +3831,7 @@
   "p": "Agenda",
   "name": "Uma folga nova vai sozinha para fora, poucos segundos depois de a registar",
   "pass": true,
-  "info": "[{\"up\":[{\"id\":\"dayoffs:2x0cpv6q32o@2026-10-25\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-25\",\"e\":\"2026-10-25\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
+  "info": "[{\"up\":[{\"id\":\"dayoffs:y892a98zl1l@2026-10-25\",\"eid\":\"\",\"t\":\"Férias\",\"s\":\"2026-10-25\",\"e\":\"2026-10-25\",\"all\":true,\"l\":\"\",\"d\":\"Criado pelo Oceanum (Folgas). Para mudar, altera na app.\"}],\"del\":[]}]"
  },
  {
   "p": "Agenda",
@@ -3921,7 +3921,7 @@
   "p": "Direção",
   "name": "Spyke e Centro de decisões sabem tudo: património, investimentos, estudo, projetos, desporto, dieta, Fé, leitura, tendências e aniversários certos",
   "pass": true,
-  "info": "Agora: sexta-feira, 16 de outubro às 16:31 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Full Body\nAlertas: Treino: 9 dias sem treinar (Último registo a 7 out)\nPróx"
+  "info": "Agora: sexta-feira, 16 de outubro às 17:35 (Portugal)\nUtilizador: Ryan da Silva Magalhães, Aveiro\nAgenda hoje e amanhã: hoje Full Body\nAlertas: Treino: 9 dias sem treinar (Último registo a 7 out)\nPróx"
  },
  {
   "p": "Direção",
@@ -4068,8 +4068,80 @@
   "info": ""
  },
  {
+  "p": "Faltas",
+  "name": "Aulas que já passaram contam sozinhas: presença quando a rotina te põe na faculdade",
+  "pass": true,
+  "info": "{\"e\":[4,0,4],\"c\":[2,1,3],\"why6\":\"Estavas a trabalhar (turno 13:00–20:00)\",\"st6\":\"Falta\",\"st7\":\"Presente\",\"why7\":\"Rotina: Faculdade 09:00–17:00\"}"
+ },
+ {
+  "p": "Faltas",
+  "name": "Falta sozinha quando estavas a trabalhar à hora da aula (turno do horário importado)",
+  "pass": true,
+  "info": "{\"e\":[4,0,4],\"c\":[2,1,3],\"why6\":\"Estavas a trabalhar (turno 13:00–20:00)\",\"st6\":\"Falta\",\"st7\":\"Presente\",\"why7\":\"Rotina: Faculdade 09:00–17:00\"}"
+ },
+ {
+  "p": "Faltas",
+  "name": "Feriados de Portugal (e o de Aveiro) contam como \"sem aula\"",
+  "pass": true,
+  "info": "[\"Implantação da República\",\"Sexta-feira Santa\",\"Feriado de Aveiro\",\"\"]"
+ },
+ {
+  "p": "Faltas",
+  "name": "Falta sozinha quando a tua rotina não te põe na faculdade nesse dia",
+  "pass": true,
+  "info": "{\"st\":\"Falta\",\"why\":\"A tua rotina não tem faculdade neste dia\"}"
+ },
+ {
+  "p": "Faltas",
+  "name": "Universidade → Faltas: cada disciplina com faltas/limite, presenças e as aulas (com o motivo)",
+  "pass": true,
+  "info": "{\"tab\":true,\"cards\":2,\"chips\":7}"
+ },
+ {
+  "p": "Faltas",
+  "name": "Avisa quando um turno vai bater com uma aula",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Faltas",
+  "name": "Corrigir com um toque: Presente → Falta → Justificada → Sem aula → volta ao automático",
+  "pass": true,
+  "info": "Falta*,Falta justificada*,Sem aula*,Presente,Falta*"
+ },
+ {
+  "p": "Faltas",
+  "name": "A falta corrigida conta para o limite",
+  "pass": true,
+  "info": "1"
+ },
+ {
+  "p": "Faltas",
+  "name": "Painel: avisa do limite de faltas e do turno à hora da aula",
+  "pass": true,
+  "info": "[\"Faltas em Contabilidade Financeira: 1 de 2\",\"Turno à hora de Contabilidade Financeira\"]"
+ },
+ {
+  "p": "Faltas",
+  "name": "Spyke: \"faltei à aula de estatística\" marca a falta na última aula",
+  "pass": true,
+  "info": "Faltei à aula de estatística | Marquei falta na aula de Estatística de hoje às 10:00. Tens 2 faltas de 3."
+ },
+ {
+  "p": "Faltas",
+  "name": "Spyke: \"quantas faltas tenho\" e sabe as faltas no resumo da tua vida",
+  "pass": true,
+  "info": "Faltas: Estatística: 2 faltas de 3, 2 presenças (50%); Contabilidade Financeira: 1 falta de 2, 2 presenças (67%)."
+ },
+ {
+  "p": "Faltas",
+  "name": "sem erros de JavaScript (faltas)",
+  "pass": true,
+  "info": ""
+ },
+ {
   "p": "Check-up Computador",
-  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "name": "Check-up: dados de teste em todas as áreas da app (222 registos)",
   "pass": true,
   "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
  },
@@ -4099,7 +4171,7 @@
  },
  {
   "p": "Check-up Computador",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (149)",
   "pass": true,
   "info": ""
  },
@@ -4117,7 +4189,7 @@
  },
  {
   "p": "Check-up iPhone",
-  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "name": "Check-up: dados de teste em todas as áreas da app (222 registos)",
   "pass": true,
   "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
  },
@@ -4147,7 +4219,7 @@
  },
  {
   "p": "Check-up iPhone",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (149)",
   "pass": true,
   "info": ""
  },
@@ -4165,7 +4237,7 @@
  },
  {
   "p": "Check-up Android tel",
-  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "name": "Check-up: dados de teste em todas as áreas da app (222 registos)",
   "pass": true,
   "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
  },
@@ -4179,7 +4251,7 @@
   "p": "Check-up Android tel",
   "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
   "pass": true,
-  "info": " · repetidas: eu.pessoas"
+  "info": ""
  },
  {
   "p": "Check-up Android tel",
@@ -4195,7 +4267,7 @@
  },
  {
   "p": "Check-up Android tel",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (146)",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (149)",
   "pass": true,
   "info": ""
  },
@@ -4213,7 +4285,7 @@
  },
  {
   "p": "Check-up Tablet vert",
-  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "name": "Check-up: dados de teste em todas as áreas da app (222 registos)",
   "pass": true,
   "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
  },
@@ -4243,7 +4315,7 @@
  },
  {
   "p": "Check-up Tablet vert",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (149)",
   "pass": true,
   "info": ""
  },
@@ -4261,7 +4333,7 @@
  },
  {
   "p": "Check-up Tablet horiz",
-  "name": "Check-up: dados de teste em todas as áreas da app (219 registos)",
+  "name": "Check-up: dados de teste em todas as áreas da app (222 registos)",
   "pass": true,
   "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
  },
@@ -4275,7 +4347,7 @@
   "p": "Check-up Tablet horiz",
   "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
   "pass": true,
-  "info": ""
+  "info": " · repetidas: carreira"
  },
  {
   "p": "Check-up Tablet horiz",
@@ -4291,7 +4363,7 @@
  },
  {
   "p": "Check-up Tablet horiz",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (147)",
+  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (148)",
   "pass": true,
   "info": ""
  },
@@ -4737,13 +4809,13 @@
   "p": "Stress",
   "name": "com 3 anos de dados nenhuma página bloqueia (> 2,5 s)",
   "pass": true,
-  "info": "máx 1598 ms"
+  "info": "máx 2057 ms"
  },
  {
   "p": "Stress",
   "name": "guardar tudo é rápido",
   "pass": true,
-  "info": "91 ms"
+  "info": "87 ms"
  },
  {
   "p": "Stress",

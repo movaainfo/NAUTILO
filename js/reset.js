@@ -21,7 +21,7 @@ const AREAS = [
   ['Tarefas, agenda e notas', ['tasks', 'events', 'mailevents', 'routine', 'routines', 'notes', 'focusblocks']],
   ['Projetos, metas, decisões e revisões', ['projects', 'milestones', 'goals', 'decisions', 'reviews_w', 'reviews_m']],
   ['Hábitos', ['habits', 'habits#log']],
-  ['Estudos', ['subjects', 'classes', 'topics', 'assessments', 'sessions', 'reviews', 'errors', 'cards', 'quizzes', 'qbank', 'qlog', 'materials', 'files', 'learn']],
+  ['Estudos', ['subjects', 'attend', 'classes', 'topics', 'assessments', 'sessions', 'reviews', 'errors', 'cards', 'quizzes', 'qbank', 'qlog', 'materials', 'files', 'learn']],
   ['Leitura e Fé', ['books', 'rchal', 'devos', 'prayers', 'bmarks', 'bread']],
   ['Corpo e treino', ['workouts', 'runs', 'runplan', 'body', 'checkins', 'bchal', 'bgoals', 'stretches', 'exercises']],
   ['Alimentação', ['meals', 'mealtpl', 'foods']],

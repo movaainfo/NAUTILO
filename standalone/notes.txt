@@ -1,4 +1,4 @@
-Limpar os dados de teste (Definições → Dados): o app separa sozinho o que é teu do que foi teste e mostra-te tudo antes de apagar, área a área.
-Fica o que é teu: o horário do trabalho importado da foto, as disciplinas, as contas e bancos, os hábitos (só os dias marcados saem), o teu plano inicial (metas, projeto, competências, contactos), o que veio dos e-mails e da B3, a biografia e o que o Spyke sabe de ti.
-Sai o que foi teste: movimentos, tarefas, treinos, sessões, refeições… e tudo o que tem "teste" no nome. Podes mudar qualquer registo antes de confirmar.
-As configurações nunca saem (código, Face ID, script Google, chaves da IA, Spyke, e-mail, perfil). Dá para desfazer durante 30 dias.
+Faltas por disciplina (Universidade → Faltas): cada aula do teu horário que já passou marca-se sozinha.
+Conta presença quando a tua rotina te põe na faculdade à hora da aula; falta quando estavas num turno do trabalho ou a rotina não te põe lá; nos feriados (Portugal e Aveiro) não há aula.
+Tocas numa aula para corrigir: Presente → Falta → Justificada → Sem aula → automático. Cada disciplina mostra faltas, limite, presenças e % de presença.
+Avisos no Painel quando te aproximas do limite e quando um turno vai bater com uma aula. Diz ao Spyke "faltei à aula de…" ou "quantas faltas tenho".
