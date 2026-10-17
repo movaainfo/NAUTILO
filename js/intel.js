@@ -210,7 +210,11 @@ I.metrics = [
   { k: 'faith', l: 'Devocionais (30 dias)', up: true, f: d => { const [a, b] = win(d, 30); return OS.all('devos').filter(x => U.inRange(x.date, a, b)).length; }, has: () => OS.all('devos').length, fmt: v => U.nf(v) },
   { k: 'mova', off: 1, l: 'Receita Mova (30 dias)', up: true, f: d => 0, has: () => 0, fmt: v => U.eur(v, { dec: 0 }) }
 ];
-I.firstDate = () => { const ds = []; ['transactions', 'sessions', 'workouts', 'runs', 'tasks', 'mvsales', 'shifts', 'sportlog', 'meals', 'trees', 'focusblocks', 'devos'].forEach(c => OS.all(c).forEach(r => { const d = r.date || r.doneAt; if (d) ds.push(d); })); return ds.sort()[0] || U.today(); };
+// a data do primeiro registo: era calculada dezenas de vezes por página (lenta com anos de dados); agora fica guardada até os dados mudarem
+let FD = null; OS.on('change', () => { FD = null; }); OS.on('remote', () => { FD = null; });
+I.firstDate = () => { if (FD && FD.t === U.today()) return FD.v; let min = '';
+  ['transactions', 'sessions', 'workouts', 'runs', 'tasks', 'mvsales', 'shifts', 'sportlog', 'meals', 'trees', 'focusblocks', 'devos'].forEach(c => OS.all(c).forEach(r => { const d = r.date || r.doneAt; if (d && (!min || d < min)) min = d; }));
+  FD = { t: U.today(), v: min || U.today() }; return FD.v; };
 I.compare = m => { const t = U.today(); return [0, 30, 90, 365].map(n => { const d = U.addDays(t, -n); if (d < I.firstDate() && n) return null; const v = m.f(d); return v == null ? null : v; }); };
 I.insights = () => {
   const out = [], t = U.today(), first = I.firstDate(), span = U.diff(t, first);

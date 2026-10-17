@@ -1,4 +1,2 @@
-Agenda no iPhone / Google Calendar sem eventos repetidos: a app procura e apaga sozinha os que ficaram em duplicado (por exemplo, o mesmo turno ou folga no calendário vermelho "Oceanum" e no da sua cor). Fica só um, no calendário da sua cor.
-Já não volta a duplicar: se o teste ao script falhar por um momento, a app não volta ao modo antigo, e antes de criar um evento vê se já existe um igual lá fora (útil quando o telemóvel e o tablet sincronizam ao mesmo tempo).
-Botão "Apagar repetidos" em Definições → Ligações, na agenda.
-A agenda dentro da app já não mostra a dobrar o que ela própria pôs no Google Calendar.
+Agenda no iPhone / Google Calendar sem eventos repetidos: a app procura e apaga sozinha os que ficaram em duplicado e já não volta a duplicar.
+A página Evolução abre muito mais depressa com muitos dados (até 4× mais rápida).
