@@ -1841,6 +1841,48 @@ async function direcaoTests(b) { cur = 'Direção'; console.log('\n=== Direção
   ok('Movimentos: tocar numa linha seleciona-a (em vez de abrir)', one === 1 && !(await E(p, () => !!document.querySelector('#osform'))));
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (Direção e Finanças)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
+/* ---------- Agenda lá fora sem duplicados: apaga os repetidos, reaproveita iguais, não volta ao modo antigo por um teste falhado ---------- */
+async function calDupTests(b) { cur = 'Agenda sem duplicados'; console.log('\n=== Agenda: sem eventos repetidos no Google Calendar / iPhone ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); const G = {}, ops = []; let nid = 0, failPing = false, cal6calls = 0;
+  const NAME = { trabalho: 'Oceanum · Trabalho', folgas: 'Oceanum · Folgas', tarefas: 'Oceanum · Tarefas', estudos: 'Oceanum · Estudos', compromissos: 'Oceanum · Compromissos', treino: 'Oceanum · Treino e rotina', outros: 'Oceanum' };
+  const isoS = it => it.all ? new Date(it.s + 'T00:00:00').toISOString() : it.s, isoE = it => it.all ? new Date((it.e || it.s) + 'T00:00:00').toISOString() : it.e;
+  await ctx.route(/script\.google\.com/, rt => { const u = new URL(rt.request().url()), P = Object.assign(Object.fromEntries(u.searchParams), Object.fromEntries(new URLSearchParams(rt.request().postData() || ''))), J = o => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) }); ops.push(P.op);
+    if (P.op === 'ping') return J({ ok: true, v: 11 }); if (P.op === 'olinfo') return J({ ok: true, v: 12 }); if (P.op === 'fping') return J({ ok: true, v: 5, pasta: 'https://drive.google.com/x' });
+    if (P.op === 'c6ping') return J({ ok: true, v: 1, cal: 'Oceanum' });
+    if (P.op === 'c7ping') return J(failPing ? { ok: false, msg: 'Serviço invocado demasiadas vezes' } : { ok: true, v: 1 });
+    if (P.op === 'cal6') { cal6calls++; return J({ ok: true, v: 1, map: {}, n: 0 }); }
+    if (P.op === 'cal7') { const j = JSON.parse(P.j), map = {}; (j.del || []).forEach(d => { if (G[d.e] && G[d.e].c === d.c) delete G[d.e]; }); (j.up || []).forEach(it => { if (it.x && G[it.x] && G[it.x].c === it.xc) delete G[it.x]; const e = it.eid && G[it.eid] ? it.eid : 'E' + (++nid); G[e] = Object.assign({}, it); map[it.id] = e; }); return J({ ok: true, v: 1, map, n: (j.up || []).length }); }
+    if (P.op === 'cl') { const a = new Date(P.a + 'T00:00:00').getTime(), z = new Date(P.b + 'T23:59:59').getTime(); return J({ ok: true, ev: Object.entries(G).filter(([, it]) => { const t = new Date(isoS(it)).getTime(); return t >= a && t <= z; }).map(([id, it]) => ({ id, t: it.t, s: isoS(it), e: isoE(it), all: !!it.all, cal: NAME[it.c] || 'Oceanum' })).concat([{ id: 'p1', t: 'Jantar', s: new Date().toISOString(), e: new Date(Date.now() + 36e5).toISOString(), all: false, cal: 'Pessoal' }]) }); }
+    return J({ ok: true, items: [], docs: {} }); });
+  await p.goto(BASE); await unlock(p);
+  const T = await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyX/exec', key: 'k', ver: 11, c6: 1, c7: 1 }); OS.setOne('calx', { on: true, rcAt: Date.now() }); return OS.U.today(); });
+  const ids = await E(p, T => { const U = OS.U, a = OS.add('shifts', { date: U.addDays(T, 1), start: '18:00', end: '22:00', src: 'foto' }), b = OS.add('dayoffs', { date: U.addDays(T, 2), kind: 'Folga', src: 'foto' }), c = OS.add('shifts', { date: U.addDays(T, 3), start: '19:00', end: '23:00', src: 'foto' }); return { a: a.id, b: b.id, c: c.id }; }, T);
+  await E(p, () => OS.CalPush.sync(true)); await sleep(500);
+  const n0 = await E(p, () => Object.keys(OS.one('calx').map).length);
+  // o que se vê nas tuas fotos: cada turno e folga também no calendário vermelho "Oceanum" (cópias antigas que ficaram para trás)
+  const before = Object.keys(G).length; Object.entries(Object.assign({}, G)).forEach(([id, it]) => { if (it.c !== 'outros') G['R' + id] = Object.assign({}, it, { c: 'outros' }); });
+  // e um turno que a app "esqueceu" (o mapa perdeu-o) mas que já está lá fora
+  await E(p, ids => { const m = Object.assign({}, OS.one('calx').map); Object.keys(m).filter(k => k.startsWith('shifts:' + ids.c)).forEach(k => delete m[k]); OS.setOne('calx', { map: m, rcAt: 0 }); }, ids);
+  const nidBefore = nid; await E(p, () => OS.CalPush.sync(true)); await sleep(600);
+  const key = it => it.t + '|' + isoS(it) + '|' + isoE(it), cnt = {}; Object.values(G).forEach(it => { cnt[key(it)] = (cnt[key(it)] || 0) + 1; });
+  const after = await E(p, () => ({ map: Object.keys(OS.one('calx').map).length, dups: OS.one('calx').dups }));
+  ok('Apaga sozinho os eventos repetidos que ficaram no calendário "Oceanum" (cada turno e folga fica só uma vez, no calendário da sua cor)', Object.values(cnt).every(n => n === 1) && Object.keys(G).length === before && !Object.values(G).some(it => it.c === 'outros' && /Trabalho|Folga/.test(it.t)), JSON.stringify({ before, now: Object.keys(G).length, cnt }));
+  ok('Um evento que a app "esqueceu" mas já está lá fora é reaproveitado (não cria outro)', nid === nidBefore && after.map === n0, JSON.stringify({ nidBefore, nid, map: after.map, n0 }));
+  // o teste ao script falha por um momento: não volta ao modo antigo (que criava tudo outra vez no "Oceanum")
+  failPing = true; const pg = await E(p, async () => { await OS.CalPush.check(); return { c7: OS.one('inbox').c7, has7: OS.CalPush.has7() }; }); failPing = false;
+  await E(p, T => OS.add('events', { title: 'Dentista', date: OS.U.addDays(T, 4), start: '10:00', end: '11:00' }), T); await E(p, () => OS.CalPush.sync(true)); await sleep(400);
+  ok('Se o teste ao script falhar por um momento, continua nas cores (não volta ao calendário único que duplicava)', pg.has7 === true && +pg.c7 === 1 && cal6calls === 0 && Object.values(G).some(it => it.t === 'Dentista' && it.c === 'compromissos'), JSON.stringify({ pg, cal6calls }));
+  // sem a Parte 7 a responder e com eventos já nas cores: espera em vez de duplicar
+  const w = await E(p, async T => { OS.one('inbox').c7 = 0; OS.add('events', { title: 'Reunião', date: OS.U.addDays(T, 5), start: '15:00', end: '16:00' }); await OS.CalPush.sync(true); const r = { err: OS.one('calx').err }; OS.one('inbox').c7 = 1; return r; }, T);
+  ok('Sem a Parte 7 a responder, não usa o modo antigo (espera em vez de duplicar)', cal6calls === 0 && /Parte 7/.test(w.err) && !Object.values(G).some(it => it.t === 'Reunião'), JSON.stringify(w));
+  // a app não mostra a dobrar o que ela própria pôs lá fora
+  const gm = await E(p, async () => { OS.setOne('integ', { gcal: true }); OS.gcalStart && await OS.gcalStart(); await new Promise(r => setTimeout(r, 900)); return OS.Cal.gcal.map(x => x.title); });
+  ok('O calendário da app não volta a ler os calendários "Oceanum · …" (não aparece nada a dobrar)', gm.includes('Jantar') && !gm.some(t => /Trabalho|Folga|Dentista/.test(t)), JSON.stringify(gm));
+  // botão para apagar repetidos
+  await E(p, () => { location.hash = 'definicoes.ligacoes'; }); await sleep(600);
+  ok('Definições: botão "Apagar repetidos" na agenda', await E(p, () => !!document.querySelector('[data-act=cpDup]')));
+  const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (agenda sem duplicados)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
+
 /* ---------- Limpar os dados de teste: separa sozinho o que é teu do que é teste, mostra tudo, mantém as configurações, propaga e permite desfazer ---------- */
 async function resetTests(b) { cur = 'Limpar testes'; console.log('\n=== Limpar os dados de teste (Definições → Dados) ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
@@ -2027,7 +2069,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) await calTests(b); if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

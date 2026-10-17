@@ -1,11 +1,11 @@
 {
- "n": 122,
- "hash": "860d411713b9",
+ "n": 123,
+ "hash": "471f29401eca",
  "notes": [
-  "Faltas por disciplina (Universidade → Faltas): cada aula do teu horário que já passou marca-se sozinha.",
-  "Conta presença quando a tua rotina te põe na faculdade à hora da aula; falta quando estavas num turno do trabalho ou a rotina não te põe lá; nos feriados (Portugal e Aveiro) não há aula.",
-  "Tocas numa aula para corrigir: Presente → Falta → Justificada → Sem aula → automático. Cada disciplina mostra faltas, limite, presenças e % de presença.",
-  "Avisos no Painel quando te aproximas do limite e quando um turno vai bater com uma aula. Diz ao Spyke \"faltei à aula de…\" ou \"quantas faltas tenho\"."
+  "Agenda no iPhone / Google Calendar sem eventos repetidos: a app procura e apaga sozinha os que ficaram em duplicado (por exemplo, o mesmo turno ou folga no calendário vermelho \"Oceanum\" e no da sua cor). Fica só um, no calendário da sua cor.",
+  "Já não volta a duplicar: se o teste ao script falhar por um momento, a app não volta ao modo antigo, e antes de criar um evento vê se já existe um igual lá fora (útil quando o telemóvel e o tablet sincronizam ao mesmo tempo).",
+  "Botão \"Apagar repetidos\" em Definições → Ligações, na agenda.",
+  "A agenda dentro da app já não mostra a dobrar o que ela própria pôs no Google Calendar."
  ],
- "date": "16/10/2026"
+ "date": "17/10/2026"
 }

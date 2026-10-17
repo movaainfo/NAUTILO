@@ -19,7 +19,9 @@ const win = (k) => { const w = TW[k] || [BACK, AHEAD]; return [U.addDays(U.today
 const st = () => OS.one('inbox') || {};
 const has6 = () => +(st().c6 || 0) >= 1, has7 = () => +(st().c7 || 0) >= 1, old6 = () => !!(OS.Files && OS.Files.has6());   // Parte 7 (cores), Parte 6 ou a Parte 5 versão 6 (antiga)
 const ready = () => !!(OS.Files && OS.Files.ready() && (has7() || has6() || old6()));
-const OP = () => has7() ? 'cal7' : has6() ? 'cal6' : 'calsync';
+// com eventos já nos calendários de cor, a Parte 6 (um só calendário) criava-os outra vez no "Oceanum": nesse caso não envia até a Parte 7 responder
+const catUsed = () => Object.values(cfg().map || {}).some(m => m && m.c && m.c !== 'outros');
+const OP = () => has7() ? 'cal7' : catUsed() ? '' : has6() ? 'cal6' : 'calsync';
 // cores lá fora (só no Google Calendar e no iPhone; a app fica igual): cada tipo vai para o seu calendário, com uma cor pastel
 const CATS = [['trabalho', 'Oceanum · Trabalho', '#A9C8F0', 'azul', ['shift']], ['folgas', 'Oceanum · Folgas', '#B8E6C9', 'verde menta', ['off']], ['tarefas', 'Oceanum · Tarefas', '#FBE7A1', 'amarelo', ['task']],
   ['estudos', 'Oceanum · Estudos', '#D6C8F2', 'lavanda', ['class', 'exam']], ['compromissos', 'Oceanum · Compromissos', '#F7C3D6', 'rosa', ['event', 'mail', 'opp']], ['treino', 'Oceanum · Treino e rotina', '#FFD1B3', 'pêssego', ['workout', 'run', 'routine']],
@@ -74,7 +76,8 @@ function op_cal7(p) { const J = JSON.parse(String(p.j || '{}')), K = J.cals || {
 `;
 const ping = async op => { try { const j = await IB.post({ op }); return j && j.ok ? (+j.v || 1) : 0; } catch (e) { return -1; } };
 CP.check = async () => { if (!(OS.Files && OS.Files.ready())) return false; const [v6, v7] = await Promise.all([ping('c6ping'), ping('c7ping')]); if (v6 < 0 && v7 < 0) return has6() || has7();
-  const c = st(); if ((v6 >= 0 && +(c.c6 || 0) !== v6) || (v7 >= 0 && +(c.c7 || 0) !== v7)) { if (v6 >= 0) c.c6 = v6; if (v7 >= 0) c.c7 = v7; OS.touch('inbox'); }
+  // só sobe, nunca desce: um teste que falha por um momento (script ocupado, sem rede) não pode pôr a app no modo antigo
+  const c = st(); if ((v6 > 0 && +(c.c6 || 0) !== v6) || (v7 > 0 && +(c.c7 || 0) !== v7)) { if (v6 > 0) c.c6 = v6; if (v7 > 0) c.c7 = v7; OS.touch('inbox'); }
   const any = v6 > 0 || v7 > 0; if (any && !cfg().on && !cfg().userOff) OS.setOne('calx', { on: true, err: '' });   // colaste a Parte 6 ou 7: liga sozinho
   if (any) CP.soon(1500); return any; };
 CP.has6 = has6; CP.has7 = has7;
@@ -106,16 +109,53 @@ CP.plan = (op = OP()) => { const c = cfg(), map = c.map || {}, cur = CP.items(),
   const del = Object.entries(map).filter(([id, m]) => { if (ids.has(id) || !m || !m.e) return false; if (!m.d || (CP.purge && gone(id))) return true; const [a, b] = win(m.k); return m.d >= a && m.d <= b; }).map(([id, m]) => ({ id, e: m.e, c: m.c || 'outros' }));
   return { up, del, n: cur.length }; };
 
+/* ---------- duplicados lá fora ----------
+   Lê os eventos dos calendários "Oceanum…" (pela Parte 3 do script, a mesma que traz a tua agenda para a app) e:
+   - se um registo da app não tem evento conhecido mas lá fora já existe um igual (mesmo título, dia e hora), passa a usar esse;
+   - se há dois ou mais iguais, fica o que a app conhece e os outros são apagados. Nunca toca nos teus outros calendários. */
+const ocCal = n => /^Oceanum( · .+)?$/.test(String(n || ''));
+const KEY_OF = Object.fromEntries(CATS.map(c => [c[1], c[0]]));
+const rkey = (t, s, e, all) => all ? t + '|D|' + U.iso(new Date(s)) : t + '|' + new Date(s).getTime() + '|' + new Date(e).getTime();
+const ikey = x => x.all ? x.t + '|D|' + x.s : x.t + '|' + new Date(x.s).getTime() + '|' + new Date(x.e).getTime();
+const clOk = () => { const c = st(); return !!(c.url && c.key && +(c.ver || 0) >= 11); };
+const remote = async (a, b) => { const c = st(), out = []; let d = a; out.trunc = false;
+  while (d <= b) { const e = U.addDays(d, 19) < b ? U.addDays(d, 19) : b;
+    const j = await IB.getJSON(c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=cl&a=' + d + '&b=' + e + '&_=' + Date.now(), 2);
+    if (!j || !j.ok) return null; const ev = j.ev || [], per = {}; ev.forEach(x => { per[x.cal] = (per[x.cal] || 0) + 1; }); if (ev.length >= 590 || Object.values(per).some(n => n >= 395)) out.trunc = true; (j.ev || []).forEach(x => { if (ocCal(x.cal) && x.id && !out.some(o => o.id === x.id)) out.push(x); }); d = U.addDays(e, 1); }
+  return out; };
+CP.reconcile = async (a, b) => { if (!clOk() || !OP()) return null; const full = !a; a = a || U.addDays(U.today(), -BACK); b = b || U.addDays(U.today(), AHEAD);
+  let R; try { R = await remote(a, b); } catch (e) { R = null; } if (!R) return null;
+  const map = Object.assign({}, cfg().map || {}), byK = {}, have = new Set(R.map(r => r.id));
+  R.forEach(r => { const k = rkey(r.t, r.s, r.e, r.all); (byK[k] = byK[k] || []).push(r); });
+  const ref = new Set(Object.values(map).map(m => m && m.e).filter(Boolean)), seenCal = new Set(R.map(r => KEY_OF[r.cal] || 'outros')); let adopted = 0;
+  CP.items().filter(x => x.date >= a && x.date <= b).forEach(x => { const m = map[x.id]; if (m && m.e && have.has(m.e)) return;
+    const L = (byK[ikey(x)] || []).filter(r => !ref.has(r.id));
+    // o evento que a app conhecia desapareceu lá fora e não há outro igual: volta a ser criado (só se a leitura veio completa e esse calendário está visível)
+    if (!L.length) { if (m && m.e && !R.trunc && seenCal.has(m.c || 'outros')) { delete map[x.id]; adopted++; } return; } const want = OP() === 'cal7' ? (CAT_OF[x.k] || 'outros') : 'outros';
+    const pick = L.find(r => (KEY_OF[r.cal] || 'outros') === want) || L[0]; map[x.id] = { e: pick.id, h: H(x), d: x.date, k: x.k, c: KEY_OF[pick.cal] || 'outros' }; ref.add(pick.id); adopted++; });
+  // iguais a um que a app conhece → sobram
+  const del = []; Object.values(byK).forEach(L => { if (L.length < 2 || !L.some(r => ref.has(r.id))) return; L.forEach(r => { if (!ref.has(r.id)) del.push({ e: r.id, c: KEY_OF[r.cal] || 'outros' }); }); });
+  for (let i = 0; i < del.length; i += 60) { const part = del.slice(i, i + 60), op = OP(), j = await IB.post({ op, j: JSON.stringify(op === 'cal7' ? { cals: CALS(), up: [], del: part } : { up: [], del: part.map(x => x.e) }) }); if (!j || !j.ok) break; }
+  OS.setOne('calx', Object.assign({ map, n: Object.keys(map).length }, full ? { rcAt: Date.now(), dups: (+cfg().dups || 0) + del.length } : {}));
+  return { adopted, del: del.length, seen: R.length }; };
+A.cpDup = async () => { if (!clOk()) return UI.toast('Para procurar duplicados preciso da Parte 3 do script (versão 11).', 'warn'); UI.toast('A procurar eventos repetidos no teu calendário…');
+  const r = await CP.reconcile(); OS.request(); UI.toast(!r ? 'Não consegui ler o calendário agora. Tenta daqui a pouco.' : r.del ? `Apaguei ${r.del} evento(s) repetido(s) do teu calendário.` : 'Não há eventos repetidos ✓', r && r.del ? 'pos' : ''); if (r) CP.soon(1500); };
+
 /* ---------- enviar ---------- */
 let busy = false, timer = 0, again = false;
 CP.state = { msg: '' };
 CP.sync = async (quiet = true) => { const c = cfg(); if (!c.on) return 0; if (!ready()) { CP.state.msg = 'Falta a Parte 6 do script.'; return 0; } if (busy) { again = true; return 0; } busy = true; let sent = 0;
-  try { for (let round = 0; round < 12; round++) { const op = OP(), P = CP.plan(op); if (!P.up.length && !P.del.length) break;
+  try { if (!OP()) throw new Error('A Parte 7 do script não respondeu: espero por ela para não duplicar eventos.');
+    // de 6 em 6 horas (e logo depois desta atualização) procura duplicados lá fora e apaga-os
+    if (Date.now() - (+cfg().rcAt || 0) > 6 * 36e5) { const r = await CP.reconcile(); if (r) sent += r.del; }
+    for (let round = 0; round < 12; round++) { let op = OP(), P = CP.plan(op); if (!P.up.length && !P.del.length) break;
+      // antes de criar eventos novos: se lá fora já existe um igual (criado por outro aparelho ao mesmo tempo), usa esse em vez de criar outro
+      const nw = P.up.filter(x => !x.eid && !x.x); if (nw.length && round === 0) { const ds = nw.map(x => x.date).sort(), r = await CP.reconcile(ds[0], ds[ds.length - 1]); if (r && (r.adopted || r.del)) { sent += r.del; P = CP.plan(op); if (!P.up.length && !P.del.length) break; } }
       const up = P.up.slice(0, 40), del = P.del.slice(0, 60), c7 = op === 'cal7';
       const body = c7 ? { cals: CALS(), up: up.map(x => ({ id: x.id, eid: x.eid, c: x.c, x: x.x || '', xc: x.xc || '', t: x.t, s: x.s, e: x.e, all: x.all, l: x.l, d: x.d })), del: del.map(x => ({ e: x.e, c: x.c })) }
         : { up: up.map(x => ({ id: x.id, eid: x.eid, t: x.t, s: x.s, e: x.e, all: x.all, l: x.l, d: x.d })), del: del.map(x => x.e) };
       const j = await IB.post({ op, j: JSON.stringify(body) });
-      if (!j || !j.ok) throw new Error(j && /Valor inválido|Pedido inválido/.test(j.msg || '') ? 'O teu script ainda não tem a agenda: cola a Parte 6 (Definições → Script Google).' : (j && j.msg) || 'o script não respondeu');
+      if (!j || !j.ok) { if (j && /Valor inválido|Pedido inválido/.test(j.msg || '') && c7) { const s0 = st(); s0.c7 = 0; OS.touch('inbox'); } throw new Error(j && /Valor inválido|Pedido inválido/.test(j.msg || '') ? (c7 ? 'O teu script já não tem a Parte 7: volta a colá-la (Definições → Script Google).' : 'O teu script ainda não tem a agenda: cola a Parte 6 (Definições → Script Google).') : (j && j.msg) || 'o script não respondeu'); }
       const map = Object.assign({}, cfg().map || {}); del.forEach(x => { delete map[x.id]; });
       up.forEach(x => { const eid = (j.map || {})[x.id]; if (eid) map[x.id] = { e: eid, h: H(x), d: x.date, k: x.k, c: x.c }; else if (x.x && c7 && map[x.id]) delete map[x.id]; }); // se não conseguiu mudar de calendário, volta a tentar
       const old = U.addDays(U.today(), -(BACK + 30)); Object.keys(map).forEach(k => { if (map[k] && map[k].d && map[k].d < old) delete map[k]; }); // o que já é passado fica lá, só deixa de ser seguido
@@ -149,7 +189,7 @@ CP.panel = () => { const c = cfg(), T = c.types || {}, ok = ready(), P = c.on &&
     <div class="cp-types">${TYPES.map(([k, l]) => `<button class="chip ${T[k] ? 'on' : ''}" data-act="cpType" data-k="${k}" aria-pressed="${T[k] ? 'true' : 'false'}">${T[k] ? '✓ ' : ''}${l}</button>`).join('')}</div>
     ${ok && has7() ? `<div class="cp-cols" aria-label="Cores no Google Calendar e no iPhone"><small class="mut">Cores lá fora (Google Calendar e iPhone):</small>${CATS.map(c => `<span class="cp-col"><i style="background:${c[2]}"></i>${esc(c[1].replace('Oceanum · ', '').replace(/^Oceanum$/, 'Outros (metas, contas, aniversários)'))}</span>`).join('')}</div>` : ''}
     ${!ok ? `<div class="note" style="margin-top:10px">Precisa da <b>Parte 7</b> do script, em <a class="acc" href="#definicoes.script">Definições → Script Google</a>. É um <b>ficheiro novo</b> (Parte7): não apagas nem mudas nenhuma das outras partes. Depois de a colares, liga-se sozinho e cada tipo aparece com a sua cor pastel (Trabalho, Folgas, Tarefas…).</div>` : !has7() ? `<div class="note" style="margin-top:10px">Para cada tipo ter a <b>sua cor</b> lá fora (Trabalho azul, Folgas verde, Tarefas amarelo…), cola a <b>Parte 7</b> em <a class="acc" href="#definicoes.script">Definições → Script Google</a>: é um ficheiro novo, não mexes na Parte 6 nem nas outras. Os eventos que já lá estão mudam sozinhos para o calendário da sua cor.</div>` : ''}
-    <div class="row gap8" style="margin-top:10px;flex-wrap:wrap">${c.on ? `<button class="btn sm" data-act="cpNow">${UI.ic('sync')}Atualizar agora</button><button class="btn sm ghost" data-act="cpOff">Desligar</button>` : `<button class="btn sm pri" data-act="cpOn">${UI.ic('cal')}Pôr a minha agenda no Google Calendar</button>`}</div>
+    <div class="row gap8" style="margin-top:10px;flex-wrap:wrap">${c.on ? `<button class="btn sm" data-act="cpNow">${UI.ic('sync')}Atualizar agora</button><button class="btn sm" data-act="cpDup">${UI.ic('trash')}Apagar repetidos</button><button class="btn sm ghost" data-act="cpOff">Desligar</button>` : `<button class="btn sm pri" data-act="cpOn">${UI.ic('cal')}Pôr a minha agenda no Google Calendar</button>`}</div>
     ${c.on ? `<p class="mut" style="font-size:12.5px;margin:8px 0 0">${c.n || 0} evento(s) no calendário Oceanum${c.at ? ' · última atualização ' + new Date(c.at).toLocaleString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}${P && (P.up.length || P.del.length) ? ` · ${P.up.length + P.del.length} por enviar` : ''}${c.err ? `<br><span class="warn">${esc(c.err)}</span>` : ''}</p>` : ''}
     <details class="tog" style="margin-top:10px"><summary><span>Ver no iPhone</span>${UI.ic('down', 'chev')}</summary><div class="tog-b"><ol class="ai-steps"><li>No iPhone: <b>Ajustes → Apps → Calendário → Contas</b> (ou Ajustes → Calendário → Contas).</li><li>Se a tua conta Google não estiver lá: <b>Adicionar conta → Google</b>. Se estiver, abre-a e liga <b>Calendários</b>.</li><li>Abre a app Calendário → <b>Calendários</b> (em baixo) e confirma que o <b>Oceanum</b> está marcado.</li></ol><p class="mut" style="font-size:12.5px">Também aparece no Google Calendar no telemóvel e no computador. As alterações chegam em poucos minutos.</p></div></details></div>`; };
 })();
