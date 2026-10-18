@@ -1,9 +1,9 @@
-// OCEANUM · leitor de notícias (função do Vercel). Recebe o link de uma notícia (Google Notícias ou do jornal),
+// NÁUTILO · leitor de notícias (função do Vercel). Recebe o link de uma notícia (Google Notícias ou do jornal),
 // descobre o artigo original e devolve só o texto limpo (título, parágrafos, imagem), para ler dentro da app.
 // Segurança: só endereços públicos http(s) (nada de IPs internos), no máximo 5 redirecionamentos, 8 s e 3 MB;
 // nunca devolve o HTML do site, só texto; só responde à própria app.
 const dns = require('dns').promises, net = require('net');
-const OK = /^https:\/\/oceanum(-[a-z0-9-]+)?\.vercel\.app$/;
+const OK = /^https:\/\/(oceanum|nautilo)(-[a-z0-9-]+)?\.vercel\.app$/;
 const CACHE = new Map(), HITS = new Map();
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 const privado = ip => { if (net.isIPv4(ip)) { const [a, b] = ip.split('.').map(Number); return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224; }

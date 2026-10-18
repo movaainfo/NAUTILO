@@ -1,4 +1,4 @@
-/* Configuração da versão independente do Oceanum.
+/* Configuração da versão independente do Náutilo.
    Deixa null para guardar os dados só neste dispositivo.
    Para sincronizar entre dispositivos, cola aqui a configuração do teu projeto Firebase (ver LANCAR.md, passo 3)
    e põe em allowedEmail o teu email Google, para mais ninguém conseguir entrar. Exemplo:
