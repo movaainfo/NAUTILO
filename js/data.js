@@ -289,7 +289,7 @@ S.experiences = { label: 'Experiência', title: r => r.title, fields: [
 ], defaults: () => ({ kind: 'Emprego' }) };
 S.opps = { label: 'Oportunidade', title: r => r.name, fields: [
   F('name', 'Nome', 'text', { req: 1, wide: 1 }), F('inst', 'Instituição'), F('kind', 'Tipo', 'sel', { o: ['Curso', 'Certificação', 'Evento', 'Palestra', 'Programa universitário', 'Estágio', 'Emprego', 'Projeto', 'Competição', 'Networking', 'Bolsa', 'Negócio'] }),
-  F('area', 'Área', 'sel', { o: L.AREAS }), F('deadline', 'Prazo', 'date'), F('status', 'Estado', 'sel', { o: ['Identificada', 'A preparar', 'Submetida', 'Em avaliação', 'Aceite', 'Recusada', 'Perdida'] }),
+  F('area', 'Área', 'sel', { o: L.AREAS }), F('deadline', 'Prazo', 'date'), F('status', 'Estado', 'sel', { o: ['Identificada', 'A preparar', 'Submetida', 'Em avaliação', 'Aceite', 'Recusada', 'Perdida', 'Descartada'] }),
   F('prio', 'Prioridade', 'sel', { o: L.PRIO }), F('next', 'Próxima ação', 'text', { wide: 1 }), F('reqs', 'Requisitos', 'area', { rows: 2 }), F('benefits', 'Benefícios', 'area', { rows: 2 }), F('link', 'Link')
 ], defaults: () => ({ status: 'Identificada', prio: '3' }) };
 
@@ -659,7 +659,7 @@ Cal.items = (from, to) => {
   OS.all('runs').forEach(r => { if (r.date >= from && r.date <= to) push({ date: r.date, title: U.r1(U.num(r.km)) + ' km · ' + r.type, src: 'run', done: true, edit: 'runs:' + r.id }); });
   days.forEach(d => { if (d < U.today()) return; const wd = String(U.parse(d).getDay()); const split = OS.one('fit').split[wd]; if (split && !OS.all('workouts').some(w => w.date === d) && split !== 'Corrida' && split !== 'Descanso') push({ date: d, title: split, src: 'workout', planned: true, sub: 'planeado' }); OS.all('runplan').filter(r => r.active && String(r.wday) === wd).forEach(r => { if (!OS.all('runs').some(x => x.date === d)) push({ date: d, title: r.type + (U.num(r.km) ? ' ' + r.km + ' km' : U.num(r.mins) ? ' ' + r.mins + ' min' : ''), src: 'run', planned: true, sub: r.desc || 'planeado' }); }); });
   Fin.upcoming(Math.max(0, U.diff(to, U.today()))).filter(x => x.date >= from && x.date <= to && x.amount < 0).forEach(x => push({ date: x.date, title: x.title + ' · ' + U.eur(-x.amount), src: 'bill', late: x.late }));
-  OS.all('opps').forEach(o => { if (o.deadline && o.deadline >= from && o.deadline <= to && !['Aceite', 'Recusada', 'Perdida', 'Submetida'].includes(o.status)) push({ date: o.deadline, title: 'Prazo: ' + o.name, src: 'opp', imp: true, edit: 'opps:' + o.id }); });
+  OS.all('opps').forEach(o => { if (o.deadline && o.deadline >= from && o.deadline <= to && !['Aceite', 'Recusada', 'Perdida', 'Descartada', 'Submetida'].includes(o.status)) push({ date: o.deadline, title: 'Prazo: ' + o.name, src: 'opp', imp: true, edit: 'opps:' + o.id }); });
   OS.all('goals').forEach(g => { if (g.due && g.due >= from && g.due <= to && g.status === 'Ativa') push({ date: g.due, title: 'Meta: ' + g.title, src: 'goal', edit: 'goals:' + g.id }); });
   OS.all('projects').forEach(g => { if (g.due && g.due >= from && g.due <= to && !['Concluído', 'Cancelado'].includes(g.status)) push({ date: g.due, title: 'Projeto: ' + g.name, src: 'goal', edit: 'projects:' + g.id }); });
   OS.all('routine').forEach(r => days.forEach(d => { if ((r.days || []).includes(String(U.parse(d).getDay()))) push({ date: d, start: r.start, end: r.end, title: r.title, src: 'routine', edit: 'routine:' + r.id }); }));

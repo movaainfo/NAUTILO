@@ -1,23 +1,18 @@
 {
- "n": 125,
- "hash": "a799c8c5e4e9",
+ "n": 126,
+ "hash": "87d6af76617d",
  "notes": [
-  "Dominus novo: o herói és tu, em pixel art no estilo do Terraria, de corpo inteiro e à tua imagem (pele morena, cabelo cacheado, óculos retangulares, cavanhaque, t-shirt, jeans e ténis), num cenário em pixel art (floresta, caverna, montanha, cidade, castelo, aurora, praia e cosmos).",
-  "Guarda-roupa enorme, com cada peça já vestida no boneco: 12 cabelos e 10 cores, 7 barbas, 8 óculos, 16 chapéus e elmos, 28 roupas (fato e gravata, smoking, farda, kimono, camisola do Brasil e armaduras de couro, malha, ferro, cavaleiro, espartana, samurai, ouro, futurista, dragão e Dominus), calças, calçado, capas, armas, escudos e extras. 19 conjuntos prontos num toque.",
-  "O jogo agora é azul, como o resto do app.",
-  "A carta do herói: o material muda com o nível (bronze, prata, ouro, herói, lenda, Dominus) e os atributos põem efeitos à tua volta: brilho (Corpo), aura (Mente), símbolos (Intelecto), ouro (Fortuna), companheiros (Relações), halo (Espírito), insígnias (Carreira) e estandartes (Disciplina). As melhores peças desbloqueiam-se com os atributos e o nível.",
-  "8 atributos que sobem sozinhos com TUDO o que registas (treinos, corridas, dieta, estudo, livros, foco, gastos, poupança, trabalho, tarefas, hábitos, devocionais, aulas, momentos com pessoas…). Nunca escolhes onde pôr pontos.",
-  "Missões: 3 por dia e 3 por semana, escolhidas pelos teus pontos fracos e cumpridas sozinhas. Chefe da semana do teu atributo mais fraco. 21 conquistas em bronze, prata e ouro.",
-  "Baús a cada nível com duas recompensas reais à escolha (da tua lista). Ouro para molduras, cenários, efeitos e a coroa. Diário com a tua história e o XP dos últimos 14 dias.",
-  "Parabéns ao subir de nível, e um \"+XP\" no canto quando registas algo em qualquer página.",
-  "Marcos atualizados: 5 pilares com 100 marcos cada (Intelecto, Fortuna, Corpo, Influência e o novo Espírito), juntando o teu Notion original com o Dominus 2.0 (ISCA-UA, Aveiro). Podes acrescentar marcos teus e tirar os que já não fazem sentido.",
-  "Família & amigos: botão \"Momento\" para registar encontros, chamadas e conversas (sobem as Relações).",
-  "Desporto › Aventuras: mais de 120 aventuras para escolher (trilhos, Everest, paraquedas, esqui, surf, mergulho, rafting, bungee, maratonas, Ironman…). Tocas em \"Quero\", planeias e marcas \"Feita\"; cada aventura feita dá XP no Dominus.",
-  "Mundo: uma aba nova para a tua volta ao mundo. O mapa pinta-se com os países onde já foste (visitei, morei ou quero ir), com a percentagem do mundo que conheces, os 6 continentes, os 4 hemisférios, marcos (5, 10, 25, 50, 100, 195 países), o passaporte com os carimbos e a lista dos 195 países com procura. Cada país conhecido dá XP de Mente no Dominus.",
-  "O app agora chama-se Náutilo, com um logo novo: a rosa dos ventos, com o norte em crista de onda.",
-  "Endereço novo: nautilo-app.vercel.app. Ao abrir o endereço antigo, o app mostra \"Mudar agora\" e leva os teus dados (pela sincronização do Google Drive ou por ficheiro). No novo endereço: Partilhar → Adicionar ao ecrã principal, e apaga o ícone antigo.",
-  "O teu Google também passa a Náutilo: em Definições → Script, copia de novo as partes 1, 2 e 3 (versão 12). Na primeira ligação o script muda sozinho o nome do ficheiro de sincronização e das cópias, da folha dos gastos, da pasta dos ficheiros e dos calendários. Nada se perde nem se duplica.",
-  "Bloco de foco: os atalhos passam a \"Náutilo Foco\" e \"Náutilo Fim\" e o modo Foco a NÁUTILO; o app mostra o que mudar no iPhone."
+  "Um app com a tua cara: \"Noite no forte\". O ecrã de entrada é o mar visto da muralha de um forte, como num filme a preto e azul, com o céu da hora real (madrugada, amanhecer, dia, fim de tarde e noite com estrelas), os palheiros da Costa Nova, um moliceiro na água e o Farol da Barra, a única luz quente, que gira de noite. Por cima, a hora, a saudação e a tua frase do dia em letra de cartaz.",
+  "Por dentro: o Painel abre numa janela para o mesmo mar, os títulos das páginas em letra condensada, cartões lisos sem brilhos e uma só cor quente (a do farol) para o que está ativo. Grão de filme muito leve por trás de tudo.",
+  "Dominus mais difícil e maior: a pontuação vale 10 vezes mais, há 300 níveis e 28 títulos (de Desperto a Dominus Absoluto). Subir custa: 90 dias de treino, estudo e devocional dão mais ou menos o nível 10.",
+  "Missões a sério: 2 horas de estudo, 90 minutos de foco, 5 km de uma vez, 8 tarefas com uma de prioridade 1, dia perfeito… E agora 3 campanhas por mês (20 treinos, 100 km, 50 horas de estudo, investir 10% do que ganhaste, 25 dias sem supérfluos, 10 candidaturas…).",
+  "Monstros em pixel art, sinistros: o monstro do dia morre com as 3 missões de hoje; o chefe da semana volta mais forte cada vez que o vences; e há um colosso por mês que só cai com o XP de um mês inteiro acima da tua média. Bestiário com 60 criaturas para descobrir.",
+  "Marcos que custam: cada marco vale 25 000 XP, mas só conta com prova escrita (certificado, nota, valor…). Os que se podem verificar (livros num ano, maratona, países, dias seguidos) provam-se sozinhos pelos teus registos.",
+  "38 classes (28 de pares de atributos, 8 puras e 2 raras: Polímata e Avatar), cada uma com 5 graus (Iniciado a Lendário) e uma skin por grau: 190 skins no separador Classes do Visual.",
+  "Conquistas com 5 medalhas (bronze, prata, ouro, platina e diamante), mais difíceis, e 8 conquistas novas (corrida mais longa, horas de foco, orações respondidas, candidaturas, campanhas, monstros, colossos e classes).",
+  "Oportunidades automáticas: o Náutilo lê o teu e-mail e as notificações do LinkedIn (vagas, alertas de emprego, estágios, bolsas, cursos, eventos) e mostra-as como sugestões com o prazo já lido. Tu decides: Adicionar, Depois ou Não me interessa. Nada entra no quadro sem tu aceitares, e continuas a poder acrescentar à mão.",
+  "No quadro das oportunidades: Avançar, Descartar ou Pensar (cria a decisão no Centro de decisões, com Avançar / Não avançar).",
+  "Senhas: uma aba nova (em Eu) com um cofre para senhas, e-mails, contas, bancos, Wi-Fi e notas seguras. Tudo é cifrado no teu aparelho com a tua senha mestra antes de ser guardado ou sincronizado; nunca vai para a IA. Gerador de senhas, aviso de senhas fracas e repetidas, copiar com um toque. Fecha-se sozinho ao fim de 5 minutos e quando sais. Se esqueceres a senha mestra, ninguém consegue abrir o cofre."
  ],
  "date": "18/10/2026"
 }

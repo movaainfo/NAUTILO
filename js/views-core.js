@@ -110,7 +110,7 @@ OS.PainelParts = () => {
   const nextExam = U.sortBy(OS.all('assessments').filter(a => a.date >= t && a.prep !== 'Feito'), a => a.date)[0];
   const wdays = U.range(wk, U.addDays(wk, 6));
   const runWeeks = Run.weeks(8);
-  const opps = U.sortBy(OS.all('opps').filter(o => o.deadline && o.deadline >= t && !['Aceite', 'Recusada', 'Perdida'].includes(o.status)), o => o.deadline).slice(0, 3);
+  const opps = U.sortBy(OS.all('opps').filter(o => o.deadline && o.deadline >= t && !['Aceite', 'Recusada', 'Perdida', 'Descartada'].includes(o.status)), o => o.deadline).slice(0, 3);
   const projs = OS.all('projects').filter(x => x.status === 'Em andamento').map(x => Object.assign({ p: x }, Proj.info(x))).slice(0, 4);
   const ins = I.insights().slice(0, 4);
   return {

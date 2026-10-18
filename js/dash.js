@@ -5,6 +5,8 @@
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, L = OS.L, esc = U.esc;
 const Fin = OS.Fin, Cal = OS.Cal;
 const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
+// a janela do Painel: o mesmo mar do ecrã de entrada, parado, à hora real
+const sky = () => { if (!OS.Scene) return ''; const m = innerWidth < 860, w = m ? Math.max(320, innerWidth) : Math.min(1280, Math.max(700, innerWidth - 60)); return `<div class="dash-sc">${OS.Scene.svg(w, m ? 420 : 320, { id: 'dsh' })}</div>`; };
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
 const range = () => { const per = OS.ui.dashPer || 'mes', t = U.today(), ym = OS.ui.dashYM || U.ym(t);
   if (per === 'hoje') return { per, a: t, b: t, label: 'Hoje', ym };
@@ -38,7 +40,7 @@ V.visao = () => {
   return `<div class="dash">
   <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
     <div class="dash-ctl">${R.per === 'mes' ? `<div class="dash-month"><button class="icon-btn" data-act="dashYM" data-d="-1" aria-label="Mês anterior">${UI.ic('left')}</button><b>${R.label}</b><button class="icon-btn" data-act="dashYM" data-d="1" aria-label="Mês seguinte" ${R.ym >= U.ym(t) ? 'disabled' : ''}>${UI.ic('right')}</button></div>` : `<div class="dash-month"><b>${R.label}</b></div>`}
-      <div class="dash-seg" role="group">${per.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="dashPer" data-p="${k}">${l}</button>`).join('')}</div></div></div>
+      <div class="dash-seg" role="group">${per.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="dashPer" data-p="${k}">${l}</button>`).join('')}</div></div>${sky()}</div>
   ${part('life')}
   ${part('control')}
   ${part('next')}

@@ -30,11 +30,12 @@ const AK = AT.map(a => a.k), AO = Object.fromEntries(AT.map(a => [a.k, a]));
 D.AT = AT;
 
 // curvas: cada atributo e o herói (nível total)
-const cumA = l => Math.round(60 * Math.pow(l, 1.9)), cumH = l => Math.round(320 * Math.pow(l, 1.8));
-const lvl = (xp, cum) => { let l = 0; while (cum(l + 1) <= xp && l < 200) l++; const a = cum(l), b = cum(l + 1); return { l, into: xp - a, need: b - a, p: (xp - a) / Math.max(1, b - a) }; };
+const cumA = l => Math.round(1000 * Math.pow(l, 1.9)), cumH = l => Math.round(900 * Math.pow(l, 2.1)), LVMAX = 300;
+const lvl = (xp, cum) => { let l = 0; while (cum(l + 1) <= xp && l < LVMAX) l++; const a = cum(l), b = cum(l + 1); return { l, into: xp - a, need: b - a, p: (xp - a) / Math.max(1, b - a) }; };
 D.lvA = xp => lvl(xp, cumA); D.lvH = xp => lvl(xp, cumH);
 const tierOf = l => l >= 20 ? 4 : l >= 12 ? 3 : l >= 7 ? 2 : l >= 3 ? 1 : 0;
-const TITLES = [[0, 'Desperto'], [3, 'Aprendiz'], [6, 'Guerreiro'], [10, 'Veterano'], [15, 'Campeão'], [20, 'Mestre'], [30, 'Lenda'], [40, 'Soberano'], [50, 'Dominus']];
+const TITLES = [[0, 'Desperto'], [2, 'Recruta'], [4, 'Aprendiz'], [6, 'Escudeiro'], [8, 'Soldado'], [10, 'Guerreiro'], [13, 'Veterano'], [16, 'Cavaleiro'], [19, 'Capitão'], [22, 'Campeão'], [26, 'Comandante'], [30, 'Mestre'], [35, 'Grão-Mestre'], [40, 'Herói'],
+  [45, 'Herói Épico'], [50, 'Lenda'], [60, 'Lenda Viva'], [70, 'Mito'], [80, 'Semideus'], [90, 'Titã'], [100, 'Soberano'], [120, 'Imortal'], [140, 'Ascendido'], [160, 'Eterno'], [180, 'Arconte'], [200, 'Dominus'], [250, 'Dominus Supremo'], [300, 'Dominus Absoluto']];
 D.titleOf = l => TITLES.filter(t => l >= t[0]).pop()[1];
 D.RANKS = TITLES.map(t => t[1]);
 const CLASSES = { 'corpo+disciplina': 'Espartano', 'corpo+mente': 'Monge Guerreiro', 'corpo+espirito': 'Paladino', 'corpo+intelecto': 'Cavaleiro Erudito', 'corpo+fortuna': 'Mercenário', 'corpo+relacoes': 'Capitão', 'carreira+corpo': 'Gladiador',
@@ -42,6 +43,23 @@ const CLASSES = { 'corpo+disciplina': 'Espartano', 'corpo+mente': 'Monge Guerrei
   'carreira+fortuna': 'Magnata', 'disciplina+fortuna': 'Tesoureiro', 'fortuna+relacoes': 'Mercador', 'fortuna+mente': 'Investidor de Sangue-Frio', 'espirito+fortuna': 'Mecenas',
   'espirito+relacoes': 'Pastor', 'carreira+relacoes': 'Líder', 'mente+relacoes': 'Diplomata', 'disciplina+relacoes': 'Guardião',
   'espirito+mente': 'Místico', 'disciplina+espirito': 'Asceta', 'carreira+espirito': 'Missionário', 'disciplina+mente': 'Monge', 'carreira+mente': 'Visionário', 'carreira+disciplina': 'Executor' };
+// classe pura (um atributo muito à frente dos outros) e as duas raras (equilíbrio total)
+const PURE = { corpo: 'Bárbaro', mente: 'Oráculo', intelecto: 'Arcanista', fortuna: 'Alquimista', relacoes: 'Bardo', espirito: 'Profeta', carreira: 'Conquistador', disciplina: 'Templário' };
+// atributo que dá a armadura de cada classe (o outro dá a capa e as cores)
+const PRIM = { 'Espartano': 'corpo', 'Monge Guerreiro': 'corpo', 'Paladino': 'espirito', 'Cavaleiro Erudito': 'corpo', 'Mercenário': 'corpo', 'Capitão': 'corpo', 'Gladiador': 'corpo', 'Sábio': 'intelecto', 'Estrategista': 'intelecto', 'Arquiteto': 'carreira',
+  'Teólogo': 'espirito', 'Mentor': 'relacoes', 'Erudito': 'intelecto', 'Magnata': 'fortuna', 'Tesoureiro': 'fortuna', 'Mercador': 'fortuna', 'Investidor de Sangue-Frio': 'fortuna', 'Mecenas': 'fortuna', 'Pastor': 'espirito', 'Líder': 'carreira', 'Diplomata': 'relacoes',
+  'Guardião': 'disciplina', 'Místico': 'mente', 'Asceta': 'espirito', 'Missionário': 'espirito', 'Monge': 'mente', 'Visionário': 'carreira', 'Executor': 'disciplina' };
+const CLS = {}; Object.entries(CLASSES).forEach(([k, n]) => { const [a, b] = k.split('+'), p = PRIM[n] || a; CLS[n] = { p, q: p === a ? b : a, d: `${AO[a].n} e ${AO[b].n}` }; });
+Object.entries(PURE).forEach(([k, n]) => { CLS[n] = { p: k, q: k, pure: 1, d: `${AO[k].n} muito à frente de tudo o resto` }; });
+CLS['Polímata'] = { p: 'intelecto', q: 'disciplina', rare: 1, d: 'Os 8 atributos a menos de 3 níveis uns dos outros, todos no nível 8 ou mais' };
+CLS['Avatar'] = { p: 'espirito', q: 'corpo', rare: 1, d: 'Os 8 atributos no nível 25 ou mais' };
+// graus de cada classe, pelo nível do herói
+const CRANK = [[0, 'Iniciado'], [15, 'Provado'], [35, 'Veterano'], [60, 'Mestre'], [100, 'Lendário']], ROM = ['I', 'II', 'III', 'IV', 'V'];
+const rankOf = l => CRANK.filter(r => l >= r[0]).length;
+const classOf = (lv, top) => { const L = AK.map(k => lv[k].l), mn = Math.min(...L), mx = Math.max(...L), a = lv[top[0]].l, b = lv[top[1]].l;
+  if (mn >= 25) return 'Avatar'; if (mn >= 8 && mx - mn <= 3) return 'Polímata'; if (a < 2 || b < 1) return 'Sem classe';
+  if (a >= 4 && a >= b + 4) return PURE[top[0]]; return CLASSES[top.slice().sort().join('+')] || 'Aventureiro'; };
+D.CLS = CLS; D.CRANK = CRANK;
 
 /* ================= DE ONDE VEM O XP (tudo o que registas) ================= */
 const habA = name => { const n = N(name);
@@ -64,7 +82,9 @@ const bdayNear = (r, d) => { const p = OS.get('people', r.person); if (!p || !p.
 
 let CK = 0, CACHE = null; const bump = () => { CK++; CACHE = null; };
 OS.on('change', bump); OS.on('remote', bump); OS.on('one:dominus', bump); OS.on('one:diet', bump);
-const evs = () => { const T = today(), E = [], add = (d, a, x, t) => { d = String(d || '').slice(0, 10); if (!/^\d{4}-\d\d-\d\d$/.test(d) || d > T || !(x > 0)) return; E.push({ d, a, x: Math.round(x), t }); };
+// a pontuação: tudo vale 10 vezes mais do que no Dominus 3 (números maiores, a mesma justiça entre áreas)
+const XS = 10;
+const evs = () => { const T = today(), E = [], add = (d, a, x, t) => { d = String(d || '').slice(0, 10); if (!/^\d{4}-\d\d-\d\d$/.test(d) || d > T || !(x > 0)) return; E.push({ d, a, x: Math.round(x * XS), t }); };
   const sf = (f, c) => { try { f(); } catch (e) { if (OS.debug) console.warn('Dominus ' + c, e); } };
   // Corpo
   sf(() => OS.all('workouts').forEach(w => add(w.date, 'corpo', 30 + Math.min(20, (OS.Fit && OS.Fit.volume ? OS.Fit.volume(w) : 0) / 1500), 'Treino' + (w.title ? ': ' + w.title : ''))), 'treinos');
@@ -116,7 +136,7 @@ const evs = () => { const T = today(), E = [], add = (d, a, x, t) => { d = Strin
   sf(() => { if (!OS.Hab || !OS.all('habits').some(h => h.core)) return; U.range(U.addDays(T, -400), T).forEach(d => { if (d < T && OS.Hab.dayScore(d) === 1) add(d, 'disciplina', 15, 'Dia perfeito (todos os inegociáveis)'); }); }, 'dias perfeitos');
   sf(() => { if (!OS.Att) return; OS.Att.all().forEach(o => { if (o.st === 'Presente') add(o.date, 'disciplina', 6, 'Aula: ' + ((OS.get('subjects', o.subject) || {}).name || '')); }); }, 'aulas');
   // Codex: os teus marcos
-  sf(() => Object.entries(S().legacy || {}).forEach(([p, L]) => (L || []).forEach(m => m && m.t && add(m.d, LEGA[p] || 'disciplina', 200, 'Marco: ' + m.t))), 'codex');
+  sf(() => Object.entries(S().legacy || {}).forEach(([p, L]) => (L || []).forEach(m => m && m.t && add(m.d, LEGA[p] || 'disciplina', LEGXP / XS, 'Marco: ' + m.t))), 'codex');
   return E; };
 
 /* ================= ESTADO CALCULADO ================= */
@@ -135,60 +155,83 @@ D.state = () => { const key = CK + '|' + today(); if (CACHE && CACHE.key === key
   const wk = wkOf(T), wkX = Object.fromEntries(AK.map(k => [k, 0])), todayX = Object.fromEntries(AK.map(k => [k, 0]));
   all.forEach(e => { if (e.d >= wk) wkX[e.a] += e.x; if (e.d === T) todayX[e.a] += e.x; });
   const sorted = AK.slice().sort((a, b) => lv[b].l - lv[a].l || ax[b] - ax[a]), top = sorted.slice(0, 2);
-  const cls = lv[top[0]].l >= 2 && lv[top[1]].l >= 1 ? CLASSES[top.slice().sort().join('+')] || 'Aventureiro' : 'Sem classe';
-  const v = { base, all, byDay, agg, ax, lv, total, H, title: D.titleOf(H.l), cls, top, streak, best, idle, mood, wkX, todayX, mis, tiers: Object.fromEntries(AK.map(k => [k, tierOf(lv[k].l)])) };
+  const cls = classOf(lv, top), clsR = rankOf(H.l), clsN = CRANK[clsR - 1][1];
+  const v = { base, all, byDay, agg, ax, lv, total, H, title: D.titleOf(H.l), cls, clsR, clsN, clsFull: cls === 'Sem classe' ? cls : cls + ' ' + ROM[clsR - 1], top, streak, best, idle, mood, wkX, todayX, mis, tiers: Object.fromEntries(AK.map(k => [k, tierOf(lv[k].l)])) };
   CACHE = { key, v }; let g = null; Object.defineProperty(v, 'gold', { get: () => g == null ? (g = goldOf(v)) : g, enumerable: true }); return v; };
 D.level = () => D.state().H.l;
 D.sumLv = () => D.state().H.l;
 D.title = () => D.state().title;
 
 /* ================= MISSÕES ================= */
-const dayAgg = byDay => { const A0 = () => ({ wk: 0, km: 0, sport: 0, meals: 0, studyMin: 0, revs: 0, trees: 0, focusMin: 0, notes: 0, tx: 0, sup: 0, social: 0, contacts: 0, devos: 0, prayers: 0, habEsp: 0, tasks: 0, proTasks: 0, perfect: 0, apps: 0 }), M = {}, g = d => (M[d] = M[d] || A0());
-  OS.all('workouts').forEach(w => w.date && g(w.date).wk++); OS.all('runs').forEach(r => r.date && (g(r.date).km += U.num(r.km))); OS.all('sportlog').forEach(s => s.date && g(s.date).sport++);
+const dayAgg = byDay => { const A0 = () => ({ wk: 0, km: 0, kmMax: 0, sport: 0, meals: 0, prot: 0, studyMin: 0, revs: 0, trees: 0, focusMin: 0, notes: 0, tx: 0, sup: 0, inv: 0, inc: 0, social: 0, meet: 0, contacts: 0, devos: 0, prayers: 0, habEsp: 0, tasks: 0, p1: 0, proTasks: 0, perfect: 0, apps: 0, books: 0, g14: 0 }), M = {}, g = d => (M[d] = M[d] || A0());
+  OS.all('workouts').forEach(w => w.date && g(w.date).wk++); OS.all('runs').forEach(r => { if (!r.date) return; const a = g(r.date), k = U.num(r.km); a.km += k; a.kmMax = Math.max(a.kmMax, k); }); OS.all('sportlog').forEach(s => s.date && g(s.date).sport++);
   OS.all('meals').forEach(m => m.date && g(m.date).meals++); OS.all('sessions').forEach(s => s.date && (g(s.date).studyMin += U.num(s.minutes))); OS.all('reviews').forEach(r => ['r1At', 'r2At', 'r3At'].forEach(k => r[k] && g(r[k]).revs++));
+  try { const lim = U.addDays(today(), -120); if (OS.Diet && OS.Diet.protOk) [...new Set(OS.all('meals').map(m => m.date))].forEach(d => { if (d && d >= lim && OS.Diet.protOk(d)) g(d).prot = 1; }); } catch (e) { }
   OS.all('trees').forEach(t => t.date && t.alive !== false && g(t.date).trees++); OS.all('focusblocks').forEach(f => f.date && (g(f.date).focusMin += U.num(f.minutes))); OS.all('trees').forEach(t => t.date && t.alive !== false && (g(t.date).focusMin += U.num(t.mins)));
   OS.all('notes').forEach(n => n._c && g(U.iso(new Date(n._c))).notes++);
-  OS.all('transactions').forEach(t => { if (!t.date) return; const a = g(t.date); a.tx++; if (t.type === 'Despesa' && t.ess === 'Supérfluo') a.sup++; });
-  OS.all('social').forEach(r => r.date && g(r.date).social++); OS.all('contacts').forEach(c => c.last && g(c.last).contacts++);
+  OS.all('transactions').forEach(t => { if (!t.date) return; const a = g(t.date); a.tx++; if (t.type === 'Despesa' && t.ess === 'Supérfluo') a.sup++; if (t.type === 'Receita') a.inc += U.num(t.amount);
+    try { if (t.type === 'Transferência' && OS.Fin.isInvestAcc(t.toAccount) && !OS.Fin.isInvestAcc(t.account)) a.inv += U.num(t.amount); } catch (e) { } });
+  OS.all('invtx').forEach(t => { if (t.date && t.type === 'Compra') g(t.date).inv += U.num(t.qty) * U.num(t.price); });
+  OS.all('social').forEach(r => { if (!r.date) return; const a = g(r.date); a.social++; if (['Encontro', 'Refeição juntos', 'Celebração', 'Ajudei'].includes(r.kind)) a.meet++; }); OS.all('contacts').forEach(c => c.last && g(c.last).contacts++);
+  OS.all('events').forEach(e => { if (e.date && SOCIAL.test(N(e.title))) g(e.date).meet++; });
   OS.all('devos').forEach(d => d.date && g(d.date).devos++); OS.all('prayers').forEach(p => p.date && g(p.date).prayers++);
   OS.all('habits').forEach(h => { if (habA(h.name) !== 'espirito') return; Object.keys(h.log || {}).forEach(d => h.log[d] && g(d).habEsp++); });
-  OS.all('tasks').forEach(t => { if (t.status !== 'Feita' || !t.doneAt) return; const a = g(t.doneAt), pj = OS.get('projects', t.project); a.tasks++; if ((pj && ['Profissional', 'Empresarial'].includes(pj.type)) || ['Carreira', 'Trabalho', 'Mova'].includes(t.area)) a.proTasks++; });
+  OS.all('tasks').forEach(t => { if (t.status !== 'Feita' || !t.doneAt) return; const a = g(t.doneAt), pj = OS.get('projects', t.project); a.tasks++; if (+t.prio === 1) a.p1++; if ((pj && ['Profissional', 'Empresarial'].includes(pj.type)) || ['Carreira', 'Trabalho', 'Mova'].includes(t.area)) a.proTasks++; });
   OS.all('applications').forEach(a => a.date && a.status !== 'Por enviar' && g(a.date).apps++);
+  OS.all('books').forEach(b => { if (b.status === 'Lido' && (b.end || b.start)) g(b.end || b.start).books++; });
+  OS.all('assessments').forEach(a => { if (a.date && a.grade !== '' && a.grade != null && U.num(a.grade) >= 14) g(a.date).g14++; });
   Object.entries(byDay).forEach(([d, L]) => { if (L.some(e => /Dia perfeito/.test(e.t))) g(d).perfect = 1; });
   return M; };
-const sumAgg = (M, from, to) => { const o = {}; U.range(from, to).forEach(d => { const a = M[d]; if (!a) return; Object.entries(a).forEach(([k, v]) => { o[k] = (o[k] || 0) + v; }); o.txDays = (o.txDays || 0) + (a.tx ? 1 : 0); o.wkDays = (o.wkDays || 0) + (a.wk ? 1 : 0); }); return o; };
+const sumAgg = (M, from, to) => { const o = {}; U.range(from, to).forEach(d => { const a = M[d]; if (!a) return; Object.entries(a).forEach(([k, v]) => { o[k] = (o[k] || 0) + v; }); o.txDays = (o.txDays || 0) + (a.tx ? 1 : 0); o.wkDays = (o.wkDays || 0) + (a.wk ? 1 : 0); o.cleanDays = (o.cleanDays || 0) + (a.tx && !a.sup ? 1 : 0); o.invDays = (o.invDays || 0) + (a.inv > 0 ? 1 : 0); }); return o; };
 const used = c => OS.all(c).length > 0;
+const core = () => OS.all('habits').some(h => h.core && h.active), proUsed = () => OS.all('tasks').some(t => ['Carreira', 'Trabalho', 'Mova'].includes(t.area) || ['Profissional', 'Empresarial'].includes((OS.get('projects', t.project) || {}).type));
+// missões do dia: difíceis de propósito. Nada de "regista uma nota": são coisas que custam.
 const DQ = [
-  ['c1', 'corpo', 'Treina hoje', a => [a.wk || 0, 1], () => true],
-  ['c2', 'corpo', 'Corre 3 km ou pratica desporto', a => [(a.km || 0) >= 3 || a.sport ? 1 : 0, 1], () => used('runs') || used('sportlog')],
-  ['c3', 'corpo', 'Regista 3 refeições', a => [a.meals || 0, 3], () => used('meals')],
-  ['m1', 'mente', 'Planta uma árvore na Floresta', a => [a.trees || 0, 1], () => true],
-  ['m2', 'mente', '25 minutos de foco', a => [a.focusMin || 0, 25], () => true],
-  ['m3', 'mente', 'Escreve uma nota', a => [a.notes || 0, 1], () => used('notes')],
-  ['i1', 'intelecto', 'Estuda 45 minutos', a => [a.studyMin || 0, 45], () => true],
-  ['i2', 'intelecto', 'Faz uma revisão', a => [a.revs || 0, 1], () => used('reviews')],
-  ['f1', 'fortuna', 'Regista os gastos de hoje', a => [a.tx ? 1 : 0, 1], () => true],
-  ['f2', 'fortuna', 'Dia sem gastos supérfluos', a => [a.tx && !a.sup ? 1 : 0, 1], () => used('transactions')],
-  ['r1', 'relacoes', 'Regista um momento com alguém', a => [a.social || 0, 1], () => true],
-  ['r2', 'relacoes', 'Fala com um contacto da tua rede', a => [a.contacts || 0, 1], () => used('contacts')],
-  ['e1', 'espirito', 'Faz o devocional de hoje', a => [a.devos || 0, 1], () => true],
-  ['e2', 'espirito', 'Ora por alguém', a => [(a.prayers || 0) + (a.habEsp || 0), 1], () => used('prayers') || OS.all('habits').some(h => habA(h.name) === 'espirito')],
-  ['k1', 'carreira', 'Conclui uma tarefa de trabalho ou carreira', a => [a.proTasks || 0, 1], () => OS.all('tasks').some(t => ['Carreira', 'Trabalho', 'Mova'].includes(t.area) || ['Profissional', 'Empresarial'].includes((OS.get('projects', t.project) || {}).type))],
-  ['d1', 'disciplina', 'Conclui 3 tarefas', a => [a.tasks || 0, 3], () => true],
-  ['d2', 'disciplina', 'Cumpre todos os inegociáveis', a => [a.perfect || 0, 1], () => OS.all('habits').some(h => h.core && h.active)]];
+  ['c1', 'corpo', 'Treina a sério e bate a meta de proteína', a => [(a.wk ? 1 : 0) + (a.prot ? 1 : 0), 2], () => used('meals')],
+  ['c2', 'corpo', 'Corre 5 km de uma vez', a => [Math.floor(a.kmMax || 0), 5], () => used('runs')],
+  ['c3', 'corpo', 'Dois treinos no mesmo dia (ginásio + corrida ou desporto)', a => [(a.wk ? 1 : 0) + ((a.km || 0) >= 3 || a.sport ? 1 : 0), 2], () => true],
+  ['m1', 'mente', '90 minutos de foco profundo', a => [a.focusMin || 0, 90], () => true],
+  ['m2', 'mente', 'Planta 3 árvores sem deixar nenhuma morrer', a => [a.trees || 0, 3], () => true],
+  ['i1', 'intelecto', 'Estuda 2 horas', a => [a.studyMin || 0, 120], () => true],
+  ['i2', 'intelecto', '3 revisões espaçadas e 1 hora de estudo', a => [Math.min(3, a.revs || 0) + ((a.studyMin || 0) >= 60 ? 1 : 0), 4], () => used('reviews')],
+  ['f1', 'fortuna', 'Todos os gastos registados e zero supérfluos', a => [a.tx && !a.sup ? 1 : 0, 1], () => true],
+  ['f2', 'fortuna', 'Investe ou põe dinheiro de lado hoje', a => [a.inv > 0 ? 1 : 0, 1], () => used('invtx') || OS.all('transactions').some(t => t.type === 'Transferência')],
+  ['r1', 'relacoes', 'Estar com alguém de quem gostas (mensagem não conta)', a => [a.meet || 0, 1], () => true],
+  ['r2', 'relacoes', 'Fala com 2 pessoas da tua rede profissional', a => [a.contacts || 0, 2], () => used('contacts')],
+  ['e1', 'espirito', 'Devocional e oração, os dois', a => [(a.devos ? 1 : 0) + ((a.prayers || 0) + (a.habEsp || 0) ? 1 : 0), 2], () => true],
+  ['k1', 'carreira', '3 tarefas de trabalho ou carreira concluídas', a => [a.proTasks || 0, 3], proUsed],
+  ['k2', 'carreira', 'Envia uma candidatura a sério', a => [a.apps || 0, 1], () => used('applications')],
+  ['d1', 'disciplina', '8 tarefas concluídas, uma delas de prioridade 1', a => [Math.min(7, a.tasks || 0) + (a.p1 ? 1 : 0), 8], () => true],
+  ['d2', 'disciplina', 'Dia perfeito: todos os inegociáveis', a => [a.perfect || 0, 1], core]];
 const WQ = [
-  ['wc', 'corpo', 'Treina 3 dias esta semana', w => [w.wkDays || 0, 3], () => true],
-  ['wr', 'corpo', 'Corre 10 km esta semana', w => [Math.floor(w.km || 0), 10], () => used('runs')],
-  ['wm', 'mente', 'Planta 5 árvores', w => [w.trees || 0, 5], () => true],
-  ['wf', 'mente', '2 horas de foco', w => [w.focusMin || 0, 120], () => true],
-  ['wi', 'intelecto', 'Estuda 5 horas', w => [w.studyMin || 0, 300], () => true],
-  ['wo', 'fortuna', 'Gastos registados em 5 dias', w => [w.txDays || 0, 5], () => true],
-  ['ws', 'relacoes', '3 momentos com pessoas', w => [(w.social || 0) + (w.contacts || 0), 3], () => true],
-  ['we', 'espirito', '4 devocionais', w => [w.devos || 0, 4], () => true],
-  ['wk', 'carreira', '5 tarefas de trabalho ou carreira', w => [w.proTasks || 0, 5], () => DQ.find(q => q[0] === 'k1')[4]()],
-  ['wt', 'disciplina', '15 tarefas concluídas', w => [w.tasks || 0, 15], () => true],
-  ['wp', 'disciplina', '3 dias perfeitos', w => [w.perfect || 0, 3], () => DQ.find(q => q[0] === 'd2')[4]()]];
-const QX = { d: 40, w: 120 }, QG = { d: 10, all: 20, w: 40 };
+  ['wc', 'corpo', 'Treina 5 dias esta semana', w => [w.wkDays || 0, 5], () => true],
+  ['wr', 'corpo', 'Corre 25 km esta semana', w => [Math.floor(w.km || 0), 25], () => used('runs')],
+  ['wm', 'mente', '10 horas de foco', w => [w.focusMin || 0, 600], () => true],
+  ['wi', 'intelecto', 'Estuda 12 horas', w => [w.studyMin || 0, 720], () => true],
+  ['wl', 'intelecto', 'Acaba um livro', w => [w.books || 0, 1], () => used('books')],
+  ['wo', 'fortuna', '7 dias com gastos registados e no máximo 1 supérfluo', w => [Math.max(0, Math.min(7, w.txDays || 0) - Math.max(0, (w.sup || 0) - 1)), 7], () => true],
+  ['ws', 'relacoes', '4 encontros com pessoas (ao vivo)', w => [w.meet || 0, 4], () => true],
+  ['we', 'espirito', '7 devocionais: todos os dias', w => [w.devos || 0, 7], () => true],
+  ['wk', 'carreira', '12 tarefas de trabalho ou carreira', w => [w.proTasks || 0, 12], proUsed],
+  ['wa', 'carreira', '3 candidaturas enviadas', w => [w.apps || 0, 3], () => used('applications')],
+  ['wt', 'disciplina', '40 tarefas concluídas', w => [w.tasks || 0, 40], () => true],
+  ['wp', 'disciplina', '5 dias perfeitos', w => [w.perfect || 0, 5], core]];
+// campanhas do mês: objetivos reais, do tamanho de um mês inteiro de trabalho
+const MQ = [
+  ['mc', 'corpo', 'Campanha de Ferro: 20 treinos no mês', m => [m.wkDays || 0, 20], () => true],
+  ['mr', 'corpo', 'Estrada: 100 km a correr', m => [Math.floor(m.km || 0), 100], () => used('runs')],
+  ['mm', 'mente', 'Mente de Aço: 40 horas de foco', m => [Math.floor((m.focusMin || 0) / 60), 40], () => true],
+  ['mi', 'intelecto', 'Erudito: 50 horas de estudo', m => [Math.floor((m.studyMin || 0) / 60), 50], () => true],
+  ['ml', 'intelecto', 'Biblioteca: lê 2 livros até ao fim', m => [m.books || 0, 2], () => used('books')],
+  ['mg', 'intelecto', 'Nota de mestre: uma avaliação com 14 ou mais', m => [m.g14 || 0, 1], () => used('assessments')],
+  ['mf', 'fortuna', 'Cofre: investe pelo menos 10% do que ganhaste', m => [m.inc > 0 && m.inv >= m.inc * .1 ? 1 : 0, 1], () => used('transactions')],
+  ['mz', 'fortuna', 'Mês limpo: 25 dias sem supérfluos', m => [m.cleanDays || 0, 25], () => true],
+  ['mo', 'relacoes', 'Rede viva: 12 encontros', m => [m.meet || 0, 12], () => true],
+  ['me', 'espirito', 'Fiel: 25 devocionais', m => [m.devos || 0, 25], () => true],
+  ['mk', 'carreira', 'Caçador de oportunidades: 10 candidaturas', m => [m.apps || 0, 10], () => used('applications')],
+  ['mt', 'disciplina', 'Executor: 150 tarefas concluídas', m => [m.tasks || 0, 150], () => true],
+  ['mp', 'disciplina', 'Inquebrável: 20 dias perfeitos', m => [m.perfect || 0, 20], core]];
+const QX = { d: 900, w: 3500, m: 15000 }, QG = { d: 10, all: 25, w: 40, m: 150 }, LEGXP = 25000;
 // as missões de cada dia/semana ficam guardadas (o que se completa depois é verificado pelos teus registos)
 const weakest = () => { let lvx = {}; try { const s = CACHE && CACHE.v; lvx = s ? Object.fromEntries(AK.map(k => [k, s.ax[k]])) : {}; } catch (e) { } return AK.slice().sort((a, b) => (lvx[a] || 0) - (lvx[b] || 0)); };
 const pick = (pool, n, seed, wk) => { const r = U.rng(seed), out = [], W = wk || weakest(), byA = k => pool.filter(q => q[1] === k && q[4]() && !out.includes(q));
@@ -196,15 +239,21 @@ const pick = (pool, n, seed, wk) => { const r = U.rng(seed), out = [], W = wk ||
   const rest = pool.filter(q => q[4]() && !out.includes(q) && !out.some(o => o[1] === q[1])); while (out.length < n && rest.length) out.push(rest.splice(Math.floor(r() * rest.length), 1)[0]);
   return out.map(q => q[0]); };
 D.dailyIds = (d = today()) => { const s = S(); if (!s.q[d]) { s.q[d] = pick(DQ, 3, 'dq' + d); Object.keys(s.q).sort().slice(0, -45).forEach(k => delete s.q[k]); save(); } return s.q[d]; };
+D.monthlyIds = (ym = today().slice(0, 7)) => { const s = S(); s.mq = s.mq || {}; if (!s.mq[ym]) { s.mq[ym] = pick(MQ, 3, 'mq' + ym); Object.keys(s.mq).sort().slice(0, -24).forEach(k => delete s.mq[k]); save(); } return s.mq[ym]; };
 D.weeklyIds = (w = wkOf(today())) => { const s = S(); if (!s.wq[w]) { s.wq[w] = pick(WQ, 3, 'wq' + w); Object.keys(s.wq).sort().slice(0, -26).forEach(k => delete s.wq[k]); save(); } return s.wq[w]; };
 const misHist = agg => { const s = S(), ev = [], done = []; let gold = 0;
   Object.entries(s.q || {}).forEach(([d, ids]) => { let n = 0; (ids || []).forEach(id => { const q = DQ.find(x => x[0] === id); if (!q) return; const [c, t] = q[3](agg[d] || {}); if (c >= t) { n++; ev.push({ d, a: q[1], x: QX.d, t: 'Missão: ' + q[2], m: 1 }); gold += QG.d; done.push({ d, id }); } }); if (n >= 3) gold += QG.all; });
   Object.entries(s.wq || {}).forEach(([w, ids]) => { const end = U.addDays(w, 6) > today() ? today() : U.addDays(w, 6), a = sumAgg(agg, w, end); (ids || []).forEach(id => { const q = WQ.find(x => x[0] === id); if (!q) return; const [c, t] = q[3](a); if (c >= t) { ev.push({ d: end, a: q[1], x: QX.w, t: 'Missão da semana: ' + q[2], m: 1 }); gold += QG.w; done.push({ d: end, id, w: 1 }); } }); });
+  Object.entries(s.mq || {}).forEach(([ym, ids]) => { const a0 = ym + '-01', e0 = ym + '-' + U.pad(U.dim(ym)), end = e0 > today() ? today() : e0, a = sumAgg(agg, a0, end); (ids || []).forEach(id => { const q = MQ.find(x => x[0] === id); if (!q) return; const [c, t] = q[3](a); if (c >= t) { ev.push({ d: end, a: q[1], x: QX.m, t: 'Campanha do mês: ' + q[2], m: 1 }); gold += QG.m; done.push({ d: end, id, mo: 1 }); } }); });
   return { ev, gold, n: done.length, done }; };
 D.missions = () => { const st = D.state(), T = today(), w = wkOf(T), a = st.agg[T] || {}, wa = sumAgg(st.agg, w, T);
   const dl = D.dailyIds().map(id => { const q = DQ.find(x => x[0] === id); if (!q) return null; const [c, t] = q[3](a); return { id, a: q[1], t: q[2], c: Math.min(c, t), n: t, ok: c >= t, x: QX.d, g: QG.d }; }).filter(Boolean);
   const wl = D.weeklyIds().map(id => { const q = WQ.find(x => x[0] === id); if (!q) return null; const [c, t] = q[3](wa); return { id, a: q[1], t: q[2], c: Math.min(c, t), n: t, ok: c >= t, x: QX.w, g: QG.w }; }).filter(Boolean);
-  return { dl, wl, left: U.diff(U.addDays(w, 7), T) }; };
+  const ym = T.slice(0, 7), ma = sumAgg(st.agg, ym + '-01', T), ml = D.monthlyIds().map(id => { const q = MQ.find(x => x[0] === id); if (!q) return null; const [c, t] = q[3](ma); return { id, a: q[1], t: q[2], c: Math.min(c, t), n: t, ok: c >= t, x: QX.m, g: QG.m }; }).filter(Boolean);
+  return { dl, wl, ml, left: U.diff(U.addDays(w, 7), T), mleft: U.dim(ym) - +T.slice(8, 10) + 1 }; };
+// o monstro do dia: as 3 missões de hoje são os 3 golpes que o matam
+D.monsterOf = (d = today()) => { const ids = (S().q || {})[d] || D.dailyIds(d), q = DQ.find(x => x[0] === ids[0]), a = q ? q[1] : 'disciplina', L = OS.Monstros ? OS.Monstros.ofA(a) : []; return L.length ? L[U.hash('mo' + d) % L.length] : ''; };
+D.kills = () => { const s = S(), st = D.state(), k = {}; st.mis.done.filter(x => !x.w && !x.mo).forEach(x => { k[x.d] = (k[x.d] || 0) + 1; }); const out = {}; Object.entries(k).forEach(([d, n]) => { if (n >= ((s.q || {})[d] || []).length && n >= 3) { const m = D.monsterOf(d); if (m) out[m] = (out[m] || 0) + 1; } }); return out; };
 
 /* ================= CHEFE DA SEMANA ================= */
 const BOSS = { corpo: ['Golem da Preguiça', 'Pesa toneladas e alimenta-se de sofá.'], mente: ['Hidra da Distração', 'Cada notificação faz-lhe nascer uma cabeça nova.'], intelecto: ['Sombra da Ignorância', 'Cresce em cada página que não abres.'],
@@ -214,11 +263,19 @@ D.bossOf = (w = wkOf(today())) => { const s = S(); if (s.boss[w]) return s.boss[
   const xpIn = (k, a, b) => st.all.filter(e => e.a === k && e.d >= a && e.d <= b).reduce((x, e) => x + e.x, 0);
   const usedK = AK.filter(k => st.all.some(e => e.a === k && e.d >= U.addDays(w, -42))), pool = usedK.length >= 3 ? usedK : AK;
   const k = pool.slice().sort((a, b) => xpIn(a, prevW, U.addDays(w, -1)) - xpIn(b, prevW, U.addDays(w, -1)))[0];
-  const avg = xpIn(k, U.addDays(w, -28), U.addDays(w, -1)) / 4, hp = Math.max(180, Math.round((avg * 1.3 + 120) / 10) * 10);
-  s.boss[w] = { a: k, hp }; Object.keys(s.boss).sort().slice(0, -30).forEach(x => delete s.boss[x]); save(); return s.boss[w]; };
+  const t = Math.min(3, Object.keys(s.boss).filter(x => x < w && s.boss[x].a === k && s.boss[x].won).length), avg = xpIn(k, U.addDays(w, -28), U.addDays(w, -1)) / 4, hp = Math.max(3000, Math.round((avg * 1.5 + 2500) * (1 + t * .2) / 100) * 100);
+  s.boss[w] = { a: k, hp, t }; Object.keys(s.boss).sort().slice(0, -30).forEach(x => delete s.boss[x]); save(); return s.boss[w]; };
 D.bossFight = (w = wkOf(today())) => { const b = D.bossOf(w), st = D.state(), end = U.addDays(w, 6), L = st.all.filter(e => e.d >= w && e.d <= end && !e.m);
   let dmg = 0; const hits = {}; L.forEach(e => { const v = e.a === b.a ? e.x : e.x * .25; dmg += v; hits[e.a] = (hits[e.a] || 0) + v; });
-  dmg = Math.round(dmg); return { w, a: b.a, hp: b.hp, dmg, left: Math.max(0, b.hp - dmg), dead: dmg >= b.hp, over: end < today(), hits, name: BOSS[b.a][0], lore: BOSS[b.a][1] }; };
+  dmg = Math.round(dmg); const dead = dmg >= b.hp; if (dead && !b.won) { b.won = 1; }
+  const mo = OS.Monstros, mid = mo ? mo.bossOf(b.a) : '', t = b.t | 0; return { w, a: b.a, hp: b.hp, dmg, left: Math.max(0, b.hp - dmg), dead, over: end < today(), hits, t, mid, name: mid ? mo.name(mid, t) : BOSS[b.a][0], lore: mid ? mo.ALL[mid].lore : BOSS[b.a][1] }; };
+// o colosso do mês: só cai com o XP de um mês inteiro (todas as áreas contam)
+D.colossus = (ym = today().slice(0, 7)) => { const s = S(); s.col = s.col || {}; const st = D.state(), a0 = ym + '-01', e0 = ym + '-' + U.pad(U.dim(ym)), mo = OS.Monstros;
+  if (!s.col[ym]) { const prev = [1, 2, 3].map(k => { const d = new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1 - k, 1), y = U.iso(d).slice(0, 7); return st.all.filter(e => !e.m && e.d.slice(0, 7) === y).reduce((x, e) => x + e.x, 0); }), avg = prev.reduce((x, v) => x + v, 0) / 3;
+    s.col[ym] = { hp: Math.max(60000, Math.round(avg * 1.15 / 1000) * 1000), i: (+ym.slice(0, 4) * 12 + +ym.slice(5, 7)) % 12 }; Object.keys(s.col).sort().slice(0, -24).forEach(k => delete s.col[k]); save(); }
+  const c = s.col[ym], dmg = Math.round(st.all.filter(e => !e.m && e.d >= a0 && e.d <= e0).reduce((x, e) => x + e.x, 0)), mid = mo ? mo.COLOSSI[c.i % mo.COLOSSI.length] : '';
+  return { ym, hp: c.hp, dmg, left: Math.max(0, c.hp - dmg), dead: dmg >= c.hp, over: e0 < today(), mid, name: mid ? mo.ALL[mid].n : 'Colosso', lore: mid ? mo.ALL[mid].lore : '' }; };
+const colossiWon = () => Object.keys(S().col || {}).filter(ym => { try { return D.colossus(ym).dead; } catch (e) { return false; } });
 const bossesWon = () => Object.keys(S().boss || {}).filter(w => { try { return D.bossFight(w).dead; } catch (e) { return false; } });
 
 /* ================= CONQUISTAS ================= */
@@ -228,17 +285,23 @@ const counts = st => { const c = {}; const n = (coll, f) => OS.all(coll).filter(
   c.workH = Math.round(U.sum(OS.all('shifts'), s => OS.Car && OS.Car.workedHours ? OS.Car.workedHours(s) : 0)); c.invest = Math.round(U.sum(OS.all('invtx').filter(t => t.type === 'Compra'), t => U.num(t.qty) * U.num(t.price)));
   c.surplus = st.base.filter(e => /^Mês com saldo positivo/.test(e.t)).length; c.txDays = new Set(OS.all('transactions').map(t => t.date)).size; c.classes = st.base.filter(e => /^Aula:/.test(e.t)).length;
   c.best = st.best; c.missions = st.mis.n; c.bosses = bossesWon().length; c.marcos = D.legacyCount(); c.level = st.H.l;
-  c.balanced = AK.filter(k => st.lv[k].l >= 5).length; c.adv = OS.all('adventures').filter(a => a.status === 'Feita').length; c.paises = OS.Mundo ? OS.Mundo.stats().n : 0; c.perfect = st.base.filter(e => /^Dia perfeito/.test(e.t)).length; return c; };
-const ACH = [['treinos', 'Forjado no Ferro', 'treinos', 'workouts', [10, 50, 200], 'dumbbell'], ['km', 'Pernas de Aço', 'km corridos', 'km', [25, 150, 600], 'run'], ['estudo', 'Mente Afiada', 'horas de estudo', 'studyH', [10, 75, 300], 'book'],
-  ['livros', 'Devorador de Livros', 'livros lidos', 'books', [1, 6, 24], 'book'], ['arvores', 'Guardião da Floresta', 'árvores plantadas', 'trees', [10, 60, 250], 'tree'], ['devos', 'Raízes Profundas', 'devocionais', 'devos', [7, 40, 150], 'sun'],
-  ['social', 'Coração Presente', 'momentos e contactos', 'social', [5, 40, 150], 'users'], ['tarefas', 'Executor', 'tarefas concluídas', 'tasks', [25, 200, 1000], 'check'], ['horas', 'Mãos à Obra', 'horas trabalhadas', 'workH', [40, 400, 1500], 'briefcase'],
-  ['invest', 'Semeador de Fortuna', '€ investidos', 'invest', [500, 5000, 25000], 'trend'], ['meses', 'Cofre Cheio', 'meses com saldo positivo', 'surplus', [1, 6, 18], 'coin'], ['caixa', 'Olho no Dinheiro', 'dias com gastos registados', 'txDays', [14, 90, 300], 'wallet'],
-  ['aulas', 'Presente!', 'aulas assistidas', 'classes', [10, 60, 200], 'school'], ['sequencia', 'Chama Eterna', 'dias seguidos (melhor sequência)', 'best', [7, 30, 100], 'flame'], ['missoes', 'Caçador de Missões', 'missões cumpridas', 'missions', [10, 60, 250], 'target'],
-  ['chefes', 'Matador de Chefes', 'chefes derrotados', 'bosses', [1, 8, 30], 'sword'], ['marcos', 'Lenda do Codex', 'marcos do Codex', 'marcos', [1, 10, 40], 'crown'], ['nivel', 'Ascensão', 'nível do herói', 'level', [5, 15, 30], 'star'],
-  ['equilibrio', 'Vida Equilibrada', 'atributos no nível 5', 'balanced', [3, 6, 8], 'scale'], ['perfeitos', 'Dia Perfeito', 'dias perfeitos', 'perfect', [3, 30, 120], 'shield'], ['aventuras', 'Aventureiro', 'aventuras feitas', 'adv', [1, 5, 15], 'mountain'], ['mundo', 'Volta ao Mundo', 'países conhecidos', 'paises', [3, 10, 25], 'globe']];
-const TIERN = ['Bronze', 'Prata', 'Ouro'], TIERG = [20, 60, 150];
+  c.balanced = Math.min(...AK.map(k => st.lv[k].l)); c.adv = OS.all('adventures').filter(a => a.status === 'Feita').length; c.paises = OS.Mundo ? OS.Mundo.stats().n : 0; c.perfect = st.base.filter(e => /^Dia perfeito/.test(e.t)).length;
+  c.longRun = Math.max(0, ...OS.all('runs').map(r => U.num(r.km))); c.focusH = Math.round((U.sum(OS.all('focusblocks'), f => U.num(f.minutes)) + U.sum(OS.all('trees').filter(t => t.alive !== false), t => U.num(t.mins))) / 60);
+  c.apps = OS.all('applications').filter(a => a.status !== 'Por enviar').length; c.answered = OS.all('prayers').filter(p => p.status === 'Respondida').length; c.colossi = colossiWon().length;
+  c.kills = Object.values(D.kills()).reduce((a, v) => a + v, 0); c.campaigns = st.mis.done.filter(x => x.mo).length; c.classes = Object.keys(S().clsSeen || {}).length; return c; };
+const ACH = [['treinos', 'Forjado no Ferro', 'treinos', 'workouts', [25, 100, 250, 500, 1000], 'dumbbell'], ['km', 'Pernas de Aço', 'km corridos', 'km', [50, 250, 750, 1500, 3000], 'run'], ['longa', 'Ultra', 'km na corrida mais longa', 'longRun', [10, 21.1, 42.2, 50, 100], 'run'],
+  ['estudo', 'Mente Afiada', 'horas de estudo', 'studyH', [25, 150, 500, 1000, 2500], 'book'], ['livros', 'Devorador de Livros', 'livros lidos', 'books', [3, 12, 30, 60, 120], 'book'], ['foco', 'Monge do Foco', 'horas de foco', 'focusH', [25, 150, 500, 1000, 2500], 'brain'],
+  ['arvores', 'Guardião da Floresta', 'árvores plantadas', 'trees', [25, 150, 500, 1000, 2500], 'tree'], ['devos', 'Raízes Profundas', 'devocionais', 'devos', [30, 100, 365, 730, 1500], 'sun'], ['oracoes', 'Fé Respondida', 'orações respondidas', 'answered', [1, 5, 15, 40, 100], 'sun'],
+  ['social', 'Coração Presente', 'momentos e contactos', 'social', [10, 60, 200, 500, 1000], 'users'], ['tarefas', 'Executor', 'tarefas concluídas', 'tasks', [100, 500, 1500, 4000, 10000], 'check'], ['horas', 'Mãos à Obra', 'horas trabalhadas', 'workH', [100, 500, 1500, 4000, 10000], 'briefcase'],
+  ['cand', 'Caçador de Portas', 'candidaturas enviadas', 'apps', [5, 25, 75, 150, 300], 'briefcase'], ['invest', 'Semeador de Fortuna', '€ investidos', 'invest', [1000, 10000, 50000, 150000, 500000], 'trend'], ['meses', 'Cofre Cheio', 'meses com saldo positivo', 'surplus', [3, 12, 24, 48, 96], 'coin'],
+  ['caixa', 'Olho no Dinheiro', 'dias com gastos registados', 'txDays', [30, 180, 365, 730, 1500], 'wallet'], ['aulas', 'Presente!', 'aulas assistidas', 'classes', [30, 120, 300, 600, 1000], 'school'], ['sequencia', 'Chama Eterna', 'dias seguidos (melhor sequência)', 'best', [14, 60, 150, 365, 730], 'flame'],
+  ['missoes', 'Caçador de Missões', 'missões cumpridas', 'missions', [30, 200, 600, 1500, 4000], 'target'], ['campanhas', 'Senhor da Guerra', 'campanhas do mês', 'campaigns', [1, 6, 15, 30, 60], 'flag'], ['monstros', 'Exterminador', 'monstros do dia mortos', 'kills', [10, 60, 200, 500, 1000], 'sword'],
+  ['chefes', 'Matador de Chefes', 'chefes derrotados', 'bosses', [3, 15, 50, 100, 200], 'sword'], ['colossos', 'Mata-Colossos', 'colossos do mês derrubados', 'colossi', [1, 4, 12, 24, 48], 'sword'], ['marcos', 'Lenda do Codex', 'marcos do Codex', 'marcos', [3, 15, 40, 100, 250], 'crown'],
+  ['nivel', 'Ascensão', 'nível do herói', 'level', [10, 30, 60, 100, 200], 'star'], ['equilibrio', 'Vida Equilibrada', 'nível do atributo mais fraco', 'balanced', [5, 10, 20, 35, 50], 'scale'], ['classes', 'Mil Caras', 'classes diferentes', 'classes', [2, 5, 10, 20, 30], 'user'],
+  ['perfeitos', 'Dia Perfeito', 'dias perfeitos', 'perfect', [10, 50, 150, 365, 730], 'shield'], ['aventuras', 'Aventureiro', 'aventuras feitas', 'adv', [2, 8, 20, 40, 75], 'mountain'], ['mundo', 'Volta ao Mundo', 'países conhecidos', 'paises', [5, 15, 35, 70, 120], 'globe']];
+const TIERN = ['Bronze', 'Prata', 'Ouro', 'Platina', 'Diamante'], TIERG = [20, 60, 150, 300, 600], TIERC = ['#CD7F32', '#C0C7D0', '#E8C26A', '#9FE8E0', '#B9D7FF'];
 D.achievements = () => { const st = D.state(), c = counts(st); return ACH.map(([id, n, u, key, th, ic]) => { const v = c[key] || 0, t = th.filter(x => v >= x).length; return { id, n, u, v, th, t, ic, next: th[t] || null }; }); };
-const goldOf = st => { const c = counts(st); let g = st.mis.gold + st.H.l * 25; ACH.forEach(([, , , key, th]) => { const v = c[key] || 0; th.forEach((x, i) => { if (v >= x) g += TIERG[i]; }); }); g += bossesWon().length * 100; const spent = (S().owned || []).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).p || 0), 0); return Math.max(0, g - spent); };
+const goldOf = st => { const c = counts(st); let g = st.mis.gold + st.H.l * 25; ACH.forEach(([, , , key, th]) => { const v = c[key] || 0; th.forEach((x, i) => { if (v >= x) g += TIERG[i]; }); }); g += bossesWon().length * 100 + colossiWon().length * 500; const spent = (S().owned || []).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).p || 0), 0); return Math.max(0, g - spent); };
 
 /* ================= CODEX (os teus marcos por pilar: o Notion original atualizado com o Dominus 2.0) =================
    A lista é tua: podes tirar marcos que já não fazem sentido e acrescentar novos. Cada marco feito guarda o texto e o dia. */
@@ -253,8 +316,30 @@ const legDone = p => (S().legacy[p] || []).filter(m => m && m.t);
 const isDone = (p, t) => legDone(p).some(m => m.t === t);
 D.legacyCount = () => D.PK.reduce((a, p) => a + legDone(p).length, 0);
 D.nextLegacy = () => D.PK.map(p => { const L = legList(p), i = L.findIndex(t => !isDone(p, t)); return i >= 0 ? { pillar: LEGN[p], n: i + 1, t: L[i] } : null; }).filter(Boolean);
+// marcos que se provam sozinhos pelos teus registos (o resto pede a prova por escrito)
+const yearMax = (L, f) => { const by = {}; L.forEach(x => { const y = String(f(x) || '').slice(0, 4); if (y) by[y] = (by[y] || 0) + 1; }); return Math.max(0, ...Object.values(by)); };
+const AUTO = [
+  [/ler (\d+) livros num ano/i, m => [yearMax(OS.all('books').filter(b => b.status === 'Lido'), b => b.end || b.start), +m[1], 'livros num ano']],
+  [/ler (\d+) livros/i, m => [OS.all('books').filter(b => b.status === 'Lido').length, +m[1], 'livros lidos']],
+  [/meia[- ]maratona/i, () => [Math.max(0, ...OS.all('runs').map(r => U.num(r.km))), 21.1, 'km de uma vez']],
+  [/maratona/i, () => [Math.max(0, ...OS.all('runs').map(r => U.num(r.km))), 42.2, 'km de uma vez']],
+  [/correr (\d+) ?km/i, m => [Math.max(0, ...OS.all('runs').map(r => U.num(r.km))), +m[1], 'km de uma vez']],
+  [/m[ée]dia (?:do ano |geral )?(?:≥|>=|de|acima de) ?(\d+)/i, m => { const G = OS.all('assessments').filter(a => a.grade !== '' && a.grade != null).map(a => U.num(a.grade)); return [G.length >= 3 ? Math.round(U.sum(G, x => x) / G.length * 10) / 10 : 0, +m[1], 'de média (3 notas ou mais)']; }],
+  [/(\d+) pa[íi]ses/i, m => [OS.Mundo ? OS.Mundo.stats().n : 0, +m[1], 'países']],
+  [/^(?!.*sem falhar)(?:.*\D)?(\d+) dias seguidos/i, m => [D.state().best, +m[1], 'dias seguidos']]];
+const autoLeg = t => { for (const [re, f] of AUTO) { const m = String(t).match(re); if (m) { try { const [c, n, u] = f(m); return { c, n, u, ok: c >= n }; } catch (e) { return null; } } } return null; };
+D.autoLeg = autoLeg;
+const legMark = (p, t, proof, d) => { const s = S(); s.legacy[p] = (s.legacy[p] || []).filter(m => m && m.t); if (s.legacy[p].some(m => m.t === t)) return; s.legacy[p].push({ t, d: d || today(), proof }); save(); UI.toast(`Marco conquistado: +${U.nf(LEGXP)} XP em ${AO[LEGA[p]].n}`, 'pos'); };
 A.d3Leg = b => { const s = S(), p = b.dataset.p, t = b.dataset.t; if (!LEG[p] || !t) return; s.legacy[p] = (s.legacy[p] || []).filter(m => m && m.t); const i = s.legacy[p].findIndex(m => m.t === t);
-  if (i >= 0) s.legacy[p].splice(i, 1); else { s.legacy[p].push({ t, d: today() }); UI.toast(`Marco conquistado: +200 XP em ${AO[LEGA[p]].n}`, 'pos'); } save(); };
+  if (i >= 0) { UI.ask('Desmarcar este marco?', `"${esc(t)}" volta a estar por fazer e perdes os ${U.nf(LEGXP)} XP.`, 'Desmarcar', () => { s.legacy[p].splice(i, 1); save(); OS.request(); }); return; }
+  const au = autoLeg(t); if (au) { if (au.ok) legMark(p, t, `Verificado pelos teus registos: ${U.nf(au.c)} ${au.u}`); else UI.toast(`Ainda não: ${U.nf(au.c)}/${U.nf(au.n)} ${au.u}. Este marco prova-se sozinho pelos teus registos.`, 'warn'); return; }
+  UI.modal(`<form class="d3-proof" data-form="d3LegProof" data-p="${esc(p)}" data-t="${esc(t)}"><div class="cz d3-k">Provar um marco · ${esc(LEGN[p])}</div><h3>${esc(t)}</h3>
+    <p class="dm">Um marco é uma conquista real e difícil. Escreve a prova: o certificado, a nota na pauta, o valor, o sítio, quem estava lá. Sem prova não conta.</p>
+    <label class="d3-pl"><span>A prova</span><textarea class="field" name="proof" rows="3" required minlength="15" placeholder="Ex.: Certificado Cambridge B2 First, 176 pontos, recebido a 12 de junho"></textarea></label>
+    <label class="d3-pl"><span>Quando foi</span><input class="field" type="date" name="d" value="${today()}" max="${today()}" required></label>
+    <div class="d3-pa"><button type="button" class="dbtn sm" data-mclose>Ainda não</button><button class="dbtn gold">Conquistei (+${U.nf(LEGXP)} XP)</button></div></form>`); };
+OS.forms.d3LegProof = (f, v) => { const p = f.dataset.p, t = f.dataset.t, proof = v('proof').replace(/\s+/g, ' ').trim(); if (!LEG[p] || !t) return;
+  if (proof.length < 15) { UI.toast('Escreve uma prova a sério (15 letras ou mais).', 'warn'); return false; } legMark(p, t, proof.slice(0, 400), v('d') || today()); UI.closeModal(); };
 A.d3LegTab = b => OS.setUI('d3Leg', b.dataset.p);
 A.d3LegOff = b => { const p = b.dataset.p, t = b.dataset.t, x = legx(); if (!LEG[p] || !t) return;
   UI.ask('Tirar este marco?', `"${esc(t)}" sai da tua lista de ${LEGN[p]}. Podes repô-lo depois.`, 'Tirar', () => { const own = (x.add[p] || []).findIndex(a => a.t === t);
@@ -752,7 +837,7 @@ D.pixelUrl = (look, o) => pxGet(look, o).url;
 D.pixelTop = (look, o) => pxGet(look, o).top;
 D.bustImg = (o = {}) => `<img class="d3-px" src="${D.pixelUrl(o.look || {}, o)}" alt="O teu herói" draggable="false">`;
 D.myBust = () => { const s = S(), st = D.state(); return D.bustImg({ look: s.look, corpo: st.tiers.corpo, mood: st.mood }); };
-D.lookOk = (cat, id, st) => { const it = (PX[cat] || []).find(x => x[0] === id); return !it || !it[2] ? '' : it[2](Object.assign({ owned: S().owned || [] }, st)); };
+D.lookOk = (cat, id, st) => { const it = (PX[cat] || []).find(x => x[0] === id); if (!it || !it[2]) return ''; if (clsPieces().has(cat + ':' + id)) return ''; return it[2](Object.assign({ owned: S().owned || [] }, st)); };
 // tira o que deixou de estar desbloqueado (ex.: apagaste registos e o nível desceu)
 D.lookFix = (look, st) => { Object.keys(PX).forEach(c => { if (look[c] != null && D.lookOk(c, look[c], st)) look[c] = D.lookOk(c, DEF_LOOK[c], st) ? '' : DEF_LOOK[c]; }); return look; };
 /* ---------- cenários em pixel art (como os biomas do Terraria): 72 × 105 (a carta toda), o herói pisa o chão na linha 66 ---------- */
@@ -858,9 +943,36 @@ document.addEventListener('pointermove', e => { const c = e.target.closest && e.
 document.addEventListener('pointerleave', e => { const c = e.target.closest && e.target.closest('[data-tilt]'); if (c) { c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); } }, true);
 
 // editor da aparência: cada peça aparece já vestida no teu boneco; as melhores desbloqueiam-se com os atributos e o nível
-const ED = [['conj', 'Conjuntos'], ['corpo', 'Corpo'], ['cabelo', 'Cabelo'], ['rosto', 'Barba e óculos'], ['head', 'Cabeça'], ['top', 'Tronco'], ['legs', 'Pernas'], ['feet', 'Pés'], ['cape', 'Capa'], ['hand', 'Mão'], ['shield', 'Escudo'], ['acc', 'Extras']];
+const ED = [['classe', 'Classes'], ['conj', 'Conjuntos'], ['corpo', 'Corpo'], ['cabelo', 'Cabelo'], ['rosto', 'Barba e óculos'], ['head', 'Cabeça'], ['top', 'Tronco'], ['legs', 'Pernas'], ['feet', 'Pés'], ['cape', 'Capa'], ['hand', 'Mão'], ['shield', 'Escudo'], ['acc', 'Extras']];
 const CATN = { hair: 'Estilo', beard: 'Barba', glasses: 'Óculos', head: 'Chapéus e elmos', top: 'Tronco', legs: 'Pernas', feet: 'Pés', cape: 'Capa', hand: 'Na mão', shield: 'Escudo', acc: 'Extras' };
 const HEADC = ['bone', 'bonetras', 'gorro', 'bandana', 'fedora', 'capuz'], FEETC = ['tenis', 'chuteiras'], NUMK = ['skin', 'topColor', 'legsColor', 'feetColor', 'headColor'];
+// skins das classes: cada classe tem 5 graus (I a V); a armadura vem do atributo principal, a capa e as cores do segundo
+const KIT = {
+  corpo: [{ head: 'bandana', top: 'regata', legs: 'treino', feet: 'tenis', hand: 'haltere' }, { top: 'a-couro', legs: 'l-couro', feet: 'botas', hand: 'machado', shield: 'madeira' }, { head: 'ferro', top: 'a-malha', legs: 'l-ferro', feet: 'f-ferro', hand: 'espada', shield: 'ferro' },
+    { head: 'espartano', top: 'a-espartano', legs: 'l-espartano', feet: 'sandalias', hand: 'lanca', shield: 'espartano' }, { head: 'dragao', top: 'a-dragao', legs: 'l-dragao', feet: 'f-ferro', hand: 'machado' }],
+  mente: [{ head: 'gorro', top: 'hoodie', legs: 'treino', feet: 'tenis', acc: 'fones' }, { head: 'capuz', top: 'hoodie', legs: 'preta', feet: 'botas', hand: 'livro' }, { head: 'capuz', top: 'monge', legs: 'preta', feet: 'sandalias', hand: 'cajado' },
+    { head: 'mago', top: 'mago', legs: 'preta', feet: 'botas', hand: 'cajado' }, { head: 'futurista', top: 'a-futurista', legs: 'l-futurista', feet: 'botas', hand: 'cajado' }],
+  intelecto: [{ top: 'camisa', legs: 'social', feet: 'sociais', hand: 'livro', acc: 'mochila' }, { head: 'fedora', top: 'sobretudo', legs: 'social', feet: 'sociais', hand: 'livro' }, { head: 'mago', top: 'mago', legs: 'preta', feet: 'botas', hand: 'livro' },
+    { head: 'futurista', top: 'a-futurista', legs: 'l-futurista', feet: 'botas', hand: 'cajado' }, { head: 'mago', top: 'manto', legs: 'social', feet: 'sociais', hand: 'cajado' }],
+  fortuna: [{ top: 'polo', legs: 'social', feet: 'sociais', hand: 'telemovel', acc: 'relogio' }, { top: 'blazer', legs: 'social', feet: 'sociais', hand: 'pasta', acc: 'relogio' }, { head: 'fedora', top: 'fato', legs: 'social', feet: 'sociais', hand: 'pasta', acc: 'colar' },
+    { top: 'smoking', legs: 'social', feet: 'sociais', hand: 'trofeu', acc: 'colar' }, { head: 'cavaleiro', top: 'a-ouro', legs: 'l-ouro', feet: 'f-ouro', hand: 'espada', shield: 'cavaleiro' }],
+  relacoes: [{ top: 'tshirt', legs: 'jeans', feet: 'tenis', acc: 'fones' }, { head: 'bone', top: 'basquete', legs: 'calcao', feet: 'tenis', hand: 'bola' }, { top: 'couro', legs: 'jeans', feet: 'botas', hand: 'microfone' },
+    { top: 'blazer', legs: 'social', feet: 'sociais', hand: 'microfone', acc: 'relogio' }, { head: 'cavaleiro', top: 'a-cavaleiro', legs: 'l-ferro', feet: 'f-ferro', hand: 'espada', shield: 'cavaleiro' }],
+  espirito: [{ top: 'camisa', legs: 'jeans', feet: 'sandalias', hand: 'livro' }, { top: 'monge', legs: 'preta', feet: 'sandalias', hand: 'livro' }, { head: 'capuz', top: 'monge', legs: 'preta', feet: 'sandalias', hand: 'cajado' },
+    { head: 'cavaleiro', top: 'a-cavaleiro', legs: 'l-ferro', feet: 'f-ferro', hand: 'espada', shield: 'cavaleiro' }, { head: 'cavaleiro', top: 'a-ouro', legs: 'l-ouro', feet: 'f-ouro', hand: 'tridente', shield: 'dominus' }],
+  carreira: [{ top: 'polo', legs: 'cargo', feet: 'botas', hand: 'telemovel' }, { top: 'camisa', legs: 'social', feet: 'sociais', hand: 'pasta', acc: 'relogio' }, { top: 'sobretudo', legs: 'social', feet: 'sociais', hand: 'pasta', acc: 'relogio' },
+    { top: 'fato', legs: 'social', feet: 'sociais', hand: 'trofeu', acc: 'relogio' }, { head: 'futurista', top: 'a-futurista', legs: 'l-futurista', feet: 'botas', hand: 'trofeu' }],
+  disciplina: [{ head: 'bonetras', top: 'farda', legs: 'cargo', feet: 'botas' }, { top: 'gi', legs: 'calcao', feet: 'descalco' }, { head: 'kabuto', top: 'a-samurai', legs: 'l-samurai', feet: 'sandalias', hand: 'katana' },
+    { head: 'ferro', top: 'a-ferro', legs: 'l-ferro', feet: 'f-ferro', hand: 'katana', shield: 'ferro' }, { head: 'kabuto', top: 'a-samurai', legs: 'l-samurai', feet: 'f-ferro', hand: 'katana' }] };
+const KCAPE = { corpo: 'vermelha', mente: 'preta', intelecto: 'azul', fortuna: 'dourada', relacoes: 'azul', espirito: 'real', carreira: 'preta', disciplina: 'vermelha' };
+const KCOL = { corpo: 6, mente: 1, intelecto: 3, fortuna: 8, relacoes: 9, espirito: 2, carreira: 5, disciplina: 7 };
+const clsSkin = (name, r) => { const c = CLS[name]; if (!c) return null; const k = Object.assign({ head: '', cape: '', hand: '', shield: '', acc: '' }, KIT[c.p][r - 1]);
+  k.topColor = KCOL[c.q]; k.legsColor = KCOL[c.p]; k.headColor = KCOL[c.q]; k.feetColor = 1;
+  k.cape = r < 3 ? '' : r < 5 ? KCAPE[c.q] : c.p === 'fortuna' || c.q === 'fortuna' ? 'dourada' : 'real'; if (c.rare && r >= 4) Object.assign(k, { head: 'coroa', top: 'a-dominus', legs: 'l-dominus', feet: 'f-dominus', hand: 'tridente', shield: 'dominus', cape: 'dominus' }); return k; };
+D.clsSkin = clsSkin;
+const seeClass = st => { if (!st.cls || st.cls === 'Sem classe' || !CLS[st.cls]) return; const s = S(); s.clsSeen = s.clsSeen || {}; if ((s.clsSeen[st.cls] || 0) < st.clsR) { s.clsSeen[st.cls] = st.clsR; save(); } };
+let CPK = '', CPS = new Set();
+const clsPieces = () => { const seen = S().clsSeen || {}, k = JSON.stringify(seen); if (k === CPK) return CPS; CPK = k; CPS = new Set(); Object.entries(seen).forEach(([n, r]) => { for (let i = 1; i <= r; i++) { const sk = clsSkin(n, i); sk && Object.entries(sk).forEach(([c, v]) => CPS.add(c + ':' + v)); } }); return CPS; };
 const setLock = (set, st) => { for (const k of Object.keys(PX)) { if (set[k] == null) continue; const r = D.lookOk(k, set[k], st); if (r) return r; } return ''; };
 const lookEd = () => { const s = S(), st = D.state(), L = Object.assign({}, DEF_LOOK, s.look), sec = ED.some(e => e[0] === OS.ui.d3ed) ? OS.ui.d3ed : 'conj', tc = st.tiers.corpo;
   const th = (lk, crop) => `<span class="d3-pt ${crop ? 'hd' : ''}"><img src="${D.pixelUrl(lk, { corpo: tc })}" alt="" draggable="false"></span>`;
@@ -869,7 +981,13 @@ const lookEd = () => { const s = S(), st = D.state(), L = Object.assign({}, DEF_
   const row = (t, h, cls = 'd3-sws') => `<div><span class="cz">${t}</span><div class="${cls}">${h}</div></div>`;
   const cat = (k, crop) => row(CATN[k], PX[k].map(([v, n]) => it(k, v, n, D.lookOk(k, v, st), crop)).join(''), 'd3-pis');
   const colors = (k, t) => row(t, COLORS.map((c, i) => sw(k, i, 'Cor ' + (i + 1), c)).join(''));
-  const P = { conj: () => row('Um toque veste tudo', SETS.map(([id, n, set]) => { const lock = setLock(set, st), on = Object.keys(set).every(k => String(L[k] == null ? '' : L[k]) === String(set[k]));
+  const P = { classe: () => { const seen = S().clsSeen || {}, cur = CLS[st.cls] ? st.cls : '', show = CLS[OS.ui.d3cls] ? OS.ui.d3cls : cur || Object.keys(seen)[0] || 'Espartano', got = seen[show] || 0;
+      const sk = r => { const k = clsSkin(show, r), lock = r > got ? (show === cur ? `Herói nível ${CRANK[r - 1][0]}` : `Sê ${show} ${ROM[r - 1]}`) : '', on = Object.keys(k).every(x => String(L[x] == null ? '' : L[x]) === String(k[x]));
+        return `<button type="button" class="d3-pi ${on ? 'on' : ''} ${lock ? 'lock' : ''}" ${lock ? 'disabled' : `data-act="d3Cls" data-c="${esc(show)}" data-r="${r}"`} aria-label="${esc(show)} ${ROM[r - 1]}${lock ? ' (' + esc(lock) + ')' : ''}">${th(Object.assign({}, L, k))}<b>${ROM[r - 1]} · ${CRANK[r - 1][1]}</b>${lock ? `<small>${UI.ic('lock')}${esc(lock)}</small>` : ''}</button>`; };
+      const names = Object.keys(CLS);
+      return `<div class="d3-clsh"><b>${esc(show)}</b><small class="dm">${esc(CLS[show].d)}${show === cur ? ' · é a tua classe agora' : got ? ` · já foste ${esc(show)} ${ROM[got - 1]}` : ' · ainda não foste esta classe'}</small></div>${row('Skins desta classe', [1, 2, 3, 4, 5].map(sk).join(''), 'd3-pis')}
+        ${row(`Todas as classes (${Object.keys(seen).length}/${names.length} desbloqueadas)`, names.map(n => `<button type="button" class="d3-clc ${n === show ? 'on' : ''} ${seen[n] ? 'got' : ''}" data-act="d3ClsShow" data-c="${esc(n)}">${esc(n)}${seen[n] ? ` <small>${ROM[seen[n] - 1]}</small>` : ''}</button>`).join(''), 'd3-cls')}`; },
+    conj: () => row('Um toque veste tudo', SETS.map(([id, n, set]) => { const lock = setLock(set, st), on = Object.keys(set).every(k => String(L[k] == null ? '' : L[k]) === String(set[k]));
       return `<button type="button" class="d3-pi ${on ? 'on' : ''} ${lock ? 'lock' : ''}" ${lock ? 'disabled' : `data-act="d3Set" data-v="${id}"`} aria-label="${esc(n)}${lock ? ' (' + esc(lock) + ')' : ''}">${th(Object.assign({}, L, set))}<b>${esc(n)}</b>${lock ? `<small>${UI.ic('lock')}${esc(lock)}</small>` : ''}</button>`; }).join(''), 'd3-pis'),
     corpo: () => row('Tom de pele', SKINS.map((c, i) => sw('skin', i, 'Tom ' + (i + 1), c)).join('')) + row('Cor dos olhos', Object.entries(EYECOL).map(([n, c]) => sw('eyes', n, n, c)).join('')) + row('Sobrancelhas', ['grossas', 'finas'].map(v => it('brows', v, v, '', 1)).join(''), 'd3-pis'),
     cabelo: () => row('Cor', Object.entries(HAIRCOL).map(([n, c]) => sw('hairColor', n, n, c)).join('')) + cat('hair', 1),
@@ -883,6 +1001,8 @@ const lookEd = () => { const s = S(), st = D.state(), L = Object.assign({}, DEF_
     <p class="dm d3-tip">As peças com cadeado desbloqueiam-se sozinhas quando o atributo chega ao nível pedido.</p>
     <button type="button" class="d3-link d3-reset" data-act="d3LookReset">Voltar ao visual da minha foto</button>`; };
 A.d3EdTab = b => OS.setUI('d3ed', b.dataset.v);
+A.d3ClsShow = b => OS.setUI('d3cls', b.dataset.c);
+A.d3Cls = b => { const s = S(), n = b.dataset.c, r = +b.dataset.r, k = clsSkin(n, r); if (!k || ((s.clsSeen || {})[n] || 0) < r) return; if (!s.look || typeof s.look !== 'object') s.look = {}; Object.assign(s.look, k); save(); UI.toast(`${n} ${ROM[r - 1]} vestido`, 'pos'); };
 A.d3Look = b => { const s = S(), k = b.dataset.k, v = b.dataset.v; if (!s.look || typeof s.look !== 'object') s.look = {}; s.look[k] = NUMK.includes(k) ? +v : v; save(); };
 A.d3Set = b => { const s = S(), it = SETS.find(x => x[0] === b.dataset.v); if (!it || setLock(it[2], D.state())) return; if (!s.look || typeof s.look !== 'object') s.look = {}; Object.assign(s.look, it[2]); save(); UI.toast(it[1] + ' vestido', 'pos'); };
 A.d3LookReset = () => { const s = S(); s.look = {}; save(); UI.toast('Visual reposto', 'pos'); };
@@ -915,10 +1035,10 @@ D.LOOKS = LOOKS;
 const LVQ = ['O esforço de hoje ficou gravado.', 'Mais forte do que ontem.', 'Isto foi conquistado, não oferecido.', 'Consistência supera intensidade.', 'Um passo mais perto de Dominus.', 'A disciplina está a pagar.', 'Ninguém te deu isto. Foste tu.'];
 
 /* ================= CERIMÓNIAS ================= */
-const snap = st => ({ H: st.H.l, a: Object.fromEntries(AK.map(k => [k, st.lv[k].l])), ach: Object.fromEntries(D.achievements().map(a => [a.id, a.t])), boss: bossesWon().length, cls: st.cls });
+const snap = st => ({ H: st.H.l, a: Object.fromEntries(AK.map(k => [k, st.lv[k].l])), ach: Object.fromEntries(D.achievements().map(a => [a.id, a.t])), boss: bossesWon().length, cls: st.clsFull });
 D.news = () => { try { const s = S(); if (!s.born || !s.seen || !s.seen.a) return 0; const st = D.state(); return (st.H.l > s.seen.H ? 1 : 0) + AK.filter(k => st.lv[k].l > (s.seen.a[k] || 0)).length; } catch (e) { return 0; } };
 const QQ = []; let showing = false;
-D.check = () => { const s = S(); if (!s.born) return; const st = D.state(), now = snap(st), was = s.seen;
+D.check = () => { const s = S(); if (!s.born) return; const st = D.state(); seeClass(st); const now = snap(st), was = s.seen;
   if (!was || typeof was !== 'object' || !was.a) { s.seen = now; save(); return; }
   if (JSON.stringify(now) === JSON.stringify(was)) return;
   const out = [];
@@ -927,9 +1047,9 @@ D.check = () => { const s = S(); if (!s.born) return; const st = D.state(), now 
   AK.forEach(k => { const a = now.a[k], b = (was.a || {})[k] || 0; if (a <= b) return; const t1 = tierOf(a), t0 = tierOf(b);
     out.push({ k: AO[k].n + ' subiu', t: `${AO[k].n} · nível ${a}`, s: t1 > t0 ? `O teu personagem mudou: ${LOOKS[k][t1]}.` : AO[k].d, col: AO[k].c, ic: AO[k].ic, av: t1 > t0 ? 1 : 0 }); });
   Object.entries(now.ach).forEach(([id, t]) => { const b = (was.ach || {})[id] || 0; if (t <= b) return; const a = ACH.find(x => x[0] === id); if (!a) return;
-    out.push({ k: 'Conquista · ' + TIERN[t - 1], t: a[1], s: `${U.nf(a[4][t - 1])} ${a[2]}`, rw: [`+${TIERG[t - 1]} de ouro`], col: ['#CD7F32', '#C0C7D0', '#E8C26A'][t - 1], ic: a[5] }); });
+    out.push({ k: 'Conquista · ' + TIERN[t - 1], t: a[1], s: `${U.nf(a[4][t - 1])} ${a[2]}`, rw: [`+${TIERG[t - 1]} de ouro`], col: TIERC[t - 1], ic: a[5] }); });
   if (now.boss > (was.boss || 0)) { const w = bossesWon().sort().pop(), f = w ? D.bossFight(w) : null; out.push({ k: 'Chefe derrotado', t: f ? f.name : 'Chefe', s: 'Venceste a semana.', rw: ['+100 de ouro'], ic: 'sword', col: '#E5735A' }); }
-  if (now.cls !== was.cls && now.cls !== 'Sem classe') out.push({ k: 'Nova classe', t: now.cls, s: 'A tua classe nasce dos teus dois atributos mais fortes.', av: 1 });
+  if (now.cls !== was.cls && now.cls !== 'Sem classe') out.push({ k: 'Nova classe', t: now.cls, s: (CLS[now.cls.replace(/ [IV]+$/, '')] || {}).d || 'A tua classe nasce dos teus atributos mais fortes.', rw: ['Skin da classe desbloqueada no Visual'], av: 1 });
   s.seen = now; save();
   if (out.length > 5) { const rest = out.splice(4); out.push({ k: 'E ainda', t: `Mais ${rest.length} novidades`, s: rest.map(x => x.t).join(' · ') }); }
   QQ.push(...out); flush(); };
@@ -966,7 +1086,7 @@ OS.on('unlock', () => setTimeout(() => { if (!FLY) flyNow(true); }, 3000));
 /* ================= VISTAS ================= */
 const ic = (n, c = '') => UI.ic(n, c);
 const bar = (p, c) => `<div class="d3-bar"><i style="width:${(Math.max(0, Math.min(1, p || 0)) * 100).toFixed(1)}%${c ? ';background:' + c : ''}"></i></div>`;
-const TABS = [['', 'Herói', 'user'], ['missoes', 'Missões', 'target'], ['chefe', 'Chefe', 'sword'], ['conquistas', 'Conquistas', 'star'], ['baus', 'Baús', 'gift'], ['visual', 'Visual', 'eye'], ['marcos', 'Marcos', 'flag'], ['diario', 'Diário', 'note']];
+const TABS = [['', 'Herói', 'user'], ['missoes', 'Missões', 'target'], ['chefe', 'Chefe', 'sword'], ['bestiario', 'Bestiário', 'skull'], ['conquistas', 'Conquistas', 'star'], ['baus', 'Baús', 'gift'], ['visual', 'Visual', 'eye'], ['marcos', 'Marcos', 'flag'], ['diario', 'Diário', 'note']];
 const MOODT = { chamas: ['Em chamas', 'Fizeste algo hoje. O teu herói sorri.'], forma: ['Em forma', 'Registaste algo há pouco tempo.'], cansado: ['Cansado', 'Há uns dias que não registas nada. O teu herói sente.'], abatido: ['Abatido', 'Volta hoje: um registo chega para ele se levantar.'] };
 const goLink = ([to, l]) => to === '@social' ? `<button type="button" class="d3-go" data-act="d3Social">${ic('plus')}${esc(l)}</button>` : `<a class="d3-go" href="#${to}">${esc(l)}</a>`;
 const xpTxt = n => U.nf(Math.round(n));
@@ -991,34 +1111,44 @@ T.heroi = st => { const s = S(), H = st.H, md = MOODT[st.mood] || MOODT.forma, M
   <section><div class="d3-h"><span class="cz">Atributos</span><span class="dm">sobem sozinhos com o que fazes</span></div><div class="d3-attrs">${AT.map(a => { const l = st.lv[a.k], nx = nextLook(a.k, l.l);
     return `<details class="d3-at" data-tog="d3at_${a.k}" ${OS.ui['tog_d3at_' + a.k] ? 'open' : ''} style="--c:${a.c}"><summary><span class="d3-ati">${ic(a.ic)}</span><span class="d3-atn"><b>${esc(a.n)}</b><small class="dm">${esc(LOOKS[a.k][tierOf(l.l)])}</small></span><b class="mono d3-atl">${l.l}</b>${bar(l.p, a.c)}<small class="dm mono d3-atx">${xpTxt(l.into)}/${xpTxt(l.need)} XP${st.wkX[a.k] ? ` · +${xpTxt(st.wkX[a.k])} esta semana` : ''}</small></summary>
       <div class="d3-atd"><p>${esc(a.d)}</p>${nx ? `<p class="dm">No nível ${nx.lv}: <b>${esc(nx.n)}</b> no teu personagem.</p>` : '<p class="gold">Visual máximo deste atributo.</p>'}<div class="d3-gos">${a.go.map(goLink).join('')}</div></div></details>`; }).join('')}</div></section>
-  <section class="d3-two"><div class="d3-card"><div class="d3-h"><span class="cz">Equilíbrio</span><span class="dm">${esc(st.cls)}</span></div>${radar(st)}</div>
+  <section class="d3-two"><div class="d3-card"><div class="d3-h"><span class="cz">Equilíbrio</span><span class="dm">${esc(st.clsFull)}${st.cls !== 'Sem classe' ? ' · ' + esc(st.clsN) : ''}</span></div>${radar(st)}${CLS[st.cls] ? `<p class="dm d3-note">${esc(CLS[st.cls].d)}. ${st.clsR < 5 ? `Grau ${ROM[st.clsR]} no herói nível ${CRANK[st.clsR][0]}.` : 'Grau máximo.'}</p>` : ''}</div>
     <div class="d3-card"><div class="d3-h"><span class="cz">Últimos ganhos</span><a class="dm" href="#dominus.diario">diário →</a></div>${feed.length ? `<div class="d3-feed">${feed.map(e => `<div><i style="background:${AO[e.a].c}"></i><span>${esc(e.t)}</span><small class="mono">${U.fmtDS(e.d)} · +${xpTxt(e.x)}</small></div>`).join('')}</div>` : '<p class="dm">Quando registares algo aparece aqui.</p>'}</div></section>`; };
 
-const mRow = m => `<div class="d3-m ${m.ok ? 'ok' : ''}" style="--c:${AO[m.a].c}"><i>${m.ok ? '✓' : ic(AO[m.a].ic)}</i><div><b>${esc(m.t)}</b>${bar(m.c / m.n, AO[m.a].c)}<small class="dm"><span class="mono">${U.nf(m.c)}/${U.nf(m.n)}</span> · ${esc(AO[m.a].n)} · +${m.x} XP · +${m.g} ouro</small></div>${m.ok ? '<span class="d3-ok cz">Feita</span>' : `<span class="d3-gos">${goLink(AO[m.a].go[0])}</span>`}</div>`;
-T.missoes = st => { const M = D.missions(), all = M.dl.length && M.dl.every(m => m.ok), done = st.mis.done, days = U.lastN(8).slice().reverse().slice(1);
-  return `<section><div class="d3-h"><span class="cz">Missões de hoje</span><span class="dm">${M.dl.filter(m => m.ok).length}/${M.dl.length}${all ? ' · bónus +' + QG.all + ' ouro ✓' : ' · as 3 = +' + QG.all + ' ouro'}</span></div><div class="d3-ms">${M.dl.map(mRow).join('')}</div></section>
+const mRow = m => `<div class="d3-m ${m.ok ? 'ok' : ''}" style="--c:${AO[m.a].c}"><i>${m.ok ? '✓' : ic(AO[m.a].ic)}</i><div><b>${esc(m.t)}</b>${bar(m.c / m.n, AO[m.a].c)}<small class="dm"><span class="mono">${U.nf(m.c)}/${U.nf(m.n)}</span> · ${esc(AO[m.a].n)} · +${U.nf(m.x)} XP · +${m.g} ouro</small></div>${m.ok ? '<span class="d3-ok cz">Feita</span>' : `<span class="d3-gos">${goLink(AO[m.a].go[0])}</span>`}</div>`;
+T.missoes = st => { const M = D.missions(), all = M.dl.length && M.dl.every(m => m.ok), done = st.mis.done, days = U.lastN(8).slice().reverse().slice(1), mo = OS.Monstros, mid = D.monsterOf(), hits = M.dl.filter(m => m.ok).length, mm = mo && mid ? mo.ALL[mid] : null;
+  return `${mm ? `<section class="d3-mon ${all ? 'dead' : ''}" style="--c:${AO[mm.a].c}"><div class="d3-mona">${mo.img(mid, { hurt: hits / 3, dead: all })}</div><div><div class="cz d3-k">Monstro do dia · ${esc(AO[mm.a].n)}</div><h2>${esc(mm.n)}</h2><p class="dm"><i>${esc(mm.lore)}</i></p>
+    <div class="d3-hp"><span class="cz">Vida</span>${bar(1 - hits / 3, '#B5483B')}<small class="mono">${3 - hits} / 3</small></div><p>${all ? '<b class="gold">Morto.</b> Fica no teu bestiário.' : `Cada missão de hoje é um golpe. Faltam <b class="mono">${3 - hits}</b>. À meia-noite foge.`}</p></div></section>` : ''}
+  <section><div class="d3-h"><span class="cz">Missões de hoje</span><span class="dm">${M.dl.filter(m => m.ok).length}/${M.dl.length}${all ? ' · bónus +' + QG.all + ' ouro ✓' : ' · as 3 = +' + QG.all + ' ouro'}</span></div><div class="d3-ms">${M.dl.map(mRow).join('')}</div></section>
   <section><div class="d3-h"><span class="cz">Missões da semana</span><span class="dm">${M.left > 1 ? M.left + ' dias para acabar' : 'último dia'}</span></div><div class="d3-ms">${M.wl.map(mRow).join('')}</div></section>
+  <section><div class="d3-h"><span class="cz">Campanhas do mês</span><span class="dm">${M.mleft > 1 ? M.mleft + ' dias para acabar' : 'último dia'} · +${U.nf(QX.m)} XP cada</span></div><div class="d3-ms d3-camp">${M.ml.map(mRow).join('')}</div></section>
   <section class="d3-card"><div class="d3-h"><span class="cz">Últimos dias</span><span class="dm mono">${st.mis.n} missões cumpridas</span></div><div class="d3-hist">${days.map(d => { const n = done.filter(x => x.d === d && !x.w).length, tot = (S().q[d] || []).length; return `<div><span class="mono dm">${U.fmtDS(d)}</span><span>${tot ? '●'.repeat(n) + '○'.repeat(Math.max(0, tot - n)) : '<small class="dm">sem missões</small>'}</span></div>`; }).join('')}</div>
-    <p class="dm d3-note">As missões são escolhidas todos os dias pelos teus atributos mais fracos e completam-se sozinhas com o que registas no Náutilo. Não precisas de marcar nada aqui.</p></section>`; };
+    <p class="dm d3-note">As missões são escolhidas pelos teus atributos mais fracos e completam-se sozinhas com o que registas no Náutilo. São difíceis de propósito: um dia com as 3 feitas é um dia a sério.</p></section>`; };
 
-const bossSvg = (a, f) => { const c = AO[a].c, hurt = f.dead ? 1 : f.dmg / f.hp, eyes = f.dead ? `<path d="M74 92l12 12M86 92l-12 12M114 92l12 12M126 92l-12 12" stroke="#111" stroke-width="5" stroke-linecap="round"/>` : `<circle cx="80" cy="98" r="9" fill="#FDE68A"/><circle cx="120" cy="98" r="9" fill="#FDE68A"/><circle cx="80" cy="99" r="4" fill="#111"/><circle cx="120" cy="99" r="4" fill="#111"/>`;
-  return `<svg viewBox="0 0 200 200" class="d3-boss ${f.dead ? 'dead' : ''}" role="img" aria-label="${esc(f.name)}"><defs><radialGradient id="bg${a}" cx=".5" cy=".4"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#140F0C"/></radialGradient></defs>
-    <ellipse cx="100" cy="186" rx="64" ry="9" fill="#000" opacity=".45"/><path d="M46 70 L30 26 L66 58Z M154 70 L170 26 L134 58Z" fill="#2A211A"/><path d="M40 180 Q24 110 52 72 Q100 30 148 72 Q176 110 160 180Z" fill="url(#bg${a})" stroke="#000" stroke-opacity=".4" stroke-width="2"/>
-    <path d="M40 140 Q20 150 18 172 M160 140 Q180 150 182 172" stroke="${c}" stroke-width="12" stroke-linecap="round" opacity=".75"/>${eyes}
-    <path d="M78 130 Q100 ${f.dead ? 122 : 146} 122 130" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>${f.dead ? '' : '<path d="M86 134 l4 8 l4 -7 M106 135 l4 7 l4 -8" fill="#F3F4F6"/>'}
-    ${hurt > .25 ? '<path d="M60 90 l14 10 l-6 12 l12 8" stroke="#000" stroke-width="2.5" fill="none" opacity=".55"/>' : ''}${hurt > .55 ? '<path d="M140 120 l-12 6 l6 12 l-10 10" stroke="#000" stroke-width="2.5" fill="none" opacity=".55"/>' : ''}${hurt > .8 ? '<path d="M96 52 l6 14 l-8 8 l6 12" stroke="#000" stroke-width="2.5" fill="none" opacity=".6"/>' : ''}</svg>`; };
-T.chefe = st => { const f = D.bossFight(), a = AO[f.a], left = U.diff(U.addDays(f.w, 7), today()), past = Object.keys(S().boss || {}).filter(w => w < f.w).sort().reverse().slice(0, 10);
+const bossArt = f => OS.Monstros && f.mid ? OS.Monstros.img(f.mid, { t: f.t, hurt: f.dead ? 0 : f.dmg / f.hp, dead: f.dead && f.over }, 'd3-boss' + (f.dead ? ' dead' : '')) : '';
+T.chefe = st => { const f = D.bossFight(), a = AO[f.a], left = U.diff(U.addDays(f.w, 7), today()), past = Object.keys(S().boss || {}).filter(w => w < f.w).sort().reverse().slice(0, 10), cf = D.colossus(), cl = U.dim(cf.ym) - +today().slice(8, 10) + 1;
   const tot = Object.values(f.hits).reduce((x, v) => x + v, 0) || 1;
-  return `<section class="d3-bossw" style="--c:${a.c}"><div class="d3-bossart">${bossSvg(f.a, f)}</div><div class="d3-bossi"><div class="cz d3-k">Chefe da semana · ${esc(a.n)}</div><h2>${esc(f.name)}</h2><p class="dm"><i>${esc(f.lore)}</i></p>
+  return `<section class="d3-bossw" style="--c:${a.c}"><div class="d3-bossart">${bossArt(f)}</div><div class="d3-bossi"><div class="cz d3-k">Chefe da semana · ${esc(a.n)}${f.t ? ` · ameaça ${f.t + 1}` : ''}</div><h2>${esc(f.name)}</h2><p class="dm"><i>${esc(f.lore)}</i></p>
       <div class="d3-hp"><span class="cz">Vida</span>${bar(f.left / f.hp, '#B5483B')}<small class="mono">${U.nf(f.left)} / ${U.nf(f.hp)}</small></div>
       <p>${f.dead ? `<b class="gold">Derrotado!</b> +100 de ouro.` : `Faltam <b class="mono">${U.nf(f.left)}</b> de dano · ${left > 1 ? left + ' dias' : 'último dia'}.`}</p>
-      <p class="dm">Fraco contra <b style="color:${a.c}">${esc(a.n)}</b>: o XP desse atributo dá dano inteiro; os outros dão 25%. As missões não contam: só o que fazes.</p><div class="d3-gos">${a.go.map(goLink).join('')}</div></div></section>
+      <p class="dm">Fraco contra <b style="color:${a.c}">${esc(a.n)}</b>: o XP desse atributo dá dano inteiro; os outros dão 25%. As missões não contam: só o que fazes. Cada vez que o vences, volta mais forte.</p><div class="d3-gos">${a.go.map(goLink).join('')}</div></div></section>
+  <section class="d3-bossw d3-col"><div class="d3-bossart">${OS.Monstros && cf.mid ? OS.Monstros.img(cf.mid, { t: 3, hurt: cf.dead ? 0 : cf.dmg / cf.hp }, 'd3-boss') : ''}</div><div class="d3-bossi"><div class="cz d3-k">Colosso do mês · ${esc(U.fmtYML(cf.ym))}</div><h2>${esc(cf.name)}</h2><p class="dm"><i>${esc(cf.lore)}</i></p>
+      <div class="d3-hp"><span class="cz">Vida</span>${bar(cf.left / cf.hp, '#7A2FB0')}<small class="mono">${U.nf(cf.left)} / ${U.nf(cf.hp)}</small></div>
+      <p>${cf.dead ? '<b class="gold">Derrubado!</b> +500 de ouro.' : `Faltam <b class="mono">${U.nf(cf.left)}</b> de dano · ${cl > 1 ? cl + ' dias' : 'último dia'}.`}</p><p class="dm">Todo o XP do mês conta (menos as missões). A vida dele vem da tua média dos últimos 3 meses, mais 15%: para o derrubar tens de fazer mais do que costumas.</p></div></section>
   <section class="d3-card"><div class="d3-h"><span class="cz">Golpes desta semana</span><span class="dm mono">${U.nf(f.dmg)} de dano</span></div>${Object.keys(f.hits).length ? AK.filter(k => f.hits[k]).sort((x, y) => f.hits[y] - f.hits[x]).map(k => `<div class="d3-hit"><span style="color:${AO[k].c}">${esc(AO[k].n)}</span>${bar(f.hits[k] / tot, AO[k].c)}<b class="mono">${U.nf(Math.round(f.hits[k]))}</b></div>`).join('') : '<p class="dm">Ainda nenhum golpe. Cada registo desta semana é um golpe.</p>'}</section>
-  ${past.length ? `<section class="d3-card"><div class="d3-h"><span class="cz">Chefes anteriores</span><span class="dm mono">${bossesWon().length} derrotados</span></div>${past.map(w => { const p = D.bossFight(w); return `<div class="d3-past"><span class="mono dm">${U.fmtDS(w)}</span><span style="color:${AO[p.a].c}">${esc(p.name)}</span><b class="${p.dead ? 'gold' : 'dm'}">${p.dead ? 'derrotado' : 'fugiu'}</b></div>`; }).join('')}</section>` : ''}`; };
+  ${past.length ? `<section class="d3-card"><div class="d3-h"><span class="cz">Chefes anteriores</span><span class="dm mono">${bossesWon().length} derrotados</span></div>${past.map(w => { const p = D.bossFight(w); return `<div class="d3-past">${OS.Monstros && p.mid ? OS.Monstros.img(p.mid, { t: p.t, dead: !p.dead, aura: false }, 'sm') : ''}<span class="mono dm">${U.fmtDS(w)}</span><span style="color:${AO[p.a].c}">${esc(p.name)}</span><b class="${p.dead ? 'gold' : 'dm'}">${p.dead ? 'derrotado' : 'fugiu'}</b></div>`; }).join('')}</section>` : ''}`; };
 
+T.bestiario = st => { const mo = OS.Monstros; if (!mo) return '<p class="dm">Bestiário indisponível.</p>'; const K = D.kills(), s = S(), bw = {}, cw = {};
+  Object.keys(s.boss || {}).forEach(w => { try { const f = D.bossFight(w); if (f.dead) bw[f.mid] = (bw[f.mid] || 0) + 1; } catch (e) { } }); Object.keys(s.col || {}).forEach(ym => { try { const c = D.colossus(ym); if (c.dead) cw[c.mid] = (cw[c.mid] || 0) + 1; } catch (e) { } });
+  const seenB = new Set(Object.keys(s.boss || {}).map(w => mo.bossOf(s.boss[w].a))), seenC = new Set(Object.values(s.col || {}).map(c => mo.COLOSSI[c.i % mo.COLOSSI.length])), seenM = new Set(Object.keys(s.q || {}).map(d => D.monsterOf(d)));
+  const cell = (id, n, seen) => { const m = mo.ALL[id]; return `<div class="d3-bst ${n ? 'won' : seen ? 'seen' : 'unk'}" style="--c:${m.a ? AO[m.a].c : '#B388FF'}">${mo.img(id, { aura: false, dead: !seen })}<b>${seen ? esc(m.n) : '???'}</b><small class="dm">${n ? `${n}× derrotado` : seen ? 'escapou' : m.a ? esc(AO[m.a].n) : 'colosso'}</small>${seen ? `<p class="dm">${esc(m.lore)}</p>` : ''}</div>`; };
+  const tot = mo.MINIONS.length + mo.BOSSES.length + mo.COLOSSI.length, got = Object.keys(K).length + Object.keys(bw).length + Object.keys(cw).length;
+  return `<section><div class="d3-h"><span class="cz">Bestiário</span><span class="dm mono">${got}/${tot} derrotados</span></div><p class="dm d3-note">${tot} criaturas: os monstros do dia (cada um morre com as 3 missões), os chefes da semana e os colossos do mês. Os que ainda não viste aparecem às escuras.</p></section>
+  <section class="d3-card"><div class="d3-h"><span class="cz">Colossos do mês</span><span class="dm mono">${Object.keys(cw).length}/${mo.COLOSSI.length}</span></div><div class="d3-bsts">${mo.COLOSSI.map(id => cell(id, cw[id] || 0, seenC.has(id))).join('')}</div></section>
+  <section class="d3-card"><div class="d3-h"><span class="cz">Chefes da semana</span><span class="dm mono">${Object.keys(bw).length}/${mo.BOSSES.length}</span></div><div class="d3-bsts">${mo.BOSSES.map(id => cell(id, bw[id] || 0, seenB.has(id))).join('')}</div></section>
+  ${AT.map(a => { const L = mo.ofA(a.k); return `<section class="d3-card"><div class="d3-h"><span class="cz" style="color:${a.c}">${esc(a.n)}</span><span class="dm mono">${L.filter(id => K[id]).length}/${L.length}</span></div><div class="d3-bsts">${L.map(id => cell(id, K[id] || 0, seenM.has(id))).join('')}</div></section>`; }).join('')}`; };
 T.conquistas = () => { const L = D.achievements(), n = L.reduce((a, x) => a + x.t, 0);
-  return `<section><div class="d3-h"><span class="cz">Conquistas</span><span class="dm mono">${n}/${L.length * 3} medalhas</span></div><div class="d3-achs">${L.map(a => `<div class="d3-ach t${a.t}"><span class="d3-achi">${ic(a.ic)}</span><div><b>${esc(a.n)}</b><small class="dm">${a.next ? `<span class="mono">${U.nf(a.v)}/${U.nf(a.next)}</span> ${esc(a.u)}` : `<span class="mono">${U.nf(a.v)}</span> ${esc(a.u)} · completa`}</small>${bar(a.next ? a.v / a.next : 1)}<span class="d3-med">${[0, 1, 2].map(i => `<i class="${i < a.t ? 'on m' + i : ''}" title="${TIERN[i]}: ${U.nf(a.th[i])}"></i>`).join('')}</span></div></div>`).join('')}</div>
-  <p class="dm d3-note">Bronze, prata e ouro. Cada medalha dá ouro para o guarda-roupa (${TIERG.join(' / ')}). Tudo conta a partir do que já registaste.</p></section>`; };
+  return `<section><div class="d3-h"><span class="cz">Conquistas</span><span class="dm mono">${n}/${L.length * 5} medalhas</span></div><div class="d3-achs">${L.map(a => `<div class="d3-ach t${a.t}"><span class="d3-achi">${ic(a.ic)}</span><div><b>${esc(a.n)}</b><small class="dm">${a.next ? `<span class="mono">${U.nf(a.v)}/${U.nf(a.next)}</span> ${esc(a.u)}` : `<span class="mono">${U.nf(a.v)}</span> ${esc(a.u)} · completa`}</small>${bar(a.next ? a.v / a.next : 1)}<span class="d3-med">${[0, 1, 2, 3, 4].map(i => `<i class="${i < a.t ? 'on m' + i : ''}" title="${TIERN[i]}: ${U.nf(a.th[i])}"></i>`).join('')}</span></div></div>`).join('')}</div>
+  <p class="dm d3-note">Bronze, prata, ouro, platina e diamante. O diamante é para poucos: anos de trabalho. Cada medalha dá ouro para o guarda-roupa (${TIERG.join(' / ')}).</p></section>`; };
 
 T.baus = st => { const s = S(), ch = D.chests(), lv = (s.opened || 0) + 1, o = ch ? chestOpts(lv) : null, mine = OS.all('rewards'), pend = s.got.map((g, i) => [g, i]).filter(([g]) => !g.used);
   return `<section class="d3-chestw">${ch ? `<div class="d3-chest">${ic('gift')}</div><div><div class="cz d3-k">Baú do nível ${lv} · ${esc(o.tier)}</div><h2>${ch > 1 ? `Tens ${ch} baús por abrir` : 'Tens um baú por abrir'}</h2><p class="dm">Escolhe uma das duas recompensas. É real: dá-ta a ti mesmo.</p>
@@ -1040,9 +1170,10 @@ T.visual = st => { const s = S(), eq = eqOf(st), has = id => (s.owned || []).inc
   <section class="d3-card"><label class="d3-tog"><input type="checkbox" data-act="d3Fly" ${s.fly !== false ? 'checked' : ''}> Mostrar o +XP no canto quando registo algo noutras páginas</label></section>`; };
 
 T.marcos = () => { const s = S(), p = D.PK.includes(OS.ui.d3Leg) ? OS.ui.d3Leg : 'int', L = legList(p), done = L.filter(t => isDone(p, t)), nxt = L.filter(t => !isDone(p, t)).slice(0, 5), off = (legx().off[p] || []).length, dd = t => (legDone(p).find(m => m.t === t) || {}).d;
-  const row = (t, i) => `<div class="d3-leg ${isDone(p, t) ? 'ok' : ''}"><button class="d3-legc" data-act="d3Leg" data-p="${p}" data-t="${esc(t)}" aria-label="${isDone(p, t) ? 'Desmarcar' : 'Marcar como feito'}: ${esc(t)}">${isDone(p, t) ? '✓' : ''}</button><span class="mono dm">${i + 1}</span><span class="d3-legt">${esc(t)}${isDone(p, t) && dd(t) ? `<small class="gold"> · ${U.fmtD(dd(t))}</small>` : ''}</span><button class="d3-legx" data-act="d3LegOff" data-p="${p}" data-t="${esc(t)}" aria-label="Tirar da lista" title="Tirar da lista">${ic('x')}</button></div>`;
+  const pf = t => (legDone(p).find(m => m.t === t) || {}).proof;
+  const row = (t, i) => { const au = isDone(p, t) ? null : autoLeg(t); return `<div class="d3-leg ${isDone(p, t) ? 'ok' : ''} ${au ? 'auto' : ''}"><button class="d3-legc" data-act="d3Leg" data-p="${p}" data-t="${esc(t)}" aria-label="${isDone(p, t) ? 'Desmarcar' : au ? 'Verificar' : 'Provar'}: ${esc(t)}">${isDone(p, t) ? '✓' : au && au.ok ? '!' : ''}</button><span class="mono dm">${i + 1}</span><span class="d3-legt">${esc(t)}${isDone(p, t) && dd(t) ? `<small class="gold"> · ${U.fmtD(dd(t))}</small>` : ''}${isDone(p, t) && pf(t) ? `<small class="dm d3-legp">${esc(pf(t))}</small>` : ''}${au ? `<small class="dm d3-legp">${au.ok ? 'Já conseguiste: toca para confirmar' : `Prova automática: <span class="mono">${U.nf(au.c)}/${U.nf(au.n)}</span> ${esc(au.u)}`}</small>${bar(au.c / au.n)}` : ''}</span><button class="d3-legx" data-act="d3LegOff" data-p="${p}" data-t="${esc(t)}" aria-label="Tirar da lista" title="Tirar da lista">${ic('x')}</button></div>`; };
   return `<nav class="d3-ptabs">${D.PK.map(k => `<button class="${k === p ? 'on' : ''}" data-act="d3LegTab" data-p="${k}" style="--c:${AO[LEGA[k]].c}">${esc(LEGN[k])} <small class="mono">${legDone(k).length}/${legList(k).length}</small></button>`).join('')}</nav>
-  <section class="d3-card"><div class="d3-h"><span class="cz">Próximos marcos · ${esc(LEGN[p])}</span><span class="dm">+200 XP em ${esc(AO[LEGA[p]].n)} cada</span></div>${nxt.length ? nxt.map(t => row(t, L.indexOf(t))).join('') : '<p class="gold">Todos feitos. Lenda.</p>'}</section>
+  <section class="d3-card"><div class="d3-h"><span class="cz">Próximos marcos · ${esc(LEGN[p])}</span><span class="dm">+${U.nf(LEGXP)} XP em ${esc(AO[LEGA[p]].n)} cada · só com prova</span></div>${nxt.length ? nxt.map(t => row(t, L.indexOf(t))).join('') : '<p class="gold">Todos feitos. Lenda.</p>'}</section>
   <section class="d3-card"><div class="d3-h"><span class="cz">Acrescentar um marco</span></div><form class="d3-legadd" data-form="d3LegAdd" data-p="${p}"><input class="field" name="t" placeholder="Ex.: Fazer o Caminho de Santiago" aria-label="Novo marco" required maxlength="160"><select class="field" name="where" aria-label="Onde"><option value="next">A seguir (próximo)</option><option value="end">No fim da lista</option></select><button class="dbtn sm gold">Acrescentar</button></form>
     ${off ? `<p class="dm">Tiraste ${off} ${off === 1 ? 'marco' : 'marcos'} desta lista. <button class="d3-link" data-act="d3LegReset" data-p="${p}">Repor</button></p>` : ''}</section>
   ${done.length ? `<section class="d3-card"><div class="d3-h"><span class="cz">Feitos</span><span class="dm mono">${done.length}</span></div>${done.map(t => row(t, L.indexOf(t))).join('')}</section>` : ''}
@@ -1070,10 +1201,11 @@ const born = () => { const s = S(), st = D.state();
         ${st.total ? `<p class="d3-start">Pelo que já registaste, começas no <b>nível ${st.H.l}</b> (${esc(st.title)}) com <b class="mono">${xpTxt(st.total)}</b> XP.</p>` : '<p class="d3-start dm">Começas no nível 0. O primeiro registo já te dá XP.</p>'}</div></div>
     <div class="d3-rules"><div>${ic('zap')}<b class="cz">8 atributos</b><span>Corpo, Mente, Intelecto, Fortuna, Relações, Espírito, Carreira e Disciplina. Sobem sozinhos: nunca escolhes onde pôr pontos.</span></div>
       <div>${ic('user')}<b class="cz">A carta muda</b><span>Brilho com o Corpo, aura com a Mente, halo com o Espírito, ouro com a Fortuna, companheiros com as Relações, estandartes com a Disciplina. Bronze, prata, ouro… com o nível.</span></div>
-      <div>${ic('target')}<b class="cz">Missões e chefe</b><span>3 missões por dia, 3 por semana e um chefe semanal do teu ponto mais fraco.</span></div>
+      <div>${ic('target')}<b class="cz">Missões e monstros</b><span>3 missões difíceis por dia (o monstro do dia), 3 por semana, 3 campanhas por mês, um chefe semanal do teu ponto mais fraco e um colosso por mês.</span></div>
       <div>${ic('gift')}<b class="cz">Baús reais</b><span>Cada nível abre um baú com duas recompensas à escolha, da tua lista.</span></div></div></section></div>`; };
 
-V.dominus = sub => { const s = S(); if (!s.born) return born();
+const mig4 = () => { const s = S(); if (s.v4) return; s.v4 = 1; Object.values(s.boss || {}).forEach(b => { if (b && b.hp && b.hp < 3000) b.hp *= 10; }); try { const st = D.state(); s.opened = Math.min(s.opened || 0, st.H.l); seeClass(st); s.seen = snap(st); } catch (e) { } save(); };
+V.dominus = sub => { const s = S(); if (!s.born) return born(); mig4();
   const st = D.state(), key = sub === 'codex' ? 'marcos' : TABS.some(t => t[0] === sub) ? sub : '', ch = D.chests(), M = D.missions(), mleft = M.dl.filter(m => !m.ok).length, bf = D.bossFight();
   setTimeout(D.check, 250);
   const badge = k => k === 'baus' && ch ? `<span class="n">${ch}</span>` : k === 'missoes' && mleft ? `<span class="n dim">${mleft}</span>` : k === 'chefe' && bf.dead ? '<span class="n ok">✓</span>' : '';
@@ -1084,6 +1216,6 @@ OS.forms.d3Born = (f, v) => { const s = S(); s.name = v('n').slice(0, 24); s.bor
   D.celebrate({ k: 'O herói nasceu', t: s.name || pname0(), s: st.total ? `Começas no nível ${st.H.l} (${st.title}) com tudo o que já fizeste.` : 'Faz as missões de hoje: o XP entra sozinho.', av: 1 }); };
 OS.forms.d3Name = (f, v) => { const s = S(); s.name = v('n').slice(0, 24); save(); UI.toast('Nome guardado', 'pos'); };
 A.d3Fly = b => { const s = S(); s.fly = !!b.checked; save(); };
-D.summary = () => { try { const s = S(); if (!s.born) return ''; const st = D.state(); return `nível ${st.H.l} (${st.title}), classe ${st.cls}; ` + AT.map(a => `${a.n} ${st.lv[a.k].l}`).join(', ') + `; ${st.streak} dias seguidos; ${D.chests()} baús por abrir`; } catch (e) { return ''; } };
+D.summary = () => { try { const s = S(); if (!s.born) return ''; const st = D.state(); return `nível ${st.H.l} (${st.title}), classe ${st.clsFull}; ` + AT.map(a => `${a.n} ${st.lv[a.k].l}`).join(', ') + `; ${st.streak} dias seguidos; ${D.chests()} baús por abrir`; } catch (e) { return ''; } };
 
 })();

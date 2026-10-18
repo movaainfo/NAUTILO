@@ -88,15 +88,26 @@ function open() { const viaCode = !L.unlocked(); setUnlocked(true); if (viaCode)
 // campo do código: sem o gestor de palavras-passe do iOS (que desenhava bordas brancas e o ícone escuro ao lado)
 const codeInput = () => { const sec = (() => { try { return CSS.supports('-webkit-text-security', 'disc'); } catch (e) { return false; } })();
   return `<input id="lkCode" class="${sec ? 'lk-sec' : ''}" type="${sec ? 'text' : 'password'}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Código de acesso" aria-label="Código de acesso">`; };
+// ecrã de entrada: o mar visto do forte, à hora real, com a tua frase do dia
+const hello = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const hm = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+let lkTick = 0, lkRes = 0, lkRT = 0;
+const scene = () => OS.Scene ? `<div class="lk-scene">${OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { anim: 1, id: 'lks' })}<i class="lk-grain" style="background-image:url(${OS.Scene.grain()})"></i></div>` : '';
 async function showLock() {
   const s = el(), bio = L.bioId(), can = bio && await L.bioAvailable();
-  s.hidden = false;
-  s.innerHTML = `<div class="sp-in">${L.logo(92)}<div class="sp-name">NÁUTILO</div>
+  s.hidden = false; s.classList.add('lkx');
+  let name = 'Ryan', q = ''; try { name = (OS.one('profile').short || 'Ryan').split(' ')[0]; } catch (e) { } try { q = OS.Quotes ? OS.Quotes.push() : ''; } catch (e) { }
+  const qs = q.length < 42 ? 'l' : q.length < 75 ? 'm' : 's';
+  s.innerHTML = `${scene()}<div class="lk-top"><div class="lk-time" id="lkTime">${hm()}</div><div class="lk-date">${OS.U ? OS.U.esc(OS.U.longDate(OS.U.today())) : ''}</div></div>
+    <div class="lk-mid"><p class="lk-hi">${hello()}, ${OS.U ? OS.U.esc(name) : 'Ryan'}.</p>${q ? `<p class="lk-q ${qs}">${OS.U.esc(q)}</p>` : ''}</div>
+    <div class="sp-in lk-bot"><div class="lk-brand">${L.logo(26)}<span class="sp-name">Náutilo</span></div>
     <form class="lk" id="lkForm" autocomplete="off">
       ${can ? `<button type="button" class="lk-bio" id="lkBio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2M9 9v1M15 9v1M12 9v4h-1M9 16c1.5 1 4.5 1 6 0"/></svg>Desbloquear com Face ID</button><div class="lk-or">ou código</div>` : ''}
       ${codeInput()}
       <button class="lk-go" type="submit" aria-label="Entrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-    </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div></div><div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div>`;
+    </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div><div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div></div>`;
+  clearInterval(lkTick); lkTick = setInterval(() => { const t = document.getElementById('lkTime'); if (!t || s.hidden) { clearInterval(lkTick); return; } t.textContent = hm(); }, 15000);
+  if (!lkRes) { lkRes = 1; addEventListener('resize', () => { clearTimeout(lkRT); lkRT = setTimeout(() => { const sc = s.querySelector('.lk-scene'); if (sc && !s.hidden) sc.outerHTML = scene(); }, 250); }); }
   document.getElementById('lkForm').onsubmit = e => { e.preventDefault(); tryCode(document.getElementById('lkCode').value); };
   const bb = document.getElementById('lkBio');
   if (bb) { const go = async auto => { if (bb.disabled || !bb.isConnected || L.unlocked()) return; bb.disabled = true; try { if (await bioUnlock(auto)) open(); } finally { bb.disabled = false; } };

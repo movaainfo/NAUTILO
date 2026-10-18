@@ -1,17 +1,17 @@
 /* NÁUTILO — modo leve: sem efeitos que esgotam a memória gráfica (tablets e telemóveis Android, aparelhos com pouca RAM).
    Sempre ativo: sem desfoque por trás, sem fundos fixos, animações infinitas limitadas. */
 *,*::before,*::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-#top{background:#04101F!important}
+#top{background:#070D16!important}
 body{background-attachment:scroll!important}
 .glow,.hx2.can.aff polygon,.bm2-m.sel,.ceremony .ring{animation-iteration-count:3!important}
 .wave-load i,.sp-load i{animation-iteration-count:20!important}
 
 /* aparelhos fracos ou Android: tudo plano */
-html.lite body{background:#04101F!important}
+html.lite body{background:#070D16!important}
 html.lite *,html.lite *::before,html.lite *::after{box-shadow:none!important;text-shadow:none!important;filter:none!important;transition:none!important;animation-duration:.001s!important;animation-iteration-count:1!important}
 html.lite .dc.hero::after,html.lite .dom::before{display:none!important}
-html.lite .pn,html.lite .dc,html.lite .kpi,html.lite .tn-dd{background:#0B2240!important}
-html.lite .dc.hero.h-abyss{background:#0B3B6E!important}html.lite .dc.hero.h-tide{background:#0E4F68!important}html.lite .dc.hero.h-reef{background:#0F5E5A!important}html.lite .dc.hero.h-deep{background:#1E3A8A!important}
-html.lite .dom{background:#0A0907!important}
-html.lite #splash{background:#04101F!important}
+html.lite .pn,html.lite .dc,html.lite .kpi,html.lite .tn-dd{background:#0E1724!important}
+html.lite .dc.hero.h-abyss{background:#10233A!important}html.lite .dc.hero.h-tide{background:#0F2433!important}html.lite .dc.hero.h-reef{background:#0F2529!important}html.lite .dc.hero.h-deep{background:#141F3D!important}
+html.lite .dom{background:#070D16!important}
+html.lite #splash{background:#04070D!important}
 html.lite .ceremony,html.lite .upd{background:#04101F!important}

@@ -22,7 +22,7 @@ cat > "$OUT/index.html" <<HTML
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>NÁUTILO</title>
 <meta name="description" content="Náutilo — o sistema operativo da tua vida: finanças, estudos, treino, dieta, metas e o jogo Dominus.">
-<meta name="theme-color" content="#04101F">
+<meta name="theme-color" content="#070D16">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -54,8 +54,8 @@ cat > "$OUT/manifest.webmanifest" <<'JSON'
   "start_url": "./#visao",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#04101F",
-  "theme_color": "#04101F",
+  "background_color": "#070D16",
+  "theme_color": "#070D16",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
