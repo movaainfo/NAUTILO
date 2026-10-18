@@ -6,8 +6,8 @@
   "start_url": "./#visao",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#04101F",
-  "theme_color": "#04101F",
+  "background_color": "#070D16",
+  "theme_color": "#070D16",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
