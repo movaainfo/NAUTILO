@@ -1,4 +1,4 @@
-/* OCEANUM — sistema visual do Life OS. Escuro por escolha: um ecrã de controlo que se usa todos os dias. */
+/* NÁUTILO — sistema visual do Life OS. Escuro por escolha: um ecrã de controlo que se usa todos os dias. */
 :root{
   color-scheme:dark;
   --bg:#070B10; --bg2:#0A0F16; --pn:#0D141D; --pn2:#111A25; --pn3:#16212E;
@@ -41,11 +41,11 @@ a{color:inherit;text-decoration:none}
 .nav-g a .ic{width:16px;height:16px;opacity:.8}
 .nav-g a .cnt{margin-left:auto;font:500 11px var(--mono);color:var(--mut)}
 .nav-g a .cnt.neg{color:var(--neg)}
-.nav-dom{margin-top:14px;padding:10px;border-radius:10px;background:linear-gradient(135deg,#1A1408,#0E0B06);border:1px solid rgba(201,162,94,.25);display:flex;align-items:center;gap:10px;color:#E8D3A8}
-.nav-dom .ic{color:#C9A25E}
+.nav-dom{margin-top:14px;padding:10px;border-radius:10px;background:linear-gradient(135deg,#0E2744,#06162B);border:1px solid rgba(120,200,255,.25);display:flex;align-items:center;gap:10px;color:#BAE6FD}
+.nav-dom .ic{color:#38BDF8}
 .nav-dom b{font-family:'Cinzel',Georgia,serif;letter-spacing:.14em;font-size:13px}
 .nav-dom small{display:block;color:#9C8660;font-size:11px}
-.nav-dom.on{box-shadow:0 0 0 1px #C9A25E}
+.nav-dom.on{box-shadow:0 0 0 1px #38BDF8}
 .side-foot{margin-top:auto;padding:14px 10px 0;display:flex;align-items:center;gap:8px;color:var(--mut);font-size:12px}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--mut)}
 .sync-dot.ok{background:var(--pos)}.sync-dot.busy{background:var(--warn)}.sync-dot.err{background:var(--neg)}

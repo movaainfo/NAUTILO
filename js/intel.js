@@ -1,4 +1,4 @@
-/* OCEANUM — camada de inteligência: alertas (Control Room), próximas ações, análises, tendências, finanças inteligentes.
+/* NÁUTILO — camada de inteligência: alertas (Control Room), próximas ações, análises, tendências, finanças inteligentes.
    Regra: só se afirma algo quando há dados suficientes; estimativas vêm sempre com as premissas. */
 (() => {
 'use strict';

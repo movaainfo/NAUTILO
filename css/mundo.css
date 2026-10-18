@@ -1,0 +1,79 @@
+/* MUNDO — a volta ao mundo: mapa que se pinta, percentagem, continentes, passaporte e lista dos 195 países */
+.mu{display:flex;flex-direction:column;gap:16px}
+.mu-fl{font-size:22px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif}
+
+/* topo: percentagem do mundo */
+.mu-hero{display:flex;align-items:center;gap:22px;flex-wrap:wrap;background:radial-gradient(ellipse 70% 120% at 0% 0%,rgba(56,189,248,.16),transparent 60%),var(--card)}
+.mu-hp{position:relative;width:112px;height:112px;flex:none}
+.mu-ring .bg{fill:none;stroke:rgba(120,200,255,.12);stroke-width:7}
+.mu-ring .fg{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(56,189,248,.55))}
+.mu-hn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mu-hn b{font-size:26px;color:var(--tx);letter-spacing:-.02em}.mu-hn small{font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em}
+.mu-ht{flex:1;min-width:220px}.mu-ht h2{margin:0 0 6px;font-size:21px}.mu-ht p{margin:4px 0;color:var(--tx2)}.mu-ht p b{color:var(--tx)}
+.mu-hem{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.mu-hem span{font-size:12px;padding:4px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--mut)}
+.mu-hem span.on{color:var(--accent2);border-color:rgba(56,189,248,.45);background:var(--accentBg)}
+
+/* mapa */
+.mu-mapc{padding-bottom:12px}
+.mu-zc{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:10px}.mu-zc::-webkit-scrollbar{display:none}.mu-zc .chip{flex:none}
+.mu-map{border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:#05172C}
+.mu-svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.mu-eq{stroke:rgba(125,211,252,.16);stroke-dasharray:4 5;fill:none}
+.mu-o{fill:#15304C;stroke:none}
+.mu-cs path{fill:#1B3A5C;stroke:#071A30;stroke-linejoin:round;cursor:pointer;transition:fill .2s}
+.mu-cs path:hover{fill:#28527E}
+.mu-cs path.v,.mu-dots .v{fill:#38BDF8}.mu-cs path.v:hover{fill:#7DD3FC}
+.mu-cs path.m,.mu-dots .m{fill:#2DD4BF}
+.mu-cs path.w,.mu-dots .w{fill:#B98A2E}
+.mu-dots circle{fill:#2A527C;stroke:#071A30;stroke-width:.6;cursor:pointer}
+.mu-leg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12.5px;color:var(--tx2);align-items:center}
+.mu-leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:#1B3A5C;border:1px solid rgba(120,200,255,.2)}
+.mu-leg i.v{background:#38BDF8}.mu-leg i.m{background:#2DD4BF}.mu-leg i.w{background:#B98A2E}
+
+/* continentes */
+.mu-conts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.mu-ct{display:grid;grid-template-columns:1fr auto;gap:6px 8px;align-items:center;text-align:left;padding:12px;border-radius:14px;border:1px solid var(--line2);background:var(--card);color:var(--tx);font:inherit;cursor:pointer}
+.mu-ct b{font-size:14px}.mu-ct span{font-size:13px;color:var(--tx2)}.mu-ct .pbar{grid-column:1/-1}.mu-ct .pbar i{background:var(--c)}.mu-ct small{grid-column:1/-1;color:var(--mut);font-size:11.5px}
+.mu-ct.on{border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset}
+
+/* marcos */
+.mu-mil{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.mu-mil div{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;border:1px dashed var(--line2);color:var(--mut)}
+.mu-mil div b{font-size:18px}.mu-mil div span{font-size:12.5px}
+.mu-mil div.on{border-style:solid;border-color:rgba(56,189,248,.5);background:var(--accentBg);color:var(--tx)}.mu-mil div.on b{color:var(--accent2)}
+
+/* passaporte: carimbos */
+.mu-pass{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px;padding:6px 2px}
+.mu-st{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px 10px;border-radius:14px;border:2px dashed var(--c);background:color-mix(in srgb,var(--c) 8%,transparent);color:var(--tx);font:inherit;cursor:pointer;transform:rotate(var(--t));transition:transform .15s}
+.mu-st:hover{transform:rotate(0) scale(1.04)}
+.mu-st .mu-fl{font-size:30px}.mu-st b{font-size:12.5px;text-align:center;line-height:1.2}.mu-st small{font-size:11px;color:var(--c);letter-spacing:.08em;text-transform:uppercase}
+
+/* próximos destinos */
+.mu-want{display:flex;flex-wrap:wrap;gap:8px}
+.mu-want button{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(185,138,46,.45);background:rgba(185,138,46,.1);color:var(--tx);font:inherit;font-size:13.5px;cursor:pointer}
+.mu-want small{color:var(--mut);font-size:11.5px}
+
+/* lista */
+.mu-fs{flex-wrap:wrap;margin-bottom:10px}
+.mu-g{margin-top:14px}
+.mu-g h4{margin:0 0 6px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}.mu-g h4 small{color:var(--mut);margin-left:6px}
+.mu-row{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line)}
+.mu-rn{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:9px 2px;background:none;border:0;color:var(--tx);font:inherit;font-size:15px;text-align:left;cursor:pointer}
+.mu-rn b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mu-row.on .mu-rn b{color:var(--accent2);font-weight:600}
+.mu-tag{flex:none;font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--accentBg);color:var(--accent2)}.mu-tag.m{background:rgba(45,212,191,.14);color:#5EEAD4}.mu-tag.w{background:rgba(185,138,46,.16);color:#E8C26A}
+.mu-tg{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--mut);cursor:pointer}
+.mu-tg .ic{width:17px;height:17px}
+.mu-tg.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.mu-tg.w.on{background:#B98A2E;border-color:#B98A2E;color:#1A1208}
+.mu-src{font-size:11.5px;margin:0 2px}
+
+/* janela de um país */
+.mu-modal{max-width:420px}
+.mu-md{padding:18px}
+.mu-mh{display:flex;align-items:center;gap:12px;margin-bottom:14px}.mu-mh .mu-fl{font-size:40px}.mu-mh h3{margin:0;font-size:20px}.mu-mh>div{flex:1}
+.mu-mst{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.mu-mst .btn{justify-content:center;flex-direction:column;gap:4px;padding:10px 6px}
+.mu-mi{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:12px;color:var(--tx2);font-size:13.5px}.mu-mi span{display:inline-flex;align-items:center;gap:5px}.mu-mi .ic{width:15px;height:15px}
+@media (max-width:600px){.mu-hero{gap:14px}.mu-hp{width:96px;height:96px}.mu-hp .mu-ring{width:96px;height:96px}.mu-hn b{font-size:22px}}
+.mu-q{width:100%;margin-bottom:4px}

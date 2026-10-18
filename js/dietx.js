@@ -1,4 +1,4 @@
-/* OCEANUM — Dieta completa: base de alimentos (TACO + comuns) com fotos, pesquisa e quantidades em gramas ou porções,
+/* NÁUTILO — Dieta completa: base de alimentos (TACO + comuns) com fotos, pesquisa e quantidades em gramas ou porções,
    refeições fixas, refeições do dia por secção, reconhecimento de comida por foto (IA) e metas ligadas ao treino. */
 (() => {
 'use strict';

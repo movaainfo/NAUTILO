@@ -1,4 +1,4 @@
-/* OCEANUM — Jornal: notícias reais do mundo, atualizadas ao longo do dia (Google Notícias via o teu script Google).
+/* NÁUTILO — Jornal: notícias reais do mundo, atualizadas ao longo do dia (Google Notícias via o teu script Google).
    Mundo (em português, edições de Portugal e Brasil) + um separador por cada país que escolheres (edição local, traduzida pela IA)
    · temas (destaques, mundo, país, economia, tecnologia, ciência, saúde, desporto, cultura) e temas teus (pesquisa)
    · "O essencial agora": resumo da IA só com as manchetes reais do momento · novas notícias aparecem sozinhas. */

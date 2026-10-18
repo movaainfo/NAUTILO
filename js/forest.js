@@ -1,5 +1,5 @@
-/* OCEANUM — Floresta: foco ao estilo do app Forest.
-   Planta uma árvore e ela cresce enquanto te concentras; se saíres do Oceanum ou desistires, a árvore morre.
+/* NÁUTILO — Floresta: foco ao estilo do app Forest.
+   Planta uma árvore e ela cresce enquanto te concentras; se saíres do Náutilo ou desistires, a árvore morre.
    Cada sessão fica na tua floresta (ilha 3D por dia, semana, mês, ano), dá moedas para desbloquear espécies
    (carvalho, pinheiro, cerejeira, ipê-amarelo, palmeira, sequoia…) e regista o tempo como sessão de estudo.
    Árvores procedimentais em 3D (three.js, em vendor/), sons ambiente gerados no próprio aparelho. */
@@ -509,7 +509,7 @@ function startBreak() { RUN = { phase: 'break', t0: Date.now(), mins: Math.max(1
 function loop() { clearInterval(tick); if (!RUN) return; tick = setInterval(step, 1000); step(); }
 function step() { if (!RUN) { clearInterval(tick); pill(); return; } if (left() <= 0) { if (RUN.phase === 'grow') return finish(true); RUN = null; save(); chime(); UI.toast('A pausa acabou. Bora plantar outra?', 'pos'); clearInterval(tick); pill(); OS.request(); return; } paint(); }
 function paint() { const L = left(), el = document.getElementById('foTime'); if (el) el.textContent = mmss(L); const ring = document.getElementById('foRing'); if (ring) ring.style.strokeDashoffset = String(100 - prog() * 100);
-  if (RUN && RUN.phase === 'grow') { const k = `pot|${RUN.sp}|${stageOf(prog())}|0|${RUN.seed}|${cfg().scene || ''}`, h = document.getElementById('fo3d'); if (h && h.dataset.k !== k) { h.dataset.k = k; mount(); } document.title = 'Floresta · ' + mmss(L) + ' · OCEANUM'; } pill(); }
+  if (RUN && RUN.phase === 'grow') { const k = `pot|${RUN.sp}|${stageOf(prog())}|0|${RUN.seed}|${cfg().scene || ''}`, h = document.getElementById('fo3d'); if (h && h.dataset.k !== k) { h.dataset.k = k; mount(); } document.title = 'Floresta · ' + mmss(L) + ' · NÁUTILO'; } pill(); }
 /* ---- janela flutuante (dentro do app) + Picture-in-Picture (fora do app) ---- */
 const GI = {}, MSPH = {}; let FL = null, FC = null, VID = null, giBusy = '';
 function growImg(sp, st) { const k = sp + '|' + st; if (GI[k] || giBusy === k) return GI[k]; if (!T || FAIL) { if (!FAIL) load3(); return null; }
@@ -544,7 +544,7 @@ A.foPip = () => openPip();
 document.addEventListener('visibilitychange', () => { if (!RUN || RUN.phase !== 'grow') return; if (document.hidden) { RUN.hid = Date.now(); RUN.pip = pipOn(); save(); return; } back(); });
 addEventListener('pagehide', () => { if (RUN && RUN.phase === 'grow' && !RUN.hid) { RUN.hid = Date.now(); save(); } });
 function back() { if (!RUN || !RUN.hid) return; const away = Date.now() - RUN.hid, lim = RUN.pip ? 0 : +cfg().strict; RUN.hid = null; RUN.pip = false; save();
-  if (lim && away > lim * 1000 && left() > 0) return finish(false, `Saíste do Oceanum durante ${Math.round(away / 1000)} s`); if (away > 4000 && left() > 0) UI.toast('Voltaste a tempo — a árvore continua a crescer', 'pos'); step(); }
+  if (lim && away > lim * 1000 && left() > 0) return finish(false, `Saíste do Náutilo durante ${Math.round(away / 1000)} s`); if (away > 4000 && left() > 0) UI.toast('Voltaste a tempo — a árvore continua a crescer', 'pos'); step(); }
 OS.on('ready', () => { if (RUN) { if (RUN.phase === 'grow' && RUN.hid) back(); if (RUN) loop(); } });
 addEventListener('hashchange', pill);
 A.foPlant = () => plant();
@@ -562,7 +562,7 @@ document.addEventListener('change', e => { if (e.target.id === 'foDur') OS.touch
 /* ================= vistas ================= */
 const TABS = [['', 'Plantar'], ['floresta', 'A minha floresta'], ['loja', 'Todas as árvores'], ['moedas', 'Moedas & prémios'], ['stats', 'Estatísticas']];
 V.floresta = sub => { const k = TABS.some(t => t[0] === (sub || '')) ? (sub || '') : '';
-  return UI.head('Floresta', 'Planta uma árvore e concentra-te: ela cresce enquanto estudas. Se saíres do Oceanum ou desistires, morre. Cada sessão fica na tua floresta.', `<span class="fo-coins" title="Moedas">🪙 ${U.nf(+cfg().coins || 0)}</span>`, 'Estudos') + UI.tabs('floresta', TABS, k) + `<div class="fo">${VW[k]()}</div>`; };
+  return UI.head('Floresta', 'Planta uma árvore e concentra-te: ela cresce enquanto estudas. Se saíres do Náutilo ou desistires, morre. Cada sessão fica na tua floresta.', `<span class="fo-coins" title="Moedas">🪙 ${U.nf(+cfg().coins || 0)}</span>`, 'Estudos') + UI.tabs('floresta', TABS, k) + `<div class="fo">${VW[k]()}</div>`; };
 const VW = {};
 const sky = k => { const P = SCN[k || cfg().scene] || SCN.verde; return `fo-sky fo-${SKY()}${P.bg ? ' fo-bg-' + P.bg : ''}`; };
 const tagSel = v => `<select class="field" id="foTag" aria-label="Etiqueta"><option value="">Sem etiqueta</option><optgroup label="Disciplinas">${OS.all('subjects').filter(s => s.status === 'Em curso').map(s => `<option value="s:${s.id}"${v === 's:' + s.id ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</optgroup><optgroup label="Competências">${OS.all('skills').map(s => `<option value="k:${s.id}"${v === 'k:' + s.id ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</optgroup><optgroup label="Outras">${['Leitura', 'Trabalho', 'Mova', 'Devocional', 'Projeto pessoal', 'Outro'].map(x => `<option${v === x ? ' selected' : ''}>${x}</option>`).join('')}</optgroup></select>`;

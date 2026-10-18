@@ -1,9 +1,23 @@
 {
- "n": 124,
- "hash": "a64a52fc09f8",
+ "n": 125,
+ "hash": "a799c8c5e4e9",
  "notes": [
-  "Agenda no iPhone / Google Calendar sem eventos repetidos: a app procura e apaga sozinha os que ficaram em duplicado e já não volta a duplicar.",
-  "A página Evolução abre muito mais depressa com muitos dados (até 4× mais rápida)."
+  "Dominus novo: o herói és tu, em pixel art no estilo do Terraria, de corpo inteiro e à tua imagem (pele morena, cabelo cacheado, óculos retangulares, cavanhaque, t-shirt, jeans e ténis), num cenário em pixel art (floresta, caverna, montanha, cidade, castelo, aurora, praia e cosmos).",
+  "Guarda-roupa enorme, com cada peça já vestida no boneco: 12 cabelos e 10 cores, 7 barbas, 8 óculos, 16 chapéus e elmos, 28 roupas (fato e gravata, smoking, farda, kimono, camisola do Brasil e armaduras de couro, malha, ferro, cavaleiro, espartana, samurai, ouro, futurista, dragão e Dominus), calças, calçado, capas, armas, escudos e extras. 19 conjuntos prontos num toque.",
+  "O jogo agora é azul, como o resto do app.",
+  "A carta do herói: o material muda com o nível (bronze, prata, ouro, herói, lenda, Dominus) e os atributos põem efeitos à tua volta: brilho (Corpo), aura (Mente), símbolos (Intelecto), ouro (Fortuna), companheiros (Relações), halo (Espírito), insígnias (Carreira) e estandartes (Disciplina). As melhores peças desbloqueiam-se com os atributos e o nível.",
+  "8 atributos que sobem sozinhos com TUDO o que registas (treinos, corridas, dieta, estudo, livros, foco, gastos, poupança, trabalho, tarefas, hábitos, devocionais, aulas, momentos com pessoas…). Nunca escolhes onde pôr pontos.",
+  "Missões: 3 por dia e 3 por semana, escolhidas pelos teus pontos fracos e cumpridas sozinhas. Chefe da semana do teu atributo mais fraco. 21 conquistas em bronze, prata e ouro.",
+  "Baús a cada nível com duas recompensas reais à escolha (da tua lista). Ouro para molduras, cenários, efeitos e a coroa. Diário com a tua história e o XP dos últimos 14 dias.",
+  "Parabéns ao subir de nível, e um \"+XP\" no canto quando registas algo em qualquer página.",
+  "Marcos atualizados: 5 pilares com 100 marcos cada (Intelecto, Fortuna, Corpo, Influência e o novo Espírito), juntando o teu Notion original com o Dominus 2.0 (ISCA-UA, Aveiro). Podes acrescentar marcos teus e tirar os que já não fazem sentido.",
+  "Família & amigos: botão \"Momento\" para registar encontros, chamadas e conversas (sobem as Relações).",
+  "Desporto › Aventuras: mais de 120 aventuras para escolher (trilhos, Everest, paraquedas, esqui, surf, mergulho, rafting, bungee, maratonas, Ironman…). Tocas em \"Quero\", planeias e marcas \"Feita\"; cada aventura feita dá XP no Dominus.",
+  "Mundo: uma aba nova para a tua volta ao mundo. O mapa pinta-se com os países onde já foste (visitei, morei ou quero ir), com a percentagem do mundo que conheces, os 6 continentes, os 4 hemisférios, marcos (5, 10, 25, 50, 100, 195 países), o passaporte com os carimbos e a lista dos 195 países com procura. Cada país conhecido dá XP de Mente no Dominus.",
+  "O app agora chama-se Náutilo, com um logo novo: a rosa dos ventos, com o norte em crista de onda.",
+  "Endereço novo: nautilo-app.vercel.app. Ao abrir o endereço antigo, o app mostra \"Mudar agora\" e leva os teus dados (pela sincronização do Google Drive ou por ficheiro). No novo endereço: Partilhar → Adicionar ao ecrã principal, e apaga o ícone antigo.",
+  "O teu Google também passa a Náutilo: em Definições → Script, copia de novo as partes 1, 2 e 3 (versão 12). Na primeira ligação o script muda sozinho o nome do ficheiro de sincronização e das cópias, da folha dos gastos, da pasta dos ficheiros e dos calendários. Nada se perde nem se duplica.",
+  "Bloco de foco: os atalhos passam a \"Náutilo Foco\" e \"Náutilo Fim\" e o modo Foco a NÁUTILO; o app mostra o que mudar no iPhone."
  ],
- "date": "17/10/2026"
+ "date": "18/10/2026"
 }

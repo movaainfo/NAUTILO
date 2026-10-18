@@ -1,4 +1,4 @@
-/* OCEANUM — vistas centrais: Hoje, Painel, Control Room, Next Action, Calendário, Tarefas, Hábitos & Rotina, Projetos, Metas, Modo Foco. */
+/* NÁUTILO — vistas centrais: Hoje, Painel, Control Room, Next Action, Calendário, Tarefas, Hábitos & Rotina, Projetos, Metas, Modo Foco. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, L = OS.L, esc = U.esc;
@@ -228,8 +228,8 @@ A.calSlot = (b, e) => { if (e.target.closest('[data-edit]')) return; const r = b
 /* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; dentro do claude.ai também pelo conector */
 let gcalUnsub = null, gcalTimer = 0, gcalBusy = false;
 const gscr = () => { const c = OS.one('inbox'); return c && c.url && c.key && +(c.ver || 0) >= 11 ? c : null; };
-// os calendários "Oceanum" e "Oceanum · …" são a cópia que a app põe no Google: não se leem de volta (senão aparecia tudo duas vezes)
-const gmap = L => L.filter(x => !/^Oceanum( · .+)?$/.test(String(x.cal || ''))).map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
+// os calendários "Náutilo" e "Náutilo · …" são a cópia que a app põe no Google: não se leem de volta (senão aparecia tudo duas vezes)
+const gmap = L => L.filter(x => !/^(Oceanum|Náutilo)( · .+)?$/.test(String(x.cal || ''))).map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
 try { const sv = U.ls.get('os2gcal', null); if (sv && OS.one('integ').gcal) Cal.gcal = sv.ev || []; } catch (e) { }
 const gcalScript = async quiet => { const c = gscr(); if (!c || gcalBusy) return; gcalBusy = true;
   const from = U.addDays(U.today(), -14), to = U.addDays(U.today(), 90);
@@ -421,9 +421,9 @@ function tickFocus() {
   const t = U.$('[data-ftime]'); if (t) t.textContent = tx; const b = U.$('[data-fbar]'); if (b) b.style.width = Math.min(100, (1 - ms / tot) * 100) + '%';
   const dock = U.$('#dock'); if (FS.min) dock.innerHTML = `<div><b>${tx}</b><small>${FS.phase === 'focus' ? esc(FS.label) : 'Pausa'}</small></div><button class="icon-btn" data-act="focusMax" aria-label="Abrir foco">${UI.ic('focus')}</button>`;
   document.title = tx + ' · ' + (FS.phase === 'focus' ? 'Foco' : 'Pausa');
-  if (ms <= 0) { if (FS.phase === 'focus') { A.focusEnd(null); } else { beep(); FS = null; U.ls.del(FK); renderFocus(); UI.toast('Pausa acabou. Volta ao trabalho.'); document.title = 'OCEANUM'; } }
+  if (ms <= 0) { if (FS.phase === 'focus') { A.focusEnd(null); } else { beep(); FS = null; U.ls.del(FK); renderFocus(); UI.toast('Pausa acabou. Volta ao trabalho.'); document.title = 'NÁUTILO'; } }
 }
-setInterval(() => { if (FS) tickFocus(); else if (document.title !== 'OCEANUM' && !/OCEANUM/i.test(document.title)) document.title = 'OCEANUM'; document.querySelectorAll('[data-clock]').forEach(e => e.textContent = U.hm()); }, 1000);
+setInterval(() => { if (FS) tickFocus(); else if (document.title !== 'NÁUTILO' && !/NÁUTILO/i.test(document.title)) document.title = 'NÁUTILO'; document.querySelectorAll('[data-clock]').forEach(e => e.textContent = U.hm()); }, 1000);
 document.addEventListener('click', e => { if (e.target.closest('#dock') && !e.target.closest('[data-act]')) A.focusMax(); });
 OS.on('ready', renderFocus);
 })();

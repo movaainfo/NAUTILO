@@ -1,4 +1,4 @@
-/* Oceanum — service worker: abre instantaneamente e funciona sem internet. */
+/* Náutilo — service worker: abre instantaneamente e funciona sem internet. */
 const V = 'oceanum-__VERSION__';
 const SHELL = __FILES__;
 const SHELLKEY = new URL('./', self.registration.scope).href;

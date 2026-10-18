@@ -1,4 +1,4 @@
-/* OCEANUM — Limpar os dados de teste (Definições → Dados).
+/* NÁUTILO — Limpar os dados de teste (Definições → Dados).
    Separa sozinho, registo a registo, o que é teu do que foi teste:
    - fica o que veio de ti: o horário do trabalho importado da foto, as disciplinas do curso, a biografia e a entrevista,
      o que veio dos e-mails, os movimentos importados da B3/corretora, o plano inicial (metas, hábitos, competências,
@@ -25,10 +25,11 @@ const AREAS = [
   ['Leitura e Fé', ['books', 'rchal', 'devos', 'prayers', 'bmarks', 'bread']],
   ['Corpo e treino', ['workouts', 'runs', 'runplan', 'body', 'checkins', 'bchal', 'bgoals', 'stretches', 'exercises']],
   ['Alimentação', ['meals', 'mealtpl', 'foods']],
-  ['Desporto', ['sports', 'sportlog']],
+  ['Desporto e aventuras', ['sports', 'sportlog', 'adventures']],
   ['Carreira', ['applications', 'contacts', 'experiences', 'opps', 'skills', 'certs']],
   ['Mova', ['mvsales', 'mvexp', 'mvclients', 'mvproducts', 'mvmkt']],
-  ['Pessoas', ['people']],
+  ['Pessoas', ['people', 'social']],
+  ['Mundo (países)', ['countries']],
   ['Biografia', ['lifeev']],
   ['Spyke', ['spymem', 'spyroutines']],
   ['Floresta, recompensas e o jogo', ['trees', 'forewards', 'rewards', 'one:dominus', 'one:forest']]];
@@ -36,7 +37,7 @@ const AREA_OF = {}; AREAS.forEach(([a, cs]) => cs.forEach(c => { AREA_OF[c] = a;
 
 // a "estrutura" da tua vida na app: fica (a não ser que tenha "teste" no nome)
 const MINE = { accounts: 'As tuas contas e bancos', subjects: 'Disciplina do teu curso', exercises: 'Biblioteca de exercícios da app', habits: 'A tua lista de hábitos (só os dias marcados saem)',
-  sports: 'Desporto que praticas', people: 'Pessoa da tua vida', skills: 'Competência que queres dominar', contacts: 'Contacto profissional', experiences: 'O teu percurso', certs: 'Certificação tua',
+  sports: 'Desporto que praticas', people: 'Pessoa da tua vida', skills: 'Competência que queres dominar', contacts: 'Contacto profissional', experiences: 'O teu percurso', certs: 'Certificação tua', adventures: 'Aventura que queres viver', countries: 'País do teu mapa',
   mailevents: 'Veio dos teus e-mails', lifeev: 'A tua biografia', spymem: 'O que o Spyke sabe sobre ti', files: 'Ficheiro guardado no teu Google Drive' };
 // o plano inicial que me deste (a especificação do início): fica
 const SEED = { goals: ['Fundo de emergência de € 1.000', 'Média ≥ 15 no 1.º semestre', 'Correr 5 km em menos de 25 min', 'Inglês B2', '12 livros num ano'],
@@ -61,7 +62,10 @@ R.verdict = (c, r, ctx = {}) => {
   return { keep: false, why: 'Dos testes' }; };
 
 // partes fora das coleções: voltam ao início (as preferências da Floresta — tempo, som, modo — ficam)
-const blank = k => { const d = U.clone(OS.ONE_DEF[k] || {}); if (k !== 'forest') return d; const cur = OS.one('forest'); return Object.assign({}, cur, { coins: d.coins || 0, owned: d.owned || [], sp: d.sp }); };
+const blank = k => { const d = U.clone(OS.ONE_DEF[k] || {});
+  // o jogo: o herói (nome, aparência, marcos) fica; saem as missões, os chefes, os baús e as compras
+  if (k === 'dominus') { const c = OS.one('dominus'); return Object.assign(d, { born: c.born || '', name: c.name || '', look: c.look || d.look, legacy: c.legacy || {}, legx: c.legx || d.legx, fly: c.fly !== false }); }
+  if (k !== 'forest') return d; const cur = OS.one('forest'); return Object.assign({}, cur, { coins: d.coins || 0, owned: d.owned || [], sp: d.sp }); };
 const oneUsed = k => JSON.stringify(OS.one(k)) !== JSON.stringify(blank(k));
 const logN = () => OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}).length, 0);
 
@@ -69,7 +73,7 @@ const logN = () => OS.all('habits').reduce((n, h) => n + Object.keys(h.log || {}
 R.plan = () => { const impAssets = new Set(OS.all('invtx').filter(t => /^Importad/i.test(String(t.note || ''))).map(t => t.asset)), rows = [];
   Object.keys(OS.D).forEach(c => { if (!OS.S[c] && !AREA_OF[c]) return; OS.all(c).forEach(r => { const v = R.verdict(c, r, { impAssets }); rows.push({ k: c + '|' + r.id, c, id: r.id, t: label(c, r), keep: v.keep, why: v.why }); }); });
   const ln = logN(); if (ln) rows.push({ k: 'habits#log', c: 'habits#log', t: ln + (ln === 1 ? ' dia marcado nos hábitos' : ' dias marcados nos hábitos'), keep: false, why: 'Marcações dos testes', n: ln });
-  if (oneUsed('dominus')) rows.push({ k: 'one:dominus', c: 'one:dominus', t: 'Progresso do jogo (pontos, níveis, recursos)', keep: false, why: 'Ganho com os dados de teste' });
+  if (oneUsed('dominus')) rows.push({ k: 'one:dominus', c: 'one:dominus', t: 'Progresso do jogo (missões, chefes, baús e compras)', keep: false, why: 'Ganho com os dados de teste' });
   const f = OS.one('forest'); if (f.coins || JSON.stringify(f.owned || []) !== JSON.stringify((OS.ONE_DEF.forest || {}).owned || [])) rows.push({ k: 'one:forest', c: 'one:forest', t: 'Moedas e árvores compradas na Floresta (' + (f.coins || 0) + ' moedas)', keep: false, why: 'Ganho com os dados de teste' });
   return rows; };
 const ALWAYS = 'o código e o Face ID, o script Google, as chaves da IA, o Spyke, o e-mail, o perfil, a biografia e a entrevista, os textos da Direção e as categorias';

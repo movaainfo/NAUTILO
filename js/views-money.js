@@ -1,4 +1,4 @@
-/* OCEANUM — Dinheiro: Finanças, Inteligência financeira, Investimentos, Compras por impulso, Simuladores. */
+/* NÁUTILO — Dinheiro: Finanças, Inteligência financeira, Investimentos, Compras por impulso, Simuladores. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, L = OS.L, esc = U.esc;

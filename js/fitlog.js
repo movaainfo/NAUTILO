@@ -1,4 +1,4 @@
-/* OCEANUM — Treino ao estilo Hevy: biblioteca com imagens animadas, rotinas, treino em curso
+/* NÁUTILO — Treino ao estilo Hevy: biblioteca com imagens animadas, rotinas, treino em curso
    (séries com "anterior", tipos de série, temporizador de descanso), resumo com recordes e ficha de cada exercício. */
 (() => {
 'use strict';

@@ -1,4 +1,4 @@
-/* OCEANUM — escudo contra código malicioso (XSS).
+/* NÁUTILO — escudo contra código malicioso (XSS).
    Todo o HTML que a app põe na página passa por aqui: scripts, atributos on…= (exceto os poucos da própria app),
    links javascript:, iframes estranhos e objetos são removidos antes de chegarem ao ecrã.
    Assim, mesmo que um texto vindo de um e-mail, notícia, IA, sincronização ou campo mal escapado traga código, ele não corre. */

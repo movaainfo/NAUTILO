@@ -1,4 +1,4 @@
-/* OCEANUM — Painel (antes Visão Geral + Painel, agora uma só página): o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
+/* NÁUTILO — Painel (antes Visão Geral + Painel, agora uma só página): o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
    dinheiro, agenda, tarefas, corpo, dieta, estudos e jogo. */
 (() => {
 'use strict';
@@ -23,7 +23,7 @@ V.visao = () => {
     const tasks = OS.Tasks.open().filter(x => (x.sched && x.sched <= t) || (x.due && x.due <= U.addDays(t, 1)) || x.status === 'Em curso').slice(0, 5), doneP = OS.all('tasks').filter(x => x.doneAt && x.doneAt >= R.a && x.doneAt <= R.b).length;
   const wk = OS.all('workouts').filter(w => w.date >= R.a && w.date <= R.b).length, km = OS.Run.kmIn(R.a, R.b), diet = safe(() => OS.Diet.day(t), { kcal: 0, p: 0 }), dg = OS.one('diet');
   const studyH = U.sum(OS.all('sessions').filter(s => s.date >= R.a && s.date <= R.b), s => s.minutes) / 60, habit = safe(() => OS.Hab.dayScore(t), 0);
-  const dom = OS.one('dominus'), lvl = safe(() => OS.Dom.sumLv(), 0), rank = (OS.Dom.RANKS || [])[dom.rank || 0] || '';
+  const dom = OS.one('dominus'), lvl = dom.born ? safe(() => OS.Dom.level(), 0) : 0, rank = dom.born ? safe(() => OS.Dom.title(), '') : '';
   const per = [['hoje', 'Hoje'], ['semana', 'Semana'], ['mes', 'Mês']];
   // trabalho: turnos, horas, ganhos, folgas e projetos (do período escolhido)
   const W = safe(() => { const Car = OS.Car, S = OS.all('shifts'), inP = S.filter(s => s.date >= R.a && s.date <= R.b), wk0 = U.monday(t), offs = OS.all('dayoffs'), isW = x => ['Profissional', 'Empresarial'].includes(x.type) || x.area === 'Trabalho';
@@ -52,7 +52,7 @@ V.visao = () => {
     ${card('Corpo', `<div class="dc-tiles"><a href="#treino"><b class="mono">${wk}</b><span>treinos</span></a><a href="#corrida"><b class="mono">${U.nf(km, 1)}</b><span>km</span></a><a href="#dieta"><b class="mono">${U.nf(diet.kcal, 0)}</b><span>kcal hoje</span></a><a href="#dieta"><b class="mono">${U.nf(diet.p, 0)}<small>/${U.num(dg.p) || '—'}</small></b><span>proteína</span></a></div>`, { cls: 'hero h-reef span4', act: more('treino', 'Treino') })}
     ${work}
     ${card('Hábitos de hoje', `<div class="dc-big">${Math.round(habit * 100)}%</div><div class="dc-bar"><i style="width:${Math.round(habit * 100)}%"></i></div><div class="dc-sub">inegociáveis cumpridos</div>`, { cls: 'span4', act: more('habitos') })}
-    ${card('Dominus', `<div class="dc-big">Nível ${lvl}</div><div class="dc-sub">${esc(rank)}${dom.started ? '' : ' · ainda não começaste'}</div>`, { cls: 'hero h-deep span4', act: more('dominus', 'Jogar') })}
+    ${card('Dominus', `<div class="dc-big">Nível ${lvl}</div><div class="dc-sub">${dom.born ? esc(rank) : 'Cria o teu herói'}</div>`, { cls: 'hero h-deep span4', act: more('dominus', 'Jogar') })}
     ${cards.length ? card('Gastos por cartão', cards.map(c => `<div class="dc-li"><b>${esc(c.l)}</b><span class="mono">${U.eur(c.v)}</span></div>`).join(''), { cls: 'span4' }) : ''}
   </div>
   ${part('money')}
@@ -79,7 +79,7 @@ V.gasto = sub => { const pre = U.num(String(sub || '').replace(',', '.')) || '',
 // Definições → Atalhos do iPhone: abrir sempre no Gasto rápido e registar sem abrir a app (o Gasto rápido só regista)
 OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
   return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3></div>
-    <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Oceanum sempre no Gasto rápido neste aparelho</label>
+    <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Náutilo sempre no Gasto rápido neste aparelho</label>
     <div class="list" style="margin-top:10px"><div class="li"><div class="li-t"><b>iPhone: registar sem abrir a app</b><small>Um atalho no Centro de Controlo pede o valor e a descrição e grava direto. Os gastos entram sozinhos.</small></div><div class="li-r"><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></div></div>
     <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>`; };
 OS.forms = OS.forms || {};
@@ -92,7 +92,7 @@ OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 
   UI.toast(`Registado: ${U.eur(amount)}${cat ? ' · ' + cat : ''}`, 'pos'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } };
 A.qgCopy = () => { const url = (() => { try { return window.top.location.href.split('#')[0]; } catch (e) { return ''; } })() || document.referrer || 'https://claude.ai/artifact/AUtUtqFR4x46BWPVcR3kLZ'; const ok = () => UI.toast('Link copiado', 'pos'); try { navigator.clipboard.writeText(url).then(ok, () => UI.toast(url)); } catch (e) { UI.toast(url); } };
 A.ibGo = (b, e) => { e && e.preventDefault(); OS.go('definicoes'); setTimeout(() => { const el = document.getElementById('inboxPn'); el && el.scrollIntoView({ behavior: 'smooth' }); }, 250); };
-A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Oceanum vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
+A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Náutilo vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
 A.dashPer = b => OS.setUI('dashPer', b.dataset.p);
 A.dashYM = b => { const cur = OS.ui.dashYM || U.ym(U.today()), n = U.addMonths(cur, +b.dataset.d); OS.setUI('dashYM', n > U.ym(U.today()) ? U.ym(U.today()) : n); };
 })();

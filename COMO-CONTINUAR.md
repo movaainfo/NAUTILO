@@ -1,6 +1,6 @@
-# Oceanum · código-fonte
+# Náutilo · código-fonte
 
-Este ramo (`codigo-fonte`) tem o código do Oceanum. O ramo `main` tem só o site publicado (gerado a partir daqui).
+Este ramo (`codigo-fonte`) tem o código do Náutilo. O ramo `main` tem só o site publicado (gerado a partir daqui).
 
 ## Gerar o site
 ```

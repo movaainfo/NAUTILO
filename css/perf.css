@@ -1,4 +1,4 @@
-/* OCEANUM — modo leve: sem efeitos que esgotam a memória gráfica (tablets e telemóveis Android, aparelhos com pouca RAM).
+/* NÁUTILO — modo leve: sem efeitos que esgotam a memória gráfica (tablets e telemóveis Android, aparelhos com pouca RAM).
    Sempre ativo: sem desfoque por trás, sem fundos fixos, animações infinitas limitadas. */
 *,*::before,*::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 #top{background:#04101F!important}

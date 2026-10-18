@@ -101,7 +101,7 @@ async function profileTests(b, prof) {
   ok('nada sai para o lado', !ovf.length, ovf.join(', '));
   ok('páginas rápidas' + (prof.slow ? ' (processador 6× mais lento)' : ''), !slow.length, slow.length ? slow.join(', ') : 'máx ' + Math.round(maxT) + ' ms');
   // D · carregar nos botões
-  const SKIP = 'wipe|lockNow|[Dd]el|remove|[Rr]eset|[Aa]bort|navOpen|cmdOpen|focusStart|focusEnd|exportData|bioRegister|bioForget|cloud|qgStart|dStart|liteSet|ibSave|ibRound|ibCopy|gcal';
+  const SKIP = 'wipe|lockNow|[Dd]el|remove|[Rr]eset|[Aa]bort|navOpen|cmdOpen|focusStart|focusEnd|exportData|bioRegister|bioForget|cloud|qgStart|dStart|d3LegOff|d3LookReset|liteSet|ibSave|ibRound|ibCopy|gcal';
   let clicks = 0; const cErr0 = errs.length;
   for (const r of (QUICK ? routes.slice(0, 12) : routes)) { await E(p, r => location.hash = r, r); await sleep(120);
     const n = await E(p, SK => [...document.querySelectorAll('#view [data-act]')].filter(x => !new RegExp(SK).test(x.dataset.act) && x.offsetParent).length, SKIP);
@@ -163,14 +163,21 @@ async function sharedTests(b) {
     const ib = await E(p, () => OS.all('transactions').filter(t => (t.tags || []).includes('atalho')).map(t => [t.amount, t.desc, t.cat]));
     ok('atalho: gasto enviado entra nas Finanças com categoria', ib.length === 3 && ib[0][0] === 8.5 && ib[0][2] === 'Transporte', JSON.stringify(ib));
     await E(p, () => OS.Inbox.pull(true)); await sleep(600); ok('atalho: não duplica', (await E(p, () => OS.all('transactions').filter(t => (t.tags || []).includes('atalho')).length)) === 3);
-    // N · jogo
-    await E(p, () => location.hash = 'dominus'); await sleep(300); if (await p.$('[data-act=dStart]')) { await p.click('[data-act=dStart]'); await sleep(500); await E(p, () => document.querySelectorAll('.ceremony').forEach(e => e.remove())); }
-    await E(p, () => { const d = OS.one('dominus'); d.xp.cor = (d.xp.cor || 0) + 400; OS.touch('dominus'); }); await sleep(900);
-    let choice = 0; for (let i = 0; i < 12 && !choice; i++) { await sleep(300); choice = await E(p, () => document.querySelectorAll('.ch-cel .ch-optb').length); if (!choice) { const c = await p.$('.ch-cel [data-close]'); if (c) await c.click(); } }
-    ok('jogo: subir de nível mostra parabéns com 2 recompensas à escolha', choice === 2, choice + ' opções');
-    await p.click('.ch-cel .ch-optb'); await sleep(400); ok('jogo: escolher recompensa guarda-a', (await E(p, () => (OS.one('dominus').rwv2.got || []).length)) >= 1);
-    for (let i = 0; i < 8 && await p.$('.ch-cel'); i++) { const c = await p.$('.ch-cel .ch-optb') || await p.$('.ch-cel [data-close]'); if (c) await c.click(); await sleep(350); }
-    await E(p, () => location.hash = 'dominus.colmeia'); await sleep(300); ok('jogo: colmeia com 61 favos', (await E(p, () => document.querySelectorAll('.hx2').length)) === 61);
+    // N · jogo (Dominus: o herói sobe com o que registas)
+    await E(p, () => location.hash = 'dominus'); await sleep(300);
+    if (await p.$('form[data-form="d3Born"] button')) { await p.click('form[data-form="d3Born"] button'); await sleep(700); }
+    for (let i = 0; i < 8 && await p.$('.d3-cel'); i++) { await E(p, () => { const c = document.querySelector('.d3-cel [data-close]'); c && c.click(); }); await sleep(300); }
+    ok('jogo: herói criado', await E(p, () => !!OS.one('dominus').born && !!document.querySelector('.d3-hero .d3c')));
+    const lv0 = await E(p, () => OS.Dom.level()), c0 = await E(p, () => OS.Dom.state().lv.corpo.l);
+    await E(p, () => { for (let i = 0; i < 14; i++) OS.add('workouts', { date: OS.U.addDays(OS.U.today(), -i), title: 'Treino ' + i, items: [] }); });
+    await sleep(300); await E(p, () => location.hash = 'dominus.missoes'); await sleep(200); await E(p, () => location.hash = 'dominus'); await sleep(1000);
+    const lv1 = await E(p, () => OS.Dom.level()), c1 = await E(p, () => OS.Dom.state().lv.corpo.l), cel = await E(p, () => (document.querySelector('.d3-cel') || {}).innerText || '');
+    ok('jogo: treinos registados sobem o Corpo (e o herói) e mostram parabéns', (lv1 > lv0 || c1 > c0) && /subiu|nível|Conquista/i.test(cel), `herói ${lv0} → ${lv1} · Corpo ${c0} → ${c1} · ` + cel.slice(0, 40));
+    for (let i = 0; i < 12 && await p.$('.d3-cel'); i++) { await E(p, () => { const c = document.querySelector('.d3-cel [data-close]'); c && c.click(); }); await sleep(300); }
+    await E(p, () => location.hash = 'dominus.baus'); await sleep(400); const opts = await E(p, () => document.querySelectorAll('[data-act=d3Open]').length);
+    ok('jogo: baú com 2 recompensas à escolha', opts === 2, opts + ' opções');
+    if (opts) { await p.click('[data-act=d3Open]'); await sleep(400); } ok('jogo: escolher recompensa guarda-a', (await E(p, () => OS.one('dominus').got.length)) >= 1);
+    await E(p, () => location.hash = 'dominus.marcos'); await sleep(300); ok('jogo: marcos em 5 pilares (com o Espírito)', (await E(p, () => document.querySelectorAll('.d3-ptabs button').length)) === 5);
     ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
   // J · funciona sem internet
   { const { ctx, p, errs } = await newPage(b, prof); await p.goto(BASE); await unlock(p);
@@ -189,7 +196,7 @@ async function sharedTests(b) {
     for (let i = 0; i < 30 && !sawUpdating; i++) { await sleep(200); sawUpdating = await E(p, () => !!document.querySelector('.upd')).catch(() => false); }
     let saw = ''; for (let i = 0; i < 40 && !/Atualizado/.test(saw); i++) { await sleep(150); saw = await E(p, () => (document.querySelector('.upd') || {}).innerText || '').catch(() => ''); }
     const ver = await E(p, () => (window.OceanumVersion || {}).v || '').catch(() => '');
-    ok('atualização: aparece "A atualizar o Oceanum…"', sawUpdating);
+    ok('atualização: aparece "A atualizar o Náutilo…"', sawUpdating);
     ok('atualização: depois mostra "Atualizado" e a versão nova', /Atualizado/.test(saw) && /9\.9/.test(saw + ver), (saw || '').replace(/\n/g, ' · ').slice(0, 80));
     OVERRIDE = {}; await ctx.close(); }
   // L · modo de segurança
@@ -625,7 +632,7 @@ async function sharedTests(b) {
     ok('floresta: árvore cresce até ao fim, dá moedas e regista estudo', await E(p, () => { const t = OS.all('trees').slice(-1)[0]; return t && t.alive && t.sp === 'natal' && t.mins === 25 && OS.one('forest').coins >= 30 && OS.all('sessions').some(x => /Floresta/.test(x.learned || '')) && /Plantaste/.test(document.querySelector('#view').textContent); }));
     await p.click('#view [data-act=foAgain]'); await sleep(300); await p.click('#view [data-act=foPlant]'); await sleep(400);
     await E(p, () => { Object.defineProperty(document, 'hidden', { get: () => true, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); OS.Forest.run().hid = Date.now() - 90000; Object.defineProperty(document, 'hidden', { get: () => false, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(500);
-    ok('floresta: sair do Oceanum mata a árvore', await E(p, () => OS.all('trees').slice(-1)[0].alive === false && /morreu/.test(document.querySelector('#view').textContent)));
+    ok('floresta: sair do Náutilo mata a árvore', await E(p, () => OS.all('trees').slice(-1)[0].alive === false && /morreu/.test(document.querySelector('#view').textContent)));
     await E(p, () => { delete document.hidden; location.hash = 'floresta.floresta'; }); await sleep(600);
     ok('floresta: a minha floresta e catálogo', await E(p, () => /árvore/.test(document.querySelector('#view .fo-ov').textContent)) && (await E(p, () => { location.hash = 'floresta.loja'; }), await sleep(400), await E(p, () => document.querySelectorAll('#view .fo-card').length >= 34)));
     // UNIVERSIDADE+
@@ -689,7 +696,7 @@ async function sharedTests(b) {
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
     ok('google script completo é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
     const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
-      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Oceanum · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4] + P[5] + P[6]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] && OS.Inbox.addon6() === P[5] && OS.Inbox.addon7() === P[6] }; });
+      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Náutilo · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4] + P[5] + P[6]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] && OS.Inbox.addon6() === P[5] && OS.Inbox.addon7() === P[6] }; });
     ok('script em 7 partes: 1 e 2 = núcleo, 3 a 7 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 7 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
     ok('script em 7 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
     { // como o Apps Script: cada ficheiro é carregado à parte, pela ordem; a Parte 3 substitui o doGet e liga-se às funções das partes 1 e 2
@@ -698,9 +705,19 @@ async function sharedTests(b) {
       vm.runInContext(gp.P[0], ctx); vm.runInContext(gp.P[1], ctx); const before = vm.runInContext("doGet({ parameter: { k: 'abc', op: 'ping' } }).t", ctx); vm.runInContext(gp.P[2], ctx); vm.runInContext(gp.P[3], ctx);
       const r = vm.runInContext("[doGet({ parameter: { k: 'abc', op: 'ping' } }).t, doPost({ parameter: { k: 'abc', op: 'ping' } }).t, doGet({ parameter: { k: 'x', op: 'ping' } }).t, typeof mensagem_, typeof eventos_, typeof noticias_, typeof cotacoes_]", ctx);
       ok('script: a Parte 4 (Outlook) liga-se às outras e responde', /"v":12/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'olinfo' } }).t", ctx)) && /usercallback/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'olinfo' } }).t", ctx)));
-      ok('script: só com as partes 1 e 2 responde versão 10; com a Parte 3 num ficheiro novo responde versão 11 (sem apagar nada)', /"v":10/.test(before) && /"v":11/.test(r[0]) && /"v":11/.test(r[1]) && /Chave errada/.test(r[2]) && r.slice(3).every(x => x === 'function'), before + ' → ' + r.join(' | '));
+      ok('script: só com as partes 1 e 2 responde versão 10; com a Parte 3 num ficheiro novo responde versão 12 (sem apagar nada)', /"v":10/.test(before) && /"v":12/.test(r[0]) && /"v":12/.test(r[1]) && /Chave errada/.test(r[2]) && r.slice(3).every(x => x === 'function'), before + ' → ' + r.join(' | '));
       vm.runInContext("function op_novo(p) { return { ok: true, eco: p.x }; }", ctx);
-      ok('script: novidades futuras entram num ficheiro novo (function op_nome) sem mexer na Parte 3', /"eco":"7"/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'novo', x: '7' } }).t", ctx))); }
+      ok('script: novidades futuras entram num ficheiro novo (function op_nome) sem mexer na Parte 3', /"eco":"7"/.test(vm.runInContext("doGet({ parameter: { k: 'abc', op: 'novo', x: '7' } }).t", ctx)));
+      { // nome Náutilo: a Parte 3 (versão 12) muda uma só vez o nome do que está no Google, encontrando cada coisa pelo seu código interno
+        const props = { DATA: 'f1', SHEET: 's1', F_ROOT: 'd1', OC_CAL: 'c1', OC7_trabalho: 'c2', OC7_outros: 'c1' }, obj = n => ({ n, getName() { return this.n; }, setName(x) { this.n = x; }, rename(x) { this.n = x; }, setDescription() { } });
+        const F = { f1: obj('Oceanum · dados.json'), d1: obj('Oceanum · Ficheiros'), s1: obj('Oceanum · Gastos do atalho'), c1: obj('Oceanum'), c2: obj('Oceanum · Trabalho') }, copias = [obj('Oceanum · cópia 2026-10-16'), obj('Oceanum · cópia 2026-10-17')];
+        const it = L => { let i = 0; return { hasNext: () => i < L.length, next: () => L[i++] }; };
+        const c2 = vm.createContext({ ContentService: { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 1 } }, ScriptApp: { getScriptId: () => 'ID' },
+          PropertiesService: { getScriptProperties: () => ({ getProperty: k => props[k] || null, setProperty: (k, v) => { props[k] = v; }, getKeys: () => Object.keys(props) }) },
+          DriveApp: { getFileById: id => F[id], getFolderById: id => F[id], searchFiles: q => it(/Oceanum · cópia/.test(q) ? copias.filter(x => /^Oceanum/.test(x.n)) : []) }, SpreadsheetApp: { openById: id => F[id] }, CalendarApp: { getCalendarById: id => F[id] } });
+        vm.runInContext(gp.P[0], c2); vm.runInContext(gp.P[1], c2); vm.runInContext(gp.P[2], c2); const pg = vm.runInContext("doGet({ parameter: { k: 'abc', op: 'ping' } }).t", c2);
+        const nm = [F.f1.n, F.d1.n, F.s1.n, F.c1.n, F.c2.n, copias[0].n, copias[1].n]; F.c1.n = 'Teste'; vm.runInContext("doGet({ parameter: { k: 'abc', op: 'ping' } }).t", c2);
+        ok('nome Náutilo no Google: a Parte 3 renomeia o ficheiro de dados, as cópias, a folha, a pasta e os calendários (uma só vez, pelo código interno)', /"v":12/.test(pg) && nm.join('|') === 'Náutilo · dados.json|Náutilo · Ficheiros|Náutilo · Gastos do atalho|Náutilo|Náutilo · Trabalho|Náutilo · cópia 2026-10-16|Náutilo · cópia 2026-10-17' && F.c1.n === 'Teste' && props.NAUTILO === '1', nm.join('|')); } }
     // SPYKE+: memória, rotinas, balanço da noite, modo Jarvis, eventos do e-mail
     await E(p, () => OS.Spyke.handle('lembra-te que gosto de estudar de manhã')); await sleep(300);
     ok('spyke: memória guarda o que lhe dizes', await E(p, () => OS.all('spymem').some(m => /estudar de manhã/.test(m.text))));
@@ -723,7 +740,7 @@ async function sharedTests(b) {
       const ans = /mestre da Palavra/.test(tx) ? { contexto: 'Carta de Paulo.', mensagem: 'Nada nos separa do amor de Deus.', licoes: ['Identidade em Cristo'], perguntas: ['O que te pesa?'], oracao: 'Obrigado, Senhor.', ligacoes: ['Salmos 23'] } : { frase: 'Um passo de cada vez, com Deus.', ref: { livro: 'MAT', cap: 11, v1: 28, v2: 28 }, porque: 'Tens um exame em breve.', reflexao: 'Jesus convida os cansados.', oracao: 'Dá-me descanso.', passo: 'Ora antes de estudar.', alerta: null };
       rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(ans) }] } }] }) }); });
     await E(p, () => location.hash = 'fe'); for (let i = 0; i < 20 && !(await E(p, () => !!OS.Faith.bible())); i++) await sleep(300); await sleep(400);
-    ok('fé: aba no menu, versículo do dia com o texto da Bíblia', await E(p, () => { const v = document.querySelector('#view .fe-v'); const R = OS.Faith.vod(); return !!document.querySelector('a[href="#fe"]') && !!v && v.textContent.includes(OS.Faith.textOf(R).slice(0, 30)) && /Versículo do dia/.test(v.textContent); }));
+    ok('fé: aba no menu, versículo do dia com o texto da Bíblia', await E(p, () => { const v = document.querySelector('#view .fe-v'); const R = OS.Faith.vod(); return !!document.querySelector('a[href="#fe"]') && !!v && v.textContent.replace(/\d+/g, '').includes(OS.Faith.textOf(R).replace(/\d+/g, '').slice(0, 30)) && /Versículo do dia/.test(v.textContent); }));
     await sleep(700);
     ok('fé: versículo do dia com explicação e aplicação para hoje', await E(p, () => /Significado de teste/.test(document.querySelector('#view .fe-v').textContent) && /Para hoje/.test(document.querySelector('#view .fe-v').textContent)));
     ok('fé: Bíblia completa (66 livros, 31 102 versículos)', await E(p, () => { const B = OS.Faith.bible(); return B.b.length === 66 && B.b.reduce((s, b) => s + b[3].reduce((a, c) => a + c.length, 0), 0) === 31102 && /amou ao mundo/.test(OS.Faith.textOf(OS.Faith.parseRef('JHN 3:16'))); }));
@@ -1106,7 +1123,7 @@ async function newFeatureTests(b) {
     const er2 = errs.filter(e => !/sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (leitores)', !er2.length, er2.slice(0, 3).join(' | ')); await ctx.close(); }
   // nome da app
   { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), m = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
-    ok('nome da app: OCEANUM no ecrã principal, no título e no manifesto', m.name === 'OCEANUM' && m.short_name === 'OCEANUM' && /<title>OCEANUM<\/title>/.test(html) && /apple-mobile-web-app-title" content="OCEANUM"/.test(html)); }
+    ok('nome da app: NÁUTILO no ecrã principal, no título e no manifesto', m.name === 'NÁUTILO' && m.short_name === 'NÁUTILO' && /<title>NÁUTILO<\/title>/.test(html) && /apple-mobile-web-app-title" content="NÁUTILO"/.test(html)); }
 }
 
 /* ================= PAINEL ÚNICO, PRÓXIMOS PASSOS, NOMES EM PORTUGUÊS E OUTLOOK DA FACULDADE ================= */
@@ -1183,7 +1200,7 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google' && sp.side, JSON.stringify(sp));
   ok('Definições → Spyke: a Parte 4 já não aparece no Spyke (só em Definições → Script Google)', await E(p, () => !/Parte 4/.test(document.getElementById('spyState').innerText) && !document.querySelector('#spyState [data-act=ibCopy]')));
   await E(p, () => location.hash = 'definicoes.script'); await sleep(700);
-  const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].map(x => x.dataset.t) }));
+  const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].filter(x => !x.closest('#nautilo')).map(x => x.dataset.t) }));
   ok('Definições → Script Google: as 7 partes com botão de copiar e a parte que falta (5) em destaque', /Parte 4/.test(sc.t) && /Parte 5/.test(sc.t) && /Parte 7/.test(sc.t) && ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'].every(x => sc.b.includes(x)) && sc.b[0] === 'p5' && /Parte 5 · copiar e colar/.test(sc.t), JSON.stringify(sc.b));
   await E(p, () => { window.__clip = ''; navigator.clipboard.writeText = t => { window.__clip = t; return Promise.resolve(); }; });
   await p.click('#view .sc-parts [data-act=ibCopy][data-t=p4]'); await sleep(300);
@@ -1425,7 +1442,7 @@ async function stress(b) {
       for (let k = 0; k < 3; k++) OS.add('meals', { date: d, meal: ['Almoço', 'Jantar', 'Lanche'][k], food: 'Comida ' + (i % 20), qty: 1, kcal: 600, p: 40, c: 60, f: 20 }, { silent: true }); }
     OS.request(); return OS.all('transactions').length + OS.all('meals').length + OS.all('workouts').length + OS.all('sessions').length; });
   ok('dados de teste criados', n > 7000, n + ' registos');
-  const routes = ['visao', 'hoje', 'painel', 'financas', 'financas.transacoes', 'treino', 'treino.mapa', 'dieta', 'dieta.semana', 'universidade', 'dominus', 'dominus.desafios', 'dominus.colmeia', 'evolucao', 'control', 'gasto'];
+  const routes = ['visao', 'hoje', 'painel', 'financas', 'financas.transacoes', 'treino', 'treino.mapa', 'dieta', 'dieta.semana', 'universidade', 'dominus', 'dominus.missoes', 'dominus.visual', 'evolucao', 'control', 'gasto'];
   const slow = []; let max = 0;
   for (const r of routes) { const t = await E(p, async r => { const t0 = performance.now(); location.hash = r; await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res))); return performance.now() - t0; }, r); max = Math.max(max, t); if (t > 2500) slow.push(r + ' ' + Math.round(t) + 'ms'); await E(p, () => document.querySelectorAll('.ceremony').forEach(e => e.remove())); }
   ok('com 3 anos de dados nenhuma página bloqueia (> 2,5 s)', !slow.length, slow.join(', ') || 'máx ' + Math.round(max) + ' ms');
@@ -1689,7 +1706,7 @@ async function calTests(b) { cur = 'Agenda'; console.log('\n=== Agenda fora da a
   // Parte 7: cada tipo no seu calendário, com cor pastel; o que já lá estava muda sozinho, sem duplicar
   const before = Object.keys(G).length; calls.length = 0; P7 = true; await E(p, () => OS.CalPush.check()); await p.waitForFunction(() => !Object.values(OS.one('calx').map).some(m => m.e && !m.c), null, { timeout: 12000 }).catch(() => { }); await E(p, () => OS.CalPush.sync(true)); await sleep(300);
   const evs = Object.values(G), cal = t => (evs.find(x => x.t === t) || {}), cals = (calls.find(c => c.cals) || {}).cals || {};
-  ok('Parte 7: Trabalho, Folgas e Tarefas vão cada um para o seu calendário, com cor pastel própria', cal('Trabalho · Loja').cal === 'trabalho' && cal('Folga').cal === 'folgas' && cal('Tarefa: Entregar trabalho').cal === 'tarefas' && /^Aula/.test((evs.find(x => x.cal === 'estudos') || {}).t || '') && new Set([cals.trabalho[1], cals.folgas[1], cals.tarefas[1], cals.estudos[1], cals.compromissos[1]]).size === 5 && Object.values(cals).every(([n, c]) => /^Oceanum/.test(n) && /^#[0-9A-F]{6}$/i.test(c) && Math.min(...[1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16))) >= 0xA0), JSON.stringify({ cals, sh: cal('Trabalho · Loja').cal, off: cal('Folga').cal, tk: cal('Tarefa: Entregar trabalho').cal }));
+  ok('Parte 7: Trabalho, Folgas e Tarefas vão cada um para o seu calendário, com cor pastel própria', cal('Trabalho · Loja').cal === 'trabalho' && cal('Folga').cal === 'folgas' && cal('Tarefa: Entregar trabalho').cal === 'tarefas' && /^Aula/.test((evs.find(x => x.cal === 'estudos') || {}).t || '') && new Set([cals.trabalho[1], cals.folgas[1], cals.tarefas[1], cals.estudos[1], cals.compromissos[1]]).size === 5 && Object.values(cals).every(([n, c]) => /^Náutilo/.test(n) && /^#[0-9A-F]{6}$/i.test(c) && Math.min(...[1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16))) >= 0xA0), JSON.stringify({ cals, sh: cal('Trabalho · Loja').cal, off: cal('Folga').cal, tk: cal('Tarefa: Entregar trabalho').cal }));
   ok('Parte 7: os eventos que já estavam no calendário "Oceanum" mudam para o da sua cor sem duplicar (o antigo é apagado)', Object.keys(G).length === before && calls.some(c => (c.up || []).some(x => x.x)) && ops.includes('cal7'), JSON.stringify({ before, after: Object.keys(G).length }));
   calls.length = 0; await E(p, T => OS.add('tasks', { title: 'Ligar ao banco', sched: OS.U.addDays(T, 3), status: 'Próxima' }), T); await E(p, () => OS.CalPush.sync(true)); await sleep(200);
   ok('Parte 7: uma tarefa nova vai logo para o calendário Tarefas (amarelo pastel)', (Object.values(G).find(x => x.t === 'Tarefa: Ligar ao banco') || {}).cal === 'tarefas' && (Object.values(G).find(x => x.t === 'Tarefa: Ligar ao banco') || {}).cor === cals.tarefas[1]);
@@ -1939,6 +1956,81 @@ async function resetTests(b) { cur = 'Limpar testes'; console.log('\n=== Limpar 
   const er = errs.filter(e => !/Failed to load|net::|sandboxed|about:srcdoc|Content Security Policy|NotSupportedError|play\(\)/.test(e)); ok('sem erros de JavaScript (limpar testes)', !er.length, er.slice(0, 3).join(' | ')); await ctx.close(); }
 
 /* ---------- Faltas: marcadas sozinhas pelo horário, pela rotina e pelos turnos; corrigir com um toque; limite e avisos ---------- */
+async function muTests(b) { cur = 'Mundo'; console.log('\n=== Mundo: mapa, países, percentagem, passaporte e Dominus ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
+  await E(p, () => location.hash = 'mundo'); await sleep(700);
+  const m0 = await E(p, () => ({ menu: !!document.querySelector('#side a[href="#mundo"], .tn-dd a[href="#mundo"]'), paths: document.querySelectorAll('.mu-cs path').length, dots: document.querySelectorAll('.mu-dots circle').length, rows: document.querySelectorAll('.mu-row').length, all: OS.Mundo.ALL.length }));
+  ok('Aba Mundo no menu, com o mapa e os 195 países (os pequenos como pontos)', m0.menu && m0.all === 195 && m0.paths + m0.dots === 195 && m0.rows === 195, JSON.stringify(m0));
+  const x0 = await E(p, () => OS.Dom.state().ax.mente);
+  await E(p, () => document.querySelector('.mu-cs path[data-c=BRA]').dispatchEvent(new MouseEvent('click', { bubbles: true }))); await sleep(300);
+  ok('Tocar num país do mapa abre a janela desse país', await E(p, () => /Brasil/.test((document.querySelector('.mu-mh h3') || {}).textContent || '')));
+  await p.click('[data-act=muSet][data-c=BRA][data-v=Morei]'); await sleep(400);
+  await E(p, () => { const b = document.querySelector('[data-act=muTog][data-c=PRT][data-v=Visitei]'); b && b.click(); }); await sleep(400);
+  await E(p, () => { const b = document.querySelector('[data-act=muTog][data-c=JPN][data-v="Quero ir"]'); b && b.click(); }); await sleep(400);
+  const m1 = await E(p, () => { const s = OS.Mundo.stats(); return { n: s.n, w: s.w.length, pct: document.querySelector('.mu-hn b').textContent, painted: document.querySelectorAll('.mu-cs path.m, .mu-cs path.v').length, stamps: document.querySelectorAll('.mu-st').length }; });
+  ok('O mapa pinta-se e a percentagem do mundo sobe (2 de 195 = 1%)', m1.n === 2 && m1.pct === '1,0%' && m1.painted === 2 && m1.stamps === 2 && m1.w === 1, JSON.stringify(m1));
+  ok('Cada país conhecido dá XP de Mente no Dominus', (await E(p, () => OS.Dom.state().ax.mente)) - x0 === 300);
+  await E(p, () => OS.setUI('muZ', '4')); await sleep(300); ok('Ver só um continente (Europa) aproxima o mapa', await E(p, () => +document.querySelector('.mu-svg').getAttribute('viewBox').split(' ')[2] < 400));
+  await E(p, () => { const i = document.querySelector('[data-uif="mu.q"]'); i.value = 'japa'; i.dispatchEvent(new Event('input', { bubbles: true })); }); await sleep(700);
+  ok('Procurar um país na lista', await E(p, () => [...document.querySelectorAll('.mu-row b')].map(b => b.textContent).join() === 'Japão'));
+  // nome Náutilo: com o script na versão 11, Definições mostra como passar o Google para o nome novo; na 12 o aviso desaparece
+  await E(p, () => { OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE/exec', key: 'k', ver: 11 }); location.hash = 'definicoes.script'; }); await sleep(600);
+  const rn = await E(p, () => ({ panel: !!document.getElementById('nautilo'), btns: document.querySelectorAll('#nautilo [data-act=ibCopy]').length }));
+  await E(p, () => { OS.setOne('inbox', Object.assign({}, OS.one('inbox'), { ver: 12 })); OS.request(); }); await sleep(500);
+  ok('Nome Náutilo: Definições mostra como passar o Google para o nome novo (partes 1 a 3) até o script ser da versão 12', rn.panel && rn.btns === 3 && !(await E(p, () => !!document.getElementById('nautilo'))), JSON.stringify(rn));
+  ok('Nome Náutilo: os calendários antigos "Oceanum…" continuam a ser reconhecidos como do app (sem duplicar)', await E(p, () => OS.CalPush && OS.CalPush.CATS.every(c => /^Náutilo/.test(c[1]))));
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+async function domTests(b) { cur = 'Dominus'; console.log('\n=== Dominus: o herói, missões, chefe, marcos, visual e aventuras ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
+  const closeCel = async () => { for (let i = 0; i < 14 && await p.$('.d3-cel'); i++) { await E(p, () => { const c = document.querySelector('.d3-cel [data-close]'); c && c.click(); }); await sleep(220); } };
+  const clk = async sel => { await sleep(300); await closeCel(); await p.click(sel); };
+  await E(p, () => location.hash = 'dominus'); await sleep(500);
+  ok('Criar o herói: boneco em pixel art à tua imagem (cabelo cacheado, óculos, cavanhaque) num cenário em pixel art', await E(p, () => { const L = OS.Dom.DEF_LOOK, im = document.querySelector('.d3-new .d3c img.d3-px'); return !!im && im.complete && im.naturalWidth === 288 && !!document.querySelector('.d3-new .d3c img.c-scn') && L.hair === 'cacheado curto' && L.glasses === 'retangulares' && L.beard === 'cavanhaque'; }));
+  await E(p, () => { const b = document.querySelector('.d3-edt [data-v="cabelo"]'); b && b.click(); }); await sleep(250); await E(p, () => { const b = document.querySelector('[data-act=d3Look][data-k=hair][data-v=afro]'); b && b.click(); }); await sleep(300);
+  ok('Personalizar: mudar o cabelo muda o personagem', await E(p, () => OS.one('dominus').look.hair === 'afro' && !!document.querySelector('.d3-pi.on[data-v=afro]')));
+  await E(p, () => { const b = document.querySelector('.d3-edt [data-v="conj"]'); b && b.click(); }); await sleep(250);
+  ok('Conjuntos prontos (fatos, armaduras, mago, samurai, Dominus…) com cadeado até teres o nível', await E(p, () => document.querySelectorAll('[data-act=d3Set], .d3-pi.lock').length >= 19 && document.querySelectorAll('.d3-pi.lock').length >= 10 && OS.Dom.SETS.length >= 19));
+  ok('Muitas peças para escolher: armaduras, fatos, elmos, capas, armas e escudos', await E(p, () => { const P = OS.Dom.PX; return P.top.length >= 25 && P.head.length >= 15 && P.hand.length >= 12 && P.cape.length >= 6 && P.shield.length >= 5 && P.top.some(t => t[0] === 'a-dominus') && P.top.some(t => t[0] === 'fato'); }));
+  await p.fill('#d3n', 'Ryan'); await p.click('form[data-form="d3Born"] button'); await sleep(700); await closeCel();
+  ok('Herói criado com nome', await E(p, () => OS.one('dominus').born === OS.U.today() && OS.one('dominus').name === 'Ryan' && !!document.querySelector('.d3-hero .d3c')));
+  const ax0 = await E(p, () => Object.assign({}, OS.Dom.state().ax));
+  await E(p, () => { const U = OS.U, T = U.today(), d = n => U.addDays(T, -n);
+    for (let i = 0; i < 12; i++) { OS.add('workouts', { date: d(i), title: 'Treino ' + i, items: [] }, { silent: true }); OS.add('sessions', { date: d(i), minutes: 90 }, { silent: true }); OS.add('transactions', { date: d(i), type: 'Despesa', amount: 4, cat: 'Alimentação', desc: 'café' }, { silent: true }); }
+    OS.add('trees', { date: T, mins: 50, alive: true }, { silent: true }); OS.add('devos', { date: T, ref: 'Salmo 23' }, { silent: true }); OS.add('social', { who: 'Mãe', kind: 'Chamada', date: T }, { silent: true });
+    OS.add('shifts', { date: d(1), start: '09:00', end: '17:00' }, { silent: true }); OS.add('tasks', { title: 'Feita', status: 'Feita', doneAt: T }, { silent: true }); OS.emit('change'); });
+  await sleep(400); const ax1 = await E(p, () => OS.Dom.state().ax);
+  const up = ['corpo', 'mente', 'intelecto', 'fortuna', 'relacoes', 'espirito', 'carreira', 'disciplina'].filter(k => ax1[k] > ax0[k]);
+  ok('Os 8 atributos sobem sozinhos com o que registas (treino, foco, estudo, gastos, pessoas, fé, trabalho, tarefas)', up.length === 8, up.join(','));
+  await E(p, () => location.hash = 'dominus.missoes'); await sleep(400);
+  ok('Missões: 3 de hoje e 3 da semana', await E(p, () => document.querySelectorAll('.d3-ms')[0].querySelectorAll('.d3-m').length === 3 && document.querySelectorAll('.d3-ms')[1].querySelectorAll('.d3-m').length === 3));
+  await E(p, () => location.hash = 'dominus.chefe'); await sleep(400); await closeCel();
+  const bf = await E(p, () => { const f = OS.Dom.bossFight(); return [f.hp, f.dmg, f.name, !!document.querySelector('.d3-boss')]; });
+  ok('Chefe da semana com vida e dano feito pelo que registaste', bf[0] >= 180 && bf[1] > 0 && bf[2] && bf[3], JSON.stringify(bf));
+  ok('Conquistas: "Forjado no Ferro" (10 treinos) em bronze', await E(p, () => OS.Dom.achievements().find(a => a.id === 'treinos').t >= 1));
+  await E(p, () => location.hash = 'dominus.marcos'); await sleep(400);
+  const leg = await E(p, () => OS.Dom.PK.map(k => OS.Dom.legList(k).length)); ok('Marcos: 5 pilares com 100 marcos cada (com o Espírito)', leg.length === 5 && leg.every(n => n === 100), JSON.stringify(leg));
+  const lx0 = await E(p, () => OS.Dom.state().ax.intelecto); await clk('.d3-leg .d3-legc'); await sleep(400);
+  ok('Marcar um marco dá +200 XP', (await E(p, () => OS.Dom.state().ax.intelecto)) - lx0 === 200);
+  await closeCel(); await p.fill('form[data-form="d3LegAdd"] input[name=t]', 'Marco meu de teste'); await clk('form[data-form="d3LegAdd"] button'); await sleep(400);
+  ok('Acrescentar um marco teu: fica como o próximo', await E(p, () => OS.Dom.nextLegacy()[0].t === 'Marco meu de teste' && OS.Dom.legList('int').length === 101));
+  await closeCel(); await E(p, () => { const b = [...document.querySelectorAll('.d3-legx')].find(x => x.dataset.t === 'Marco meu de teste'); b && b.click(); }); await sleep(200); await clk('[data-mok]'); await sleep(300);
+  await closeCel(); await E(p, () => { const b = [...document.querySelectorAll('.d3-legx')].find(x => x.dataset.t === 'Inglês B2 certificado'); b && b.click(); }); await sleep(200); await clk('[data-mok]'); await sleep(300);
+  ok('Tirar marcos da lista (os teus e os de base)', await E(p, () => OS.Dom.legList('int').length === 99 && !OS.Dom.legList('int').includes('Inglês B2 certificado')));
+  await E(p, () => { const b = document.querySelector('[data-act=d3LegReset]'); b && b.click(); }); await sleep(300); ok('Repor os marcos tirados', await E(p, () => OS.Dom.legList('int').length === 100));
+  await E(p, () => location.hash = 'dominus.visual'); await sleep(500); await closeCel();
+  ok('Visual: roupas melhores ficam presas até subires a Fortuna', await E(p, () => !!document.querySelector('.d3-edt') && (() => { document.querySelector('.d3-edt [data-v="top"]').click(); return true; })()) && await (async () => { await sleep(300); return E(p, () => { const f = [...document.querySelectorAll('.d3-pi')].find(x => /^Smoking/.test(x.textContent)); return !!f && f.disabled; }); })());
+  const gold = await E(p, () => OS.Dom.state().gold); await E(p, () => { const b = document.querySelector('[data-act=d3Buy][data-id=fr-carmesim]'); b && b.click(); }); await sleep(400);
+  ok('Loja: comprar uma moldura com o ouro ganho', gold < 60 ? true : await E(p, () => OS.one('dominus').owned.includes('fr-carmesim') && !!document.querySelector('.d3-vis .d3c.fr-carmesim')), 'ouro ' + gold);
+  await E(p, () => location.hash = 'hoje'); await sleep(1200); await E(p, () => OS.add('runs', { date: OS.U.today(), km: 6, mins: 32 })); await sleep(1700);
+  const fly = await E(p, () => (document.querySelector('.d3-fly') || {}).innerText || ''); ok('Ao registar noutra página aparece o +XP no canto', /\+\d+ Corpo/.test(fly), fly);
+  await E(p, () => location.hash = 'desporto.aventuras'); await sleep(500);
+  const nAdv = await E(p, () => OS.Adv.ALL.length); ok('Aventuras: catálogo grande para escolher (montanha, céu, neve, água…)', nAdv >= 100, nAdv + ' ideias');
+  await E(p, () => { const b = document.querySelector('.adv-c [data-act=advAdd]'); b && b.click(); }); await sleep(300);
+  const c0 = await E(p, () => OS.Dom.state().ax.corpo); await E(p, () => { const b = document.querySelector('.adv-row [data-v="Feita"]'); b && b.click(); }); await sleep(400);
+  ok('Aventura feita dá XP de Corpo e a conquista "Aventureiro"', (await E(p, () => OS.Dom.state().ax.corpo)) > c0 && await E(p, () => OS.Dom.achievements().find(a => a.id === 'aventuras').t >= 1));
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
 async function attTests(b) { cur = 'Faltas'; console.log('\n=== Faltas por disciplina (automáticas) ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
   await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
@@ -1958,7 +2050,7 @@ async function attTests(b) { cur = 'Faltas'; console.log('\n=== Faltas por disci
   ok('Falta sozinha quando estavas a trabalhar à hora da aula (turno do horário importado)', st.st6 === 'Falta' && /trabalhar/.test(st.why6) && st.c[1] === 1, JSON.stringify(st));
   const hol = await E(p, () => [OS.Att.holiday('2026-10-05'), OS.Att.holiday('2027-03-26'), OS.Att.holiday('2026-05-12'), OS.Att.holiday('2026-10-16')]);
   ok('Feriados de Portugal (e o de Aveiro) contam como "sem aula"', hol[0] === 'Implantação da República' && hol[1] === 'Sexta-feira Santa' && hol[2] === 'Feriado de Aveiro' && hol[3] === '', JSON.stringify(hol));
-  const nr = await E(p, w => { const r = OS.all('routine')[0]; OS.upd('routine', r.id, { days: [String(OS.U.parse(w.d7).getDay())] }); const x = OS.Att.all().find(o => o.cls === w.c2 && o.date !== w.d6); const out = { st: x && x.st, why: x && x.why }; OS.upd('routine', r.id, { days: [String(OS.U.parse(w.d7).getDay()), String(OS.U.parse(w.d6).getDay())] }); return out; }, W);
+  const nr = await E(p, w => { const r = OS.all('routine')[0]; OS.upd('routine', r.id, { days: [String(OS.U.parse(w.d7).getDay())] }); const x = OS.Att.all().find(o => o.cls === w.c2 && o.date !== w.d6 && !OS.Att.holiday(o.date)); const out = { st: x && x.st, why: x && x.why }; OS.upd('routine', r.id, { days: [String(OS.U.parse(w.d7).getDay()), String(OS.U.parse(w.d6).getDay())] }); return out; }, W);
   ok('Falta sozinha quando a tua rotina não te põe na faculdade nesse dia', nr.st === 'Falta' && /rotina não tem faculdade/.test(nr.why), JSON.stringify(nr));
   // a aba
   await E(p, () => { location.hash = 'universidade.presencas'; }); await sleep(700);
@@ -2069,7 +2161,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

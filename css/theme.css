@@ -1,4 +1,4 @@
-/* OCEANUM — tema Mar: azuis do abismo à espuma. Navegação no topo, cartões em gradiente, jogo num botão flutuante. */
+/* NÁUTILO — tema Mar: azuis do abismo à espuma. Navegação no topo, cartões em gradiente, jogo num botão flutuante. */
 :root{
   --bg:#04101F; --bg2:#06162B; --pn:#0A1E36; --pn2:#0E2744; --pn3:#133154;
   --line:rgba(120,200,255,.10); --line2:rgba(120,200,255,.18); --line3:rgba(120,200,255,.28);
@@ -136,8 +136,8 @@ body.nav-open::after{content:"";position:fixed;inset:0;background:rgba(2,8,18,.6
 #gameFab:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 14px 34px rgba(14,165,233,.6),0 0 0 1px rgba(165,243,252,.55)}
 #gameFab .ic{width:22px;height:22px;stroke-width:1.9}
 #gameFab .fab-lv{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#FBBF24;color:#1A1208;font:700 11px/20px var(--mono);text-align:center;box-shadow:0 0 0 2px #04101F}
-#gameFab.on{background:radial-gradient(circle at 30% 25%,#E8D3A8,#C9A25E 50%,#7A5A26);box-shadow:0 10px 26px rgba(201,162,94,.4)}
-body.dom-mode #top{background:rgba(10,9,7,.86);border-bottom-color:rgba(201,162,94,.14)}
+#gameFab.on{background:radial-gradient(circle at 30% 25%,#BAE6FD,#38BDF8 50%,#0B5A8A);box-shadow:0 10px 26px rgba(56,189,248,.4)}
+body.dom-mode #top{background:rgba(4,16,31,.86);border-bottom-color:rgba(120,200,255,.14)}
 .qg-steps{margin:10px 0 6px;padding-left:20px;line-height:1.65}.qg-steps li{margin-bottom:4px}
 .dc .chart{height:auto!important;min-height:150px}
 .dc .donut{display:flex;align-items:center;gap:16px;flex-wrap:wrap}

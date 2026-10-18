@@ -1,4 +1,4 @@
-/* OCEANUM — Treino (estilo Hevy), corpo integrado, alongamentos e dieta com fotos */
+/* NÁUTILO — Treino (estilo Hevy), corpo integrado, alongamentos e dieta com fotos */
 /* imagens animadas dos exercícios: as duas fases do movimento alternam */
 .exi{position:relative;display:inline-block;flex:none;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--line2)}
 .exi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -1014,3 +1014,25 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .att-c i{font-style:normal;font-weight:500;font-size:10px;opacity:.6}
 .att-c.p{border-color:rgba(52,211,153,.45);color:#34d399}.att-c.f{border-color:rgba(248,113,113,.5);color:#f87171}.att-c.j{border-color:rgba(251,191,36,.45);color:#fbbf24}.att-c.s{color:var(--mut)}
 .att-warn{border-color:rgba(251,191,36,.35)}
+/* Desporto › Aventuras */
+.adv-k{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.adv-k button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg2,rgba(255,255,255,.03));color:inherit;cursor:pointer;font:inherit;text-align:left;min-width:0}
+.adv-k button b{font-size:22px;line-height:1}.adv-k button span{font-size:12.5px;color:var(--mut)}
+.adv-k button.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.adv-list{display:flex;flex-direction:column}
+.adv-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.adv-row:last-child{border-bottom:0}
+.adv-row.done .li-t b{color:var(--mut)}
+.adv-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.adv-ok{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600}.adv-ok .ic{width:14px;height:14px}
+.adv-d{display:inline-flex;gap:3px}.adv-d i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.adv-d i.on{background:#22c55e}.adv-d.d2 i.on{background:#eab308}.adv-d.d3 i.on{background:#f97316}.adv-d.d4 i.on{background:#ef4444}
+.adv-q{width:100%;margin-bottom:12px}
+.adv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.adv-c{display:flex;flex-direction:column;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg2,rgba(255,255,255,.02));min-width:0}
+.adv-c.in{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.adv-ct{display:flex;flex-direction:column;gap:2px;min-width:0}.adv-ct b{font-size:15px;line-height:1.25}.adv-ct small{color:var(--mut);font-size:12.5px}
+.adv-cf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.adv-cf small{flex:1;min-width:0;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:560px){.adv-row{grid-template-columns:minmax(0,1fr) auto}.adv-row .adv-acts{grid-column:1/-1;justify-content:flex-start}}
+.adv-sec{margin-bottom:14px}.adv-sh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 8px}.adv-sh b{font-size:14px}
+@media (max-width:560px){.adv-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.adv-c{padding:10px}.adv-ct b{font-size:13.5px}.adv-cf small{display:none}}

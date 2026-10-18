@@ -1,4 +1,4 @@
-/* OCEANUM — Relatórios no formato do Brasil (quando o país da app é o Brasil):
+/* NÁUTILO — Relatórios no formato do Brasil (quando o país da app é o Brasil):
    Declaração de Ajuste Anual do IRPF por fichas (rendimentos tributáveis de PJ e de PF/exterior, isentos, tributação exclusiva,
    renda variável, bens e direitos, dívidas e ônus, pagamentos efetuados), simulação completa x simplificada, carnê-leão mês a mês,
    DARF da renda variável e aplicações no exterior (Lei 14.754/2023). Valores em reais. Estimativa: confirma no programa da Receita

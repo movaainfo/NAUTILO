@@ -1,4 +1,4 @@
-/* OCEANUM — Bioimpedância com IA: tiras uma foto (ou envias o PDF) do resultado do exame, a IA lê todos os valores,
+/* NÁUTILO — Bioimpedância com IA: tiras uma foto (ou envias o PDF) do resultado do exame, a IA lê todos os valores,
    e depois analisa-os com o teu treino, dieta e objetivo para dizer onde tens de melhorar e como. */
 (() => {
 'use strict';
@@ -8,14 +8,14 @@ const n = v => U.num(v) || 0;
 /* ================= IA (Google Gemini, chave grátis do utilizador) ================= */
 const AI = OS.AI = {};
 AI.key = () => OS.one('diet').aiKey || '';
-/* A IA do OCEANUM é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
+/* A IA do NÁUTILO é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
    universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio: Definições → Spyke. */
 AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Centro de decisões)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
 const STEPS = `<ol class="ai-steps"><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em <b>Ligar</b>.</li></ol>`;
 const FORM = act => `<div class="row gap8 ai-row"><input class="field grow" data-aikey placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Ligar</button></div>`;
 const moved = () => OS.Move && !OS.Move.isOld && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
 // cartão pequeno onde uma função precisa da IA: o mesmo em toda a app. A configuração (chave, passos) vive só em Definições → Spyke.
-AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" aria-hidden="true"></span><div><b>Esta função usa o Spyke, a IA do OCEANUM</b><small>Liga a IA uma vez em Definições e tudo o que usa IA passa a funcionar na app inteira.</small></div></div>
+AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" aria-hidden="true"></span><div><b>Esta função usa o Spyke, a IA do NÁUTILO</b><small>Liga a IA uma vez em Definições e tudo o que usa IA passa a funcionar na app inteira.</small></div></div>
   <a class="btn pri sm ai-go" href="#definicoes.spyke">${UI.ic('settings')}Ligar em Definições → Spyke</a></div>`;
 // dentro de uma janela, o botão leva às Definições e fecha a janela logo a seguir (depois de navegar)
 document.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('#modal .ai-go')) setTimeout(() => UI.closeModal(), 0); });
@@ -71,7 +71,7 @@ AI.freeOn = () => OS.one('diet').freeAI !== false;
 AI.free = async (messages, o = {}) => { if (!AI.freeOn()) throw new Error('A IA de reserva está desligada.');
   let last = ''; for (let i = 0; i < 3; i++) { const ac = window.AbortController ? new AbortController() : null, to = ac && setTimeout(() => ac.abort(), 45000);
     try { const r = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ac ? ac.signal : undefined, credentials: 'omit', referrerPolicy: 'no-referrer',
-        body: JSON.stringify(Object.assign({ model: 'openai', messages, temperature: o.temp == null ? .3 : o.temp, private: true, referrer: 'oceanum' }, o.tools ? { tools: o.tools } : {}, o.json ? { response_format: { type: 'json_object' } } : {})) });
+        body: JSON.stringify(Object.assign({ model: 'openai', messages, temperature: o.temp == null ? .3 : o.temp, private: true, referrer: 'nautilo' }, o.tools ? { tools: o.tools } : {}, o.json ? { response_format: { type: 'json_object' } } : {})) });
       const j = await r.json().catch(() => ({})); if (r.ok && j.choices && j.choices[0]) { AI.lastEngine = 'reserva'; return j.choices[0].message || {}; }
       last = (j.error && (j.error.message || j.error)) || 'erro ' + r.status; if (r.status === 429) await new Promise(res => setTimeout(res, 1500 * (i + 1))); else if (r.status < 500) break; }
     catch (e) { last = e.name === 'AbortError' ? 'demorou demasiado' : (e.message || 'sem rede'); } finally { to && clearTimeout(to); } }

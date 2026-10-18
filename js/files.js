@@ -1,5 +1,5 @@
-/* OCEANUM — Ficheiros na nuvem: PDFs, slides, exames e documentos da Universidade e dos Cursos guardados no TEU Google Drive
-   (pasta "Oceanum · Ficheiros", uma subpasta por disciplina e por curso). Depois de enviados, podes apagá-los do aparelho:
+/* NÁUTILO — Ficheiros na nuvem: PDFs, slides, exames e documentos da Universidade e dos Cursos guardados no TEU Google Drive
+   (pasta "Náutilo · Ficheiros", uma subpasta por disciplina e por curso). Depois de enviados, podes apagá-los do aparelho:
    ficam no Drive e abrem-se daqui em qualquer aparelho. Precisa da Parte 5 do script Google (Definições → Script Google). */
 (() => {
 'use strict';
@@ -11,11 +11,12 @@ OS.S.files = { label: 'Ficheiro', title: r => r.name, fields: [
   { k: 'notes', l: 'Notas', t: 'area', rows: 2 }], defaults: () => ({ kind: 'PDF' }) };
 
 /* ---------- Parte 5 do script ---------- */
-IB.addon5 = () => `// Oceanum · PARTE 5 — Ficheiros na nuvem (pasta "Oceanum · Ficheiros" no TEU Google Drive): PDFs e documentos da Universidade e dos Cursos.
+IB.addon5 = () => `// Náutilo · PARTE 5 — Ficheiros na nuvem (pasta "Náutilo · Ficheiros" no TEU Google Drive): PDFs e documentos da Universidade e dos Cursos.
 // Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Não apagues as outras partes.
 function fRaiz_() { const P = PropertiesService.getScriptProperties(); let f = null; const id = P.getProperty('F_ROOT');
   if (id) { try { f = DriveApp.getFolderById(id); if (f.isTrashed()) f = null; } catch (e) { f = null; } }
-  if (!f) { const it = DriveApp.getFoldersByName('Oceanum · Ficheiros'); f = it.hasNext() ? it.next() : DriveApp.createFolder('Oceanum · Ficheiros'); P.setProperty('F_ROOT', f.getId()); }
+  if (!f) { let it = DriveApp.getFoldersByName('Náutilo · Ficheiros'); if (!it.hasNext()) it = DriveApp.getFoldersByName('Oceanum · Ficheiros'); f = it.hasNext() ? it.next() : DriveApp.createFolder('Náutilo · Ficheiros'); P.setProperty('F_ROOT', f.getId()); }
+  if (/^Oceanum/.test(f.getName())) { try { f.setName('Náutilo · Ficheiros'); } catch (e) { } }
   return f; }
 function fPasta_(c) { let f = fRaiz_(); String(c || '').split('/').map(function (x) { return x.replace(/[\\\\:*?"<>|]/g, ' ').trim().slice(0, 80); }).filter(String).forEach(function (n) { const it = f.getFoldersByName(n); f = it.hasNext() ? it.next() : f.createFolder(n); }); return f; }
 function fTmp_() { const r = fRaiz_(), it = r.getFoldersByName('_envios'); return it.hasNext() ? it.next() : r.createFolder('_envios'); }
@@ -78,9 +79,9 @@ FL.send = (files, area, ref) => { const L = [...files], big = L.filter(f => f.si
 
 /* ---------- ações ---------- */
 const needPart5 = () => UI.modal(`<div style="padding:18px"><div class="pn-h"><h3>${UI.ic('arrowUp')}Guardar ficheiros na nuvem</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
-  ${FL.ready() ? `<p style="margin:0 0 10px">Os ficheiros vão para o <b>teu Google Drive</b> (pasta <b>Oceanum · Ficheiros</b>, uma subpasta por disciplina e por curso). Para isso o teu script precisa da <b>Parte 5</b> (um ficheiro novo, 2 minutos):</p>
+  ${FL.ready() ? `<p style="margin:0 0 10px">Os ficheiros vão para o <b>teu Google Drive</b> (pasta <b>Náutilo · Ficheiros</b>, uma subpasta por disciplina e por curso). Para isso o teu script precisa da <b>Parte 5</b> (um ficheiro novo, 2 minutos):</p>
   <ol class="ai-steps"><li><button class="btn pri" data-act="ibCopy" data-t="p${IB.partsHelp().n}">${UI.ic('link')}Copiar a Parte 5</button></li>
-  <li>Em <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o projeto do Oceanum → <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte5</b> → apaga o que vier → cola → <b>Guardar</b>.</li>
+  <li>Em <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o projeto do Náutilo → <b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte5</b> → apaga o que vier → cola → <b>Guardar</b>.</li>
   <li><b>Implantar → Gerenciar implantações</b> → lápis → Versão: <b>Nova versão</b> → <b>Implantar</b>. Se pedir, autoriza o Google Drive.</li>
   <li>Volta aqui e toca em <b>Verificar</b>.</li></ol>
   <div class="row gap8"><button class="btn sm" data-act="fVer">${UI.ic('sync')}Verificar</button><a class="btn sm ghost" href="#definicoes.script" data-mclose>Ver todas as partes</a></div>`

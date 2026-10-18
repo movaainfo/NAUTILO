@@ -1,4 +1,4 @@
-/* OCEANUM — Universidade, Aprendizagem, Conhecimento, Treino (com mapa corporal), Corrida. */
+/* NÁUTILO — Universidade, Aprendizagem, Conhecimento, Treino (com mapa corporal), Corrida. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, L = OS.L, esc = U.esc, A = OS.act;

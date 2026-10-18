@@ -1,4 +1,4 @@
-/* OCEANUM — versão independente (fora do claude.ai).
+/* NÁUTILO — versão independente (fora do claude.ai).
    Sem configuração: os dados ficam guardados neste dispositivo (funciona offline).
    Com Firebase configurado em config.js: entras com a tua conta Google e os dados sincronizam entre telemóvel e computador.
    O motor de dados (core.js) fala com uma base de dados ao estilo Firestore; aqui ligamo-lo ao Firestore real, numa pasta só tua. */

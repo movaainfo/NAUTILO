@@ -1,6 +1,6 @@
-/* OCEANUM — E-mail da faculdade (Outlook / Microsoft 365) separado por matéria.
+/* NÁUTILO — E-mail da faculdade (Outlook / Microsoft 365) separado por matéria.
    Ligação: pela Parte 4 do teu script Google (login oficial da Microsoft; o acesso fica guardado no teu script, por isso
-   ligas uma vez e funciona em todos os aparelhos). Nada passa por servidores do Oceanum.
+   ligas uma vez e funciona em todos os aparelhos). Nada passa por servidores do Náutilo.
    Matéria de cada e-mail: 1) a que escolheste à mão; 2) a que aprendeu com esse remetente; 3) nome da cadeira, palavras
    dos e-mails e professor(a) (definidos em cada disciplina); 4) a IA; senão, "Geral".
    Se a universidade não deixar ligar apps, reencaminha o Outlook para o Gmail e escolhe o domínio (ex.: ua.pt): esses e-mails
@@ -54,7 +54,7 @@ const all = () => U.sortBy(L.items.concat(gmailUni()), x => x.d || '').reverse()
 /* ---------- ecrã ---------- */
 const STEPS_AZ = red => `<ol class="ai-steps">
   <li>No computador (ou no telemóvel em modo computador), abre <a class="acc" href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noopener">portal.azure.com → Registos de aplicações</a> e entra com a <b>conta da faculdade</b>.</li>
-  <li><b>Novo registo</b> → Nome: <b>Oceanum</b> → Tipos de conta: <b>Apenas as contas deste diretório organizacional</b> → URI de redirecionamento: escolhe <b>Web</b> e cola este endereço:<div class="ol-copy"><code>${esc(red || '…')}</code><button class="btn xs" data-act="olCopy" data-v="${esc(red || '')}">Copiar</button></div> → <b>Registar</b>.</li>
+  <li><b>Novo registo</b> → Nome: <b>Náutilo</b> → Tipos de conta: <b>Apenas as contas deste diretório organizacional</b> → URI de redirecionamento: escolhe <b>Web</b> e cola este endereço:<div class="ol-copy"><code>${esc(red || '…')}</code><button class="btn xs" data-act="olCopy" data-v="${esc(red || '')}">Copiar</button></div> → <b>Registar</b>.</li>
   <li>Na página da aplicação, copia o <b>ID da Aplicação (cliente)</b> e o <b>ID do Diretório (inquilino)</b>.</li>
   <li><b>Certificados e segredos</b> → <b>Novo segredo de cliente</b> → validade 24 meses → <b>Adicionar</b> → copia o <b>Valor</b> (só aparece uma vez).</li>
   <li><b>Permissões de API</b> → <b>Adicionar uma permissão</b> → <b>Microsoft Graph</b> → <b>Permissões delegadas</b> → marca <b>Mail.Read</b>, <b>Mail.Send</b>, <b>User.Read</b> e <b>offline_access</b> → <b>Adicionar</b>.</li>
@@ -64,7 +64,7 @@ const direct = () => { if (!ready()) return `<p class="mut">Primeiro liga o scri
   if (!INFO) { if (!busy) setTimeout(info, 30); return `<div class="sai-busy"><div class="fd-spin"></div><span>A verificar a ligação ao Outlook…</span></div>`; }
   if (!INFO.has4) return `<p class="mut">Precisa da Parte 4 do script Google: copia-a em <a class="acc" href="#definicoes.script">Definições → Script Google</a> e volta aqui.</p><button class="btn sm" data-act="olInfo">${UI.ic('sync')}Verificar</button>`;
   const admin = /AADSTS65001|AADSTS90094|admin|administrador|consent/i.test(INFO.err || '');
-  return `${INFO.err ? `<div class="ib-st bad">Na última tentativa: ${esc(INFO.err)}</div>${admin ? `<p class="mut" style="font-size:13px">A tua universidade exige autorização do administrador. Pede ao apoio informático (ex.: <b>sti@ua.pt</b>) para aprovar a app "Oceanum", ou usa o reencaminhamento pelo Gmail (acima).</p>` : ''}` : ''}
+  return `${INFO.err ? `<div class="ib-st bad">Na última tentativa: ${esc(INFO.err)}</div>${admin ? `<p class="mut" style="font-size:13px">A tua universidade exige autorização do administrador. Pede ao apoio informático (ex.: <b>sti@ua.pt</b>) para aprovar a app "Náutilo", ou usa o reencaminhamento pelo Gmail (acima).</p>` : ''}` : ''}
     ${STEPS_AZ(INFO.redirect)}
     <form class="ol-f" data-form="olCfg" autocomplete="off"><input class="field" name="id" placeholder="ID da Aplicação (cliente)" aria-label="ID da Aplicação (cliente)" spellcheck="false" autocapitalize="none"><input class="field" name="ten" placeholder="ID do Diretório (inquilino)" aria-label="ID do Diretório (inquilino)" spellcheck="false" autocapitalize="none"><input class="field" name="sec" type="password" placeholder="Valor do segredo do cliente" aria-label="Segredo do cliente" autocomplete="new-password"><button class="btn sm pri">Guardar no meu script</button></form>
     <div class="row gap8" style="margin-top:10px;flex-wrap:wrap"><button class="btn pri" data-act="olAuth" ${INFO.cfg ? '' : 'disabled'}>${UI.ic('user')}Entrar com a conta da faculdade</button><button class="btn sm ghost" data-act="olInfo">${UI.ic('sync')}Verificar</button></div>

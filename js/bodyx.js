@@ -1,4 +1,4 @@
-/* OCEANUM — Corpo integrado: peso, altura e exame de bioimpedância completo; alongamentos (com fotos e rotina guiada);
+/* NÁUTILO — Corpo integrado: peso, altura e exame de bioimpedância completo; alongamentos (com fotos e rotina guiada);
    e a ligação entre treino, dieta e corrida (gasto do exercício, meta do dia ajustada, recomendações e visão do corpo). */
 (() => {
 'use strict';

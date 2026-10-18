@@ -1,4 +1,4 @@
-/* OCEANUM — camada minimalista: menos linhas, mais espaço, uma coisa de cada vez. */
+/* NÁUTILO — camada minimalista: menos linhas, mais espaço, uma coisa de cada vez. */
 :root{--line:rgba(150,180,210,.06);--pn:#0C121A;--side:220px}
 #side{background:var(--bg);border-right:none;padding:22px 12px 28px;gap:0}
 .brand{padding:2px 10px 22px}.brand b{letter-spacing:.34em;font-weight:500;font-size:12.5px}
@@ -7,7 +7,7 @@
 .nav-g a{padding:8px 10px;font-size:14px;color:var(--mut);border-radius:9px}.nav-g a.on{background:rgba(255,255,255,.04);color:var(--tx)}.nav-g a.on::before{display:none}
 .nav-exp{display:flex;align-items:center;gap:10px;margin-top:14px;padding:8px 10px;border-radius:9px;color:var(--mut);font-size:14px;border:1px dashed rgba(150,180,210,.14)}
 .nav-exp:hover,.nav-exp.on{color:var(--tx);border-color:var(--accent)}.nav-exp small{margin-left:auto;font:500 11px var(--mono);padding:1px 7px;border-radius:9px;background:var(--accentBg);color:var(--accent)}
-.nav-dom{margin-top:10px;background:transparent;border-color:rgba(201,162,94,.18)}
+.nav-dom{margin-top:10px;background:transparent;border-color:rgba(120,200,255,.18)}
 #top{background:rgba(7,11,16,.6);border-bottom:none;padding:14px 32px}.crumb b{font-size:15px;font-weight:500;color:var(--tx2)}
 #view{gap:34px;padding:22px 32px 120px;max-width:1080px}
 .pn{border:none;background:var(--pn);border-radius:18px;padding:20px 22px}

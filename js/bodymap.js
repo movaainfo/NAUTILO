@@ -1,4 +1,4 @@
-/* OCEANUM — Mapa corporal: figura anatómica musculada (frente e costas), músculos clicáveis
+/* NÁUTILO — Mapa corporal: figura anatómica musculada (frente e costas), músculos clicáveis
    e ficha detalhada por músculo: o que treinaste, séries, cargas, recordes, recuperação e equilíbrio. */
 (() => {
 'use strict';

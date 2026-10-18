@@ -1,4 +1,4 @@
-/* OCEANUM — Frases do dia: verdades que doem (para acordar) e motivação forte (para ir).
+/* NÁUTILO — Frases do dia: verdades que doem (para acordar) e motivação forte (para ir).
    Uma de cada por dia, iguais o dia todo; podes ver outra. Aparecem na Visão Geral (debaixo da saudação) e no Hoje. */
 (() => {
 'use strict';

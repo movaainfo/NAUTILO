@@ -1,4 +1,4 @@
-/* OCEANUM — Corpo: separadores (Visão · Desafios e metas · Mapa corporal · Peso e medidas), calendário de disciplina
+/* NÁUTILO — Corpo: separadores (Visão · Desafios e metas · Mapa corporal · Peso e medidas), calendário de disciplina
    ("fui hoje?": treino, corrida ou presença marcada), desafios com progresso automático e metas do corpo (peso, gordura,
    cintura, músculo e força num exercício). */
 (() => {

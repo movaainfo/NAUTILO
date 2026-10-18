@@ -1,4 +1,4 @@
-/* OCEANUM — Importador da B3 (Área do Investidor): lê os ficheiros Excel (ou CSV) que descarregas em investidor.b3.com.br
+/* NÁUTILO — Importador da B3 (Área do Investidor): lê os ficheiros Excel (ou CSV) que descarregas em investidor.b3.com.br
    · Extratos → Negociação: compras e vendas na data do negócio
    · Extratos → Movimentação: dividendos, JCP, rendimentos de FII, juros, amortizações, bonificações, desdobramentos, resgates do Tesouro
      (e as liquidações de compras/vendas, quando não juntas o ficheiro de Negociação)

@@ -1,6 +1,6 @@
-/* OCEANUM — sincronização entre aparelhos (uma só conta) através do script Google do utilizador.
+/* NÁUTILO — sincronização entre aparelhos (uma só conta) através do script Google do utilizador.
    O motor de dados (core.js) fala com uma "base de dados" com collection().onSnapshot() e doc().set().
-   Aqui essa base é o ficheiro "Oceanum · dados.json" no Google Drive do utilizador, servido pelo seu Apps Script.
+   Aqui essa base é o ficheiro "Náutilo · dados.json" no Google Drive do utilizador, servido pelo seu Apps Script.
    - Primeiro aparelho a ligar: envia tudo o que tem.
    - Aparelhos seguintes: fica a versão com mais dados (a outra é guardada como cópia neste aparelho).
    - Depois: cada alteração é enviada; os outros aparelhos recebem-na em segundos (ao abrir, ao voltar à app e a cada 20 s). */

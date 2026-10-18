@@ -1,4 +1,4 @@
-/* Oceanum — atualizações visíveis: ecrã curto "A atualizar…" quando chega uma versão nova,
+/* Náutilo — atualizações visíveis: ecrã curto "A atualizar…" quando chega uma versão nova,
    e aviso "Atualizado · versão X" na primeira abertura dessa versão. */
 (() => {
 'use strict';
@@ -22,7 +22,7 @@ const css = `.upd{position:fixed;inset:0;z-index:300;display:grid;place-items:ce
 const style = () => { if (!document.getElementById('updCss')) { const s = document.createElement('style'); s.id = 'updCss'; s.textContent = css; document.head.appendChild(s); } };
 const show = html => { style(); const el = document.createElement('div'); el.className = 'upd'; el.setAttribute('role', 'status'); el.innerHTML = `<div class="in">${html}</div>`; document.body.appendChild(el); return el; };
 // 1) chegou uma versão nova enquanto a app estava aberta: ecrã curto e recarrega
-window.OceanumUpdating = () => { show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão nova encontrada</small>'); setTimeout(() => location.reload(), 900); };
+window.OceanumUpdating = () => { show('<div class="ring"></div><b>A atualizar o Náutilo…</b><small>versão nova encontrada</small>'); setTimeout(() => location.reload(), 900); };
 // 2) primeira abertura de uma versão nova: confirmação
 const prev = ls.get(KEY);
 if (VER.v && prev !== VER.v) { ls.set(KEY, VER.v);
@@ -38,7 +38,7 @@ let checking = false, lastCheck = 0, forcing = false, waitT = 0;
 const TK = 'os2updT', tget = () => { try { return JSON.parse(ls.get(TK) || '{}') || {}; } catch (e) { return {}; } };
 if (num(VER.v) >= num(tget().v)) ls.set(TK, '{}'); // já estamos na versão pedida
 const serverVer = async () => { const r = await fetch(location.pathname + '?vchk=' + Date.now(), { cache: 'no-store', credentials: 'omit' }); if (!r.ok) return ''; const m = (await r.text()).match(/OCEANUM_VERSION=\{"v": *"([^"]+)"/); return m ? m[1] : ''; };
-const hard = async () => { if (forcing) return; forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão nova encontrada</small>');
+const hard = async () => { if (forcing) return; forcing = true; show('<div class="ring"></div><b>A atualizar o Náutilo…</b><small>versão nova encontrada</small>');
   try { if (navigator.serviceWorker) { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r => r.unregister())); } if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.filter(k => k !== 'oceanum-img').map(k => caches.delete(k))); } } catch (e) { }
   setTimeout(() => location.reload(), 300); };
 // a meio de escrever (campo com texto, formulário aberto): espera
@@ -48,7 +48,7 @@ const apply = sv => { if (forcing) return; if (busy()) { clearTimeout(waitT); wa
   if (n > 5) return; // algo está mesmo errado: não fica em ciclo (o botão "Procurar atualização" continua a funcionar)
   try { navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => { }); } catch (e) { }
   if (n >= 2) return hard();
-  forcing = true; show('<div class="ring"></div><b>A atualizar o Oceanum…</b><small>versão ' + String(sv).replace(/[<&]/g, '') + '</small>'); setTimeout(() => location.reload(), 700); };
+  forcing = true; show('<div class="ring"></div><b>A atualizar o Náutilo…</b><small>versão ' + String(sv).replace(/[<&]/g, '') + '</small>'); setTimeout(() => location.reload(), 700); };
 window.OceanumCheckUpdate = async manual => { if (checking || forcing) return ''; if (!manual && Date.now() - lastCheck < 15000) return ''; if (!manual && navigator.onLine === false) return 'off'; lastCheck = Date.now(); checking = true;
   try { const sv = await serverVer(); if (!sv || num(sv) <= num(VER.v)) { if (manual) note('Já tens a versão mais recente (' + (VER.v || '') + ').', 'pos'); return 'ok'; }
     if (manual) { ls.set(TK, JSON.stringify({ v: sv, n: 1 })); note('Versão ' + sv + ' encontrada. A atualizar…'); }

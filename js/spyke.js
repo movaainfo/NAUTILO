@@ -1,7 +1,7 @@
-/* OCEANUM — Spyke: assistente de voz (estilo J.A.R.V.I.S.), voz masculina.
+/* NÁUTILO — Spyke: assistente de voz (estilo J.A.R.V.I.S.), voz masculina.
    Com a app aberta: toca no microfone, diz "Spyke…" (palavra de ativação) ou bate duas palmas.
    Com a app fechada (limite do iPhone: uma app web não pode ouvir em segundo plano): Atalhos da Siri + "Atalhos vocais" do iOS
-   chamam o teu script Google, que devolve o resumo do dia (o Oceanum envia-o sempre que está aberto) ou responde com a IA.
+   chamam o teu script Google, que devolve o resumo do dia (o Náutilo envia-o sempre que está aberto) ou responde com a IA.
    Voz: Gemini TTS (voz masculina, ex.: Charon) com a tua chave; sem chave, a voz do sistema (masculina se existir). */
 (() => {
 'use strict';
@@ -61,6 +61,8 @@ S.ctx = () => { const t = U.today(), L = [], add = (k, v) => { if (v) L.push(k +
   try { add('Agenda hoje e amanhã', OS.Cal.items(t, U.addDays(t, 1)).filter(x => x.src !== 'task').slice(0, 14).map(x => (x.date === t ? 'hoje' : 'amanhã') + (x.start ? ' ' + x.start : '') + ' ' + x.title).join('; ')); } catch (e) { }
   try { add('Alertas', OS.Intel.alerts().slice(0, 10).map(a => `${a.area}: ${a.title}${a.detail ? ' (' + a.detail + ')' : ''}`).join('; ')); } catch (e) { }
   try { add('Próximas ações por prioridade', OS.Intel.next().slice(0, 10).map(n => `${n.kind}: ${n.title}${n.why && n.why.length ? ' (' + n.why.slice(0, 2).join(', ') + ')' : ''}`).join('; ')); } catch (e) { }
+  try { if (OS.Dom && OS.Dom.summary) add('Dominus (o jogo da vida dele)', OS.Dom.summary()); } catch (e) { }
+  try { if (OS.Mundo) { const w = OS.Mundo.stats(); if (w.n || w.w.length) add('Mundo (países)', `conhece ${w.n} de 195 países (${Math.round(w.pct)}% do mundo, ${w.conts} continentes): ${w.v.map(c => c.n).join(', ')}${w.w.length ? '. Quer ir: ' + w.w.map(c => c.n).join(', ') : ''}`); } } catch (e) { }
   try { add('Hábitos por fazer hoje', OS.all('habits').filter(h => h.active && OS.Hab.due(h, t) && !OS.Hab.done(h, t)).map(h => h.name).join(', ')); } catch (e) { }
   try { const F = OS.Fin, m = F.month(U.ym(t)); add('Finanças', `disponível ${U.eur(F.liquid())}; este mês receitas ${U.eur(m.inc)}, despesas ${U.eur(m.exp)}; a pagar em 7 dias: ${F.upcoming(7).filter(x => x.amount < 0 && !x.tx).slice(0, 5).map(x => x.title + ' ' + U.eur(-x.amount) + ' ' + x.date).join(', ') || 'nada'}`); } catch (e) { }
   try { add('Faltas nas aulas', OS.Att ? OS.Att.summary() : ''); } catch (e) { }
@@ -572,7 +574,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     ${voiceErr ? `<div class="ib-st bad" style="margin-top:8px">Na última vez: ${esc(voiceErr)}</div>` : ''}
     <div class="spy-vb" id="spyAz"><h4>Microsoft · voz humana grátis (recomendada)</h4>
       <p class="mut" style="margin:0 0 8px;font-size:13px">Voz neural oficial da Microsoft, masculina e natural, sempre em português. Grátis até 500 mil caracteres por mês (umas 8 a 9 horas de fala).</p>
-      ${c.azKey ? '' : `<ol class="spy-steps"><li>Abre <a class="acc" href="https://portal.azure.com" target="_blank" rel="noopener">portal.azure.com</a> e entra com uma conta Microsoft. És estudante: usa <a class="acc" href="https://azure.microsoft.com/free/students" target="_blank" rel="noopener">Azure for Students</a> (não pede cartão).</li><li>Na pesquisa lá em cima escreve <b>Speech</b> → <b>Serviços de Voz / Speech services</b> → <b>Criar</b>.</li><li>Grupo de recursos: <b>Criar novo</b> → "oceanum". Região: <b>West Europe</b>. Nome: "oceanum-voz". Escalão de preço: <b>Free F0</b> → <b>Rever + criar</b> → <b>Criar</b>.</li><li>Quando acabar: <b>Ir para o recurso</b> → <b>Chaves e Ponto Final</b> → copia a <b>CHAVE 1</b> e a <b>Localização/Região</b> (ex.: westeurope).</li><li>Cola aqui as duas e toca em <b>Ouvir</b>.</li></ol>`}
+      ${c.azKey ? '' : `<ol class="spy-steps"><li>Abre <a class="acc" href="https://portal.azure.com" target="_blank" rel="noopener">portal.azure.com</a> e entra com uma conta Microsoft. És estudante: usa <a class="acc" href="https://azure.microsoft.com/free/students" target="_blank" rel="noopener">Azure for Students</a> (não pede cartão).</li><li>Na pesquisa lá em cima escreve <b>Speech</b> → <b>Serviços de Voz / Speech services</b> → <b>Criar</b>.</li><li>Grupo de recursos: <b>Criar novo</b> → "nautilo". Região: <b>West Europe</b>. Nome: "nautilo-voz". Escalão de preço: <b>Free F0</b> → <b>Rever + criar</b> → <b>Criar</b>.</li><li>Quando acabar: <b>Ir para o recurso</b> → <b>Chaves e Ponto Final</b> → copia a <b>CHAVE 1</b> e a <b>Localização/Região</b> (ex.: westeurope).</li><li>Cola aqui as duas e toca em <b>Ouvir</b>.</li></ol>`}
       <div class="ws-form"><label>Chave (CHAVE 1)<input class="field" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" data-bind="spyke.azKey" value="${esc(c.azKey || '')}" placeholder="32 letras e números"></label>
         <label>Região<input class="field" autocomplete="off" autocapitalize="none" spellcheck="false" data-bind="spyke.azRegion" value="${esc(c.azRegion || 'westeurope')}" placeholder="westeurope"></label>
         <label>Voz<select class="field" data-bind="spyke.azVoice">${AZV.map(([v, l]) => `<option value="${esc(v)}"${(c.azVoice || AZV[0][0]) === v ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></label></div>
@@ -601,7 +603,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     ${c.clap ? `<div class="ws-form" style="margin-top:8px"><label>Sensibilidade das palmas<input type="range" min="1" max="9" data-bind="spyke.sens" value="${c.sens}"></label></div><button class="btn sm" data-act="spyClapTest" style="margin-top:6px">${UI.ic('mic')}Testar o microfone e as palmas</button>` : ''}
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.morning" ${c.morning ? 'checked' : ''}><span></span>De manhã, ao abrir a app pela primeira vez, o Spyke dá o resumo do dia</label>
     <div class="spy-note"><b>Para o iPhone não pedir o microfone sempre</b><small>${MICSET}. Na app do ecrã principal o iPhone pode voltar a perguntar uma vez cada vez que a abres: é uma regra da Apple para apps web.</small></div>
-    <div class="spy-note"><b>Com a app fechada</b><small>O iPhone não deixa nenhuma app web ouvir em segundo plano: quando sais do OCEANUM o microfone desliga-se e volta a ligar sozinho quando voltas. Para chamar o Spyke com a app fechada diz <b>"E aí Siri, abre o OCEANUM"</b> (abre já a ouvir) ou usa os Atalhos vocais do guia em baixo.</small></div>
+    <div class="spy-note"><b>Com a app fechada</b><small>O iPhone não deixa nenhuma app web ouvir em segundo plano: quando sais do NÁUTILO o microfone desliga-se e volta a ligar sozinho quando voltas. Para chamar o Spyke com a app fechada diz <b>"E aí Siri, abre o NÁUTILO"</b> (abre já a ouvir) ou usa os Atalhos vocais do guia em baixo.</small></div>
     ${SR ? '' : '<p class="neg" style="font-size:12.5px;margin:8px 0 0">Este navegador não tem reconhecimento de voz: usa o Safari no iPhone ou o Chrome.</p>'}</div>
   <div class="pn"><div class="pn-h"><h3>Conversa</h3></div>
     <label class="switch"><input type="checkbox" data-bind="spyke.cont" ${c.cont ? 'checked' : ''}><span></span>Conversa contínua: depois de responder continua a ouvir sem dizeres o nome outra vez</label>

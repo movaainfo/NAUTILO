@@ -1,6 +1,6 @@
-/* OCEANUM — Caixa de entrada de gastos (atalho do iPhone).
+/* NÁUTILO — Caixa de entrada de gastos (atalho do iPhone).
    O atalho pede valor e descrição e envia para um script Google (Apps Script) na conta do utilizador, que guarda numa folha.
-   O Oceanum, quando está aberto, puxa o que chegou, cria a despesa e marca como importado. Sem abrir a app para registar. */
+   O Náutilo, quando está aberto, puxa o que chegou, cria a despesa e marca como importado. Sem abrir a app para registar. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
@@ -10,7 +10,7 @@ const cfg = () => OS.one('inbox');
 const SEEN = 'os2inboxSeen';
 const genKey = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
 
-IB.core = key => `// Oceanum · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
+IB.core = key => `// Náutilo · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
 const KEY = '${key}';
 function doGet(e) {
   const p = e.parameter || {};
@@ -25,7 +25,7 @@ function doGet(e) {
   if (p.op === 'nw') { let fs = []; try { fs = JSON.parse(p.f || '[]'); } catch (e) { } return out({ ok: true, nw: noticias_(fs.slice(0, 10)) }); }
   if (p.op === 'al') { PropertiesService.getScriptProperties().setProperty('AL', String(p.j || '[]').slice(0, 8500)); const on = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'verificarAlertas'; }); return out({ ok: true, ativo: on }); }
   if (p.op === 'c') return out({ ok: true, c: agenda_(String(p.s || '')) });
-  // ---- e-mail (Gmail) e LinkedIn (pelas notificações no Gmail), para o resumo do Oceanum ----
+  // ---- e-mail (Gmail) e LinkedIn (pelas notificações no Gmail), para o resumo do Náutilo ----
   if (p.op === 'gm') return out({ ok: true, gm: correio_(String(p.q || ''), Number(p.n || 30)) });
   if (p.op === 'ga') return out({ ok: true, n: acaoCorreio_(String(p.a || ''), String(p.ids || '')) });
   if (p.op === 'dr') return out(rascunho_(String(p.id || ''), String(p.b || '')));
@@ -33,7 +33,7 @@ function doGet(e) {
   if (p.op === 'br') { const P = PropertiesService.getScriptProperties(); P.setProperty('BR', String(p.j || '{}').slice(0, 8500)); P.setProperty('CX', String(p.cx || '').slice(0, 8500)); if (p.gk) P.setProperty('GK', String(p.gk).slice(0, 120)); else if (p.nogk) P.deleteProperty('GK'); return out({ ok: true }); }
   if (p.op === 'brief') return ContentService.createTextOutput(resumo_());
   if (p.op === 'ask') return ContentService.createTextOutput(pergunta_(String(p.q || '')));
-  // ---- sincronização: os dados do Oceanum num ficheiro do teu Google Drive ----
+  // ---- sincronização: os dados do Náutilo num ficheiro do teu Google Drive ----
   if (p.op === 'list') { const all = dados_(); const m = {}; Object.keys(all).forEach(function (id) { m[id] = all[id].t || 0; }); return out({ ok: true, docs: m }); }
   if (p.op === 'get') { const all = dados_(), ids = String(p.ids || '').split(',').filter(String); const o = {}; (ids.length ? ids : Object.keys(all)).forEach(function (id) { if (all[id]) o[id] = all[id]; }); return out({ ok: true, docs: o }); }
   if (p.op === 'put') { const L = LockService.getScriptLock(); L.waitLock(20000);
@@ -55,26 +55,26 @@ function doGet(e) {
   const txt = String(p.v || '') + ' ', m = txt.match(/\\d+(?:[.,]\\d+)?/), v = m ? Number(m[0].replace(',', '.')) : 0;
   if (!(v > 0)) return out({ ok: false, msg: 'Valor inválido' });
   sh.appendRow([Utilities.getUuid(), new Date().toISOString(), v, p.d || '', p.c || '', '', '']);
-  return ContentService.createTextOutput('✓ ' + v.toFixed(2).replace('.', ',') + ' € registado no Oceanum');
+  return ContentService.createTextOutput('✓ ' + v.toFixed(2).replace('.', ',') + ' € registado no Náutilo');
 }
 function doPost(e) { return doGet(e); }
 // funciona dentro de uma folha ou sozinho (script.google.com): cria a folha de gastos se for preciso
 function folha_() { let ss = null; try { ss = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { }
   if (!ss) { const P = PropertiesService.getScriptProperties(), id = P.getProperty('SHEET'); if (id) { try { ss = SpreadsheetApp.openById(id); } catch (e) { ss = null; } }
-    if (!ss) { ss = SpreadsheetApp.create('Oceanum · Gastos do atalho'); P.setProperty('SHEET', ss.getId()); } }
+    if (!ss) { ss = SpreadsheetApp.create('Náutilo · Gastos do atalho'); P.setProperty('SHEET', ss.getId()); } }
   return ss.getSheets()[0]; }
 function ficheiro_() { const P = PropertiesService.getScriptProperties(), id = P.getProperty('DATA'); if (id) { try { return DriveApp.getFileById(id); } catch (e) { } }
   // projeto novo ou copiado: usa o ficheiro de dados que já existe no teu Drive (nunca começa do zero por engano)
-  const it = DriveApp.getFilesByName('Oceanum · dados.json'); let best = null; while (it.hasNext()) { const x = it.next(); if (!x.isTrashed() && (!best || x.getSize() > best.getSize())) best = x; }
-  if (best) { P.setProperty('DATA', best.getId()); return best; }
-  const f = DriveApp.createFile('Oceanum · dados.json', '{}', 'application/json'); P.setProperty('DATA', f.getId()); return f; }
+  let best = null; ['Náutilo · dados.json', 'Oceanum · dados.json'].forEach(function (nm) { const it = DriveApp.getFilesByName(nm); while (it.hasNext()) { const x = it.next(); if (!x.isTrashed() && (!best || x.getSize() > best.getSize())) best = x; } });
+  if (best) { if (/^Oceanum/.test(best.getName())) best.setName('Náutilo · dados.json'); P.setProperty('DATA', best.getId()); return best; }
+  const f = DriveApp.createFile('Náutilo · dados.json', '{}', 'application/json'); P.setProperty('DATA', f.getId()); return f; }
 function dados_() { try { return JSON.parse(ficheiro_().getBlob().getDataAsString() || '{}'); } catch (e) { return {}; } }
 function guardar_(all) { const f = ficheiro_();
   // cópia de segurança diária ANTES de gravar (fica no teu Drive; guarda as últimas 14)
   const P = PropertiesService.getScriptProperties(), hoje = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd');
-  if (P.getProperty('BK') !== hoje && f.getBlob().getDataAsString() !== '{}') { P.setProperty('BK', hoje); f.makeCopy('Oceanum · cópia ' + hoje);
-    const it = DriveApp.searchFiles("title contains 'Oceanum · cópia ' and trashed = false"), lista = []; while (it.hasNext()) lista.push(it.next());
-    lista.sort(function (a, b) { return b.getName() < a.getName() ? -1 : 1; }).slice(14).forEach(function (x) { x.setTrashed(true); }); }
+  if (P.getProperty('BK') !== hoje && f.getBlob().getDataAsString() !== '{}') { P.setProperty('BK', hoje); f.makeCopy('Náutilo · cópia ' + hoje);
+    const it = DriveApp.searchFiles("(title contains 'Náutilo · cópia ' or title contains 'Oceanum · cópia ') and trashed = false"), lista = []; while (it.hasNext()) lista.push(it.next());
+    lista.sort(function (a, b) { return b.getName().slice(-10) < a.getName().slice(-10) ? -1 : 1; }).slice(14).forEach(function (x) { x.setTrashed(true); }); }
   f.setContent(JSON.stringify(all)); }
 function out(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 // ---- e-mail: só lê o que pedires (assunto, remetente, início do texto); ações: lido, arquivar, spam, lixo, estrela ----
@@ -90,21 +90,21 @@ function rascunho_(id, b) { if (!id || !b) return { ok: false, msg: 'Falta o e-m
   const eu = String(Session.getEffectiveUser().getEmail() || '').toLowerCase(), ms = t.getMessages(); let m = ms[ms.length - 1];
   for (let i = ms.length - 1; i >= 0; i--) { if (String(ms[i].getFrom()).toLowerCase().indexOf(eu) < 0) { m = ms[i]; break; } }
   const d = m.createDraftReply(b.slice(0, 20000)); return { ok: true, id: d.getId() }; }
-// ---- Spyke pela Siri: o Oceanum envia o resumo do dia; o atalho lê-o em voz alta ----
+// ---- Spyke pela Siri: o Náutilo envia o resumo do dia; o atalho lê-o em voz alta ----
 function resumo_() { let b = {}; try { b = JSON.parse(PropertiesService.getScriptProperties().getProperty('BR') || '{}'); } catch (e) { }
   const hoje = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd');
   if (b.d === hoje && b.t) return b.t; if (b.d2 === hoje && b.t2) return b.t2;
-  return 'Ainda não tenho o resumo de hoje. Abre o Oceanum uma vez e eu fico atualizado.'; }
+  return 'Ainda não tenho o resumo de hoje. Abre o Náutilo uma vez e eu fico atualizado.'; }
 function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || '';
-  if (!q) return resumo_(); if (!gk) return 'Para te responder pela Siri, liga a IA no Oceanum e ativa as perguntas pela Siri nas definições do Spyke.';
+  if (!q) return resumo_(); if (!gk) return 'Para te responder pela Siri, liga a IA no Náutilo e ativa as perguntas pela Siri nas definições do Spyke.';
   const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
-  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Oceanum do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   const ms = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
   for (let i = 0; i < ms.length; i++) { try { const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + ms[i] + ':generateContent?key=' + encodeURIComponent(gk), { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } }) });
     if (r.getResponseCode() !== 200) continue; const j = JSON.parse(r.getContentText()), t = (((j.candidates || [])[0] || {}).content || {}).parts; if (t && t.length) return t.map(function (x) { return x.text || ''; }).join('').trim(); } catch (e) { } }
   return 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }
 // ---- mercado: Yahoo Finance (o teu script vai buscar; a app só recebe os números) ----
-const YH_ = ['https://query1.finance.yahoo.com', 'https://query2.finance.yahoo.com'], UA_ = { 'User-Agent': 'Mozilla/5.0 (Oceanum)' };
+const YH_ = ['https://query1.finance.yahoo.com', 'https://query2.finance.yahoo.com'], UA_ = { 'User-Agent': 'Mozilla/5.0 (Nautilo)' };
 function yget_(path) { for (let i = 0; i < YH_.length; i++) { try { const r = UrlFetchApp.fetch(YH_[i] + path, { muteHttpExceptions: true, headers: UA_ }); if (r.getResponseCode() === 200) return JSON.parse(r.getContentText()); } catch (e) { } } return null; }
 function cart_(j) { const r = j && j.chart && j.chart.result && j.chart.result[0]; if (!r || !r.meta) return null; const m = r.meta, q = (r.indicators && r.indicators.quote && r.indicators.quote[0]) || {}, c = (q.close || []).filter(function (x) { return x != null; });
   const per = m.currentTradingPeriod && m.currentTradingPeriod.regular, now = Date.now() / 1000, open = per ? now >= per.start && now < per.end : false, k = Math.max(1, Math.ceil(c.length / 80));
@@ -152,7 +152,7 @@ function agenda_(s) { const syms = s.split(',').filter(String).slice(0, 25), C =
 // ---- alertas de preço por email, mesmo com a app fechada ----
 // Corre UMA vez esta função no editor (▶ Executar) para ligar: pede autorização para enviar email e criar o temporizador.
 function ativarAlertas() { ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'verificarAlertas') ScriptApp.deleteTrigger(t); });
-  ScriptApp.newTrigger('verificarAlertas').timeBased().everyMinutes(15).create(); MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Oceanum · alertas ligados', 'Vais receber aqui os alertas de preço que criares no Oceanum (verificados a cada 15 minutos).'); }
+  ScriptApp.newTrigger('verificarAlertas').timeBased().everyMinutes(15).create(); MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Náutilo · alertas ligados', 'Vais receber aqui os alertas de preço que criares no Náutilo (verificados a cada 15 minutos).'); }
 function verificarAlertas() { const P = PropertiesService.getScriptProperties(); let al = []; try { al = JSON.parse(P.getProperty('AL') || '[]'); } catch (e) { return; }
   const ativos = al.filter(function (a) { return a.on; }); if (!ativos.length) return; const fired = JSON.parse(P.getProperty('ALF') || '{}'), hoje = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd');
   const q = cotacoes_(ativos.map(function (a) { return a.s; }).filter(function (x, i, l) { return l.indexOf(x) === i; }).join(',')), msgs = [];
@@ -166,7 +166,7 @@ function verificarAlertas() { const P = PropertiesService.getScriptProperties();
     if (a.k === 'dataex' && ag[a.s] && ag[a.s].ex) { const d = Utilities.formatDate(new Date(ag[a.s].ex * 1000), 'UTC', 'yyyy-MM-dd'), am = Utilities.formatDate(new Date(Date.now() + 864e5), 'Europe/Lisbon', 'yyyy-MM-dd'); if (d === am) hit = a.s + ': data-ex amanhã (' + d + '). Para receberes o dividendo tens de ter o ativo hoje.'; }
     if (hit) { msgs.push(hit + (a.n ? ' — ' + a.n : '')); fired[a.id] = hoje; } });
   P.setProperty('ALF', JSON.stringify(fired));
-  if (msgs.length) MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Oceanum · ' + (msgs.length === 1 ? msgs[0] : msgs.length + ' alertas de preço'), msgs.join('\\n') + '\\n\\nAbre o Oceanum para ver os detalhes.'); }
+  if (msgs.length) MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Náutilo · ' + (msgs.length === 1 ? msgs[0] : msgs.length + ' alertas de preço'), msgs.join('\\n') + '\\n\\nAbre o Náutilo para ver os detalhes.'); }
 // ---- jornal: Google Notícias (edição de cada país, temas e pesquisa), atualizado a cada poucos minutos ----
 function gnUrl_(f) { const ed = f.ed || 'hl=pt-PT&gl=PT&ceid=PT:pt-150';
   if (f.q) return 'https://news.google.com/rss/search?q=' + encodeURIComponent(f.q + ' when:2d') + '&' + ed;
@@ -190,16 +190,17 @@ function procura_(q, n) { if (!q) return { q: [], news: [] }; const C = CacheSer
     news: (j.news || []).map(function (x) { return { ti: x.title, l: x.link, pub: x.publisher, t: x.providerPublishTime }; }) };
   try { C.put(k, JSON.stringify(o), 600); } catch (e) { } return o; }
 `;
-// parte 3 (versão 11): vai num ficheiro novo, liga-se às partes 1 e 2 sem as mudar
-IB.addon = () => `// Oceanum · PARTE 3 (versão 11) — e-mail completo, responder e-mails, Google Agenda e leitura de páginas dentro da app.
+// parte 3 (versão 12): vai num ficheiro novo, liga-se às partes 1 e 2 sem as mudar
+IB.addon = () => `// Náutilo · PARTE 3 (versão 12) — e-mail completo, responder e-mails, Google Agenda e leitura de páginas dentro da app.
 // Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte3), por baixo do Código.gs e da Parte2. Não apagues as outras partes: esta liga-se a elas.
 // Esta função doGet substitui a da parte 1 (o Apps Script usa a do último ficheiro).
 const G_ = this;
 function doGet(e) {
   const p = e.parameter || {};
   if (p.k !== KEY) return out({ ok: false, msg: 'Chave errada' });
-  if (p.op === 'ping') return out({ ok: true, v: 11 });
-  // novidades futuras: um ficheiro novo com function op_nome(p) { ... } e o Oceanum chama-a com &op=nome (sem mexer nesta parte)
+  try { nautilo_(); } catch (er) { }
+  if (p.op === 'ping') return out({ ok: true, v: 12 });
+  // novidades futuras: um ficheiro novo com function op_nome(p) { ... } e o Náutilo chama-a com &op=nome (sem mexer nesta parte)
   if (/^[a-z0-9]{1,12}$/.test(p.op || '') && typeof G_['op_' + p.op] === 'function') return out(G_['op_' + p.op](p));
   // ---- cotações em tempo real (Yahoo Finance) para os Investimentos ----
   if (p.op === 'q') return out({ ok: true, q: cotacoes_(String(p.s || '')) });
@@ -210,7 +211,7 @@ function doGet(e) {
   if (p.op === 'nw') { let fs = []; try { fs = JSON.parse(p.f || '[]'); } catch (e) { } return out({ ok: true, nw: noticias_(fs.slice(0, 10)) }); }
   if (p.op === 'al') { PropertiesService.getScriptProperties().setProperty('AL', String(p.j || '[]').slice(0, 8500)); const on = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'verificarAlertas'; }); return out({ ok: true, ativo: on }); }
   if (p.op === 'c') return out({ ok: true, c: agenda_(String(p.s || '')) });
-  // ---- e-mail (Gmail) e LinkedIn (pelas notificações no Gmail), para o resumo do Oceanum ----
+  // ---- e-mail (Gmail) e LinkedIn (pelas notificações no Gmail), para o resumo do Náutilo ----
   if (p.op === 'gm') return out({ ok: true, gm: correio_(String(p.q || ''), Number(p.n || 30)) });
   if (p.op === 'ga') return out({ ok: true, n: acaoCorreio_(String(p.a || ''), String(p.ids || '')) });
   if (p.op === 'dr') return out(rascunho_(String(p.id || ''), String(p.b || '')));
@@ -225,7 +226,7 @@ function doGet(e) {
   if (p.op === 'br') { const P = PropertiesService.getScriptProperties(); P.setProperty('BR', String(p.j || '{}').slice(0, 8500)); P.setProperty('CX', String(p.cx || '').slice(0, 8500)); if (p.gk) P.setProperty('GK', String(p.gk).slice(0, 120)); else if (p.nogk) P.deleteProperty('GK'); return out({ ok: true }); }
   if (p.op === 'brief') return ContentService.createTextOutput(resumo_());
   if (p.op === 'ask') return ContentService.createTextOutput(pergunta_(String(p.q || '')));
-  // ---- sincronização: os dados do Oceanum num ficheiro do teu Google Drive ----
+  // ---- sincronização: os dados do Náutilo num ficheiro do teu Google Drive ----
   if (p.op === 'list') { const all = dados_(); const m = {}; Object.keys(all).forEach(function (id) { m[id] = all[id].t || 0; }); return out({ ok: true, docs: m }); }
   if (p.op === 'get') { const all = dados_(), ids = String(p.ids || '').split(',').filter(String); const o = {}; (ids.length ? ids : Object.keys(all)).forEach(function (id) { if (all[id]) o[id] = all[id]; }); return out({ ok: true, docs: o }); }
   if (p.op === 'put') { const L = LockService.getScriptLock(); L.waitLock(20000);
@@ -247,7 +248,7 @@ function doGet(e) {
   const txt = String(p.v || '') + ' ', m = txt.match(/\\d+(?:[.,]\\d+)?/), v = m ? Number(m[0].replace(',', '.')) : 0;
   if (!(v > 0)) return out({ ok: false, msg: 'Valor inválido' });
   sh.appendRow([Utilities.getUuid(), new Date().toISOString(), v, p.d || '', p.c || '', '', '']);
-  return ContentService.createTextOutput('✓ ' + v.toFixed(2).replace('.', ',') + ' € registado no Oceanum');
+  return ContentService.createTextOutput('✓ ' + v.toFixed(2).replace('.', ',') + ' € registado no Náutilo');
 }
 // ---- versão 11: e-mail completo, responder, Google Agenda e leitura de páginas ----
 // Corre UMA vez esta função no editor (▶ Executar) para dar todas as autorizações de uma vez.
@@ -263,9 +264,19 @@ function criarEvento_(p) { const t = String(p.t || '').slice(0, 200), d = String
   if (!/^\\d\\d:\\d\\d$/.test(p.h || '')) { c.createAllDayEvent(t, new Date(d + 'T00:00:00')); return { ok: true }; }
   const s = new Date(d + 'T' + p.h + ':00'), e = /^\\d\\d:\\d\\d$/.test(p.f || '') ? new Date(d + 'T' + p.f + ':00') : new Date(s.getTime() + 3600000); c.createEvent(t, s, e, { location: String(p.l || '').slice(0, 200) }); return { ok: true }; }
 function buscar_(u) { if (!/^https?:\\/\\/[^\\s]+$/.test(u)) return { ok: false, msg: 'Endereço inválido' }; try { const r = UrlFetchApp.fetch(u, { muteHttpExceptions: true, followRedirects: true, headers: UA_ }); return { ok: true, code: r.getResponseCode(), ct: String(r.getHeaders()['Content-Type'] || ''), t: r.getContentText().slice(0, 1500000) }; } catch (e) { return { ok: false, msg: String(e.message || e).slice(0, 200) }; } }
+
+// ---- versão 12: o app passou a chamar-se Náutilo. Uma só vez, muda o nome do que está no teu Google (o ficheiro de dados e as cópias,
+// a folha dos gastos, a pasta dos ficheiros e os calendários). Cada coisa é encontrada pelo seu código interno: nada se perde nem se duplica.
+function nautilo_() { const P = PropertiesService.getScriptProperties(); if (P.getProperty('NAUTILO') === '1') return; const novo = function (n) { return String(n || '').replace(/^Oceanum/, 'Náutilo'); }, antigo = function (n) { return /^Oceanum/.test(String(n || '')); };
+  try { const id = P.getProperty('DATA'); if (id) { const f = DriveApp.getFileById(id); if (antigo(f.getName())) f.setName(novo(f.getName())); } } catch (e) { }
+  try { const it = DriveApp.searchFiles("title contains 'Oceanum · cópia ' and trashed = false"); let n = 0; while (it.hasNext() && n++ < 40) { const x = it.next(); x.setName(novo(x.getName())); } } catch (e) { }
+  try { const id = P.getProperty('SHEET'); let ss = null; if (id) ss = SpreadsheetApp.openById(id); else { try { ss = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { } } if (ss && antigo(ss.getName())) ss.rename(novo(ss.getName())); } catch (e) { }
+  try { const id = P.getProperty('F_ROOT'); if (id) { const f = DriveApp.getFolderById(id); if (antigo(f.getName())) f.setName(novo(f.getName())); } } catch (e) { }
+  P.getKeys().filter(function (k) { return k === 'OC_CAL' || /^OC7_[a-z]+$/.test(k); }).forEach(function (k) { try { const c = CalendarApp.getCalendarById(P.getProperty(k)); if (c && antigo(c.getName())) { c.setName(novo(c.getName())); try { c.setDescription('Criado pelo Náutilo: o que registas na app aparece aqui.'); } catch (e) { } } } catch (e) { } });
+  P.setProperty('NAUTILO', '1'); }
 `;
 // parte 4: Outlook da faculdade (Microsoft 365) e IA sem limites na Siri — também num ficheiro novo
-IB.addon4 = () => `// Oceanum · PARTE 4 — Outlook da faculdade (Microsoft 365) e IA sem limites nas perguntas pela Siri.
+IB.addon4 = () => `// Náutilo · PARTE 4 — Outlook da faculdade (Microsoft 365) e IA sem limites nas perguntas pela Siri.
 // Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte4), por baixo das outras. Não apagues nada: liga-se às partes 1, 2 e 3.
 // Depois: Implantar → Gerenciar implantações → lápis → Nova versão → Implantar.
 const OL_SCOPE_ = 'offline_access User.Read Mail.Read Mail.Send';
@@ -284,7 +295,7 @@ function olCallback(req) { const p = (req && req.parameter) || {}, P = Propertie
   const r = olToken_({ grant_type: 'authorization_code', code: p.code, redirect_uri: olRedirect_() });
   if (!r.ok) { P.setProperty('OL_ERR', r.msg); return olPage_('Não foi possível ligar o Outlook', r.msg); }
   let user = ''; try { const me = JSON.parse(UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/me?$select=mail,userPrincipalName', { headers: { Authorization: 'Bearer ' + r.at }, muteHttpExceptions: true }).getContentText()); user = me.mail || me.userPrincipalName || ''; } catch (e) { }
-  P.setProperty('OL_USER', user); P.deleteProperty('OL_ERR'); return olPage_('Outlook ligado ✓', (user ? user + ' · ' : '') + 'Podes fechar esta janela e voltar ao Oceanum.'); }
+  P.setProperty('OL_USER', user); P.deleteProperty('OL_ERR'); return olPage_('Outlook ligado ✓', (user ? user + ' · ' : '') + 'Podes fechar esta janela e voltar ao Náutilo.'); }
 function olToken_(extra) { const P = PropertiesService.getScriptProperties(), ten = P.getProperty('OL_TEN') || 'organizations';
   const body = { client_id: P.getProperty('OL_ID'), client_secret: P.getProperty('OL_SEC'), scope: OL_SCOPE_ }; Object.keys(extra).forEach(function (k) { body[k] = extra[k]; });
   const r = UrlFetchApp.fetch('https://login.microsoftonline.com/' + ten + '/oauth2/v2.0/token', { method: 'post', payload: body, muteHttpExceptions: true });
@@ -317,12 +328,12 @@ function iaModelos_(gk) { const C = CacheService.getScriptCache(), h = C.get('IA
   C.put('IA_MS', JSON.stringify(ms.slice(0, 8)), 21600); return ms.slice(0, 8); }
 function iaTexto_(prompt, gk) { if (gk) { const ms = iaModelos_(gk); for (let i = 0; i < ms.length; i++) { try { const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + ms[i] + ':generateContent?key=' + encodeURIComponent(gk), { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } }) });
       if (r.getResponseCode() !== 200) continue; const t = ((((JSON.parse(r.getContentText()).candidates || [])[0] || {}).content || {}).parts || []).map(function (x) { return x.text || ''; }).join('').trim(); if (t) return t; } catch (e) { } } }
-  try { const r = UrlFetchApp.fetch('https://text.pollinations.ai/openai', { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ model: 'openai', private: true, referrer: 'oceanum', messages: [{ role: 'user', content: prompt }] }) });
+  try { const r = UrlFetchApp.fetch('https://text.pollinations.ai/openai', { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ model: 'openai', private: true, referrer: 'nautilo', messages: [{ role: 'user', content: prompt }] }) });
     if (r.getResponseCode() === 200) { const m = ((JSON.parse(r.getContentText()).choices || [])[0] || {}).message || {}; return String(m.content || '').trim(); } } catch (e) { }
   return ''; }
 function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || ''; if (!q) return resumo_();
   const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
-  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Oceanum do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
 // o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
 IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4() + (IB.addon5 ? '\n' + IB.addon5() : '') + (IB.addon6 ? '\n' + IB.addon6() : '') + (IB.addon7 ? '\n' + IB.addon7() : '');
@@ -394,29 +405,29 @@ IB.check = async () => { const u = base(), c = cfg();
 const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base());
   return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3><span class="mut" style="font-size:12px">${c.n ? c.n + ' gastos importados' : ''}</span></div>
   ${c.url && c.key ? `<div class="ib-now"><button class="btn sm pri" data-act="ibTest">${UI.ic('sync')}Ir buscar gastos agora</button><span class="mut">${c.last ? 'última verificação: ' + new Date(c.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não verificou'}${c.err ? ' · <span class="neg">' + esc(c.err) + '</span>' : ''}</span></div>` : ''}
-  <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado, sem abrir o Oceanum. Precisa de uma folha Google tua como caixa de entrada (grátis, uma vez só).</p>
+  <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado, sem abrir o Náutilo. Precisa de uma folha Google tua como caixa de entrada (grátis, uma vez só).</p>
   <div class="ib-w">
     <div class="ib-s ${c.key ? 'done' : ''}"><i>1</i><div><b>Copiar o código</b><p>Toca no botão: o código fica copiado.</p><button class="btn sm pri" data-act="ibCopy" data-t="code">${UI.ic('link')}Copiar código</button>
       <p>Depois, no <b>Chrome</b> (não na app do Sheets), abre <a class="acc" href="https://script.google.com/create" target="_blank" rel="noopener"><b>script.google.com/create</b></a>. Se aparecer em versão de telemóvel ou abrir uma app: menu <b>⋮ → Site para computador</b> (no iPhone: <b>aA → Pedir site para computador</b>).</p>
-      <p>Apaga o texto que lá está (<code>function myFunction…</code>) → cola o código → <b>💾 Guardar</b>. Não precisas de criar folha nenhuma: o script cria a "Oceanum · Gastos" sozinho.</p>
+      <p>Apaga o texto que lá está (<code>function myFunction…</code>) → cola o código → <b>💾 Guardar</b>. Não precisas de criar folha nenhuma: o script cria a "Náutilo · Gastos" sozinho.</p>
       <p class="mut">Se tiveres várias contas Google, usa uma janela anónima e entra só com uma.</p></div></div>
     <div class="ib-s ${st.ok ? 'done' : ''}"><i>2</i><div><b>Publicar e colar o endereço</b><p>No Apps Script: <b>Implementar → Nova implementação</b> → ⚙ tipo <b>Aplicação Web</b> → Executar como: <b>Eu</b> → Quem tem acesso: <b>Qualquer pessoa</b> → <b>Implementar</b> → <b>Autorizar acesso</b> → escolhe a tua conta → "Avançadas" → "Aceder a (não seguro)" → <b>Permitir</b>. Copia o <b>URL da aplicação Web</b> (termina em <code>/exec</code>):</p>
       <div class="ib-url"><input class="field" id="ibUrl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(c.url || '')}" aria-label="URL da aplicação Web" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn sm pri" data-act="ibSave">Verificar</button></div>
       ${st.m ? `<div class="ib-st ${st.ok ? 'ok' : 'bad'}">${st.ok ? '✓' : '✗'} ${esc(st.m)}</div>` : ''}</div></div>
-    <div class="ib-s ${IB.testDone ? 'done' : ''}"><i>3</i><div><b>Testar como o atalho</b><p>Envia um gasto de teste e confirma que o Oceanum o recebe (não fica nas tuas finanças).</p><button class="btn sm" data-act="ibRound" ${st.ok ? '' : 'disabled'}>Testar agora</button>${IB.testMsg ? `<div class="ib-st ${IB.testDone ? 'ok' : 'bad'}">${esc(IB.testMsg)}</div>` : ''}</div></div>
+    <div class="ib-s ${IB.testDone ? 'done' : ''}"><i>3</i><div><b>Testar como o atalho</b><p>Envia um gasto de teste e confirma que o Náutilo o recebe (não fica nas tuas finanças).</p><button class="btn sm" data-act="ibRound" ${st.ok ? '' : 'disabled'}>Testar agora</button>${IB.testMsg ? `<div class="ib-st ${IB.testDone ? 'ok' : 'bad'}">${esc(IB.testMsg)}</div>` : ''}</div></div>
     <div class="ib-s"><i>4</i><div><b>Criar o atalho (3 ações)</b><p>App <b>Atalhos</b> → <b>+</b> → nome "Gasto". Adiciona:</p>
       <div class="ib-sc"><div><b>1 · Pedir entrada</b> → toca em "Texto" e muda para <b>Número</b> → pergunta: <i>Quanto gastaste?</i></div><div><b>2 · Pedir entrada</b> → Texto → pergunta: <i>Em quê?</i></div><div><b>3 · Obter conteúdo do URL</b> → no URL cola o <b>link abaixo</b> → toca em ▸ (mostrar mais) → Método: <b>POST</b> → Corpo do pedido: <b>Formulário</b> → <b>Adicionar campo → Texto</b>:<br>&nbsp;&nbsp;chave <code>v</code> · valor: toca e escolhe <b>Entrada fornecida</b> (a 1.ª)<br>&nbsp;&nbsp;chave <code>d</code> · valor: <b>Entrada fornecida</b> (a 2.ª)</div><div><b>4 · Mostrar resultado</b> (opcional) → <b>Conteúdo do URL</b></div></div>
       ${ready ? `<div class="ib-link"><code>${esc(q(''))}</code><button class="btn sm pri" data-act="ibCopy" data-t="link">Copiar link</button></div>` : '<p class="mut">O link aparece depois do passo 2.</p>'}
-      <p>Toca em ▶️ para experimentar: deve aparecer "✓ … registado no Oceanum".</p></div></div>
+      <p>Toca em ▶️ para experimentar: deve aparecer "✓ … registado no Náutilo".</p></div></div>
     <div class="ib-s"><i>5</i><div><b>Pôr no Centro de Controlo</b><p>Abre o Centro de Controlo → <b>+</b> (canto superior esquerdo) → <b>Adicionar controlo</b> → pesquisa <b>Atalhos</b> → toca em <b>Atalho</b> → <b>Escolher</b> → "Gasto". Também podes pô-lo no <b>botão de Ação</b> ou no ecrã principal.</p></div></div>
   </div>
-  <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças sempre que abres o Oceanum, com a categoria adivinhada pela descrição (Uber → Transporte, café → Alimentação) e a etiqueta <i>atalho</i>.</p></div>`; };
+  <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças sempre que abres o Náutilo, com a categoria adivinhada pela descrição (Uber → Transporte, café → Alimentação) e a etiqueta <i>atalho</i>.</p></div>`; };
 const syncPanel = () => { const c = cfg(), SY = window.OceanumSync || {}, on = !!SY.on, ready = !!(c.url && c.key), v3 = (c.ver || 0) >= 3 && c.drive !== 0, st = IB.st || {};
   const t = SY.last ? new Date(SY.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '';
   return `<div class="pn" id="syncPn"><div class="pn-h"><h3>Sincronizar aparelhos</h3><span class="${on && !SY.err ? 'pos' : 'mut'}" style="font-size:12px">${on ? esc(SY.state || '') + (t ? ' · ' + t : '') : 'desligada'}</span></div>
-  <p class="mut" style="margin:0 0 12px">Uma só conta: o que fazes no telemóvel aparece no tablet e vice-versa. Os dados ficam no teu Google Drive ("Oceanum · dados.json"), com uma cópia de segurança por dia.</p>
+  <p class="mut" style="margin:0 0 12px">Uma só conta: o que fazes no telemóvel aparece no tablet e vice-versa. Os dados ficam no teu Google Drive ("Náutilo · dados.json"), com uma cópia de segurança por dia.</p>
   ${on ? `<div class="ib-st ${SY.err ? 'bad' : 'ok'}">${SY.err ? '✗ ' + esc(SY.err) + ' — os dados ficam guardados aqui e são enviados quando a ligação voltar.' : '✓ Ligada neste aparelho.'}</div>
-    <div class="ib-s"><i>+</i><div><b>Ligar outro aparelho</b><p>Copia o código e abre-o no outro aparelho (manda para ti por WhatsApp ou email). No outro aparelho: Oceanum → Definições → Sincronizar aparelhos → cola o código → <b>Ligar</b>. É como uma palavra-passe: não o partilhes.</p><button class="btn sm pri" data-act="syCopy">${UI.ic('link')}Copiar código de ligação</button></div></div>
+    <div class="ib-s"><i>+</i><div><b>Ligar outro aparelho</b><p>Copia o código e abre-o no outro aparelho (manda para ti por WhatsApp ou email). No outro aparelho: Náutilo → Definições → Sincronizar aparelhos → cola o código → <b>Ligar</b>. É como uma palavra-passe: não o partilhes.</p><button class="btn sm pri" data-act="syCopy">${UI.ic('link')}Copiar código de ligação</button></div></div>
     <p style="margin:10px 0 0"><button class="btn sm ghost" data-act="syOff">Desligar a sincronização neste aparelho</button></p>`
   : `<div class="ib-w">
     <div class="ib-s sy-rec"><i>↺</i><div><b>Já tinhas a sincronização ligada (ou mudaste de endereço)?</b><p>Os teus dados estão no teu Google Drive. Recupera-os neste aparelho com o endereço e a chave do teu script Google (os passos aparecem ao tocar).</p><button class="btn sm pri" data-act="mvWelcome">Recuperar os meus dados</button></div></div>
@@ -439,7 +450,7 @@ IB.MAXP = 12000;
 // as partes 1 e 2 (o núcleo, igual desde a versão 10) cortam-se ao meio numa linha de topo; a parte 3 é o ficheiro das novidades
 IB.parts = key => { const L = IB.core(key).split('\n'), half = L.join('\n').length / 2, out = []; let cur = [], n = 0, cut = false;
   L.forEach(l => { if (!cut && n > half && /^(function |\/\/ ---- |const )/.test(l)) { out.push(cur); cur = []; cut = true; } cur.push(l); n += l.length + 1; });
-  out.push(cur); return out.map((c, i) => (i ? `// Oceanum · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4(), IB.addon5 ? IB.addon5() : [], IB.addon6 ? IB.addon6() : [], IB.addon7 ? IB.addon7() : []); };
+  out.push(cur); return out.map((c, i) => (i ? `// Náutilo · parte ${i + 1} do código (fica num ficheiro à parte no mesmo projeto)\n` : '') + c.join('\n') + '\n').concat(IB.addon(), IB.addon4(), IB.addon5 ? IB.addon5() : [], IB.addon6 ? IB.addon6() : [], IB.addon7 ? IB.addon7() : []); };
 IB.partsHelp = () => { const n = IB.parts(cfg().key || 'x').length; return { n, files: Array.from({ length: n }, (_, i) => i ? 'Parte' + (i + 1) : 'Código.gs') }; };
 const partsBtns = (cls = 'btn pri', from = 0, to = 99) => { const { n, files } = IB.partsHelp(); return Array.from({ length: n }, (_, i) => i < from || i > to ? '' : `<button class="${cls}" data-act="ibCopy" data-t="p${i + 1}">${UI.ic('link')}Copiar parte ${i + 1}${i ? ' (' + files[i] + ')' : ' (Código.gs)'}</button>`).join(''); };
 IB.partsBtns = partsBtns;
@@ -462,15 +473,23 @@ IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.ke
     [2, 'Parte 3 · ficheiro Parte3', 'E-mail completo dentro da app, Agenda Google e leitor de notícias.', on && v >= 11],
     [3, 'Parte 4 · ficheiro Parte4', 'Outlook da faculdade (separado por matéria) e IA sem limites nas perguntas pela Siri.', has4],
     [4, 'Parte 5 · ficheiro Parte5', 'Ficheiros na nuvem: PDFs e documentos da Universidade e dos Cursos no teu Google Drive.', !!(OS.Files && OS.Files.has5())],
-    [5, 'Parte 6 · ficheiro Parte6', 'A tua agenda do Oceanum no Google Calendar e no Calendário do iPhone: tudo o que está no Calendário (trabalho, folgas, compromissos, aulas, provas…).' + (has7 && !has6 ? ' Não precisas dela: a Parte 7 já faz isto.' : ''), has6 || has7],
+    [5, 'Parte 6 · ficheiro Parte6', 'A tua agenda do Náutilo no Google Calendar e no Calendário do iPhone: tudo o que está no Calendário (trabalho, folgas, compromissos, aulas, provas…).' + (has7 && !has6 ? ' Não precisas dela: a Parte 7 já faz isto.' : ''), has6 || has7],
     [6, 'Parte 7 · ficheiro Parte7', 'Cores na agenda lá fora: cada tipo no seu calendário, com uma cor pastel (Trabalho azul, Folgas verde, Tarefas amarelo, Estudos lavanda, Compromissos rosa…). Já inclui o que a Parte 6 faz.', has7]];
   const has5 = !!(OS.Files && OS.Files.has5()), nx = on && v < 11 ? 3 : !has4 ? 4 : !has5 ? 5 : !has7 ? 7 : 0, done = !nx;
-  const WHY = { 3: 'Traz o e-mail completo, a Agenda Google e as notícias.', 4: 'Traz o Outlook da faculdade e a IA sem limites na Siri.', 5: 'Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive.', 6: 'Põe tudo o que está no Calendário do Oceanum no teu Google Calendar e no Calendário do iPhone (o trabalho da escala importada também). Depois de a colares, liga-se sozinho.', 7: 'Põe tudo o que está no Calendário do Oceanum no teu Google Calendar e no Calendário do iPhone, com uma cor pastel para cada tipo: Trabalho azul, Folgas verde, Tarefas amarelo, Estudos lavanda, Compromissos rosa, Treino e rotina pêssego. Liga-se sozinho e o que já lá estava muda para a cor certa.' };
-  return `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ O teu script tem todas as partes' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : nx === 5 ? !IB._p5d : nx >= 6 ? !IB._p6d : false) : ''}</div>
+  const WHY = { 3: 'Traz o e-mail completo, a Agenda Google e as notícias.', 4: 'Traz o Outlook da faculdade e a IA sem limites na Siri.', 5: 'Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive.', 6: 'Põe tudo o que está no Calendário do Náutilo no teu Google Calendar e no Calendário do iPhone (o trabalho da escala importada também). Depois de a colares, liga-se sozinho.', 7: 'Põe tudo o que está no Calendário do Náutilo no teu Google Calendar e no Calendário do iPhone, com uma cor pastel para cada tipo: Trabalho azul, Folgas verde, Tarefas amarelo, Estudos lavanda, Compromissos rosa, Treino e rotina pêssego. Liga-se sozinho e o que já lá estava muda para a cor certa.' };
+  // o app passou a chamar-se Náutilo: a Parte 3 versão 12 muda o nome do que está no Google (ficheiro, cópias, folha, pasta e calendários)
+  const ren = on && v >= 10 && v < 12 ? `<div class="pn sc-ren" id="nautilo"><div class="pn-h"><h3>Passar o teu Google para o nome Náutilo</h3><span class="bdg warn">versão 12</span></div>
+    <p class="mut" style="margin:0 0 8px">O app agora chama-se Náutilo. Copia outra vez as partes 1, 2 e 3 e cola-as por cima das que tens. Na primeira ligação, o script muda sozinho o nome do ficheiro de sincronização e das cópias, da folha dos gastos, da pasta dos ficheiros e dos calendários (no Google e no iPhone). Cada coisa é encontrada pelo seu código interno: nada se perde nem se duplica.</p>
+    <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', 0, 2)}</div></li>
+      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto → cola cada parte no seu ficheiro (<b>Código.gs</b>, <b>Parte2</b>, <b>Parte3</b>, a substituir o que lá está) → <b>Guardar</b>. Aproveita e muda o nome do projeto (em cima, à esquerda) para <b>Náutilo</b>.</li>
+      <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>. O endereço e a chave não mudam.</li>
+      <li>Volta aqui e toca em <b>Verificar</b>: quando disser versão 12, está tudo com o nome novo.</li></ol>
+    <small class="mut">As partes 4 a 7 podes colar outra vez quando quiseres (só mudam textos); o que elas criaram já fica renomeado pela Parte 3.</small></div>` : '';
+  return ren + `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ O teu script tem todas as partes' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : nx === 5 ? !IB._p5d : nx >= 6 ? !IB._p6d : false) : ''}</div>
     ${!on ? `<p class="mut" style="margin:0 0 8px">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ''}
     ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nem mudas nada das outras partes. ${WHY[nx] || ''}</p>
     <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', nx - 1, nx - 1)}</div></li>
-      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Oceanum (no iPhone: <b>aA → Pedir site para computador</b>).</li>
+      <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Náutilo (no iPhone: <b>aA → Pedir site para computador</b>).</li>
       <li><b>Arquivos → +</b> → <b>Script</b> → nome <b>Parte${nx}</b> → apaga o que vier lá escrito → cola → <b>Guardar</b>. Se a Parte${nx} já existir, abre-a e substitui o conteúdo.</li>
       <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>.${tail ? ` Se houver mais de uma, edita a que termina em <code>…${tail}</code>.` : ''}${nx === 5 ? ' Se pedir, autoriza o acesso ao Google Drive.' : nx >= 6 ? ' Se pedir, autoriza o acesso à Agenda (Google Calendar).' : ''}</li>
       <li>Volta aqui e toca em <b>Verificar</b>. Se continuar a dizer "falta", a Parte${nx} tem de ficar <b>por baixo</b> da Parte${nx - 1} na lista de ficheiros (⋮ → Mover para baixo) e repete o passo 4.</li></ol>`}
@@ -494,7 +513,7 @@ A.ibSave = async () => { const el = document.getElementById('ibUrl'), c = cfg();
 A.ibRound = async () => { IB.testMsg = 'A enviar o teste…'; IB.testDone = false; IB.testOk = false; OS.request();
   try { await fetch(q('&v=0.01&d=__teste__')); } catch (e) { }
   await new Promise(r => setTimeout(r, 1200)); await IB.pull(false);
-  IB.testDone = !!IB.testOk; IB.testMsg = IB.testOk ? '✓ Funcionou: o Oceanum recebeu o teste. Já podes criar o atalho.' : '✗ O teste não chegou. Volta ao passo 2 e carrega em Verificar.'; OS.request(); };
+  IB.testDone = !!IB.testOk; IB.testMsg = IB.testOk ? '✓ Funcionou: o Náutilo recebeu o teste. Já podes criar o atalho.' : '✗ O teste não chegou. Volta ao passo 2 e carrega em Verificar.'; OS.request(); };
 A.ibTest = () => IB.pull(true);
 IB.clean = d => { const t = String(d || '').replace(/(^|\s)[-+]?\d+(?:[.,]\d+)?\s*(?:€|eur|euros?|r\$|reais|usd|\$)?\s*[,;:\-–]?(?=\s|$)/i, ' ').replace(/\s+/g, ' ').trim(); return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; };
 OS.on('ready', () => { try { OS.all('transactions').filter(t => (t.tags || []).includes('atalho') && /\d/.test(t.desc || '')).forEach(t => { const nd = IB.clean(t.desc); if (nd && nd !== t.desc) OS.upd('transactions', t.id, { desc: nd }, { silent: true }); }); } catch (e) { } });

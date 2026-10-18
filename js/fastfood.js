@@ -1,4 +1,4 @@
-/* OCEANUM — fast food por cadeia e país. Valores por unidade/dose (médias das tabelas oficiais das cadeias; variam um pouco por país).
+/* NÁUTILO — fast food por cadeia e país. Valores por unidade/dose (médias das tabelas oficiais das cadeias; variam um pouco por país).
    [cadeia, produto, kcal, proteína, hidratos, gordura, gramas, países ('*' = quase todos)] */
 OS.FastFood = [
   ['McDonald\'s', 'Big Mac', 508, 26, 42, 25, 219, '*'], ['McDonald\'s', 'Cheeseburger', 302, 15, 31, 12, 118, '*'], ['McDonald\'s', 'Hambúrguer', 254, 13, 30, 9, 104, '*'],

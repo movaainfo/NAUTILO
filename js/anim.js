@@ -1,4 +1,4 @@
-/* OCEANUM — animações dos exercícios: boneco articulado (vista de lado ou de frente), equipamento e músculo-alvo em destaque.
+/* NÁUTILO — animações dos exercícios: boneco articulado (vista de lado ou de frente), equipamento e músculo-alvo em destaque.
    Cada padrão de movimento tem duas poses (início e fim); a animação vai e volta entre elas, como no Hevy. */
 (() => {
 'use strict';

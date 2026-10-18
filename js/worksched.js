@@ -1,5 +1,5 @@
-/* OCEANUM — Trabalho+: folgas, horário semanal, horário a partir de FOTO (IA lê a escala e atualiza só os dias futuros
-   do período indicado) e projetos de trabalho (ligados aos Projetos e Tarefas do Oceanum). */
+/* NÁUTILO — Trabalho+: folgas, horário semanal, horário a partir de FOTO (IA lê a escala e atualiza só os dias futuros
+   do período indicado) e projetos de trabalho (ligados aos Projetos e Tarefas do Náutilo). */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc, today = () => U.today();
@@ -55,7 +55,7 @@ A.wsApply = () => { const t = today(), from = OS.ui.wsFrom || t, to = OS.ui.wsTo
   if (OS.CalPush) OS.CalPush.soon(1500); // a escala importada vai logo também para o Google Calendar / iPhone
   UI.toast(`Semana atualizada: ${R.filter(x => !x.off).length} turnos e ${R.filter(x => x.off).length} folgas${OS.CalPush && OS.one('calx').on ? ' (e no Google Calendar)' : ''}`, 'pos'); IM = { files: [], busy: false, err: '', res: null }; OS.setUI('wsW', 0); location.hash = 'trabalho.horario'; };
 
-/* ---------- projetos de trabalho (são Projetos do Oceanum do tipo Profissional) ---------- */
+/* ---------- projetos de trabalho (são Projetos do Náutilo do tipo Profissional) ---------- */
 const isWork = p => ['Profissional', 'Empresarial'].includes(p.type) || p.area === 'Trabalho';
 W.projetos = () => { const P = OS.all('projects').filter(isWork), act = P.filter(p => !['Concluído', 'Cancelado'].includes(p.status)), Proj = OS.Proj;
   return `<div class="row gap8" style="flex-wrap:wrap;margin-bottom:10px">${UI.addBtn('projects', 'Projeto de trabalho', { type: 'Profissional', status: 'Em andamento', area: 'Trabalho' })}<a class="btn ghost" href="#projetos">Todos os projetos</a><span class="mut" style="font-size:12.5px;align-self:center">São os mesmos projetos da aba Projetos e Tarefas — mudar aqui muda lá.</span></div>
