@@ -3210,7 +3210,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.29", "date": "21/10/2026", "notes": ["Contas Náutilo: qualquer pessoa pode criar a sua conta com e-mail e senha e usar o Náutilo. Os dados ficam guardados na conta, cifrados, e aparecem iguais no telemóvel e no computador.", "Perfis como na Netflix: até 5 perfis em cada conta, cada um com nome, avatar, cor, código de bloqueio e os seus próprios dados. A bolinha do perfil fica na barra de cima: toca para trocar de perfil ou ver a conta.", "O ecrã de bloqueio é o mesmo de sempre, com o código de cada perfil e \"Trocar de perfil\". Esqueceste o código? Mudas com a senha da conta.", "Definições › Conta e perfis: mudar a senha, código de recuperação novo, sincronizar agora, sair dos outros aparelhos e apagar a conta.", "Esqueceste a senha? Ao criar a conta recebes um código de recuperação (guarda-o); com ele escolhes uma senha nova.", "As contas novas começam limpas, com o nome de quem as criou: sem nada do perfil do Ryan (disciplinas, contactos, metas, marcos do Dominus, textos da IA).", "O teu Náutilo pessoal (este aparelho) continua exatamente igual: o mesmo código, os mesmos dados, a mesma sincronização pelo Google Drive.", "Mundo › Ilhas: a lista abre no grupo de Portugal (a página fica mais rápida); \"Todas\" mostra as 191."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.29", "date": "21/10/2026", "notes": ["Contas Náutilo: qualquer pessoa pode criar a sua conta com e-mail e senha. Os dados ficam na conta, cifrados, e aparecem iguais no telemóvel e no computador.", "Perfis como na Netflix: até 5 perfis em cada conta, cada um com nome, avatar, cor, código de bloqueio e os seus próprios dados. A bolinha do perfil fica na barra de cima: toca para trocar de perfil ou ver a conta.", "O ecrã de bloqueio é o mesmo de sempre, com o código de cada perfil e \"Trocar de perfil\". Esqueceste o código? Mudas com a senha da conta.", "Definições › Conta e perfis: mudar a senha, código de recuperação novo, sincronizar agora, sair dos outros aparelhos e apagar a conta. Esqueceste a senha? Usa o código de recuperação que recebes ao criar a conta.", "O teu Náutilo pessoal: em Definições › Geral › Conta Náutilo tocas em \"Criar conta e guardar\" e tudo o que tens (dados, metas, jogo, definições, ligações) vai para a tua conta, com o mesmo código. Os outros aparelhos mostram \"Entrar na conta\".", "Contas novas começam limpas, com o nome de quem as criou: sem nada do perfil do Ryan. As funcionalidades são as mesmas para todos: o atalho de gastos do iPhone funciona com um link do perfil (sem script Google) e o Jornal busca as notícias pelo servidor do Náutilo.", "Mundo › Ilhas: a lista abre no grupo de Portugal (a página fica mais rápida); \"Todas\" mostra as 191."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -3483,6 +3483,8 @@ function payloadFor(docId) {
   return { items: OS.all(c).filter(r => String(r._s || 0) === s) };
 }
 function flush() {
+  // a limpar o aparelho (sair da conta, trocar de perfil): nada volta a ser gravado até recarregar
+  if (OS.noSave) { dirty.clear(); return; }
   // divide shards grandes demais
   [...dirty].forEach(id => {
     const [c, s] = id.split('~'); if (c === 'one') return;
@@ -3951,12 +3953,12 @@ OS.ONE_DEF.fin = { cats: {
 } };
 OS.ONE_DEF.fit = { split: { 1: 'Peito & Tríceps', 2: 'Costas & Bíceps', 3: 'Pernas', 4: 'Ombros & Core', 5: 'Full Body', 6: 'Corrida', 0: 'Mobilidade' } };
 // quem usa a app: no modo pessoal é o Ryan (os textos de sempre); numa conta é o nome do perfil e o que ele disser (cidade, curso, trabalho)
-OS.who = () => OS.one('profile').short || (OS.Acc && OS.Acc.on ? 'o utilizador' : 'Ryan');
+OS.who = () => OS.one('profile').short || (OS.Acc && OS.Acc.pub ? 'o utilizador' : 'Ryan');
 const whoBits = () => { const p = OS.one('profile'); return [p.city && 'vive em ' + p.city, p.uni && 'estuda em ' + p.uni + (p.course ? ', ' + p.course : ''), p.jobRole && 'trabalha como ' + p.jobRole].filter(Boolean); };
-OS.whoCtx = (ryan, prep = '') => { if (!(OS.Acc && OS.Acc.on)) return ryan; const b = whoBits(); return (prep ? prep + ' ' : '') + OS.who() + (b.length ? ' (' + b.join('; ') + ')' : ''); };
+OS.whoCtx = (ryan, prep = '') => { if (!(OS.Acc && OS.Acc.pub)) return ryan; const b = whoBits(); return (prep ? prep + ' ' : '') + OS.who() + (b.length ? ' (' + b.join('; ') + ')' : ''); };
 // textos fixos com o nome do Ryan ("o Ryan de daqui a 5 anos"): numa conta passam a "o teu eu de…"
-OS.my = s => OS.Acc && OS.Acc.on ? String(s || '').replace(/\b(o|O|ao|Ao|no|do) Ryan de\b/g, '$1 teu eu de') : s;
-OS.whoFlat = ryan => OS.Acc && OS.Acc.on ? [OS.who()].concat(whoBits()).join(', ') : ryan;
+OS.my = s => OS.Acc && OS.Acc.pub ? String(s || '').replace(/\b(o|O|ao|Ao|no|do) Ryan de\b/g, '$1 teu eu de') : s;
+OS.whoFlat = ryan => OS.Acc && OS.Acc.pub ? [OS.who()].concat(whoBits()).join(', ') : ryan;
 OS.ONE_DEF.mova = { name: 'Mova', what: '', offer: '', customer: '', stage: 'Ideia', founded: '', revenueTarget: '', clientsTarget: '', marginTarget: '', notes: '' };
 OS.ONE_DEF.northstar = { h3m: '', h1y: '', h3y: '', h5y: '', hlong: '', values: '', identity: '', notAccept: '' };
 OS.ONE_DEF.plan = { week: {}, month: {}, mit: {} };
@@ -4599,7 +4601,7 @@ const EXERCISES = [['Supino reto com barra', 'Peito', ['Tríceps', 'Ombros'], 'B
 OS.on('seed', () => {
   const meta = OS.one('meta'); if (meta.seeded) return;
   // conta nova (versão pública): só o essencial, sem nada do Ryan
-  if (OS.Acc && OS.Acc.on) { OS.touch('profile'); OS.touch('fin'); OS.touch('fit');
+  if (OS.Acc && OS.Acc.pub) { OS.touch('profile'); OS.touch('fin'); OS.touch('fit');
     if (!OS.all('accounts').length) { OS.add('accounts', { name: 'Conta principal', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); OS.add('accounts', { name: 'Fundo de emergência', type: 'Reserva', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); }
     if (!OS.all('exercises').length) EXERCISES.forEach(([name, muscle, secondary, equip]) => OS.add('exercises', { name, muscle, secondary, equip }, { silent: true }));
     if (!OS.all('habits').length) [['Acordar à hora, sem snooze', 'Manhã', 1], ['2 blocos de foco (100 min)', 'Dia', 1, 'study100'], ['Treino ou corrida', 'Dia', 1, 'workout'], ['20 páginas de leitura', 'Noite', 1], ['Registar gastos do dia', 'Noite', 0, 'cash'], ['Telemóvel fora do quarto', 'Noite', 0]].forEach(([name, group, core, auto]) => OS.add('habits', { name, group, core: !!core, freq: name.startsWith('Treino') ? 'Dias úteis' : 'Diário', active: true, log: {}, auto: auto || '', area: 'Pessoal' }, { silent: true }));
@@ -4684,22 +4686,6 @@ let S = LS.get(K.s, null);
 const hasLocal = LS.keys().some(k => k.startsWith('os2:'));
 const accDevice = !!(S || LS.get(K.owner, ''));
 const personal = !accDevice && !!(LS.get(K.pers, 0) || hasLocal || /ligar=/.test(location.hash) || LS.get('os2sync', 0));
-const Acc = OS.Acc = { on: !personal };
-if (personal) return;
-
-/* ---------- daqui para baixo: modo conta ---------- */
-const PCOL = ['#F2C48D', '#7FA9DA', '#3FCF8E', '#E0896A', '#9A8CF5', '#F28CB1', '#5CC8E6', '#F2B544'];
-const AVS = ['', '🌊', '⚓', '🧭', '🐋', '🦈', '🐢', '🌙', '☀️', '🔥', '🌿', '🎯', '📚', '💼', '🏃', '🎧', '🦊', '🐺', '🦁', '🐼'];
-const pid = () => LS.get(K.p, '');
-const profiles = () => (S && S.perfis) || [];
-const cur = () => profiles().find(p => p.id === pid()) || null;
-const first = n => String(n || '').trim().split(/\s+/)[0] || '';
-Object.assign(Acc, { sess: () => S, profiles, profile: cur, email: () => (S && S.e) || '', lk: () => (cur() || {}).lk || '' });
-
-// numa conta nova nada do Ryan: o perfil começa com o nome de quem o criou (o resto preenche em Definições)
-Object.assign(OS.ONE_DEF.profile, { name: '', short: '', city: '', uni: '', course: '', year: '', semester: '', semStart: '', semEnd: '' });
-if (OS.ONE_DEF.mova) OS.ONE_DEF.mova.name = 'O meu negócio';
-
 /* ---------- pedidos ao servidor ---------- */
 const api = async (path, opt = {}, tries = 3) => { let last = null;
   for (let i = 0; i < tries; i++) {
@@ -4714,10 +4700,68 @@ const conta = (op, body = {}) => api('conta', { method: 'POST', headers: Object.
 const saveS = () => { if (S) LS.set(K.s, S); else LS.del(K.s); };
 const takeConta = (j, email) => { S = Object.assign(S || {}, { t: j.token || (S && S.t), e: (j.conta && j.conta.email) || email || (S && S.e), n: (j.conta && j.conta.nome) || '', perfis: (j.conta && j.conta.perfis) || [] }); saveS(); };
 
+const Acc = OS.Acc = { on: !personal };
+const A = OS.act = OS.act || {}; OS.forms = OS.forms || {};
+if (personal) {
+  /* ---------- modo pessoal: guardar este Náutilo numa conta (o que é do Ryan vai para a conta dele) ---------- */
+  const moved = () => OS.one('meta').acc || '';
+  // cria (ou entra n)a conta, cria o perfil pessoal com o mesmo código de bloqueio e envia todos os dados deste aparelho
+  Acc.migrate = async (email, senha, criar) => { email = String(email || '').trim().toLowerCase();
+    const j = await conta(criar ? 'registar' : 'entrar', criar ? { email, senha, nome: OS.one('profile').name || '' } : { email, senha }); takeConta(j, email);
+    let p = (S.perfis || []).find(x => x.ps);
+    if (!p) { const r = await conta('perfil', { acao: 'criar', perfil: { nome: String(OS.one('profile').short || 'Ryan').slice(0, 24), cor: '#7FA9DA', av: '', lk: OS.Lock.curHash(), ps: true } }); takeConta(r); p = r.perfil; }
+    OS.setOne('meta', { acc: email });
+    const now = Date.now(), docs = [], known = {};
+    Object.keys(OS.D).forEach(c => { const by = {}; OS.all(c).forEach(r => { (by[r._s || 0] = by[r._s || 0] || []).push(r); }); Object.entries(by).forEach(([k, items]) => docs.push([c + '~' + k, { t: now, items }])); });
+    Object.keys(OS.ONE).forEach(k => docs.push(['one~' + k, { t: now, data: OS.ONE[k] }]));
+    let part = {}, n = 0, cnt = 0;
+    const send = async () => { if (!cnt) return; const r = await api('dados', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'gravar', p: p.id, docs: part }) }); Object.assign(known, r.etags); part = {}; n = 0; cnt = 0; };
+    for (const [id, d] of docs) { const sz = JSON.stringify(d).length; if (cnt && (n + sz > 1.5e6 || cnt >= 300)) await send(); part[id] = d; n += sz; cnt++; }
+    await send();
+    // os outros aparelhos ficam a saber pelo Google Drive (espera um pouco que o aviso lá chegue)
+    for (let i = 0; i < 20 && OS.sync.status === 'busy'; i++) await new Promise(r => setTimeout(r, 200));
+    LS.set(K.p, p.id); LS.set(K.data, p.id); LS.set(K.owner, email); LS.set('nau:k:' + p.id, known); LS.del(K.pers); LS.del('os2sync');
+    return { perfil: p, docs: docs.length }; };
+  const go = async criar => { const em = document.getElementById('accMigE'), pw = document.getElementById('accMigP'); if (!em || !pw) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em.value.trim())) return OS.UI.toast('Escreve o teu e-mail.', 'warn');
+    if (pw.value.length < 8) return OS.UI.toast('A senha precisa de pelo menos 8 caracteres.', 'warn');
+    OS.UI.toast('A guardar o teu Náutilo na conta…');
+    try { const r = await Acc.migrate(em.value, pw.value, criar); OS.UI.toast(`Guardado: ${r.docs} partes dos teus dados na conta. A abrir com a conta…`, 'pos'); setTimeout(() => location.reload(), 900); }
+    catch (e) { OS.UI.toast(e.net ? 'Sem internet. Tenta outra vez.' : e.message, 'neg'); } };
+  A.accMigNew = () => go(true); A.accMigIn = () => go(false);
+  // noutro aparelho do Ryan: o Náutilo já está na conta → entrar nela aqui (os dados vêm da conta)
+  A.accJoin = () => { const em = moved(); if (!em) return; OS.UI.closeModal();
+    if (!confirm(`Este aparelho passa a usar a conta ${em}. Os dados vêm da conta (o que mudaste só aqui e ainda não sincronizou pelo Google Drive perde-se). Continuar?`)) return;
+    OS.noSave = true; LS.keys().forEach(k => { if (!/^(nau:|os2lite$|__)/.test(k)) LS.del(k); }); LS.set(K.owner, em); LS.del(K.pers); location.reload(); };
+  A.accJoinLater = () => { LS.set('nau:joinAsk', Date.now()); OS.UI.closeModal(); };
+  const panel = () => { const em = moved(), e = U.esc;
+    return `<div class="pn" id="accMig"><div class="pn-h"><h3>${OS.UI.ic('user')}Conta Náutilo</h3>${em ? `<span class="mut">${e(em)}</span>` : ''}</div>
+    ${em ? `<p class="mut" style="margin:0 0 10px">O teu Náutilo está guardado na conta <b>${e(em)}</b>. Este aparelho ainda usa o modo antigo (só neste aparelho e no Google Drive).</p><button class="btn pri" data-act="accJoin">Entrar na conta neste aparelho</button>`
+    : `<p class="mut" style="margin:0 0 12px">Guarda o teu Náutilo numa conta: tudo o que tens aqui (dados, metas, jogo, definições, ligações) vai para a tua conta, cifrado, com o mesmo código de bloqueio. Depois entras com e-mail e senha em qualquer aparelho e podes criar outros perfis.</p>
+      <div class="col gap8"><label>E-mail<input class="field" id="accMigE" type="email" autocomplete="email"></label><label>Senha da conta (pelo menos 8 caracteres)<input class="field" id="accMigP" type="password" autocomplete="new-password"></label>
+      <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="accMigNew">Criar conta e guardar</button><button class="btn" data-act="accMigIn">Já tenho conta: entrar e guardar</button></div></div>`}</div>`; };
+  OS.on('ready', () => { const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (String(sub || '') === '' ? panel() : '');
+    const ask = LS.get('nau:joinAsk', 0); if (moved() && !navigator.webdriver && (!ask || Date.now() - ask > 3 * 864e5)) setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">O teu Náutilo está na conta</h3><p class="mut" style="margin:0 0 14px">Guardaste o teu Náutilo na conta <b>${U.esc(moved())}</b>. Entra nela também neste aparelho para ficar tudo igual em todo o lado.</p><div class="row gap8"><button class="btn pri" data-act="accJoin">Entrar na conta</button><button class="btn ghost" data-act="accJoinLater">Agora não</button></div></div>`), 1800); });
+  return;
+}
+
+/* ---------- daqui para baixo: modo conta ---------- */
+const PCOL = ['#F2C48D', '#7FA9DA', '#3FCF8E', '#E0896A', '#9A8CF5', '#F28CB1', '#5CC8E6', '#F2B544'];
+const AVS = ['', '🌊', '⚓', '🧭', '🐋', '🦈', '🐢', '🌙', '☀️', '🔥', '🌿', '🎯', '📚', '💼', '🏃', '🎧', '🦊', '🐺', '🦁', '🐼'];
+const pid = () => LS.get(K.p, '');
+const profiles = () => (S && S.perfis) || [];
+const cur = () => profiles().find(p => p.id === pid()) || null;
+const first = n => String(n || '').trim().split(/\s+/)[0] || '';
+// pub: perfil de uma pessoa qualquer (textos e valores neutros); o perfil pessoal (ps) é o Náutilo do Ryan passado para a conta: fica como era
+Object.assign(Acc, { sess: () => S, profiles, profile: cur, email: () => (S && S.e) || '', lk: () => (cur() || {}).lk || '', pub: !(cur() && cur().ps) });
+
+// numa conta nova nada do Ryan: o perfil começa com o nome de quem o criou (o resto preenche em Definições)
+if (Acc.pub) { Object.assign(OS.ONE_DEF.profile, { name: '', short: '', city: '', uni: '', course: '', year: '', semester: '', semStart: '', semEnd: '' }); if (OS.ONE_DEF.mova) OS.ONE_DEF.mova.name = 'O meu negócio'; }
+
 /* ---------- dados locais de cada perfil ---------- */
 // guarda: a sessão e as escolhas do aparelho; o resto (dados do perfil, preferências do perfil) sai ao trocar de perfil ou de conta
 const KEEP = /^(nau:|os2lite$|__)/;
-const wipeLocal = () => { LS.keys().forEach(k => { if (!KEEP.test(k)) LS.del(k); }); LS.keys().filter(k => /^nau:(k|pend):/.test(k)).forEach(LS.del);
+const wipeLocal = () => { OS.noSave = true; LS.keys().forEach(k => { if (!KEEP.test(k)) LS.del(k); }); LS.keys().filter(k => /^nau:(k|pend):/.test(k)).forEach(LS.del);
   try { sessionStorage.removeItem('os2unlock'); } catch (e) { } try { indexedDB.deleteDatabase('oceanum-reset'); } catch (e) { } LS.del(K.data); };
 
 /* ---------- a base de dados do motor (como no sync.js, mas com a conta) ---------- */
@@ -4743,7 +4787,8 @@ const flushPut = async () => { timer = 0; const batch = queue, ws = waiters; que
 const put = (id, data) => new Promise((ok, ko) => { queue[id] = data; pend.add(id); savePend(); waiters.push({ ok, ko }); clearTimeout(timer); timer = setTimeout(flushPut, 900); });
 const payload = id => { const [c, s] = id.split('~'); return c === 'one' ? { data: OS.one(s) } : { items: OS.all(c).filter(r => String(r._s || 0) === s) }; };
 const repush = () => { if (!navigator.onLine) return; [...pend].filter(id => !queue[id]).forEach(id => put(id, Object.assign({ t: Date.now() }, payload(id))).catch(() => { })); };
-Acc.flush = async () => { clearTimeout(timer); await flushPut(); return !pend.size; };
+// espera também pelo que já ia a caminho (até ~3 s), para "sincronizado" ser verdade
+Acc.flush = async () => { clearTimeout(timer); for (let i = 0; i < 20 && (Object.keys(queue).length || pend.size); i++) { if (Object.keys(queue).length) await flushPut(); else await new Promise(r => setTimeout(r, 150)); } return !pend.size; };
 
 // primeira leitura: antes de o motor arrancar (assim um telemóvel lento nunca cria dados de exemplo por cima dos teus)
 const prefetch = async () => { const L = await dados('lista', {}, true); lastM = L.m; const remote = L.docs || {}, ids = Object.keys(remote);
@@ -4840,8 +4885,8 @@ const showGate = (mode, msg) => { if (!G) { G = document.createElement('div'); G
 const hideGate = () => { if (G) { G.hidden = true; G.innerHTML = ''; G.remove(); G = null; } document.documentElement.classList.remove('ac-open'); };
 
 // escolher o perfil: se este aparelho tinha os dados de outro, limpa-os e recomeça; senão o motor arranca já
-const choose = async id => { const was = LS.get(K.data, ''), booted = !!OS.dbRef;
-  if (booted || (was && was !== id)) {
+const choose = async id => { const was = LS.get(K.data, ''), booted = !!OS.dbRef, p = profiles().find(x => x.id === id) || {};
+  if (booted || (was && was !== id) || !!p.ps === Acc.pub) {
     if (booted && pend.size && !(await Acc.flush().catch(() => false)) && !confirm('Há alterações deste perfil que ainda não chegaram à nuvem (sem internet?). Se trocares agora, perdem-se. Trocar na mesma?')) return;
     LS.set(K.p, id); if (was !== id) wipeLocal(); try { sessionStorage.removeItem('os2unlock'); } catch (e) { } location.reload(); return; }
   LS.set(K.p, id); known = LS.get(kKnown(), {}); pend = new Set(LS.get(kPend(), []));
@@ -4862,7 +4907,7 @@ async function onSubmit(e) { const f = e.target.closest('form[data-acf]'); if (!
     if (kind === 'novo') { const lk = await code(), j = await conta('perfil', { acao: 'criar', perfil: { nome: v('nome'), cor: val('cor'), av: val('av'), lk } }); takeConta(j); set('perfis'); return; }
     if (kind === 'editar') { const j = await conta('perfil', { acao: 'editar', id: gEdit, perfil: { nome: v('nome'), cor: val('cor'), av: val('av') } }); takeConta(j); set('perfis'); return; }
     if (kind === 'codigo') { const lk = await code(), j = await conta('codigo', { id: gEdit, senha: v('senha'), lk }); takeConta(j); const r = LS.get(K.reset, {}); r[gEdit] = lk; LS.set(K.reset, r); set('perfis', 'Código mudado. Usa o novo ao abrir este perfil.'); return; }
-    if (kind === 'apagarp') { const j = await conta('perfil', { acao: 'apagar', id: gEdit, senha: v('senha') }); takeConta(j); LS.del('nau:k:' + gEdit); LS.del('nau:pend:' + gEdit); if (LS.get(K.data, '') === gEdit) { wipeLocal(); } if (pid() === gEdit) LS.del(K.p); set('perfis', 'Perfil apagado.'); return; }
+    if (kind === 'apagarp') { const j = await conta('perfil', { acao: 'apagar', id: gEdit, senha: v('senha') }); takeConta(j); LS.del('nau:k:' + gEdit); LS.del('nau:pend:' + gEdit); const here = LS.get(K.data, '') === gEdit; if (here) wipeLocal(); if (pid() === gEdit) LS.del(K.p); if (here && OS.dbRef) { location.reload(); return; } set('perfis', 'Perfil apagado.'); return; }
   } catch (err) { fail(err); } }
 async function onClick(e) { const b = e.target.closest('[data-ac]'); if (!b || gBusy) return; const a = b.dataset.ac;
   if (a === 'm') return set(b.dataset.v);
@@ -4909,7 +4954,6 @@ OS.on('ready', () => { const p = cur(); if (!p) return;
 });
 // a bolinha do perfil na barra de cima (como na Netflix): toca para trocar de perfil ou ver a conta
 Acc.bubble = () => { const p = cur(); return p ? `<button class="ac-bub" data-act="accMenu" aria-label="Perfil ${esc(p.nome)}" title="${esc(p.nome)}">${avatar(p)}</button>` : ''; };
-const A = OS.act = OS.act || {};
 A.accMenu = () => { const p = cur(); if (!p) return; OS.UI.modal(`<div class="ac-menu"><div class="ac-mh">${avatar(p, 1)}<div><b>${esc(p.nome)}</b><small class="mut">${esc(Acc.email())}</small></div></div>
   <div class="list"><button class="li" data-act="accSwitch"><div class="li-t"><b>Trocar de perfil</b><small>${profiles().length} ${profiles().length === 1 ? 'perfil' : 'perfis'} nesta conta</small></div><span class="mut">›</span></button>
   <a class="li" href="#definicoes.conta" data-mclose><div class="li-t"><b>Conta e perfis</b><small>Senha, código de recuperação, sincronização</small></div><span class="mut">›</span></a>
@@ -4919,6 +4963,27 @@ A.accOut = () => { OS.UI.closeModal(); logout(); };
 A.accSync = async () => { OS.UI.toast('A sincronizar…'); await Acc.flush().catch(() => { }); if (Acc.poll) await Acc.poll(); OS.UI.toast(SY.err ? 'Sem ligação: fica guardado neste aparelho' : 'Tudo sincronizado', SY.err ? 'warn' : 'pos'); OS.request(); };
 A.accAll = async () => { try { const j = await conta('sairtodos'); S.t = j.token; saveS(); OS.UI.toast('Saíste de todos os outros aparelhos', 'pos'); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 OS.forms = OS.forms || {};
+/* ---------- atalho de gastos do iPhone sem script: cada perfil tem o seu link (a caixa fica na conta) ---------- */
+const AKK = () => 'nau:ak:' + pid();
+Acc.atalho = () => { const k = LS.get(AKK(), ''); return k ? { url: new URL('api/atalho', document.baseURI).href, key: k } : null; };
+const ensureAk = async nova => { if (!cur() || (!nova && LS.get(AKK(), ''))) return; const j = await conta('atalho', { id: pid(), nova: !!nova }); LS.set(AKK(), j.chave); };
+OS.on('ready', () => setTimeout(() => ensureAk().then(() => { const c = OS.one('inbox'); if (!(c.url && c.key) && OS.Inbox && OS.Inbox.pull) OS.Inbox.pull(false); }).catch(() => { }), 1500));
+const akLink = () => { const a = Acc.atalho(); return a ? a.url + '?k=' + encodeURIComponent(a.key) : ''; };
+A.accAkCopy = async () => { const l = akLink(); if (!l) { await ensureAk().catch(() => { }); OS.request(); return; } try { await navigator.clipboard.writeText(l); OS.UI.toast('Link copiado: cola-o no atalho', 'pos'); } catch (e) { OS.UI.toast('Toca no link, seleciona e copia', 'warn'); } };
+A.accAkNew = async () => { if (!confirm('Criar um link novo? O atalho antigo deixa de funcionar até colares o novo.')) return; try { await ensureAk(true); OS.UI.toast('Link novo criado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+A.accAkTest = async () => { const a = Acc.atalho(); if (!a) return; try { const r = await fetch(a.url, { method: 'POST', body: new URLSearchParams({ k: a.key, v: '1', d: '__teste__' }) }); if (!r.ok) throw new Error(await r.text());
+    OS.Inbox.testOk = false; await OS.Inbox.pull(false); OS.UI.toast(OS.Inbox.testOk ? 'O atalho está a funcionar: o Náutilo recebeu o teste (não conta nas finanças).' : 'O teste ainda não chegou. Tenta outra vez.', OS.Inbox.testOk ? 'pos' : 'warn'); }
+  catch (e) { OS.UI.toast('O teste falhou: ' + e.message, 'neg'); } };
+Acc.atalhoPanel = () => { const l = akLink(), UI = OS.UI;
+  return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3></div>
+  <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado neste perfil, sem abrir o Náutilo. Não precisas de configurar nada fora do Náutilo.</p>
+  <div class="ib-w"><div class="ib-s"><i>1</i><div><b>O teu link</b><p>É só deste perfil. Não o partilhes: quem o tiver pode registar gastos aqui.</p>
+    ${l ? `<div class="ib-link"><code>${esc(l)}</code><button class="btn sm pri" data-act="accAkCopy">Copiar link</button></div><div class="row gap8" style="margin-top:8px"><button class="btn sm" data-act="accAkTest">Testar agora</button><button class="btn sm ghost" data-act="accAkNew">Criar link novo</button></div>` : `<button class="btn sm pri" data-act="accAkCopy">Criar o link</button>`}</div></div>
+    <div class="ib-s"><i>2</i><div><b>Criar o atalho (3 ações)</b><p>App <b>Atalhos</b> → <b>+</b> → nome "Gasto". Adiciona:</p>
+      <div class="ib-sc"><div><b>1 · Pedir entrada</b> → toca em "Texto" e muda para <b>Número</b> → pergunta: <i>Quanto gastaste?</i></div><div><b>2 · Pedir entrada</b> → Texto → pergunta: <i>Em quê?</i></div><div><b>3 · Obter conteúdo do URL</b> → cola o <b>link</b> → ▸ (mostrar mais) → Método: <b>POST</b> → Corpo do pedido: <b>Formulário</b> → <b>Adicionar campo → Texto</b>: chave <code>v</code> com a 1.ª <b>Entrada fornecida</b>; chave <code>d</code> com a 2.ª.</div></div>
+      <p>Toca em ▶️ para experimentar: deve aparecer "✓ … registado no Náutilo".</p></div></div>
+    <div class="ib-s"><i>3</i><div><b>Pôr no Centro de Controlo</b><p>Centro de Controlo → <b>+</b> → <b>Adicionar controlo</b> → <b>Atalhos</b> → <b>Atalho</b> → <b>Escolher</b> → "Gasto". Também podes pô-lo no <b>botão de Ação</b> ou no ecrã principal.</p></div></div></div>
+  <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças quando abres o Náutilo, com a categoria adivinhada pela descrição e a etiqueta <i>atalho</i>.</p></div>`; };
 OS.forms.accPw = async f => { try { const j = await conta('senha', { atual: f.elements.atual.value, nova: f.elements.nova.value }); takeConta(j); OS.UI.toast('Senha mudada. Os outros aparelhos vão pedir a senha nova.', 'pos'); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 OS.forms.accRec = async f => { try { const j = await conta('novocodigo', { senha: f.elements.senha.value }); OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">Código de recuperação novo</h3><p class="mut">O antigo deixou de valer. Guarda este:</p><div class="ac-code">${esc(j.recuperacao)}</div><div class="row gap8" style="margin-top:14px"><button class="btn pri" data-mclose>Já guardei</button></div></div>`); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 OS.forms.accName = async f => { try { const j = await conta('nome', { nome: f.elements.nome.value }); takeConta(j); OS.UI.toast('Nome guardado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
@@ -8398,7 +8463,7 @@ const ED = { PT: ['Portugal', '🇵🇹', 'hl=pt-PT&gl=PT&ceid=PT:pt-150', 'pt']
   ZA: ['África do Sul', '🇿🇦', 'hl=en-ZA&gl=ZA&ceid=ZA:en', 'en'], NG: ['Nigéria', '🇳🇬', 'hl=en-NG&gl=NG&ceid=NG:en', 'en'], PL: ['Polónia', '🇵🇱', 'hl=pl&gl=PL&ceid=PL:pl', 'pl'], SE: ['Suécia', '🇸🇪', 'hl=sv&gl=SE&ceid=SE:sv', 'sv'], NO: ['Noruega', '🇳🇴', 'hl=no&gl=NO&ceid=NO:no', 'no'], GR: ['Grécia', '🇬🇷', 'hl=el&gl=GR&ceid=GR:el', 'el'] };
 const TOPICS = [['TOP', 'Destaques'], ['WORLD', 'Mundo'], ['NATION', 'País'], ['BUSINESS', 'Economia'], ['TECHNOLOGY', 'Tecnologia'], ['SCIENCE', 'Ciência'], ['HEALTH', 'Saúde'], ['SPORTS', 'Desporto'], ['ENTERTAINMENT', 'Cultura']];
 const NW = OS.News = { cache: {} };
-const scr = () => { const c = OS.one('inbox'); return c && c.url && c.key ? c : null; };
+const scr = () => { const c = OS.one('inbox'); return c && c.url && c.key ? c : OS.Acc && OS.Acc.on ? { url: new URL('api/noticias', document.baseURI).href, key: '-' } : null; };
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 /* que feeds formam cada vista */
 const specs = (tab, topic, theme) => { if (theme) return tab === 'W' ? [{ id: 'q:PT:' + theme, q: theme, ed: ED.PT[2] }, { id: 'q:BR:' + theme, q: theme, ed: ED.BR[2] }] : [{ id: 'q:' + tab + ':' + theme, q: theme, ed: ED[tab][2] }];
@@ -8552,7 +8617,7 @@ OS.on('ready', () => { setInterval(() => { if (document.hidden || !scr()) return
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
-OS.ONE_DEF.me = { birth: '', birthplace: '', hometown: '', nationality: OS.Acc && OS.Acc.on ? '' : 'Brasileira', ptSince: '', langs: 'Português', qa: {}, bio: null, photo: '' };
+OS.ONE_DEF.me = { birth: '', birthplace: '', hometown: '', nationality: OS.Acc && OS.Acc.pub ? '' : 'Brasileira', ptSince: '', langs: 'Português', qa: {}, bio: null, photo: '' };
 OS.ONE_DEF.mever = { v: [] };
 const me = () => OS.one('me'), P = () => OS.one('profile'), today = () => U.today();
 const first = () => (P().short || (P().name || 'Ryan').split(' ')[0]);
@@ -10274,7 +10339,7 @@ A.tuClear = () => { TU = { log: [] }; U.ls.set(TK, TU); OS.request(); };
 OS.forms.tutor = async (f, v) => { const q = f.elements.q.value.trim(), s = v('s'), mode = OS.ui.tuM || 'explicar'; if (!q || TB) return; if (!tutorAI()) { UI.toast('Liga a IA em Definições → Spyke', 'warn'); return; }
   TB = true; OS.request(); const ent = { q, s, mode, d: today() };
   // resposta em texto simples (markdown): mais rápida e sem falhar por JSON partido nas respostas longas
-  const sys = `És um tutor universitário excelente, paciente e rigoroso, a ajudar ${OS.Acc && OS.Acc.on ? OS.whoCtx('') : `o Ryan (estudante em Portugal, ${OS.one('profile').uni || ''}${OS.one('profile').course ? ', curso de ' + OS.one('profile').course : ''})`}. Disciplina: ${s ? subjN(s) : 'geral'}. Responde em português de Portugal.
+  const sys = `És um tutor universitário excelente, paciente e rigoroso, a ajudar ${OS.Acc && OS.Acc.pub ? OS.whoCtx('') : `o Ryan (estudante em Portugal, ${OS.one('profile').uni || ''}${OS.one('profile').course ? ', curso de ' + OS.one('profile').course : ''})`}. Disciplina: ${s ? subjN(s) : 'geral'}. Responde em português de Portugal.
 Regras: sê correto acima de tudo; se não tiveres a certeza, diz; se citares normas/leis portuguesas (SNC, CIRC, CIVA…), sê exato; usa **negrito** para conceitos-chave e listas com "- " quando ajudar; sem enchimento.
 Começa SEMPRE com uma linha "# " com um título curto e depois a resposta.`;
   try { const ctx = TU.log.filter(m => !m.err).slice(-3).map(m => `Pergunta anterior: ${m.q.slice(0, 400)}\nResposta: ${(m.a || '').slice(0, 600)}`).join('\n\n');
@@ -11900,7 +11965,7 @@ const W = OS.Weather = {};
 const CODES = { 0: 'céu limpo', 1: 'quase limpo', 2: 'parcialmente nublado', 3: 'nublado', 45: 'nevoeiro', 48: 'nevoeiro com geada', 51: 'chuvisco fraco', 53: 'chuvisco', 55: 'chuvisco forte', 56: 'chuvisco gelado', 57: 'chuvisco gelado', 61: 'chuva fraca', 63: 'chuva', 65: 'chuva forte', 66: 'chuva gelada', 67: 'chuva gelada forte', 71: 'neve fraca', 73: 'neve', 75: 'neve forte', 77: 'grãos de neve', 80: 'aguaceiros fracos', 81: 'aguaceiros', 82: 'aguaceiros fortes', 85: 'aguaceiros de neve', 86: 'aguaceiros de neve fortes', 95: 'trovoada', 96: 'trovoada com granizo', 99: 'trovoada forte com granizo' };
 W.desc = c => CODES[c] || 'tempo variável';
 W.kind = c => c === 0 || c === 1 ? 'sol' : c === 2 ? 'sol-nuvem' : c === 3 || c === 45 || c === 48 ? 'nuvem' : c >= 71 && c <= 86 && ![80, 81, 82].includes(c) ? 'neve' : c >= 95 ? 'trovoada' : 'chuva';
-W.city = () => (OS.one('profile').city || (OS.Acc && OS.Acc.on ? 'Lisboa' : 'Aveiro')).trim();
+W.city = () => (OS.one('profile').city || (OS.Acc && OS.Acc.pub ? 'Lisboa' : 'Aveiro')).trim();
 let data = U.ls.get(K, null), busy = null;
 const geo = async name => { const g = U.ls.get('os2wxgeo', null); if (g && g.n === name) return g;
   const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=pt&name=' + encodeURIComponent(name)), j = await r.json(), x = (j.results || [])[0];
@@ -12018,7 +12083,7 @@ const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
 OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false, ear: 'auto', pausa: 1.2, bargeS: true, alertVoz: false };
 // numa conta (versão pública) o Spyke começa calado: sem microfone sempre ligado nem modo Jarvis ao abrir (cada pessoa liga se quiser)
-if (OS.Acc && OS.Acc.on) Object.assign(OS.ONE_DEF.spyke, { always: false, jarvisStart: false, morning: false, siri: false, fix3: 1, fix4: 1 });
+if (OS.Acc && OS.Acc.pub) Object.assign(OS.ONE_DEF.spyke, { always: false, jarvisStart: false, morning: false, siri: false, fix3: 1, fix4: 1 });
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
@@ -12761,7 +12826,7 @@ const T = [
     run: a => { const r = OS.Spyke && OS.Spyke.findRoute ? OS.Spyke.findRoute(a.pagina) : null; if (!r) return 'Não encontrei essa página.'; location.hash = r[0]; return 'Abri ' + r[1] + '.'; } }];
 
 /* ---------- instruções ---------- */
-const system = () => `És o Spyke, o assistente pessoal ${OS.Acc && OS.Acc.on ? OS.whoCtx('', 'de') : 'do ' + who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco.${OS.Acc && OS.Acc.on ? '' : ' Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.'}
+const system = () => `És o Spyke, o assistente pessoal ${OS.Acc && OS.Acc.pub ? OS.whoCtx('', 'de') : 'do ' + who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco.${OS.Acc && OS.Acc.pub ? '' : ' Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.'}
 Regras:
 - Responde SEMPRE em português do Brasil, para ser dito em voz alta: no máximo 3 ou 4 frases curtas, sem listas, sem markdown, sem emojis. Nunca digas o teu próprio nome.
 - Recebes um resumo atual com quase tudo da vida dele: se o resumo chega, responde logo (é mais rápido). Para detalhes que não estão lá, usa "consultar" (por área), "procurar_na_app" (procura em toda a app) ou "ler_area". Não inventes números nem factos.
@@ -13349,7 +13414,7 @@ let busy = false, lastAI = 0;
 const aiOn = () => OS.AI && OS.AI.key && OS.AI.key();
 const aiScan = async (force) => { if (busy || !aiOn() || (!force && Date.now() - lastAI < 10 * 60e3)) return; const todo = sources().map(([it, info]) => [it, info]).filter(([it, info]) => it && it.id && !AI[it.id] && !(info && info.c === 'spam') && !NOT.test((it.s || '') + ' ' + (it.sn || ''))).slice(0, 25);
   if (!todo.length) return; busy = true; lastAI = Date.now(); const p = OS.one('profile');
-  try { const o = await OS.AI.json([{ text: `${OS.Acc && OS.Acc.on ? OS.whoCtx('') + ' quer crescer na carreira.' : (p.short || 'Ryan') + ' é estudante no ISCA-UA (Aveiro, Portugal), trabalha e quer crescer na carreira (finanças, contabilidade, gestão, empreender).'} Hoje é ${U.today()}.
+  try { const o = await OS.AI.json([{ text: `${OS.Acc && OS.Acc.pub ? OS.whoCtx('') + ' quer crescer na carreira.' : (p.short || 'Ryan') + ' é estudante no ISCA-UA (Aveiro, Portugal), trabalha e quer crescer na carreira (finanças, contabilidade, gestão, empreender).'} Hoje é ${U.today()}.
 Destes e-mails (Gmail e notificações do LinkedIn), diz quais trazem uma OPORTUNIDADE concreta para ele: vaga, estágio, bolsa, curso, certificação, evento, palestra, competição, programa universitário, mentoria ou negócio.
 Não contes: publicidade genérica, faturas, segurança, convites para ligar, quem viu o perfil, reações e newsletters sem nada concreto.
 Para cada e-mail: {"id","ok":true/false,"titulo":"nome curto da oportunidade","instituicao":"quem oferece","tipo":"Curso|Certificação|Evento|Palestra|Programa universitário|Estágio|Emprego|Projeto|Competição|Networking|Bolsa|Negócio","prazo":"AAAA-MM-DD ou null","porque":"porque lhe interessa, máx. 14 palavras"}
@@ -16103,7 +16168,7 @@ OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
   return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3></div>
     <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Náutilo sempre no Gasto rápido neste aparelho</label>
     <div class="list" style="margin-top:10px"><div class="li"><div class="li-t"><b>iPhone: registar sem abrir a app</b><small>Um atalho no Centro de Controlo pede o valor e a descrição e grava direto. Os gastos entram sozinhos.</small></div><div class="li-r"><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></div></div>
-    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>`; };
+    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>${OS.Acc && OS.Acc.on && OS.Acc.atalhoPanel && !(OS.one('inbox').url && OS.one('inbox').key) ? OS.Acc.atalhoPanel() : ''}`; };
 OS.forms = OS.forms || {};
 OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 0)) { UI.toast('Escreve o valor', 'warn'); return; }
   const cat = (f.querySelector('input[name=cat]:checked') || {}).value || '', account = (f.querySelector('input[name=acc]:checked') || {}).value || '';
@@ -16685,7 +16750,7 @@ const LEG0 = {"int":["Passar a Introdução à Contabilidade com nota ≥ 14","P
 // numa conta (versão pública) ficam os marcos gerais: saem os que são só do Ryan (faculdade, OCC, empresa, Aveiro, voleibol, fazenda, think tank…)
 const PUBX = /ISCA|OCC|Contabilist|Aveiro|Crumbel|Banco de Portugal|BCE|Testosterona|escoliose|hipercifose|voleibol|alergolog|alérgic|Introdução à Contabilidade|Informática Organizacional|Contabilidade Financeira|Macroecon|macroecon|económic|macro aplicada|área macro|macro estratégica|Fiscalidade|política monetária|políticas públicas|reformas estruturais|think tank|universidade própria|corpo docente|da universidade|Universidade (reconhecida|financeiramente|expandida)|escola própria de pensamento|Escola intelectual|arquiteto de sistemas|doutorandos|Centro avançado|líderes públicos|Libras|Centro de Saúde|estética dental|PCR <|Vitamina D|Glicemia|campeonatos regionais|equipa regional|desporto olímpico|olímpic|Olímpic|medalhista|convocado|tática|Tempo de reação|fundamentos: passe|salto vertical|partidas amistosas|treino técnico formal|equipa local|Ombros \+15|grau da visão|Exercícios visuais|nariz|CFA|seed money|empresa|societário|contrato social|capital social|Lançar oficialmente|colaborador estratégico|regime tributário|número fiscal|viabilidade|modelo de negócio|proposta de valor|marca, identidade|processo operacional|fundo de expansão|fazenda|agrícola|Abrir atividade nas Finanças|Terra Santa|Evangelhos|Bíblia|bíblic|igreja|Igreja|versículo|testemunho|teolog|ministério|dizim|Culto|culto|pregação|missionári|missões|Discipul|discipul|C\. S\. Lewis|Romanos|Provérbios|Salmos|cristão|Jó|jejum|Jejum|missão|devocional|Devocional|Santo Agostinho|servo bom|Novo Testamento|imigrantes/;
 const PUBR = [[/ \(ex\.: ETF\/Certificados de Aforro\)/, ' (ex.: ETF)'], [/homem de palavra/, 'pessoa de palavra'], [/ \(Finanças ou Economia\)/, ''], [/ em contabilidade, auditoria ou finanças/, ' na tua área']];
-const LEG = OS.Acc && OS.Acc.on ? Object.fromEntries(Object.entries(LEG0).map(([k, v]) => [k, v.filter(t => !PUBX.test(t)).map(t => PUBR.reduce((x, [a, b]) => x.replace(a, b), t))])) : LEG0;
+const LEG = OS.Acc && OS.Acc.pub ? Object.fromEntries(Object.entries(LEG0).map(([k, v]) => [k, v.filter(t => !PUBX.test(t)).map(t => PUBR.reduce((x, [a, b]) => x.replace(a, b), t))])) : LEG0;
 const LEGA = { int: 'intelecto', for: 'fortuna', cor: 'corpo', inf: 'relacoes', esp: 'espirito' }, LEGN = { int: 'Intelecto', for: 'Fortuna', cor: 'Corpo', inf: 'Influência', esp: 'Espírito' };
 D.LEG = LEG; D.PK = Object.keys(LEG); D.LEGN = LEGN;
 const legx = () => { const s = S(); if (!s.legx || typeof s.legx !== 'object') s.legx = {}; s.legx.add = s.legx.add || {}; s.legx.off = s.legx.off || {}; return s.legx; };
@@ -16823,7 +16888,7 @@ const bodyOf = tc => { const b = tc >= 4 ? 2 : tc >= 2 ? 1 : 0, t = tc >= 3 ? 1 
 const DEF_LOOK = { skin: 6, hair: 'cacheado curto', hairColor: 'preto', eyes: 'castanho escuro', brows: 'grossas', beard: 'cavanhaque', glasses: 'retangulares', head: '', headColor: 3,
   top: 'tshirt', topColor: 0, legs: 'jeans', legsColor: 3, feet: 'tenis', feetColor: 2, cape: '', hand: '', shield: '', acc: '' };
 // numa conta o herói começa neutro (o visual do Ryan só no modo pessoal)
-if (OS.Acc && OS.Acc.on) Object.assign(DEF_LOOK, { skin: 3, hair: 'liso curto', hairColor: 'castanho', eyes: 'castanho', brows: 'finas', beard: 'nenhuma', glasses: '' });
+if (OS.Acc && OS.Acc.pub) Object.assign(DEF_LOOK, { skin: 3, hair: 'liso curto', hairColor: 'castanho', eyes: 'castanho', brows: 'finas', beard: 'nenhuma', glasses: '' });
 D.DEF_LOOK = DEF_LOOK;
 D.pixel = (look = {}, o = {}) => { const L = Object.assign({}, DEF_LOOK, look), tc = o.corpo || 0, mood = o.mood || 'forma', C = mkC(), B = bodyOf(tc);
   const sk = SKINS[L.skin] != null ? SKINS[L.skin] : SKINS[6], SK = SKR(sk), hc = HAIRCOL[L.hairColor] || HAIRCOL.preto, HC = RAMP(hc);
@@ -17566,7 +17631,7 @@ T.marcos = () => { const s = S(), p = D.PK.includes(OS.ui.d3Leg) ? OS.ui.d3Leg :
     ${off ? `<p class="dm">Tiraste ${off} ${off === 1 ? 'marco' : 'marcos'} desta lista. <button class="d3-link" data-act="d3LegReset" data-p="${p}">Repor</button></p>` : ''}</section>
   ${done.length ? `<section class="d3-card"><div class="d3-h"><span class="cz">Feitos</span><span class="dm mono">${done.length}</span></div>${done.map(t => row(t, L.indexOf(t))).join('')}</section>` : ''}
   <section class="d3-card"><details><summary class="cz">Ver os ${L.length} marcos de ${esc(LEGN[p])}</summary><div class="d3-legall">${L.map(row).join('')}</div></details></section>
-  <p class="dm d3-note">${OS.Acc && OS.Acc.on ? 'Marcos reais e difíceis nos 5 pilares, do primeiro passo ao legado. Tira os que não são para ti e acrescenta os teus.' : 'Os teus marcos vêm do teu Notion (Dominus original + Dominus 2.0) e estão atualizados com o que mudou: a vida em Aveiro, o ISCA-UA e o pilar Espiritual. Tira os que já não fazem sentido e acrescenta os novos.'}</p>`; };
+  <p class="dm d3-note">${OS.Acc && OS.Acc.pub ? 'Marcos reais e difíceis nos 5 pilares, do primeiro passo ao legado. Tira os que não são para ti e acrescenta os teus.' : 'Os teus marcos vêm do teu Notion (Dominus original + Dominus 2.0) e estão atualizados com o que mudou: a vida em Aveiro, o ISCA-UA e o pilar Espiritual. Tira os que já não fazem sentido e acrescenta os novos.'}</p>`; };
 
 // diário: quando cada nível foi alcançado, a partir do histórico
 const timeline = st => { const ev = st.all.slice().sort((a, b) => a.d.localeCompare(b.d)), acc = Object.fromEntries(AK.map(k => [k, 0])), lv = Object.fromEntries(AK.map(k => [k, 0])), out = []; let tot = 0, hl = 0;
@@ -17624,7 +17689,7 @@ const genKey = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b =>
 
 // no script de cada pessoa vai o nome do perfil (no modo pessoal fica "do Ryan" como sempre)
 const nm_ = () => String(OS.who()).replace(/[\\'"`$\n\r]/g, '').slice(0, 40);
-const dRyan_ = () => OS.Acc && OS.Acc.on ? 'de ' + nm_() : 'do Ryan', oRyan_ = () => OS.Acc && OS.Acc.on ? nm_() : 'O Ryan';
+const dRyan_ = () => OS.Acc && OS.Acc.pub ? 'de ' + nm_() : 'do Ryan', oRyan_ = () => OS.Acc && OS.Acc.pub ? nm_() : 'O Ryan';
 IB.core = key => `// Náutilo · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
 const KEY = '${key}';
 function doGet(e) {
@@ -17969,7 +18034,7 @@ const getJSON = async (url, tries = 3) => { let last = null;
   for (let i = 0; i < tries; i++) { try { const r = await fetch(url, { cache: 'no-store', credentials: 'omit' }), t = await r.text(); try { return JSON.parse(t); } catch (e) { last = new Error('resposta do Google não é JSON'); } } catch (e) { last = e; }
     await new Promise(res => setTimeout(res, 800 * (i + 1))); }
   throw last || new Error('sem resposta'); };
-IB.pull = async (manual) => { const c = cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
+IB.pull = async (manual) => { const c = OS.Acc && OS.Acc.on && !(cfg().url && cfg().key) && OS.Acc.atalho ? (OS.Acc.atalho() || cfg()) : cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
   try { const j = await getJSON(c.url + (c.url.includes('?') ? '&' : '?') + 'op=pull&k=' + encodeURIComponent(c.key) + '&_=' + Date.now());
     if (!j.ok) { if (manual) UI.toast(j.msg || 'O script recusou o pedido', 'neg'); return; }
     const seen = new Set(U.ls.get(SEEN, [])), got = [];
@@ -18017,7 +18082,7 @@ IB.check = async () => { const u = base(), c = cfg();
       } catch (e) { return IB.st = { ok: false, m: 'Não consegui testar a gravação no Google Drive. Tenta outra vez.' }; } }
     return IB.st = { ok: true, m: 'Ligado. A caixa de entrada está a funcionar' + ((j.v || 2) >= 3 ? ' e a gravação no Google Drive também.' : '.') };
   } catch (e) { return IB.st = { ok: false, m: 'Não consegui falar com o script. Confirma: (1) "Quem tem acesso: Qualquer pessoa"; (2) autorizaste a app com a tua conta Google; (3) o código tem "doGet" (cola-o outra vez se for antigo).' }; } };
-const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base());
+const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base()); if (OS.Acc && OS.Acc.on && !(c.url && c.key) && OS.Acc.atalhoPanel) return OS.Acc.atalhoPanel();
   return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3><span class="mut" style="font-size:12px">${c.n ? c.n + ' gastos importados' : ''}</span></div>
   ${c.url && c.key ? `<div class="ib-now"><button class="btn sm pri" data-act="ibTest">${UI.ic('sync')}Ir buscar gastos agora</button><span class="mut">${c.last ? 'última verificação: ' + new Date(c.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não verificou'}${c.err ? ' · <span class="neg">' + esc(c.err) + '</span>' : ''}</span></div>` : ''}
   <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado, sem abrir o Náutilo. Precisa de uma folha Google tua como caixa de entrada (grátis, uma vez só).</p>
@@ -18655,6 +18720,7 @@ const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')
 const rand = n => crypto.getRandomValues(new Uint8Array(n));
 const hash = () => (OS.one('security').hash) || (OS.Acc && OS.Acc.on ? OS.Acc.lk() || '-' : DEFAULT_HASH);
 OS.ONE_DEF.security = { hash: '', changed: '' };
+L.curHash = () => hash();
 
 // memória primeiro: se o navegador bloquear o sessionStorage (vista embutida), o desbloqueio continua válido nesta sessão
 let memUnlock = false;

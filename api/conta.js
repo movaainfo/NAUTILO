@@ -5,7 +5,7 @@
 const N = require('./_nuvem');
 const MAXP = 5, COLORS = ['#F2C48D', '#7FA9DA', '#3FCF8E', '#E0896A', '#9A8CF5', '#F28CB1', '#5CC8E6', '#F2B544'];
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/;
-const pub = r => ({ email: r.email, nome: r.nome || '', criado: r.criado, perfis: (r.perfis || []).map(p => ({ id: p.id, nome: p.nome, cor: p.cor, av: p.av || '', lk: p.lk || '', inf: !!p.inf, criado: p.criado })) });
+const pub = r => ({ email: r.email, nome: r.nome || '', criado: r.criado, perfis: (r.perfis || []).map(p => ({ id: p.id, nome: p.nome, cor: p.cor, av: p.av || '', lk: p.lk || '', inf: !!p.inf, ps: !!p.ps, criado: p.criado })) });
 const cleanName = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
 const cleanProfile = (p, old) => { const o = Object.assign({}, old || {});
   if (p.nome != null) o.nome = cleanName(p.nome, 24);
@@ -13,6 +13,7 @@ const cleanProfile = (p, old) => { const o = Object.assign({}, old || {});
   if (p.av != null) o.av = [...String(p.av)].slice(0, 2).join('').replace(/[<>&"']/g, '');
   if (p.lk != null && /^([a-f0-9]{64})?$/.test(p.lk)) o.lk = p.lk;
   if (p.inf != null) o.inf = !!p.inf;
+  if (p.ps != null) o.ps = !!p.ps;
   return o; };
 
 // ler e gravar a conta (cifrada); grava só se ninguém a mudou entretanto (etag), e volta a tentar
@@ -26,7 +27,7 @@ const session = async req => { const t = await N.readToken(req); if (!t) throw N
   const a = await readAcc(t.a); if (!a || a.rec.uid !== t.u || (a.rec.tv || 1) !== t.v) throw N.err('sessao', 'A sessão terminou. Entra outra vez.', 401);
   return { t, eid: t.a, rec: a.rec }; };
 const needPw = async (rec, pw) => { if (!(await N.checkPw(pw, rec.pw))) throw N.err('senha', 'A senha não está certa.', 403); };
-const dropData = async (uid, pid) => { const s = N.store(); const L = (await s.list('d/' + uid + '/' + (pid ? pid + '/' : ''))).concat(pid ? await s.list('m/' + uid + '/' + pid) : await s.list('m/' + uid + '/')); if (L.length) await s.del(L); };
+const dropData = async (uid, pid) => { const s = N.store(), sub = pid ? pid + '/' : ''; const L = (await s.list('d/' + uid + '/' + sub)).concat(await s.list('i/' + uid + '/' + sub), pid ? await s.list('m/' + uid + '/' + pid) : await s.list('m/' + uid + '/')); if (L.length) await s.del(L); };
 
 const OPS = {
   async registar(req, b) {
@@ -94,6 +95,12 @@ const OPS = {
     await change(s.eid, r => { r.rc = rc; }); return { recuperacao: code }; },
 
   async sairtodos(req) { const s = await session(req); const rec = await change(s.eid, r => { r.tv = (r.tv || 1) + 1; }); return { token: await N.signToken(rec, s.eid) }; },
+
+  // chave do atalho de gastos do iPhone para este perfil (nova = a antiga deixa de funcionar)
+  async atalho(req, b) { const s = await session(req); let n = '';
+    const rec = await change(s.eid, r => { const p = (r.perfis || []).find(x => x.id === b.id); if (!p) throw N.err('perfil', 'Esse perfil já não existe.', 404);
+      if (p.ak && !b.nova) { n = p.ak; return false; } p.ak = n = N.crypto.randomBytes(6).toString('hex'); });
+    return { chave: await N.atalhoKey(s.eid, b.id, n) }; },
 
   async nome(req, b) { const s = await session(req); const rec = await change(s.eid, r => { r.nome = cleanName(b.nome, 40); }); return { conta: pub(rec) }; },
 

@@ -114,15 +114,21 @@ const HITS = new Map();
 const limit = (req, key, n, ms) => { const ip = String(req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || '').split(',')[0].trim(), k = key + '|' + ip, now = Date.now();
   const h = (HITS.get(k) || []).filter(t => now - t < ms); h.push(now); HITS.set(k, h); if (HITS.size > 5000) HITS.delete(HITS.keys().next().value); return h.length > n; };
 const body = async req => { if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) return req.body;
-  if (typeof req.body === 'string') { try { return JSON.parse(req.body); } catch (e) { return {}; } }
+  const form = /x-www-form-urlencoded/i.test(req.headers['content-type'] || ''), parse = t => { if (form) return Object.fromEntries(new URLSearchParams(t)); try { return JSON.parse(t || '{}'); } catch (e) { return {}; } };
+  if (typeof req.body === 'string') return parse(req.body);
   const chunks = []; let n = 0; for await (const c of req) { n += c.length; if (n > 4.4e6) throw err('grande', 'pedido grande demais', 413); chunks.push(c); }
-  try { return JSON.parse(Buffer.concat(chunks).toString() || '{}'); } catch (e) { return {}; } };
+  return parse(Buffer.concat(chunks).toString()); };
 const send = (res, status, obj) => { res.statusCode = status; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.end(JSON.stringify(obj)); };
-const handler = fn => async (req, res) => {
-  if (!allowed(req)) return send(res, 403, { ok: false, msg: 'Pedido recusado.' });
+// anyOrigin: aceita pedidos de fora da app (o atalho do iPhone, que se autentica pela chave); open: não precisa da base de dados
+const handler = (fn, o = {}) => async (req, res) => {
+  if (!o.anyOrigin && !allowed(req)) return send(res, 403, { ok: false, msg: 'Pedido recusado.' });
   if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end(); }
-  if (!store()) return send(res, 503, { ok: false, msg: 'A base de dados das contas ainda não está ligada.' });
+  if (!o.open && !store()) return send(res, 503, { ok: false, msg: 'A base de dados das contas ainda não está ligada.' });
   try { await fn(req, res); }
   catch (e) { const st = e.status && e.status >= 400 && e.status < 600 ? e.status : 500; send(res, st, { ok: false, msg: st === 500 ? 'O servidor não conseguiu fazer isto agora. Tenta outra vez.' : e.message, code: e.code }); if (st === 500) console.error('nautilo', e.code || '', e.message); } };
 
-module.exports = { store, master, userKey, accKey, seal, open, emailId, normEmail, hashPw, checkPw, newCode, normCode, signToken, readToken, limit, body, send, handler, err, sleep, crypto };
+// chave do atalho do iPhone de um perfil: (conta, perfil, versão) assinados; trocar a versão invalida a chave antiga
+const atalhoTag = async body => crypto.createHmac('sha256', await master()).update('atalho:' + body).digest().subarray(0, 18);
+const atalhoKey = async (eid, pid, n) => { const body = b64u(JSON.stringify({ a: eid, p: pid, n })); return body + '.' + b64u(await atalhoTag(body)); };
+
+module.exports = { atalhoTag, atalhoKey, unb64u, b64u, store, master, userKey, accKey, seal, open, emailId, normEmail, hashPw, checkPw, newCode, normCode, signToken, readToken, limit, body, send, handler, err, sleep, crypto };
