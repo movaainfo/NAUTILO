@@ -1036,3 +1036,17 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 @media (max-width:560px){.adv-row{grid-template-columns:minmax(0,1fr) auto}.adv-row .adv-acts{grid-column:1/-1;justify-content:flex-start}}
 .adv-sec{margin-bottom:14px}.adv-sh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 8px}.adv-sh b{font-size:14px}
 @media (max-width:560px){.adv-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.adv-c{padding:10px}.adv-ct b{font-size:13.5px}.adv-cf small{display:none}}
+/* Floresta: pílula leve (árvore pequena + tempo + barra de progresso) */
+.fo-fi{display:inline-grid;place-items:end center;width:32px;height:32px;margin:-6px 0;flex:none;font-size:20px;line-height:1}.fo-fi img{width:34px;height:34px;object-fit:contain;transform-origin:50% 100%}
+.fo-tt{flex:1;white-space:nowrap}
+.fo-fp{display:block;height:3px;background:rgba(255,255,255,.08)}.fo-fp::after{content:"";display:block;height:100%;width:calc(var(--p,0)*100%);background:#8ef0a0}
+.fo-float.mini .fo-fp{position:absolute;left:14px;right:14px;bottom:3px;height:2px;border-radius:2px}.fo-float.mini{position:fixed}
+.fo-float.brk .fo-fp::after{background:#ffd166}.fo-float.brk{border-color:#ffd166}
+/* Floresta: técnica Pomodoro */
+.fo-pomo{display:flex;flex-direction:column;gap:10px;width:100%;max-width:440px;margin:4px auto;padding:12px 14px;border-radius:14px;border:1px solid var(--line2);background:rgba(255,255,255,.03);text-align:left}
+.fo-pomo.on{border-color:rgba(242,196,141,.45);background:rgba(242,196,141,.06)}
+.fo-pt{display:flex;gap:10px;align-items:flex-start;cursor:pointer}.fo-pt input{margin-top:3px;width:18px;height:18px;accent-color:#e05a47}.fo-pt b{display:block}.fo-pt small{display:block;color:var(--tx2);font-size:12.5px;line-height:1.4}
+.fo-pg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.fo-pg label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--tx2)}.fo-pg .field{padding:6px 8px}
+.fo-pa{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--tx2)}
+.fo-pdots{display:flex;gap:7px;justify-content:center;margin:2px 0}.fo-pdots i{width:12px;height:12px;border-radius:50%;border:2px solid #e05a47;opacity:.55}.fo-pdots i.on{background:#e05a47;opacity:1}.fo-pdots i.cur{opacity:1;box-shadow:0 0 0 3px rgba(224,90,71,.25)}
+@media (max-width:520px){.fo-pg{grid-template-columns:repeat(2,minmax(0,1fr))}}

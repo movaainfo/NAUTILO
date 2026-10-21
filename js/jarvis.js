@@ -6,7 +6,7 @@ const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
 const J = OS.Jarvis = {};
 const cfg = () => Object.assign({ jarvisStart: true }, OS.one('spyke'));
 let el = null, fab = null, raf = 0, dataAt = 0, newsX = 0, newsW = 0;
-const name = () => OS.one('profile').short || 'Ryan';
+const name = () => OS.one('profile').short || OS.who();
 const eur = v => U.eur(v);
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'; };
 

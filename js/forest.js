@@ -6,7 +6,7 @@
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc, today = () => U.today();
-OS.ONE_DEF.forest = { coins: 0, owned: ['carvalho', 'pinheiro', 'arbusto'], sp: 'carvalho', mins: 25, strict: '20', sound: '', tag: '', brk: 5 };
+OS.ONE_DEF.forest = { coins: 0, owned: ['carvalho', 'pinheiro', 'arbusto'], sp: 'carvalho', mins: 25, strict: '20', sound: '', tag: '', brk: 5, pomo: { on: false, f: 25, s: 5, l: 15, n: 4, auto: true } };
 const cfg = () => OS.one('forest');
 OS.S.trees = { label: 'Árvore', title: r => ((SP[r.sp] || {}).n || 'Árvore') + ' · ' + U.fmtD(r.date), fields: [
   { k: 'date', l: 'Data', t: 'date', req: 1 }, { k: 'mins', l: 'Minutos', t: 'num', req: 1 }, { k: 'sp', l: 'Espécie', t: 'sel', o: () => Object.entries(SP).map(([k, s]) => [k, s.n]) },
@@ -491,6 +491,9 @@ function chime() { try { const ctx = SND.ctx || (SND.ctx = new (window.AudioCont
 const RK = 'oc_forest_run';
 let RUN = U.ls.get(RK, null), LAST = null, tick = 0, wake = null;
 const save = () => RUN ? U.ls.set(RK, RUN) : U.ls.del(RK);
+// Pomodoro: foco → pausa curta → … → pausa longa ao fim de n focos; o ciclo de hoje fica guardado neste aparelho
+const PO = () => { const c = cfg(); c.pomo = Object.assign({ on: false, f: 25, s: 5, l: 15, n: 4, auto: true }, c.pomo || {}); return c.pomo; };
+const PK = 'oc_pomo'; const PS = () => { const x = U.ls.get(PK, null); return x && x.d === today() ? x : { d: today(), i: 0, done: 0 }; }; const psSave = x => U.ls.set(PK, x);
 const durMs = () => RUN ? RUN.mins * 6e4 : 0;
 const left = () => RUN ? Math.max(0, RUN.t0 + durMs() - Date.now()) : 0;
 const prog = () => RUN ? Math.min(1, (Date.now() - RUN.t0) / durMs()) : 0;
@@ -498,59 +501,78 @@ const mmss = ms => { const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m
 const STAGES = 30, stageOf = p => Math.floor(p * STAGES) / STAGES;
 const PHRASES = ['Larga o telemóvel. A tua árvore está a crescer', 'Uma coisa de cada vez.', 'Disciplina é escolher o que queres mais em vez do que queres agora.', 'O foco de hoje é a floresta de amanhã.', '"Tudo o que fizerem, façam de todo o coração" — Colossenses 3:23', 'Só mais um pouco. Estás a ir bem.', 'Grandes árvores começam com uma semente.'];
 function tagInfo(v) { if (!v) return { tag: '', subject: '', skill: '' }; if (v.startsWith('s:')) { const s = OS.get('subjects', v.slice(2)); return { tag: s ? s.name : '', subject: v.slice(2), skill: '' }; } if (v.startsWith('k:')) { const s = OS.get('skills', v.slice(2)); return { tag: s ? s.name : '', subject: '', skill: v.slice(2) }; } return { tag: v, subject: '', skill: '' }; }
-function plant() { const c = cfg(), sp = SP[c.sp] ? c.sp : 'carvalho', ti = tagInfo(c.tag);
-  RUN = { phase: 'grow', t0: Date.now(), mins: Math.max(1, +c.mins || 25), sp, tagv: c.tag || '', tag: ti.tag, subject: ti.subject, skill: ti.skill, seed: (Math.random() * 1e9) | 0, hid: null, ph: Math.floor(Math.random() * PHRASES.length) };
-  LAST = null; save(); sndPlay(c.sound); try { navigator.wakeLock && navigator.wakeLock.request('screen').then(w => wake = w).catch(() => { }); } catch (e) { } loop(); try { vid(); } catch (e) { } OS.request(); }
+function plant() { const c = cfg(), sp = SP[c.sp] ? c.sp : 'carvalho', ti = tagInfo(c.tag), po = PO(), ps = PS();
+  RUN = { phase: 'grow', t0: Date.now(), mins: Math.max(1, po.on ? +po.f || 25 : +c.mins || 25), sp, tagv: c.tag || '', tag: ti.tag, subject: ti.subject, skill: ti.skill, seed: (Math.random() * 1e9) | 0, hid: null, ph: Math.floor(Math.random() * PHRASES.length) };
+  if (po.on) RUN.pomo = { i: (ps.i % (+po.n || 4)) + 1, of: +po.n || 4 };
+  LAST = null; save(); sndPlay(c.sound); try { navigator.wakeLock && navigator.wakeLock.request('screen').then(w => wake = w).catch(() => { }); } catch (e) { } loop(); if (PIPOK) { try { vid(); } catch (e) { } } OS.request(); }
 function finish(ok, why) { if (!RUN || RUN.phase !== 'grow') return; const mins = ok ? RUN.mins : Math.max(0, Math.floor((Date.now() - RUN.t0) / 6e4)), coins = ok ? coinsFor(RUN.mins) : 0;
   const t = OS.add('trees', { date: today(), t0: RUN.t0, mins, plan: RUN.mins, sp: RUN.sp, alive: !!ok, tag: RUN.tag, subject: RUN.subject, skill: RUN.skill, coins, why: why || '', seed: RUN.seed });
   if (ok) { cfg().coins = (+cfg().coins || 0) + coins; OS.touch('forest'); if ((RUN.subject || RUN.skill) && mins >= 5) OS.add('sessions', { date: today(), subject: RUN.subject, skill: RUN.skill, minutes: mins, type: 'Estudo profundo', phone: true, focus: 5, learned: 'Floresta: ' + SP[RUN.sp].n, tree: t.id }); chime(); }
-  LAST = { id: t.id, ok: !!ok, sp: RUN.sp, mins, coins, why: why || '', seed: RUN.seed }; RUN = null; save(); sndStop(); try { wake && wake.release(); } catch (e) { } wake = null; clearInterval(tick); pill(); OS.request(); }
-function startBreak() { RUN = { phase: 'break', t0: Date.now(), mins: Math.max(1, +cfg().brk || 5) }; LAST = null; save(); loop(); OS.request(); }
+  const pomo = RUN.pomo; LAST = { id: t.id, ok: !!ok, sp: RUN.sp, mins, coins, why: why || '', seed: RUN.seed, pomo }; RUN = null; save(); sndStop(); try { wake && wake.release(); } catch (e) { } wake = null; clearInterval(tick);
+  // Pomodoro: foco cumprido conta para o ciclo e a pausa começa sozinha; se a árvore morreu, o ciclo recomeça
+  if (pomo) { const ps = PS(); if (ok) { ps.i = pomo.i; ps.done++; psSave(ps); if (PO().auto) { pill(); return startBreak(pomo.i >= pomo.of); } } else { ps.i = 0; psSave(ps); } }
+  pill(); OS.request(); }
+function startBreak(long) { const po = PO(), ps = PS(), on = po.on && ps.i > 0; if (long == null) long = on && ps.i >= (+po.n || 4);
+  RUN = { phase: 'break', t0: Date.now(), mins: Math.max(1, on ? (long ? +po.l || 15 : +po.s || 5) : +cfg().brk || 5), long: !!long, pomo: on ? { i: ps.i, of: +po.n || 4 } : null }; LAST = null; save(); loop(); OS.request(); }
+// fim da pausa no Pomodoro: o foco seguinte começa sozinho; depois da pausa longa o ciclo fica completo
+function breakOver() { const b = RUN, po = PO(); RUN = null; save(); chime(); clearInterval(tick);
+  if (b && b.pomo && po.on) { if (b.long) { const ps = PS(); ps.i = 0; psSave(ps); UI.toast(`Ciclo completo: ${b.pomo.of} pomodoros. Descansa a sério.`, 'pos'); LAST = null; pill(); OS.request(); return; }
+    if (po.auto) { UI.toast(`Pomodoro ${b.pomo.i + 1} de ${b.pomo.of}: a árvore seguinte já está a crescer`, 'pos'); LAST = null; return plant(); } }
+  UI.toast('A pausa acabou. Bora plantar outra?', 'pos'); pill(); OS.request(); }
 function loop() { clearInterval(tick); if (!RUN) return; tick = setInterval(step, 1000); step(); }
-function step() { if (!RUN) { clearInterval(tick); pill(); return; } if (left() <= 0) { if (RUN.phase === 'grow') return finish(true); RUN = null; save(); chime(); UI.toast('A pausa acabou. Bora plantar outra?', 'pos'); clearInterval(tick); pill(); OS.request(); return; } paint(); }
+function step() { if (!RUN) { clearInterval(tick); pill(); return; } if (left() <= 0) { if (RUN.phase === 'grow') return finish(true); return breakOver(); } paint(); }
 function paint() { const L = left(), el = document.getElementById('foTime'); if (el) el.textContent = mmss(L); const ring = document.getElementById('foRing'); if (ring) ring.style.strokeDashoffset = String(100 - prog() * 100);
   if (RUN && RUN.phase === 'grow') { const k = `pot|${RUN.sp}|${stageOf(prog())}|0|${RUN.seed}|${cfg().scene || ''}`, h = document.getElementById('fo3d'); if (h && h.dataset.k !== k) { h.dataset.k = k; mount(); } document.title = 'Floresta · ' + mmss(L) + ' · NÁUTILO'; } pill(); }
 /* ---- janela flutuante (dentro do app) + Picture-in-Picture (fora do app) ---- */
-const GI = {}, MSPH = {}; let FL = null, FC = null, VID = null, giBusy = '';
-function growImg(sp, st) { const k = sp + '|' + st; if (GI[k] || giBusy === k) return GI[k]; if (!T || FAIL) { if (!FAIL) load3(); return null; }
-  try { giBusy = k; if (!TR) { TR = new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); TR.setSize(160, 160); TR.toneMapping = T.ACESFilmicToneMapping; }
-    if (!MSPH[sp]) { const mb = new Bld(rngOf(42), 0); tree(mb, sp, 1, false); const g0 = mb.geo(); g0.computeBoundingSphere(); MSPH[sp] = g0.boundingSphere.clone(); g0.dispose(); }
-    const sc = new T.Scene(); sc.add(new T.HemisphereLight('#e6f2ff', '#5a7a44', 1.25)); const d = new T.DirectionalLight('#fff4e0', 2.1); d.position.set(3, 6, 4); sc.add(d); const b = new Bld(rngOf(42), 1); tree(b, sp, st, false); const m = new T.Mesh(b.geo(), MAT()); sc.add(m);
-    const bs = MSPH[sp], c = bs.center.clone(), dd = bs.radius / Math.sin(15 * Math.PI / 180) * .95, cam = new T.PerspectiveCamera(30, 1, .1, 200); c.y = Math.max(c.y, bs.radius * .8); cam.position.copy(c).addScaledVector(new T.Vector3(.42, .3, 1).normalize(), dd); cam.lookAt(c);
-    TR.render(sc, cam); const img = new Image(); img.src = TR.domElement.toDataURL('image/png'); GI[k] = img; m.geometry.dispose(); m.material.dispose(); } catch (e) { console.warn(e); } giBusy = ''; return GI[k]; }
+let FL = null, FC = null, VID = null;
+const PIPOK = (() => { try { return !!(document.createElement('canvas').captureStream && (document.pictureInPictureEnabled || 'webkitSetPresentationMode' in HTMLVideoElement.prototype)); } catch (e) { return false; } })();
+// a árvore da janela flutuante: a miniatura da espécie (já feita para a loja) a crescer com o tempo; sem miniatura, uma árvore desenhada em 2D
+const TI = {};
+const thumbImg = sp => { if (!THUMB[sp]) return null; if (!TI[sp] || TI[sp]._src !== THUMB[sp]) { const im = new Image(); im.src = THUMB[sp]; im._src = THUMB[sp]; TI[sp] = im; } return TI[sp].complete && TI[sp].naturalWidth ? TI[sp] : null; };
+const PINE = /pinheiro|abeto|cedro|cipreste|sequoia|pinh/;
+function tree2d(x, cx, gy, p, sp) { const g = Math.max(.12, p), h = 30 + 150 * g, trunkW = 6 + 10 * g, k = String(sp || '');
+  x.fillStyle = '#6b4a2f'; x.fillRect(cx - trunkW / 2, gy - h * .45, trunkW, h * .45);
+  if (PINE.test(k)) { x.fillStyle = '#2f7d4a'; for (let i = 0; i < 3; i++) { const w = (60 - i * 14) * g + 14, yb = gy - h * (.3 + i * .22); x.beginPath(); x.moveTo(cx - w, yb); x.lineTo(cx + w, yb); x.lineTo(cx, yb - h * .38); x.closePath(); x.fill(); } return; }
+  const r = 14 + 46 * g; [['#2f8a4c', 0, -1, 1], ['#3fa35c', -.55, -.75, .78], ['#3fa35c', .55, -.75, .78], ['#5cbf72', -.2, -1.25, .7]].forEach(([c, dx, dy, rr]) => { x.fillStyle = c; x.beginPath(); x.arc(cx + dx * r, gy - h * .45 + dy * r * .9, r * rr, 0, Math.PI * 2); x.fill(); }); }
 function drawFC() { if (!FC) { FC = document.createElement('canvas'); FC.width = 320; FC.height = 400; } const x = FC.getContext('2d'), W = 320, H = 400, sky = SKY(), p = RUN ? (RUN.phase === 'grow' ? prog() : 1) : 0;
-  const gr = x.createLinearGradient(0, 0, 0, H); ({ day: [['#7cc7ef', 0], ['#e3f4ea', 1]], dawn: [['#f3a98c', 0], ['#eef0d8', 1]], dusk: [['#4b3f8f', 0], ['#f6b98a', 1]], night: [['#0a1630', 0], ['#2e4b5f', 1]] }[sky]).forEach(([c, o]) => gr.addColorStop(o, c)); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+  const gr = x.createLinearGradient(0, 0, 0, H); ({ day: [['#7cc7ef', 0], ['#e3f4ea', 1]], dawn: [['#f3a98c', 0], ['#eef0d8', 1]], dusk: [['#4b3f8f', 0], ['#f6b98a', 1]], night: [['#0a1630', 0], ['#2e4b5f', 1]] }[sky] || [['#0a1630', 0], ['#2e4b5f', 1]]).forEach(([c, o]) => gr.addColorStop(o, c)); x.fillStyle = gr; x.fillRect(0, 0, W, H);
   const cx = W / 2, cy = 150, R = 118; x.lineWidth = 7; x.strokeStyle = 'rgba(255,255,255,.3)'; x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.stroke(); x.strokeStyle = RUN && RUN.phase === 'break' ? '#ffd166' : '#8ef0a0'; x.lineCap = 'round'; x.beginPath(); x.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * p); x.stroke();
   x.fillStyle = 'rgba(70,140,60,.55)'; x.beginPath(); x.ellipse(cx, cy + 82, 70, 14, 0, 0, Math.PI * 2); x.fill();
-  if (RUN && RUN.phase === 'grow') { const img = growImg(RUN.sp, Math.max(.1, Math.ceil(p * 10) / 10)) || growImg(RUN.sp, 1); if (img && img.complete && img.naturalWidth) x.drawImage(img, cx - 95, cy - 105, 190, 190); else { x.fillStyle = '#6fd17f'; x.beginPath(); x.arc(cx, cy, 30 + 40 * p, 0, Math.PI * 2); x.fill(); } }
-  else { x.font = '64px system-ui'; x.textAlign = 'center'; x.fillText('Pausa', cx, cy + 22); }
+  if (RUN && RUN.phase === 'grow') { const img = thumbImg(RUN.sp), sz = 70 + 130 * Math.max(.1, p); if (img) x.drawImage(img, cx - sz / 2, cy + 90 - sz, sz, sz); else tree2d(x, cx, cy + 86, p, RUN.sp); }
+  else { x.fillStyle = '#fff'; x.font = '600 40px system-ui,-apple-system,sans-serif'; x.textAlign = 'center'; x.fillText(RUN && RUN.long ? 'Pausa longa' : 'Pausa', cx, cy + 14); }
   x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = '600 64px system-ui,-apple-system,sans-serif'; x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 8; x.fillText(mmss(left()), cx, 330); x.shadowBlur = 0; x.font = '500 18px system-ui,-apple-system,sans-serif'; x.fillStyle = 'rgba(255,255,255,.9)';
-  x.fillText(RUN ? (RUN.phase === 'grow' ? (SP[RUN.sp] || {}).n + (RUN.tag ? ' · ' + RUN.tag : '') : 'Pausa') : '', cx, 365, W - 30); return FC; }
+  x.fillText(RUN ? (RUN.phase === 'grow' ? (SP[RUN.sp] || {}).n + (RUN.pomo ? ` · ${RUN.pomo.i}/${RUN.pomo.of}` : '') + (RUN.tag ? ' · ' + RUN.tag : '') : 'Pausa') : '', cx, 365, W - 30); return FC; }
 const pipOn = () => !!(document.pictureInPictureElement || (VID && VID.webkitPresentationMode === 'picture-in-picture'));
 function vid() { if (VID) return VID; drawFC(); VID = document.createElement('video'); VID.muted = true; VID.playsInline = true; VID.setAttribute('playsinline', ''); VID.setAttribute('muted', ''); VID.autoplay = true; VID.setAttribute('autopictureinpicture', ''); try { VID.autoPictureInPicture = true; } catch (e) { }
   VID.className = 'fo-vid'; try { VID.srcObject = FC.captureStream ? FC.captureStream(2) : null; } catch (e) { } document.body.appendChild(VID); VID.play().catch(() => { }); return VID; }
-async function openPip() { try { const v = vid(); await v.play().catch(() => { }); if (v.requestPictureInPicture && document.pictureInPictureEnabled !== false) await v.requestPictureInPicture(); else if (v.webkitSetPresentationMode) v.webkitSetPresentationMode('picture-in-picture'); else UI.toast('Este navegador não tem janela flutuante fora da app', 'neg'); } catch (e) { UI.toast('Não consegui abrir a janela flutuante: ' + (e.message || ''), 'neg'); } }
+async function openPip() { try { drawFC(); const v = vid(); await v.play().catch(() => { }); if (v.requestPictureInPicture && document.pictureInPictureEnabled !== false) await v.requestPictureInPicture(); else if (v.webkitSetPresentationMode) v.webkitSetPresentationMode('picture-in-picture'); else UI.toast('Este navegador não tem janela flutuante fora da app', 'neg'); } catch (e) { UI.toast('Não consegui abrir a janela flutuante: ' + (e.message || ''), 'neg'); } }
 function closePip() { try { if (document.pictureInPictureElement) document.exitPictureInPicture(); else if (VID && VID.webkitPresentationMode === 'picture-in-picture') VID.webkitSetPresentationMode('inline'); } catch (e) { } }
-function pill() { const fl = !/^#floresta/.test(location.hash) && RUN; if (RUN) drawFC();
+function pill() { const fl = !/^#floresta/.test(location.hash) && RUN; if (RUN && (pipOn() || (FL && !FL.classList.contains('mini') && fl))) { try { drawFC(); } catch (e) { } }
   if (!RUN) { if (FL) { FL.remove(); FL = null; } closePip(); if (VID) { try { VID.pause(); (VID.srcObject && VID.srcObject.getTracks ? VID.srcObject.getTracks() : []).forEach(t => t.stop()); } catch (e) { } VID.remove(); VID = null; } return; }
-  if (!FL) { FL = document.createElement('div'); FL.id = 'foFloat'; FL.className = 'fo-float mini'; FL.innerHTML = `<div class="fo-fh"><span>Floresta</span><button data-f="pip" title="Janela flutuante fora da app" aria-label="Janela flutuante fora da app">⧉</button><button data-f="min" aria-label="Aumentar ou reduzir">⤢</button></div><div class="fo-fc"></div><div class="fo-ft"><button data-f="open">Abrir</button><button data-f="give">Desistir</button></div>`;
-    FL.querySelector('.fo-fc').appendChild(FC); document.body.appendChild(FL); let sx = 0, sy = 0, ox = 0, oy = 0, mv = false;
+  if (!FL) { if (!FC) drawFC(); FL = document.createElement('div'); FL.id = 'foFloat'; FL.className = 'fo-float mini'; FL.innerHTML = `<div class="fo-fh"><span class="fo-fi" aria-hidden="true"></span><span class="fo-tt" role="timer" aria-live="off"></span>${PIPOK ? '<button data-f="pip" title="Janela flutuante fora da app" aria-label="Janela flutuante fora da app">⧉</button>' : ''}<button data-f="min" aria-label="Aumentar ou reduzir">⤢</button></div><i class="fo-fp"></i><div class="fo-fc"></div><div class="fo-ft"><button data-f="open">Abrir</button><button data-f="give">Desistir</button></div>`;
+    FL.querySelector('.fo-fc').appendChild(FC); document.body.appendChild(FL); FL._fi = ''; let sx = 0, sy = 0, ox = 0, oy = 0, mv = false;
     FL.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; mv = false; sx = e.clientX; sy = e.clientY; const r = FL.getBoundingClientRect(); ox = r.left; oy = r.top; FL.setPointerCapture(e.pointerId); FL._drag = true; });
     FL.addEventListener('pointermove', e => { if (!FL._drag) return; const dx = e.clientX - sx, dy = e.clientY - sy; if (Math.abs(dx) + Math.abs(dy) > 4) mv = true; FL.style.left = Math.max(4, Math.min(innerWidth - FL.offsetWidth - 4, ox + dx)) + 'px'; FL.style.top = Math.max(4, Math.min(innerHeight - FL.offsetHeight - 4, oy + dy)) + 'px'; FL.style.right = 'auto'; FL.style.bottom = 'auto'; });
     FL.addEventListener('pointerup', () => { FL._drag = false; if (!mv) location.hash = 'floresta'; });
-    FL.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); const f = b.dataset.f; if (f === 'pip') openPip(); if (f === 'min') FL.classList.toggle('mini'); if (f === 'open') location.hash = 'floresta'; if (f === 'give') A.foGiveUp(); }); }
-  FL.classList.toggle('off', !fl); const t = FL.querySelector('.fo-fh span'); if (t) t.textContent = (RUN.phase === 'grow' ? '' : 'Pausa · ') + mmss(left()); }
+    FL.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); const f = b.dataset.f; if (f === 'pip') openPip(); if (f === 'min') { FL.classList.toggle('mini'); pill(); } if (f === 'open') location.hash = 'floresta'; if (f === 'give') { if (RUN && RUN.phase === 'break') A.foSkip(); else A.foGiveUp(); } }); }
+  FL.classList.toggle('off', !fl); FL.classList.toggle('brk', RUN.phase !== 'grow');
+  const t = FL.querySelector('.fo-tt'); if (t) t.textContent = (RUN.phase === 'grow' ? (RUN.pomo ? RUN.pomo.i + '/' + RUN.pomo.of + ' · ' : '') : (RUN.long ? 'Pausa longa · ' : 'Pausa · ')) + mmss(left());
+  FL.style.setProperty('--p', (RUN.phase === 'grow' ? prog() : Math.min(1, (Date.now() - RUN.t0) / durMs())).toFixed(3));
+  // a árvore pequena: muda só quando cresce um degrau (não a cada segundo)
+  const fi = FL.querySelector('.fo-fi'), st = RUN.phase === 'grow' ? Math.ceil(prog() * 5) : -1, key = (RUN.sp || '') + '|' + st + '|' + (THUMB[RUN.sp] ? 1 : 0);
+  if (fi && FL._fi !== key) { FL._fi = key; fi.innerHTML = RUN.phase !== 'grow' ? '☕' : THUMB[RUN.sp] ? `<img src="${THUMB[RUN.sp]}" alt="" style="transform:scale(${(.6 + .4 * Math.max(.1, prog())).toFixed(2)})">` : esc((SP[RUN.sp] || {}).e || '🌱'); }
+  const fb = FL.querySelector('[data-f=give]'); if (fb) fb.textContent = RUN.phase === 'grow' ? 'Desistir' : 'Saltar pausa'; }
 A.foPip = () => openPip();
 document.addEventListener('visibilitychange', () => { if (!RUN || RUN.phase !== 'grow') return; if (document.hidden) { RUN.hid = Date.now(); RUN.pip = pipOn(); save(); return; } back(); });
 addEventListener('pagehide', () => { if (RUN && RUN.phase === 'grow' && !RUN.hid) { RUN.hid = Date.now(); save(); } });
 function back() { if (!RUN || !RUN.hid) return; const away = Date.now() - RUN.hid, lim = RUN.pip ? 0 : +cfg().strict; RUN.hid = null; RUN.pip = false; save();
   if (lim && away > lim * 1000 && left() > 0) return finish(false, `Saíste do Náutilo durante ${Math.round(away / 1000)} s`); if (away > 4000 && left() > 0) UI.toast('Voltaste a tempo — a árvore continua a crescer', 'pos'); step(); }
-OS.on('ready', () => { if (RUN) { if (RUN.phase === 'grow' && RUN.hid) back(); if (RUN) loop(); } });
+OS.on('ready', () => { if (RUN) { if (RUN.phase === 'grow' && RUN.hid) back(); if (RUN) loop(); if (RUN && RUN.sp && !THUMB[RUN.sp]) setTimeout(() => { try { if (T && !FAIL) thumbs([RUN.sp]); else if (!FAIL) load3().then(() => RUN && thumbs([RUN.sp])); } catch (e) { } }, 4000); } });
 addEventListener('hashchange', pill);
 A.foPlant = () => plant();
 A.foGiveUp = () => UI.ask('Desistir?', 'Se desistires agora, a tua árvore morre e fica seca na floresta.', 'Desistir', () => finish(false, 'Desististe'), 'danger');
 A.foBreak = () => startBreak();
-A.foSkip = () => { RUN = null; save(); clearInterval(tick); pill(); OS.request(); };
+A.foSkip = () => { if (RUN && RUN.phase === 'break' && RUN.pomo && PO().on) { RUN.t0 = Date.now() - durMs(); return step(); } RUN = null; save(); clearInterval(tick); pill(); OS.request(); };
 A.foAgain = () => { LAST = null; OS.request(); };
 A.foSp = b => { const k = b.dataset.k; if (SP[k]) { cfg().sp = k; OS.touch('forest'); if (/loja/.test(location.hash)) UI.toast(SP[k].n + ' escolhida', 'pos'); } };
 A.foCat = b => OS.setUI('foCat', b.dataset.v);
@@ -569,18 +591,20 @@ const tagSel = v => `<select class="field" id="foTag" aria-label="Etiqueta"><opt
 VW[''] = () => { const c = cfg(), sp = SP[c.sp] ? c.sp : 'carvalho', t = today(), Td = OS.all('trees').filter(x => x.date === t), cat = OS.ui.foCat || '', se = SEASON(), list = Object.keys(SP).filter(k => !cat || SP[k].k === cat);
   let k, title, body; const ring = (p, cls = '') => `<svg class="fo-ring ${cls}" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" pathLength="100" class="bg"/><circle id="foRing" cx="60" cy="60" r="54" pathLength="100" class="fg" style="stroke-dashoffset:${100 - p * 100}"/></svg>`;
   if (RUN && RUN.phase === 'grow') { k = `pot|${RUN.sp}|${stageOf(prog())}|0|${RUN.seed}|${cfg().scene || ''}`;
-    body = `<div class="fo-ph">${esc(PHRASES[RUN.ph % PHRASES.length])}</div><div class="fo-time" id="foTime">${mmss(left())}</div><div class="fo-sub">${esc(SP[RUN.sp].n)}${RUN.tag ? ' · ' + esc(RUN.tag) : ''} · ${RUN.mins} min</div>
+    body = `<div class="fo-ph">${esc(PHRASES[RUN.ph % PHRASES.length])}</div><div class="fo-time" id="foTime">${mmss(left())}</div><div class="fo-sub">${esc(SP[RUN.sp].n)}${RUN.tag ? ' · ' + esc(RUN.tag) : ''} · ${RUN.mins} min</div>${RUN.pomo ? `<div class="fo-pdots" title="Pomodoro ${RUN.pomo.i} de ${RUN.pomo.of}">${pdots(RUN.pomo.i - 1, RUN.pomo.of, 1)}</div>` : ''}
       <div class="row gap8" style="justify-content:center;flex-wrap:wrap"><div class="seg fo-snd">${SOUNDS.map(([v, l]) => `<button class="${(c.sound || '') === v ? 'on' : ''}" data-act="foSound" data-v="${v}">${l}</button>`).join('')}</div></div>
       <div class="row gap8" style="justify-content:center;flex-wrap:wrap"><button class="btn sm" data-act="foPip">⧉ Janela flutuante (para sair da app)</button><button class="btn ghost fo-give" data-act="foGiveUp">Desistir</button></div><small class="mut" style="max-width:360px">Abre a janela flutuante antes de saíres: ficas a ver a árvore e o tempo por cima das outras apps e a árvore não morre enquanto ela estiver aberta.</small>`; return stage(k, ring(prog()), body); }
-  if (RUN && RUN.phase === 'break') { return `<div class="pn fo-break"><div class="fo-ph">Pausa — estica as pernas, bebe água, olha para longe.</div><div class="fo-time" id="foTime">${mmss(left())}</div><button class="btn" data-act="foSkip">Saltar pausa</button></div>`; }
+  if (RUN && RUN.phase === 'break') { return `<div class="pn fo-break"><div class="fo-ph">${RUN.long ? 'Pausa longa: sai da secretária, come qualquer coisa, apanha ar.' : 'Pausa: estica as pernas, bebe água, olha para longe.'}</div><div class="fo-time" id="foTime">${mmss(left())}</div>${RUN.pomo ? `<div class="fo-pdots">${pdots(RUN.pomo.i, RUN.pomo.of)}</div><small class="mut">${RUN.long ? 'Ciclo completo depois desta pausa.' : `A seguir: pomodoro ${RUN.pomo.i + 1} de ${RUN.pomo.of}${PO().auto ? ', começa sozinho' : ''}.`}</small>` : ''}<button class="btn" data-act="foSkip">Saltar pausa</button></div>`; }
   if (LAST) { k = `pot|${LAST.sp}|1|${LAST.ok ? 0 : 1}|${LAST.seed}|${cfg().scene || ''}`;
-    body = LAST.ok ? `<div class="fo-done">Plantaste ${/a$/.test(SP[LAST.sp].n) ? 'uma' : 'um'} <b>${esc(SP[LAST.sp].n)}</b>!</div><div class="fo-sub">${LAST.mins} minutos de foco · +${LAST.coins} 🪙</div><div class="row gap8" style="justify-content:center;flex-wrap:wrap"><button class="btn pri" data-act="foBreak">Pausa de ${c.brk || 5} min</button><button class="btn" data-act="foAgain">Plantar outra</button><a class="btn ghost" href="#floresta.floresta">Ver a floresta</a></div>`
+    body = LAST.ok ? `<div class="fo-done">Plantaste ${/a$/.test(SP[LAST.sp].n) ? 'uma' : 'um'} <b>${esc(SP[LAST.sp].n)}</b>!</div><div class="fo-sub">${LAST.mins} minutos de foco · +${LAST.coins} 🪙</div><div class="row gap8" style="justify-content:center;flex-wrap:wrap"><button class="btn pri" data-act="foBreak">${PO().on ? (PS().i >= +PO().n ? 'Pausa longa de ' + PO().l : 'Pausa de ' + PO().s) : 'Pausa de ' + (c.brk || 5)} min</button><button class="btn" data-act="foAgain">Plantar outra</button><a class="btn ghost" href="#floresta.floresta">Ver a floresta</a></div>`
       : `<div class="fo-done dead">A tua árvore morreu</div><div class="fo-sub">${esc(LAST.why || '')}${LAST.mins ? ' · ' + LAST.mins + ' min' : ''}. Fica seca na floresta como lembrete. Recomeça — tu consegues.</div><div class="row gap8" style="justify-content:center"><button class="btn pri" data-act="foAgain">Tentar outra vez</button></div>`;
     return stage(k, ring(1, LAST.ok ? 'ok' : 'dead'), body); }
   k = `pot|${sp}|1|0|${U.hash(sp) % 997}|${cfg().scene || ''}`;
-  body = `<div class="fo-time" id="foTime">${mmss((+c.mins || 25) * 6e4)}</div>
-    <input type="range" id="foDur" min="10" max="180" step="5" value="${+c.mins || 25}" aria-label="Duração em minutos" class="fo-range">
-    <div class="row gap6 fo-chips">${[15, 25, 45, 50, 60, 90, 120].map(m => `<button class="chip ${+c.mins === m ? 'on' : ''}" data-act="foMins" data-v="${m}">${m}</button>`).join('')}</div>
+  const po = PO(), ps = PS();
+  body = `<div class="fo-time" id="foTime">${mmss((po.on ? +po.f || 25 : +c.mins || 25) * 6e4)}</div>
+    ${po.on ? '' : `<input type="range" id="foDur" min="10" max="180" step="5" value="${+c.mins || 25}" aria-label="Duração em minutos" class="fo-range">
+    <div class="row gap6 fo-chips">${[15, 25, 45, 50, 60, 90, 120].map(m => `<button class="chip ${+c.mins === m ? 'on' : ''}" data-act="foMins" data-v="${m}">${m}</button>`).join('')}</div>`}
+    ${pomoPanel(po, ps)}
     <div class="fo-ctl">${tagSel(c.tag || '')}<select class="field" id="foStrict" aria-label="Regra de saída"><option value="10"${c.strict === '10' ? ' selected' : ''}>Morre se saíres 10 s</option><option value="20"${c.strict === '20' ? ' selected' : ''}>Morre se saíres 20 s</option><option value="60"${c.strict === '60' ? ' selected' : ''}>Morre se saíres 1 min</option><option value="0"${c.strict === '0' ? ' selected' : ''}>Só morre se desistires</option></select></div>
     ${se[0] !== sp ? `<button class="fo-season" data-act="foSp" data-k="${se[0]}">${se[1]} — experimenta: <b>${esc(SP[se[0]].n)}</b></button>` : ''}
     <div class="row gap6 fo-cats">${CATS.map(([k, l]) => `<button class="chip ${cat === k ? 'on' : ''}" data-act="foCat" data-v="${k}">${l}</button>`).join('')}</div>
@@ -589,6 +613,18 @@ VW[''] = () => { const c = cfg(), sp = SP[c.sp] ? c.sp : 'carvalho', t = today()
     <button class="btn pri fo-go" data-act="foPlant">Plantar</button>
     <div class="fo-today">${Td.length ? `Hoje: <b>${Td.filter(x => x.alive !== false).length}</b> árvore(s) · <b>${U.hours(U.sum(Td.filter(x => x.alive !== false), x => +x.mins || 0))}</b> de foco${Td.some(x => x.alive === false) ? ` · ${Td.filter(x => x.alive === false).length} morta(s)` : ''}` : 'Ainda não plantaste hoje.'}</div>`;
   if (T && !FAIL) thumbs([sp].concat(list)); else if (!T && !FAIL) load3().then(() => thumbs([sp].concat(list))); return stage(k, ring(0, 'idle'), body); };
+// Pomodoro: bolinhas do ciclo (cheias = feitos, a pulsar = o atual)
+const pdots = (done, of, cur) => Array.from({ length: of }, (_, i) => `<i class="${i < done ? 'on' : ''} ${cur && i === done ? 'cur' : ''}"></i>`).join('');
+const PPRE = [['Clássico', 25, 5, 15, 4], ['Profundo', 50, 10, 30, 3], ['Maratona', 90, 20, 30, 2], ['Curto', 15, 3, 10, 4]];
+const pomoPanel = (po, ps) => `<div class="fo-pomo ${po.on ? 'on' : ''}"><label class="fo-pt"><input type="checkbox" data-act="foPomo" ${po.on ? 'checked' : ''}><span><b>Técnica Pomodoro</b><small>Foco e pausas em ciclo: ${+po.f} min de foco, ${+po.s} de pausa, e uma pausa de ${+po.l} min a cada ${+po.n} focos.</small></span></label>
+  ${po.on ? `<div class="row gap6 fo-chips">${PPRE.map(([n, f, sb, l, k]) => `<button class="chip ${+po.f === f && +po.s === sb && +po.l === l && +po.n === k ? 'on' : ''}" data-act="foPre" data-v="${f},${sb},${l},${k}">${n} ${f}/${sb}</button>`).join('')}</div>
+  <div class="fo-pg"><label>Foco<input class="field" type="number" min="5" max="180" data-po="f" value="${+po.f}"></label><label>Pausa<input class="field" type="number" min="1" max="60" data-po="s" value="${+po.s}"></label><label>Pausa longa<input class="field" type="number" min="1" max="90" data-po="l" value="${+po.l}"></label><label>Focos por ciclo<input class="field" type="number" min="1" max="12" data-po="n" value="${+po.n}"></label></div>
+  <label class="fo-pa"><input type="checkbox" data-act="foPomoAuto" ${po.auto ? 'checked' : ''}> Começar a pausa e o foco seguinte sozinhos</label>
+  <div class="fo-pdots" title="Ciclo de hoje">${pdots(ps.i % (+po.n || 4), +po.n || 4)}</div><small class="mut">${ps.done ? `Hoje: ${ps.done} pomodoro${ps.done > 1 ? 's' : ''} feitos. ` : ''}Se desistires de uma árvore, o ciclo recomeça.</small>` : ''}</div>`;
+A.foPomo = b => { PO().on = !!b.checked; OS.touch('forest'); };
+A.foPomoAuto = b => { PO().auto = !!b.checked; OS.touch('forest'); };
+A.foPre = b => { const [f, sb, l, k] = b.dataset.v.split(',').map(Number); Object.assign(PO(), { f, s: sb, l, n: k }); OS.touch('forest'); };
+document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.po; if (!k) return; const lim = { f: [5, 180], s: [1, 60], l: [1, 90], n: [1, 12] }[k], v = Math.round(U.clamp(+e.target.value || lim[0], lim[0], lim[1])); PO()[k] = v; OS.touch('forest'); });
 const stage = (k, ring, body) => `<div class="fo-wrap"><div class="${sky()} fo-stage"><div id="fo3d" class="fo-3d" data-mode="pot" data-k="${k}"><div class="fo-fb"><span class="fd-spin"></span><small>A preparar a tua árvore…</small></div></div>${ring}</div><div class="fo-panel">${body}</div></div>`;
 
 const PER = [['d', 'Dia'], ['w', 'Semana'], ['m', 'Mês'], ['y', 'Ano'], ['a', 'Tudo']];

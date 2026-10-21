@@ -46,7 +46,7 @@ const fetchQ = async (q, n) => { const all = []; const S = sources();
 const aiOn = () => OS.AI && OS.AI.key && OS.AI.key();
 const classify = async items => { const todo = items.filter(x => !M.ai[x.id]).slice(0, 30); if (!todo.length && M.sum) return;
   const p = OS.one('profile');
-  const o = await OS.AI.json([{ text: `És o assistente de e-mail de ${p.short || 'Ryan'} (estudante no ISCA-UA em Aveiro, trabalha, brasileiro a viver em Portugal). Hoje é ${U.today()}.
+  const o = await OS.AI.json([{ text: `És o assistente de e-mail de ${OS.whoCtx((p.short || 'Ryan') + ' (estudante no ISCA-UA em Aveiro, trabalha, brasileiro a viver em Portugal)')}. Hoje é ${U.today()}.
 Classifica cada e-mail numa categoria: "urgente" (prazo hoje/amanhã, pagamento em atraso, segurança da conta, universidade/trabalho a pedir ação já), "responder" (uma pessoa real espera resposta dele), "atencao" (importante ler, sem resposta), "info" (notificações, recibos, confirmações), "promo" (marketing, newsletters), "spam" (suspeito: phishing, burla, pede dados ou dinheiro, remetente estranho).
 Para cada e-mail: {"id","c","porque":"máx. 12 palavras","acao":"o que fazer, máx. 8 palavras, ou vazio","prazo":"AAAA-MM-DD ou null","evento":null ou {"titulo","data":"AAAA-MM-DD","hora":"HH:MM" ou null,"fim":"HH:MM" ou null,"local":"…" ou null}}.
 "evento" só quando o e-mail marca algo com data concreta para ele: reunião, entrevista, aula, consulta, exame, evento, entrega com prazo. Converte datas relativas ("amanhã", "sexta") usando a data do e-mail.
@@ -63,7 +63,7 @@ const refresh = async (manual) => { if (busy || !ready()) { if (manual && !ready
   busy = ''; OS.request(); };
 const refreshLi = async (manual) => { if (busy || !ready()) return; busy = 'li'; err = ''; if (manual) OS.request();
   try { const items = await fetchQ(cfg().liq, 40); M.li = { at: Date.now(), items, sum: liGuess(items) };
-    if (aiOn() && items.length) { try { const o = await OS.AI.json([{ text: `Estes são e-mails de notificação do LinkedIn do ${OS.one('profile').short || 'Ryan'}. Extrai SÓ o que está nos e-mails (não inventes):
+    if (aiOn() && items.length) { try { const o = await OS.AI.json([{ text: `Estes são e-mails de notificação do LinkedIn de ${OS.who()}. Extrai SÓ o que está nos e-mails (não inventes):
 JSON {"resumo":"2 frases: o que vale a pena fazer no LinkedIn agora","mensagens":[{"de","texto":"máx. 20 palavras","id"}],"convites":[{"nome","cargo","id"}],"vagas":[{"titulo","empresa","local","id"}],"visualizacoes":número ou null,"publicacoes":[{"texto":"máx. 15 palavras","id"}]}
 E-mails: ${JSON.stringify(items.slice(0, 35).map(x => ({ id: x.id, assunto: x.s, data: x.d.slice(0, 10), inicio: x.sn.slice(0, 300) })))}` }], .1); M.li.sum = Object.assign(liGuess(items), o, { ai: true }); } catch (e) { err = 'IA: ' + (e.message || '') ; } }
     save(); } catch (e) { err = e.message || 'Não consegui ir buscar o LinkedIn.'; }
@@ -177,7 +177,7 @@ if (OS.Cal && OS.Cal.items) { OS.Cal.src.mail = ['E-mail', '#f59e0b']; const _it
 /* ---------- responder: o texto fica como rascunho no teu Gmail ---------- */
 const postTo = async (u, o) => { const r = await fetch(u, { method: 'POST', body: new URLSearchParams(Object.assign({ k: OS.one('inbox').key }, o)), credentials: 'omit', cache: 'no-store' }); const t = await r.text(); try { return JSON.parse(t); } catch (e) { return { ok: false, msg: t.slice(0, 160) }; } };
 const compose = async (it, instr) => { const p = OS.one('profile');
-  const o = await OS.AI.json([{ text: `Escreve a resposta de ${p.name || p.short || 'Ryan'} a este e-mail. Língua: a mesma do e-mail (se for português, usa o português de quem escreveu). Tom: educado, direto e humano; curto (2 a 6 frases). Termina com "${p.short || 'Ryan'}". Não inventes factos, datas ou compromissos que ele não disse.
+  const o = await OS.AI.json([{ text: `Escreve a resposta de ${p.name || OS.who()} a este e-mail. Língua: a mesma do e-mail (se for português, usa o português de quem escreveu). Tom: educado, direto e humano; curto (2 a 6 frases). Termina com "${OS.who()}". Não inventes factos, datas ou compromissos que ele não disse.
 O que ele quer dizer: ${instr || '(responde de forma adequada e prática)'}
 E-mail de ${it.f} · assunto: ${it.s}
 Texto: ${it.sn.slice(0, 900)}

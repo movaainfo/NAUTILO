@@ -40,6 +40,13 @@ OS.ONE_DEF.fin = { cats: {
   Receita: { 'Salário': ['Salário', 'Horas extra', 'Subsídios'], 'Mova': ['Distribuição de lucro'], 'Serviços próprios': ['Freelance', 'Serviços'], 'Família': ['Mesada', 'Ajuda'], 'Investimentos': ['Dividendos', 'Juros', 'Mais-valias'], 'Bolsas': ['Bolsa de estudo'], 'Outros': ['Reembolsos', 'Vendas', 'Diversos'] }
 } };
 OS.ONE_DEF.fit = { split: { 1: 'Peito & Tríceps', 2: 'Costas & Bíceps', 3: 'Pernas', 4: 'Ombros & Core', 5: 'Full Body', 6: 'Corrida', 0: 'Mobilidade' } };
+// quem usa a app: no modo pessoal é o Ryan (os textos de sempre); numa conta é o nome do perfil e o que ele disser (cidade, curso, trabalho)
+OS.who = () => OS.one('profile').short || (OS.Acc && OS.Acc.pub ? 'o utilizador' : 'Ryan');
+const whoBits = () => { const p = OS.one('profile'); return [p.city && 'vive em ' + p.city, p.uni && 'estuda em ' + p.uni + (p.course ? ', ' + p.course : ''), p.jobRole && 'trabalha como ' + p.jobRole].filter(Boolean); };
+OS.whoCtx = (ryan, prep = '') => { if (!(OS.Acc && OS.Acc.pub)) return ryan; const b = whoBits(); return (prep ? prep + ' ' : '') + OS.who() + (b.length ? ' (' + b.join('; ') + ')' : ''); };
+// textos fixos com o nome do Ryan ("o Ryan de daqui a 5 anos"): numa conta passam a "o teu eu de…"
+OS.my = s => OS.Acc && OS.Acc.pub ? String(s || '').replace(/\b(o|O|ao|Ao|no|do) Ryan de\b/g, '$1 teu eu de') : s;
+OS.whoFlat = ryan => OS.Acc && OS.Acc.pub ? [OS.who()].concat(whoBits()).join(', ') : ryan;
 OS.ONE_DEF.mova = { name: 'Mova', what: '', offer: '', customer: '', stage: 'Ideia', founded: '', revenueTarget: '', clientsTarget: '', marginTarget: '', notes: '' };
 OS.ONE_DEF.northstar = { h3m: '', h1y: '', h3y: '', h5y: '', hlong: '', values: '', identity: '', notAccept: '' };
 OS.ONE_DEF.plan = { week: {}, month: {}, mit: {} };
@@ -681,6 +688,12 @@ const EXERCISES = [['Supino reto com barra', 'Peito', ['Tríceps', 'Ombros'], 'B
   ['Abdominal na roda', 'Abdómen', ['Oblíquos'], 'Outro'], ['Elevação de pernas suspenso', 'Abdómen', ['Antebraços'], 'Peso corporal'], ['Russian twist', 'Oblíquos', ['Abdómen'], 'Peso corporal'], ['Hiperextensão lombar', 'Lombar', ['Glúteos'], 'Máquina'], ['Farmer walk', 'Antebraços', ['Trapézio', 'Abdómen'], 'Halteres']];
 OS.on('seed', () => {
   const meta = OS.one('meta'); if (meta.seeded) return;
+  // conta nova (versão pública): só o essencial, sem nada do Ryan
+  if (OS.Acc && OS.Acc.pub) { OS.touch('profile'); OS.touch('fin'); OS.touch('fit');
+    if (!OS.all('accounts').length) { OS.add('accounts', { name: 'Conta principal', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); OS.add('accounts', { name: 'Fundo de emergência', type: 'Reserva', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); }
+    if (!OS.all('exercises').length) EXERCISES.forEach(([name, muscle, secondary, equip]) => OS.add('exercises', { name, muscle, secondary, equip }, { silent: true }));
+    if (!OS.all('habits').length) [['Acordar à hora, sem snooze', 'Manhã', 1], ['2 blocos de foco (100 min)', 'Dia', 1, 'study100'], ['Treino ou corrida', 'Dia', 1, 'workout'], ['20 páginas de leitura', 'Noite', 1], ['Registar gastos do dia', 'Noite', 0, 'cash'], ['Telemóvel fora do quarto', 'Noite', 0]].forEach(([name, group, core, auto]) => OS.add('habits', { name, group, core: !!core, freq: name.startsWith('Treino') ? 'Dias úteis' : 'Diário', active: true, log: {}, auto: auto || '', area: 'Pessoal' }, { silent: true }));
+    meta.seeded = true; OS.touch('meta'); return; }
   const p = OS.one('profile'); OS.touch('profile'); OS.touch('fin'); OS.touch('fit'); OS.touch('mova');
   if (!OS.all('subjects').length) {
     [['Informática Organizacional', 'Média', 5], ['Introdução à Contabilidade', 'Alta', 6]].forEach(([n, d, h]) => OS.add('subjects', { name: n, sem: '1.º Semestre 26/27', status: 'Em curso', target: 15, hoursWeek: h, diff: d, ects: 6 }, { silent: true }));

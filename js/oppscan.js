@@ -62,7 +62,7 @@ let busy = false, lastAI = 0;
 const aiOn = () => OS.AI && OS.AI.key && OS.AI.key();
 const aiScan = async (force) => { if (busy || !aiOn() || (!force && Date.now() - lastAI < 10 * 60e3)) return; const todo = sources().map(([it, info]) => [it, info]).filter(([it, info]) => it && it.id && !AI[it.id] && !(info && info.c === 'spam') && !NOT.test((it.s || '') + ' ' + (it.sn || ''))).slice(0, 25);
   if (!todo.length) return; busy = true; lastAI = Date.now(); const p = OS.one('profile');
-  try { const o = await OS.AI.json([{ text: `${p.short || 'Ryan'} é estudante no ISCA-UA (Aveiro, Portugal), trabalha e quer crescer na carreira (finanças, contabilidade, gestão, empreender). Hoje é ${U.today()}.
+  try { const o = await OS.AI.json([{ text: `${OS.Acc && OS.Acc.pub ? OS.whoCtx('') + ' quer crescer na carreira.' : (p.short || 'Ryan') + ' é estudante no ISCA-UA (Aveiro, Portugal), trabalha e quer crescer na carreira (finanças, contabilidade, gestão, empreender).'} Hoje é ${U.today()}.
 Destes e-mails (Gmail e notificações do LinkedIn), diz quais trazem uma OPORTUNIDADE concreta para ele: vaga, estágio, bolsa, curso, certificação, evento, palestra, competição, programa universitário, mentoria ou negócio.
 Não contes: publicidade genérica, faturas, segurança, convites para ligar, quem viu o perfil, reações e newsletters sem nada concreto.
 Para cada e-mail: {"id","ok":true/false,"titulo":"nome curto da oportunidade","instituicao":"quem oferece","tipo":"Curso|Certificação|Evento|Palestra|Programa universitário|Estágio|Emprego|Projeto|Competição|Networking|Bolsa|Negócio","prazo":"AAAA-MM-DD ou null","porque":"porque lhe interessa, máx. 14 palavras"}

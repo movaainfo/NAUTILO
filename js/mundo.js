@@ -29,7 +29,8 @@ const stats = () => { const m = mine(), v = ALL.filter(c => been(m[c.c3])), w = 
   const hem = [['Norte', v.some(c => c.lat > 0)], ['Sul', v.some(c => c.lat < 0)], ['Este', v.some(c => c.lng > 0)], ['Oeste', v.some(c => c.lng < 0)]];
   return { m, v, w, n: v.length, pct: v.length / ALL.length * 100, apct: area / AREA * 100, byC, conts: byC.filter(c => c.v).length, hem, next: MIL.find(x => x[0] > v.length) }; };
 const dateOf = r => r.date || (r._c ? U.iso(new Date(r._c)) : U.today());
-OS.Mundo = { ALL, BY, CONT, name: c => (BY[c] || {}).n || c, flag: c => flag((BY[c] || {}).c2), stats, been, dateOf, mine };
+OS.Mundo = { ALL, BY, CONT, name: c => (BY[c] || {}).n || c, flag: c => flag((BY[c] || {}).c2), flag2: flag, stats, been, dateOf, mine,
+  scale: z => (z !== '' && WORLD.B[z] ? WORLD.B[z] : WORLD.Z)[2] / WORLD.W };
 
 // ---------- ações ----------
 const recOf = c => OS.all('countries').filter(r => r.code === c);
@@ -40,7 +41,7 @@ A.muPick = b => { const c = BY[b.dataset.c]; if (!c) return; const r = mine()[c.
       <div class="row gap8"><button class="btn sm" data-act="muEdit" data-id="${r.id}">${UI.ic('edit')}<span>Data, cidades e memórias</span></button><button class="btn sm ghost" data-act="muClear" data-c="${c.c3}">Tirar</button></div>` : '<p class="mut">Marca se já foste, se viveste lá ou se queres ir.</p>'}</div>`, 'mu-modal'); };
 A.muSet = b => { const c = b.dataset.c, v = b.dataset.v, L = recOf(c), name = (BY[c] || {}).n || c, was = been(mine()[c]);
   if (L.length) { OS.upd('countries', L[0].id, { status: v }); L.slice(1).forEach(r => OS.del('countries', r.id)); } else OS.add('countries', { code: c, status: v });
-  UI.closeModal(); UI.toast(v === 'Quero ir' ? `${name} está nos teus próximos destinos` : was ? `${name}: ${v.toLowerCase()}` : `${flag((BY[c] || {}).c2)} ${name} no teu mapa! +150 XP de Mente no Dominus`, 'pos'); };
+  UI.closeModal(); UI.toast(v === 'Quero ir' ? `${name} está nos teus próximos destinos` : was ? `${name}: ${v.toLowerCase()}` : `${flag((BY[c] || {}).c2)} ${name} no teu mapa! +1500 XP de Mente no Dominus`, 'pos'); };
 A.muClear = b => { recOf(b.dataset.c).forEach(r => OS.del('countries', r.id)); UI.closeModal(); };
 A.muEdit = b => { UI.closeModal(); UI.openForm('countries', b.dataset.id); };
 A.muTog = b => { const c = b.dataset.c, v = b.dataset.v, r = mine()[c]; if (r && (r.status === v || (v === 'Visitei' && r.status === 'Morei'))) { recOf(c).forEach(x => OS.del('countries', x.id)); return; } A.muSet(b); };

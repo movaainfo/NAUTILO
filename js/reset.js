@@ -29,7 +29,7 @@ const AREAS = [
   ['Carreira', ['applications', 'contacts', 'experiences', 'opps', 'skills', 'certs']],
   ['Mova', ['mvsales', 'mvexp', 'mvclients', 'mvproducts', 'mvmkt']],
   ['Pessoas', ['people', 'social']],
-  ['Mundo (países)', ['countries']],
+  ['Mundo (países e ilhas)', ['countries', 'islands']],
   ['Biografia', ['lifeev']],
   ['Spyke', ['spymem', 'spyroutines']],
   ['Floresta, recompensas e o jogo', ['trees', 'forewards', 'rewards', 'one:dominus', 'one:forest']]];
@@ -37,7 +37,7 @@ const AREA_OF = {}; AREAS.forEach(([a, cs]) => cs.forEach(c => { AREA_OF[c] = a;
 
 // a "estrutura" da tua vida na app: fica (a não ser que tenha "teste" no nome)
 const MINE = { accounts: 'As tuas contas e bancos', subjects: 'Disciplina do teu curso', exercises: 'Biblioteca de exercícios da app', habits: 'A tua lista de hábitos (só os dias marcados saem)',
-  sports: 'Desporto que praticas', people: 'Pessoa da tua vida', skills: 'Competência que queres dominar', contacts: 'Contacto profissional', experiences: 'O teu percurso', certs: 'Certificação tua', adventures: 'Aventura que queres viver', countries: 'País do teu mapa',
+  sports: 'Desporto que praticas', people: 'Pessoa da tua vida', skills: 'Competência que queres dominar', contacts: 'Contacto profissional', experiences: 'O teu percurso', certs: 'Certificação tua', adventures: 'Aventura que queres viver', countries: 'País do teu mapa', islands: 'Ilha do teu mapa',
   mailevents: 'Veio dos teus e-mails', lifeev: 'A tua biografia', spymem: 'O que o Spyke sabe sobre ti', files: 'Ficheiro guardado no teu Google Drive' };
 // o plano inicial que me deste (a especificação do início): fica
 const SEED = { goals: ['Fundo de emergência de € 1.000', 'Média ≥ 15 no 1.º semestre', 'Correr 5 km em menos de 25 min', 'Inglês B2', '12 livros num ano'],

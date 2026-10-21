@@ -105,7 +105,7 @@ function decDrawer(id) {
   const ar = alphaRes(d.alpha, Math.max(0, ...alts.map(a => U.num(a.cost))));
   UI.drawer(`<div class="drw-h"><div><div class="eyebrow">Decisão · ${esc(d.status)}</div><h3>${esc(d.title)}</h3></div><div class="row gap4"><button class="btn sm ghost" data-edit="decisions:${d.id}">${UI.ic('edit')}Editar</button><button type="button" class="icon-btn" data-close aria-label="Fechar">${UI.ic('x')}</button></div></div>
   <div class="drw-b">${d.context ? `<p class="tx2" style="margin:0">${esc(d.context)}</p>` : ''}
-    <div><div class="eyebrow" style="margin-bottom:8px">Filtro Alpha (as tuas 5 perguntas)</div>${ALPHA.map((q, i) => `<div class="row between gap8" style="padding:5px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${i + 1}. ${q}</span>${UI.seg('x', [['Sim', 'Sim'], ['Não', 'Não']], (d.alpha || {})['q' + i]).replace(/data-ui="x"/g, `data-alpha="${d.id}" data-q="q${i}"`)}</div>`).join('')}<div class="row gap8" style="margin-top:8px">${UI.badge(ar[0], ar[1])}<span class="mut" style="font-size:12px">Regra: emoção = Sim, ou qualquer outra = Não → esperar 24 h. Dinheiro acima de € 50 → esperar 3 dias.</span></div></div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Filtro Alpha (as tuas 5 perguntas)</div>${ALPHA.map(OS.my).map((q, i) => `<div class="row between gap8" style="padding:5px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${i + 1}. ${q}</span>${UI.seg('x', [['Sim', 'Sim'], ['Não', 'Não']], (d.alpha || {})['q' + i]).replace(/data-ui="x"/g, `data-alpha="${d.id}" data-q="q${i}"`)}</div>`).join('')}<div class="row gap8" style="margin-top:8px">${UI.badge(ar[0], ar[1])}<span class="mut" style="font-size:12px">Regra: emoção = Sim, ou qualquer outra = Não → esperar 24 h. Dinheiro acima de € 50 → esperar 3 dias.</span></div></div>
     <div><div class="row between"><div class="eyebrow">Alternativas lado a lado</div><button class="btn sm" data-act="altAdd" data-id="${d.id}">${UI.ic('plus')}Alternativa</button></div>
     ${alts.length ? `<div class="tblw" style="margin-top:8px"><table class="tbl matrix"><thead><tr><th>Critério</th><th>Peso</th>${alts.map((a, i) => `<th><input value="${esc(a.name || '')}" data-alt="${d.id}" data-i="${i}" data-k="name" placeholder="Alternativa ${i + 1}" aria-label="Nome da alternativa ${i + 1}"></th>`).join('')}</tr></thead><tbody>
       ${CRIT.map(([k, l, t2, up]) => `<tr><td>${l}<div class="mut" style="font-size:11px">${up ? 'mais é melhor' : 'menos é melhor'}</div></td><td><select data-wt="${d.id}" data-k="${k}" aria-label="Peso ${l}">${[0, 1, 2, 3, 4, 5].map(n => `<option${+w[k] === n ? ' selected' : ''}>${n}</option>`).join('')}</select></td>${alts.map((a, i) => `<td class="${best[k] != null && a[k] !== '' && a[k] != null && +a[k] === best[k] ? 'best' : ''}">${t2 === 'r' ? `<select data-alt="${d.id}" data-i="${i}" data-k="${k}" aria-label="${l}"><option value="">—</option>${[1, 2, 3, 4, 5].map(n => `<option${+a[k] === n ? ' selected' : ''}>${n}</option>`).join('')}</select>` : `<input type="number" step="any" value="${a[k] ?? ''}" data-alt="${d.id}" data-i="${i}" data-k="${k}" aria-label="${l}">`}</td>`).join('')}</tr>`).join('')}
@@ -135,9 +135,9 @@ const decCtx = d => { const L = [], add = (k, v) => { if (v) L.push(k + ': ' + v
   add('Decisão', d.title); add('Contexto', d.context); add('Decidir até', d.deadline); add('Estado', d.status);
   (d.alts || []).forEach((a, i) => add('Alternativa ' + (i + 1), [a.name || 'sem nome'].concat(CRIT.filter(([k]) => a[k] !== '' && a[k] != null).map(([k, l]) => l + ' = ' + a[k]), a.notes ? ['notas: ' + a.notes] : []).join('; ')));
   add('Pesos que ele deu (0–5)', CRIT.map(([k, l]) => l + ' ' + Object.assign({}, W0, d.weights || {})[k]).join(', '));
-  add('Filtro Alpha', ALPHA.map((q, i) => q + ' ' + ((d.alpha || {})['q' + i] || 'sem resposta')).join(' | '));
+  add('Filtro Alpha', ALPHA.map(OS.my).map((q, i) => q + ' ' + ((d.alpha || {})['q' + i] || 'sem resposta')).join(' | '));
   return L.join('\n'); };
-const who = () => OS.one('profile').short || 'Ryan';
+const who = () => OS.one('profile').short || OS.who();
 const decPrompt = (d, task) => [{ text: `És o Spyke, o assistente pessoal do ${who()}. Ajudas a pensar uma decisão importante: és honesto, concreto e usas os dados dele; não decides por ele. Escreve em português claro (de Portugal), sem emojis, frases curtas.
 DECISÃO:
 ${decCtx(d)}
@@ -262,7 +262,7 @@ A.evoAI = async () => { if (EVAI.busy) return; if (!(OS.AI && (OS.AI.key() || (O
   EVAI.busy = true; EVAI.err = ''; OS.request(); const by = evoData();
   const lines = Object.values(by).map(x => `${x.m.l}: hoje ${x.v[0] == null ? '—' : x.m.fmt(x.v[0])} | 30 dias ${x.v[1] == null ? '—' : x.m.fmt(x.v[1])} | 3 meses ${x.v[2] == null ? '—' : x.m.fmt(x.v[2])} | 1 ano ${x.v[3] == null ? '—' : x.m.fmt(x.v[3])}`).join('\n');
   const goals = OS.all('goals').filter(g => g.status === 'Ativa').map(g => { const i = Goal.info(g); return `${g.title} (${g.horizon || ''}): ${Math.round(i.p * 100)}%${i.exp != null ? ', esperado ' + Math.round(i.exp * 100) + '%' : ''}${i.late ? ', atrasada' : i.behind ? ', atrás do ritmo' : ''}`; }).join('\n');
-  try { const r = await OS.AI.json([{ text: `És o Spyke, o assistente do ${OS.one('profile').short || 'Ryan'}. Analisa a EVOLUÇÃO dele em todas as áreas da vida (desporto, estudos, carreira, dinheiro, hábitos, metas), com honestidade e números. Português de Portugal, sem emojis.
+  try { const r = await OS.AI.json([{ text: `És o Spyke, o assistente de ${OS.who()}. Analisa a EVOLUÇÃO dele em todas as áreas da vida (desporto, estudos, carreira, dinheiro, hábitos, metas), com honestidade e números. Português de Portugal, sem emojis.
 MÉTRICAS (hoje vs 30 dias, 3 meses e 1 ano atrás):
 ${lines}
 METAS ATIVAS:
@@ -272,7 +272,8 @@ Responde só JSON: {"resumo":"3 frases sobre como está a evoluir no geral","not
     U.ls.set('oc_evoai', Object.assign(r, { at: Date.now() })); }
   catch (e) { EVAI.err = e.message || 'O Spyke não respondeu.'; }
   EVAI.busy = false; OS.request(); };
-V.evolucao = () => {
+// a evolução vive agora no fim do Painel (secção "A tua evolução"): o que já lá estava (metas, tendências) não se repete
+OS.EvoBody = () => {
   const M = I.metrics.filter(m => !m.has || m.has()), sel = OS.ui.evM || 'study', m = I.metrics.find(x => x.k === sel) || M[0], t = U.today();
   const weeks = Array.from({ length: 26 }, (_, i) => U.addDays(t, -7 * (25 - i)));
   const series = m ? weeks.map(d => { const v = m.f(d); return v == null ? null : m.ratio ? U.r2(v * 100) : U.r2(v); }) : [];
@@ -281,7 +282,7 @@ V.evolucao = () => {
   const lt = String(V.longterm()).replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, ''), kEnd = Math.max(0, lt.indexOf('<div class="g g2">'));
   const evoPanel = `<div class="pn evo-g"><div class="pn-h"><h3>${UI.ic('chart')}Evolução por área</h3><span class="mut" style="font-size:12px">${all.length ? `${all.filter(x => x.up).length} de ${all.length} indicadores melhoraram nos últimos 30 dias${allY.length ? ` · ${allY.filter(x => x.upY).length} de ${allY.length} num ano` : ''}` : 'regista mais dados para ver tendências'}</span></div>
     <div class="evo-cards">${areas.filter(a => a.L.length).map(a => `<div class="evo-c"><div class="evo-ch">${UI.ic(a.ic)}<b>${a.area}</b>${a.score != null ? `<span class="bdg ${a.score >= .67 ? 'pos' : a.score >= .34 ? 'warn' : 'neg'}">${a.score >= .67 ? 'a evoluir' : a.score >= .34 ? 'misto' : 'a piorar'}</span>` : ''}</div>${a.L.map(x => `<div class="evo-m click" data-act="evM" data-v="${x.m.k}"><span>${esc(x.m.l.replace(/ \(30 dias\)/, ''))}</span><b class="mono">${x.v[0] == null ? '—' : x.m.fmt(x.v[0])}</b><span class="evo-t">${x.v[0] != null && x.v[1] != null ? UI.trend(x.v[0], x.v[1], x.m.up) : ''}</span></div>`).join('')}</div>`).join('')}
-      <div class="evo-c"><div class="evo-ch">${UI.ic('target')}<b>Metas</b>${G.length ? `<span class="bdg ${onTrack / G.length >= .67 ? 'pos' : onTrack / G.length >= .34 ? 'warn' : 'neg'}">${onTrack}/${G.length} no ritmo</span>` : ''}</div>${G.length ? U.sortBy(G, i => i.p).slice(0, 4).map(i => `<div class="evo-m click" data-edit="goals:${i.g.id}"><span>${esc(i.g.title)}</span><b class="mono">${Math.round(i.p * 100)}%</b><span class="evo-t ${i.late ? 'neg' : i.behind ? 'warn' : 'pos'}">${i.late ? 'atrasada' : i.behind ? 'atrás' : 'no ritmo'}</span></div>`).join('') : '<p class="mut" style="font-size:13px">Sem metas ativas.</p>'}</div></div></div>
+</div></div>
   <div class="pn evo-ai"><div class="sai-h"><span class="ai-orb sm" aria-hidden="true"></span><div><h3>O Spyke analisa a tua evolução</h3><small class="mut">Uma leitura honesta de todas as áreas, o que está a melhorar, o que está parado e o que fazer nos próximos 30 dias para chegares aos teus objetivos.</small></div><button class="btn sm ${AIr ? 'ghost' : 'pri'}" data-act="evoAI" ${EVAI.busy ? 'disabled' : ''}>${AIr ? 'Analisar de novo' : 'Analisar'}</button></div>
     ${EVAI.busy ? `<div class="sai-busy"><div class="fd-spin"></div><span>O Spyke está a ler a tua evolução…</span></div>` : ''}${EVAI.err ? `<p class="neg">${esc(EVAI.err)}</p>` : ''}
     ${AIr && !EVAI.busy ? `<div class="evo-ar"><div class="evo-n"><b>${esc(AIr.nota || '—')}</b><small>/10</small></div><p>${esc(AIr.resumo || '')}</p></div>
@@ -292,8 +293,8 @@ V.evolucao = () => {
   <div class="pn flush" style="overflow-x:auto"><table class="cmp" style="min-width:620px"><thead><tr><th style="padding-left:18px">Métrica</th><th>Hoje</th><th>30 dias atrás</th><th>3 meses atrás</th><th>1 ano atrás</th><th></th></tr></thead><tbody>${M.map(x => { const v = I.compare(x); return `<tr style="cursor:pointer" data-act="evM" data-v="${x.k}" class="${x.k === sel ? 'sel' : ''}"><td style="padding-left:18px;${x.k === sel ? 'color:var(--accent)' : ''}">${x.l}</td>${v.map((y, i) => `<td class="mono ${i ? 'mut' : ''}">${y == null ? '—' : x.fmt(y)}</td>`).join('')}<td>${v[0] != null && v[1] != null ? UI.trend(v[0], v[1], x.up) : ''}</td></tr>`; }).join('')}</tbody></table></div>
   ${m ? `<div class="pn" id="evChart"><div class="pn-h"><h3>${m.l} · 26 semanas</h3></div>${C.mount({ type: 'line', labels: weeks.map(d => U.fmtDS(d)), series: [{ name: m.l, data: series }], fmt: v => m.ratio ? U.nf(v, 0) + '%' : m.k === 'pace' ? U.mmss(v) : U.nf(v, v % 1 ? 1 : 0), min0: m.k !== 'nw' && m.k !== 'pace', empty: 'Sem dados para esta métrica.' }, 240)}</div>` : ''}`;
   const mk = lt.lastIndexOf('<div class="pn"><div class="pn-h"><h3>Marcos e conquistas</h3>');
-  return UI.head('Minha Evolução', 'Tudo o que te aproxima dos teus objetivos, numa página: desporto, estudos, carreira, dinheiro, hábitos e metas. Onde estás, quanto evoluíste (hoje contra 30 dias, 3 meses e 1 ano) e para onde vais.', '', 'Direção')
-    + lt.slice(0, kEnd) + evoPanel + (mk > 0 ? lt.slice(kEnd, mk) + trends + lt.slice(mk) : lt.slice(kEnd) + trends); };
+  return lt.slice(0, kEnd) + evoPanel + (mk > 0 ? lt.slice(kEnd, mk) + trends + lt.slice(mk) : lt.slice(kEnd) + trends); };
+V.evolucao = () => V.visao ? V.visao('') : '';
 A.evM = b => OS.setUI('evM', b.dataset.v);
 
 /* ================= DEFINIÇÕES ================= */

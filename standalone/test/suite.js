@@ -14,6 +14,10 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascri
 let OFFLINE = false, GSFAIL = 0, SLOWIDX = 0, FAILP = '';
 // os mesmos cabeçalhos de segurança do Vercel (CSP incluída), para os testes apanharem o que ela bloquearia; o Apps Script simulado está em http://127.0.0.1
 const SECH = (() => { try { const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')), all = v.headers.find(h => h.source === '/(.*)'), o = {}; all.headers.forEach(h => { o[h.key] = h.key === 'Content-Security-Policy' ? h.value.replace("connect-src 'self'", `connect-src 'self' http://127.0.0.1:${PORT}`) : h.value; }); delete o['Strict-Transport-Security']; return o; } catch (e) { return {}; } })();
+// servidor das contas para os testes: pasta temporária em vez do Vercel Blob (apagada no fim)
+const ACCDIR = fs.mkdtempSync(path.join(require('os').tmpdir(), 'nautilo-contas-')); process.env.NAUTILO_STORE_DIR = ACCDIR; process.env.NAUTILO_CACHE_MS = '0'; process.env.NAUTILO_RSS_BASE = 'http://localhost:' + PORT + '/rssmock'; delete process.env.BLOB_READ_WRITE_TOKEN;
+process.on('exit', () => { try { fs.rmSync(ACCDIR, { recursive: true, force: true }); } catch (e) { } });
+const ACCFN = {}; const ACCAPI = n => { if (!(n in ACCFN)) { try { ACCFN[n] = require(path.join(ROOT, 'api', n + '.js')); } catch (e) { ACCFN[n] = null; } } return ACCFN[n]; };
 // servidor estático + caixa de entrada simulada (Apps Script)
 const INBOX = [], STORE = {};
 const srv = http.createServer((req, res) => {
@@ -34,6 +38,11 @@ const srv = http.createServer((req, res) => {
       INBOX.push({ id: crypto.randomUUID(), t: new Date().toISOString(), v, d: q.d || '', c: q.c || '' }); out('✓ registado', 1); });
     return; }
   if (OFFLINE) { req.socket.destroy(); return; }
+  // contas: as funções do servidor a sério (api/conta.js e api/dados.js), com uma pasta temporária no lugar do Vercel Blob
+  if (u.pathname.startsWith('/rssmock/')) { const q = u.query.q || '', n = (k) => `<item><title>${k} - Jornal Teste</title><link>https://exemplo.pt/${encodeURIComponent(k)}</link><pubDate>${new Date().toUTCString()}</pubDate><source url="https://exemplo.pt">Jornal Teste</source><description></description></item>`;
+    res.writeHead(200, { 'Content-Type': 'application/rss+xml' }); return res.end(`<?xml version="1.0"?><rss><channel>${[1, 2, 3].map(i => n((q ? 'Pesquisa ' : 'Notícia da conta ') + i)).join('')}</channel></rss>`); }
+  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias)$/);
+  if (am) { const fn = ACCAPI(am[1]); if (!fn) { res.writeHead(404); return res.end(); } req.query = u.query; return fn(req, res); }
   let p = decodeURIComponent(u.pathname);
   if (!p.startsWith('/Oceanum/')) { res.writeHead(404); return res.end(); }
   p = p.slice('/Oceanum/'.length) || 'index.html';
@@ -1154,9 +1163,13 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   await E(p, () => { const U = OS.U, t = U.today(); OS.add('subjects', { name: 'Contabilidade', status: 'Em curso', prof: 'Ana Silva', mail: 'CONT1' }); OS.add('subjects', { name: 'Marketing', status: 'Em curso', prof: 'Rui' });
     OS.add('goals', { title: 'Poupar 5000 €', cat: 'Finanças', horizon: '1 ano', metric: 'manual', target: 5000, base: 0, cur: 1000, status: 'Ativa', start: U.addDays(t, -30), due: U.addDays(t, 300), steps: [{ t: 'Abrir conta poupança' }] }); location.hash = 'next'; }); await sleep(700);
   const lp = await E(p, () => ({ dir: [...document.querySelectorAll('#side .nav-g')].filter(g => /Direção/.test(g.querySelector('h6').textContent)).map(g => g.textContent)[0] || '', cats: document.querySelectorAll('.lp-c').length, txt: document.getElementById('view').innerText }));
-  ok('Próximos passos: está na Direção, com as áreas da vida e os passos do pequeno ao grande', /Próximos passos/.test(lp.dir) && lp.cats === 5 && /Abrir conta poupança/.test(lp.txt) && /Hoje|Esta semana/.test(lp.txt) && /Este mês/.test(lp.txt), lp.dir.replace(/\s+/g, ' ').slice(0, 120));
+  ok('Plano de vida: uma só entrada na Direção (sem Estrela-guia e Roteiro à parte), com as áreas da vida e os passos do pequeno ao grande', /Plano de vida/.test(lp.dir) && !/Estrela-guia|Roteiro da vida|Próximos passos/.test(lp.dir) && lp.cats === 5 && /Abrir conta poupança/.test(lp.txt) && /Hoje|Esta semana/.test(lp.txt) && /Este mês/.test(lp.txt), lp.dir.replace(/\s+/g, ' ').slice(0, 120));
   await p.click('#view [data-act=lpAI]'); await sleep(1500);
   ok('Próximos passos: o Spyke faz o plano com novos passos ligados às metas', await E(p, () => /Resolver 10 exercícios de Contabilidade/.test(document.getElementById('view').innerText) && /Fechar o semestre/.test(document.getElementById('view').innerText)));
+  await E(p, () => location.hash = 'northstar'); await sleep(500);
+  ok('Plano de vida: o endereço antigo da Estrela-guia abre o separador Estrela-guia', await E(p, () => location.hash === '#next.estrela' && /Identidade/.test(document.getElementById('view').textContent) && /Estrela-guia/.test(document.querySelector('#view .tabs a.on').textContent)));
+  await E(p, () => location.hash = 'roadmap'); await sleep(500);
+  ok('Plano de vida: o endereço antigo do Roteiro abre o separador Roteiro (com a linha do tempo)', await E(p, () => location.hash === '#next.roteiro' && /Objetivo → Projeto/.test(document.getElementById('view').textContent) && /Roteiro/.test(document.querySelector('#view .tabs a.on').textContent)));
   await E(p, () => location.hash = 'next.agora'); await sleep(400); ok('Próximos passos: a aba "Agora" mantém a próxima ação de sempre', await E(p, () => !!document.querySelector('#view .na') || /Nada encaixa/.test(document.getElementById('view').innerText)));
   // Outlook da faculdade: a aba Faculdade só mostra e-mails; a configuração está em Definições → E-mail
   await E(p, () => location.hash = 'email.faculdade'); await sleep(1200);
@@ -1623,8 +1636,8 @@ async function extras2Tests(b) { cur = 'Extras'; console.log('\n=== Investimento
   ok('Entrevista: mais de 500 perguntas em 37 capítulos (mente e emoções, perdas, valores, identidade, sentidos, cartas…)', iv2.n >= 500 && iv2.parts >= 37 && ['Mente e emoções', 'Perdas e luto', 'Valores e crenças', 'Identidade e cultura', 'Os sentidos da memória', 'Cartas', 'A família que quero construir'].every(x => iv2.names.includes(x)) && /avós do lado da mãe/.test(iv2.keep), JSON.stringify({ n: iv2.n, parts: iv2.parts }));
   // ---- Minha Evolução (juntou o Longo prazo) ----
   await E(p, () => { location.hash = 'longterm'; }); await sleep(900); v = await view();
-  ok('Minha Evolução: o antigo Longo prazo abre aqui (mesmo visual) e o menu tem só "Minha Evolução"', (await E(p, () => location.hash)) === '#evolucao' && /Minha Evolução/i.test(v) && await E(p, () => { const t = document.getElementById('view').textContent; return /Patrimônio · projeção/.test(t) && /Grandes metas/.test(t) && /Life Analytics/.test(t); }) && await E(p, () => { const t = [...document.querySelectorAll('#side .nav-g a')].map(a => a.textContent).join('|'); return /Minha Evolução/.test(t) && !/Longo prazo/.test(t); }));
-  ok('Minha Evolução: evolução por área (dinheiro, estudos, desporto, carreira, metas)', /Evolução por área/.test(v) && /Dinheiro/.test(v) && /Metas/.test(v));
+  ok('A evolução vive no Painel: o antigo Longo prazo abre o Painel na secção "A tua evolução", e o menu já não tem "Minha Evolução"', (await E(p, () => location.hash)) === '#visao' && /A tua evolução/i.test(v) && await E(p, () => { const t = document.getElementById('view').textContent; return !!document.querySelector('#view #evo') && /Patrimônio · projeção/.test(t) && /Grandes metas/.test(t) && /Life Analytics/.test(t) && /Próxima ação/.test(t); }) && await E(p, () => { const t = [...document.querySelectorAll('#side .nav-g a')].map(a => a.textContent).join('|'); return !/Minha Evolução/.test(t) && !/Longo prazo/.test(t); }));
+  ok('Painel › A tua evolução: evolução por área (dinheiro, estudos, desporto, carreira) sem repetir as metas do Painel', /Evolução por área/.test(v) && /Dinheiro/.test(v) && await E(p, () => !document.querySelector('#view #evo .evo-c [data-edit^="goals:"]') && document.querySelectorAll('#view .dash .pn-h h3').length > 0));
   await p.click('#view [data-act=evoAI]'); await p.waitForFunction(() => /Foco para os próximos 30 dias/i.test(document.getElementById('view').innerText), null, { timeout: 8000 }).catch(() => { }); v = await view();
   ok('Minha Evolução: o Spyke analisa a evolução (nota, por área, foco para 30 dias)', /7\s*\/10/.test(v) && /Correr 3 vezes por semana/.test(v) && /Parado ou a piorar/i.test(v), v.slice(0, 200));
   // ---- Centro de decisões com o Spyke ----
@@ -1820,7 +1833,7 @@ async function direcaoTests(b) { cur = 'Direção'; console.log('\n=== Direção
   v = await go('revisao.mensal', 900);
   ok('Revisão mensal: "Equilíbrio da vida" (desporto, foco, dieta, Fé, leitura) e investimentos do mês', /Equilíbrio da vida/i.test(v) && /Desporto/.test(v) && /Foco profundo/.test(v) && /Dieta registada/.test(v) && /Devocionais/.test(v) && /Hábitos Atómicos/.test(v) && /Investido \(líquido\)/.test(v) && /Proventos recebidos/.test(v));
   v = await go('northstar', 700); ok('Estrela-guia: "onde foi o teu tempo" inclui desporto e foco (Floresta)', /Desporto/.test(v) && /Foco \(Floresta\)/.test(v));
-  v = await go('evolucao', 1000); ok('Minha Evolução: também Fé, desporto, foco, dieta, leitura e horas trabalhadas', await E(p, () => { const t = document.getElementById('view').textContent; return /Fé/.test(t) && /Desporto \(30 dias\)/.test(t) && /Foco profundo/.test(t) && /Devocionais/.test(t); }));
+  v = await go('evolucao', 1000); ok('Painel › A tua evolução (endereço antigo #evolucao): também Fé, desporto, foco, dieta, leitura e horas trabalhadas', await E(p, () => { const t = document.getElementById('view').textContent; return /Fé/.test(t) && /Desporto \(30 dias\)/.test(t) && /Foco profundo/.test(t) && /Devocionais/.test(t); }));
   v = await go('next', 900); ok('Próximos passos: devocional, leitura e proteína do dia entram nos passos', await E(p, () => { const t = document.getElementById('view').textContent; return /Ler 20 páginas de "O Poder do Agora"/.test(t) && /Comer mais \d+ g de proteína hoje/.test(t); }));
   const C = await E(p, () => OS.Spyke.ctx());
   ok('Spyke e Centro de decisões sabem tudo: património, investimentos, estudo, projetos, desporto, dieta, Fé, leitura, tendências e aniversários certos', /Património e investimentos/.test(C) && /Desporto/.test(C) && /Dieta hoje/.test(C) && /A ler: O Poder do Agora/.test(C) && /Mãe Teste \(Mãe\) faz anos a 12\/04/.test(C), C.slice(0, 200));
@@ -1960,7 +1973,7 @@ async function muTests(b) { cur = 'Mundo'; console.log('\n=== Mundo: mapa, país
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
   await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
   await E(p, () => location.hash = 'mundo'); await sleep(700);
-  const m0 = await E(p, () => ({ menu: !!document.querySelector('#side a[href="#mundo"], .tn-dd a[href="#mundo"]'), paths: document.querySelectorAll('.mu-cs path').length, dots: document.querySelectorAll('.mu-dots circle').length, rows: document.querySelectorAll('.mu-row').length, all: OS.Mundo.ALL.length }));
+  const m0 = await E(p, () => ({ menu: !!document.querySelector('#side a[href="#mundo"], .tn-dd a[href="#mundo"]'), paths: document.querySelectorAll('.mu-cs path').length, dots: document.querySelectorAll('.mu-dots circle').length, rows: document.querySelectorAll('.mu-row').length - document.querySelectorAll('#ilhas .mu-row').length, all: OS.Mundo.ALL.length }));
   ok('Aba Mundo no menu, com o mapa e os 195 países (os pequenos como pontos)', m0.menu && m0.all === 195 && m0.paths + m0.dots === 195 && m0.rows === 195, JSON.stringify(m0));
   const x0 = await E(p, () => OS.Dom.state().ax.mente);
   await E(p, () => document.querySelector('.mu-cs path[data-c=BRA]').dispatchEvent(new MouseEvent('click', { bubbles: true }))); await sleep(300);
@@ -1973,7 +1986,22 @@ async function muTests(b) { cur = 'Mundo'; console.log('\n=== Mundo: mapa, país
   ok('Cada país conhecido dá XP de Mente no Dominus (1500 por país)', (await E(p, () => OS.Dom.state().ax.mente)) - x0 === 3000);
   await E(p, () => OS.setUI('muZ', '4')); await sleep(300); ok('Ver só um continente (Europa) aproxima o mapa', await E(p, () => +document.querySelector('.mu-svg').getAttribute('viewBox').split(' ')[2] < 400));
   await E(p, () => { const i = document.querySelector('[data-uif="mu.q"]'); i.value = 'japa'; i.dispatchEvent(new Event('input', { bubbles: true })); }); await sleep(700);
-  ok('Procurar um país na lista', await E(p, () => [...document.querySelectorAll('.mu-row b')].map(b => b.textContent).join() === 'Japão'));
+  ok('Procurar um país na lista', await E(p, () => [...document.querySelectorAll('.mu-row b')].filter(b => !b.closest('#ilhas')).map(b => b.textContent).join() === 'Japão'));
+  // ilhas e territórios: lista própria, losangos no mapa, XP de Mente
+  const i0 = await E(p, () => { const M = OS.Mundo, az = M.ISL.filter(i => /\(Açores\)/.test(i.n)).length; return { n: M.ISL.length, az, has: ['madeira', 'portosanto', 'noronha', 'tenerife', 'havai', 'bali', 'groenlandia', 'portorico', 'zanzibar', 'taiti'].filter(k => !M.IBY[k]), rows: document.querySelectorAll('#ilhas .mu-row').length, dia: document.querySelectorAll('.mu-isl path').length }; });
+  await E(p, () => document.querySelector('#ilhas [data-act=muIG][data-v=""]').click()); await sleep(400); i0.all = await E(p, () => document.querySelectorAll('#ilhas .mu-row').length);
+  ok('Mundo › Ilhas e territórios: quase 200 (Madeira, Porto Santo, as 9 dos Açores, Noronha, Canárias, Havai, Bali, Gronelândia…) listadas e no mapa; abre no grupo Portugal e "Todas" mostra a lista inteira', i0.n >= 180 && i0.az === 9 && !i0.has.length && i0.rows === 16 && i0.all === i0.n && i0.dia === i0.n, JSON.stringify(i0));
+  const xi = await E(p, () => OS.Dom.state().ax.mente);
+  await E(p, () => document.querySelector('[data-act=muTogI][data-i=madeira][data-v=Visitei]').click()); await sleep(400);
+  await E(p, () => document.querySelector('[data-act=muTogI][data-i=bali][data-v="Quero ir"]').click()); await sleep(400);
+  const i1 = await E(p, () => ({ n: OS.Mundo.istats().n, hero: document.querySelector('.mu-ht p').innerText, v: !!document.querySelector('.mu-isl path.v[data-i=madeira]'), w: !!document.querySelector('.mu-isl path.w[data-i=bali]'), head: document.querySelector('#ilhas .pn-h').innerText, countries: OS.Mundo.stats().n }));
+  ok('Marcar a Madeira como visitada: conta 1 ilha, pinta o losango no mapa e não mexe nos países', i1.n === 1 && /1 ilha/.test(i1.hero) && i1.v && i1.w && /1 de \d+ conhecidas/.test(i1.head) && i1.countries === 2, JSON.stringify(i1));
+  ok('Cada ilha conhecida dá XP de Mente no Dominus (500 por ilha)', (await E(p, () => OS.Dom.state().ax.mente)) - xi === 500);
+  await E(p, () => document.querySelector('.mu-isl path[data-i=saomiguel]').dispatchEvent(new MouseEvent('click', { bubbles: true }))); await sleep(300);
+  ok('Tocar num losango do mapa abre a janela dessa ilha', await E(p, () => /São Miguel/.test((document.querySelector('.mu-mh h3') || {}).textContent || '') && !!document.querySelector('[data-act=muSetI][data-i=saomiguel]')));
+  await E(p, () => OS.UI.closeModal()); await sleep(200);
+  await E(p, () => { const i = document.querySelector('[data-uif="mu.qi"]'); i.value = 'noron'; i.dispatchEvent(new Event('input', { bubbles: true })); }); await sleep(700);
+  ok('Procurar uma ilha na lista', await E(p, () => [...document.querySelectorAll('#ilhas .mu-row b')].map(b => b.textContent).join() === 'Fernando de Noronha'));
   // nome Náutilo: com o script na versão 11, Definições mostra como passar o Google para o nome novo; na 12 o aviso desaparece
   await E(p, () => { OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE/exec', key: 'k', ver: 11 }); location.hash = 'definicoes.script'; }); await sleep(600);
   const rn = await E(p, () => ({ panel: !!document.getElementById('nautilo'), btns: document.querySelectorAll('#nautilo [data-act=ibCopy]').length }));
@@ -1981,6 +2009,110 @@ async function muTests(b) { cur = 'Mundo'; console.log('\n=== Mundo: mapa, país
   ok('Nome Náutilo: Definições mostra como passar o Google para o nome novo (partes 1 a 3) até o script ser da versão 12', rn.panel && rn.btns === 3 && !(await E(p, () => !!document.getElementById('nautilo'))), JSON.stringify(rn));
   ok('Nome Náutilo: os calendários antigos "Oceanum…" continuam a ser reconhecidos como do app (sem duplicar)', await E(p, () => OS.CalPush && OS.CalPush.CATS.every(c => /^Náutilo/.test(c[1]))));
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis (versão pública) ===');
+  const errs = [], ctxs = [];
+  const fresh = async (prof, init) => { const ctx = await b.newContext(prof.o); ctxs.push(ctx); const p = await ctx.newPage();
+    p.on('pageerror', e => errs.push('JS: ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/fonts\.g|net::ERR|Failed to load resource|ERR_INTERNET|ERR_CONNECTION|status of 40[134]/.test(m.text())) errs.push('consola: ' + m.text().slice(0, 160)); }); p.on('dialog', d => d.accept());
+    await p.addInitScript(() => { window.__accPoll = 1200; }); if (init) await p.addInitScript(init); await p.goto(BASE); return p; };
+  const gateUp = p => p.waitForSelector('#acc .ac-in form, #acc .ac-who, #acc .ac-code', { timeout: 15000 });
+  const lockUp = p => p.waitForSelector('#lkCode', { state: 'visible', timeout: 15000 });
+  const app = p => p.waitForFunction(() => !document.getElementById('acc') && document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30, null, { timeout: 15000 });
+  const code = async (p, c) => { await lockUp(p); await p.fill('#lkCode', c); await p.click('.lk-go'); await app(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); }); };
+  const files = () => { const out = []; const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) f.isDirectory() ? walk(path.join(d, f.name)) : out.push(path.join(d, f.name)); }; try { walk(ACCDIR); } catch (e) { } return out; };
+  // aparelho A (iPhone): aparelho novo → criar conta
+  const A = await fresh(PROFILES[0]); await gateUp(A);
+  const g0 = await E(A, () => ({ gate: !!document.querySelector('#acc .ac-card[data-acf=criar]'), lock: !!(document.getElementById('lkCode') && document.getElementById('lkCode').offsetParent), mode: OS.Acc && OS.Acc.on }));
+  ok('Aparelho novo: abre o ecrã da conta (criar conta ou entrar) e não o código pessoal', g0.gate && !g0.lock && g0.mode, JSON.stringify(g0));
+  await A.fill('#acc input[name=nome]', 'Ana Teste'); await A.fill('#acc input[name=email]', 'ana@exemplo.pt'); await A.fill('#acc input[name=senha]', 'segredo123'); await A.click('#acc button[type=submit]');
+  await A.waitForSelector('#acc .ac-code', { timeout: 15000 }); const rec = await E(A, () => document.querySelector('#acc .ac-code').textContent.trim());
+  ok('Criar conta: mostra o código de recuperação (só uma vez)', /^[A-Z0-9]{4}(-[A-Z0-9]{4}){3}$/.test(rec), rec);
+  await A.click('#acc [data-ac=guardei]'); await A.waitForSelector('#acc form[data-acf=novo]');
+  ok('Depois pede o primeiro perfil, já com o nome', await E(A, () => document.querySelector('#acc input[name=nome]').value === 'Ana'));
+  await A.click('#acc .ac-avs label:nth-child(2)'); await A.fill('#acc input[name=c1]', 'abc123'); await A.fill('#acc input[name=c2]', 'abc124'); await A.click('#acc button[type=submit]'); await sleep(400);
+  ok('Códigos diferentes: avisa e não cria', await E(A, () => /não são iguais/.test((document.querySelector('#acc .ac-msg') || {}).textContent || '') && !!document.querySelector('#acc form[data-acf=novo]')));
+  await A.fill('#acc input[name=c1]', 'abc123'); await A.fill('#acc input[name=c2]', 'abc123'); await A.click('#acc button[type=submit]'); await A.waitForSelector('#acc .ac-grid .ac-p[data-ac=escolher]');
+  const g1 = await E(A, () => ({ n: document.querySelectorAll('#acc .ac-p[data-ac=escolher]').length, name: document.querySelector('#acc .ac-p b').textContent, av: document.querySelector('#acc .ac-p .ac-av').textContent, add: !!document.querySelector('#acc .ac-p.add'), title: document.querySelector('#acc .ac-h').textContent }));
+  ok('Perfis como na Netflix: "Quem está a usar", a bolinha do perfil e "Adicionar perfil"', g1.n === 1 && g1.name === 'Ana' && g1.av === '🌊' && g1.add && /Quem está a usar/.test(g1.title), JSON.stringify(g1));
+  await A.click('#acc .ac-p[data-ac=escolher]'); await lockUp(A);
+  ok('Escolher o perfil abre o mesmo ecrã de bloqueio, com o nome do perfil e "Trocar de perfil"', await E(A, () => /Ana\./.test(document.querySelector('.lk-hi').textContent) && !!document.getElementById('lkSw')));
+  await A.fill('#lkCode', 'teste1234'); await A.click('.lk-go'); await sleep(400);
+  ok('O código pessoal (do Ryan) não abre um perfil de uma conta', await E(A, () => /incorreto/i.test(document.getElementById('lkMsg').textContent) && !!document.getElementById('lkCode').offsetParent));
+  await code(A, 'abc123');
+  const a1 = await E(A, () => ({ subj: OS.all('subjects').length, apps: OS.all('applications').length, contacts: OS.all('contacts').length, goals: OS.all('goals').length, short: OS.one('profile').short, uni: OS.one('profile').uni, hab: OS.all('habits').length, acc: OS.all('accounts').length, bub: !!document.querySelector('.ac-bub'), mova: OS.one('mova').name }));
+  ok('Perfil novo começa limpo: nada do Ryan (sem disciplinas, candidaturas, contactos, metas), com o nome do perfil', a1.subj === 0 && a1.apps === 0 && a1.contacts === 0 && a1.goals === 0 && a1.short === 'Ana' && !a1.uni && a1.hab > 0 && a1.acc === 2 && a1.mova !== 'Mova', JSON.stringify(a1));
+  ok('A bolinha do perfil aparece na barra de cima', a1.bub);
+  await E(A, () => { OS.add('tasks', { title: 'Tarefa da Ana', status: 'Inbox' }); OS.add('transactions', { type: 'Despesa', amount: 12.5, date: OS.U.today(), desc: 'Almoço', cat: 'Alimentação' }); }); await sleep(1200);
+  const fl = await E(A, async () => await OS.Acc.flush()), pd = await E(A, () => ({ st: OS.Acc.sync.state, err: OS.Acc.sync.err }));
+  const fz = files(), blob = fz.filter(f => /tasks/.test(f)).map(f => fs.readFileSync(f).toString('latin1')).join('');
+  ok('O que registas vai para a conta, cifrado no servidor (sem texto legível)', fl && fz.some(f => /[\\/]d[\\/]/.test(f) && /tasks/.test(f)) && blob.length > 30 && !blob.includes('Tarefa da Ana'), fz.length + ' ficheiros · flush ' + fl + ' · ' + JSON.stringify(pd) + ' · ' + fz.filter(f => /[\\/]d[\\/]/.test(f)).map(f => path.basename(f)).join(','));
+  // aparelho B (computador): entrar com a mesma conta
+  const B = await fresh(PROFILES[4]); await gateUp(B); await B.click('#acc [data-ac=m][data-v=entrar]');
+  await B.fill('#acc input[name=email]', 'ana@exemplo.pt'); await B.fill('#acc input[name=senha]', 'errada000'); await B.click('#acc button[type=submit]'); await sleep(700);
+  ok('Senha errada: mensagem clara', await E(B, () => /E-mail ou senha errados/.test((document.querySelector('#acc .ac-msg') || {}).textContent || '')));
+  await B.fill('#acc input[name=senha]', 'segredo123'); await B.click('#acc button[type=submit]'); await B.waitForSelector('#acc .ac-p[data-ac=escolher]'); await B.click('#acc .ac-p[data-ac=escolher]'); await code(B, 'abc123');
+  ok('Noutro aparelho (computador): entra com a mesma conta e vê os mesmos dados', await E(B, () => OS.all('tasks').some(t => t.title === 'Tarefa da Ana') && OS.all('transactions').some(t => t.desc === 'Almoço') && OS.one('profile').short === 'Ana'));
+  await E(B, () => OS.add('tasks', { title: 'Feita no computador', status: 'Inbox' })); await E(B, async () => await OS.Acc.flush());
+  await A.waitForFunction(() => OS.all('tasks').some(t => t.title === 'Feita no computador'), null, { timeout: 12000 }).catch(() => { });
+  ok('Sincroniza nos dois sentidos em segundos (computador → telemóvel)', await E(A, () => OS.all('tasks').some(t => t.title === 'Feita no computador')));
+  // segundo perfil no computador: dados separados
+  await E(B, () => OS.Acc.switchProfile()); await B.waitForSelector('#acc .ac-p.add'); await B.click('#acc .ac-p.add');
+  await B.fill('#acc input[name=nome]', 'Bruno'); await B.fill('#acc input[name=c1]', 'bruno99'); await B.fill('#acc input[name=c2]', 'bruno99'); await B.click('#acc button[type=submit]');
+  await B.waitForFunction(() => document.querySelectorAll('#acc .ac-p[data-ac=escolher]').length === 2, null, { timeout: 15000 }).catch(async e => { console.log('    [estado]', await E(B, () => ({ g: (document.getElementById('acc') || {}).innerText, s: localStorage.getItem('nau:s') && JSON.parse(localStorage.getItem('nau:s')).perfis.length }))); throw e; });
+  await Promise.all([B.waitForNavigation({ timeout: 15000 }).catch(() => { }), B.click('#acc .ac-p[data-ac=escolher]:nth-child(2)')]); await code(B, 'bruno99');
+  const b2 = await E(B, () => ({ t: OS.all('tasks').map(t => t.title), short: OS.one('profile').short, p: OS.Acc.profile().nome }));
+  ok('Segundo perfil na mesma conta: dados separados (não vê as tarefas da Ana)', b2.p === 'Bruno' && b2.short === 'Bruno' && !b2.t.includes('Tarefa da Ana'), JSON.stringify(b2));
+  // definições da conta
+  await E(B, () => location.hash = 'definicoes.conta'); await sleep(500);
+  ok('Definições › Conta e perfis: e-mail, perfis, sincronização, senha, sair e apagar a conta', await E(B, () => { const t = document.querySelector('#view').innerText; return /ana@exemplo\.pt/.test(t) && /Bruno/.test(t) && /Sincroniza/i.test(t) && /Mudar a senha/.test(t) && /Apagar a conta/.test(t); }));
+  // o modo pessoal não muda
+  { const { ctx, p, errs: e2 } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p);
+    ok('Modo pessoal (aparelho que já tinha o Náutilo): igual a antes, sem ecrã de conta nem bolinha', await E(p, () => !OS.Acc.on && !document.getElementById('acc') && !document.querySelector('.ac-bub') && OS.one('profile').short === 'Ryan'));
+    errs.push(...e2); await ctx.close(); }
+  // sair da conta no telemóvel: limpa o aparelho e volta ao ecrã da conta
+  await Promise.all([A.waitForNavigation({ timeout: 15000 }).catch(() => { }), E(A, () => OS.Acc.logout())]); await gateUp(A);
+  ok('Sair da conta limpa este aparelho e volta ao ecrã de entrar', await E(A, () => !Object.keys(localStorage).some(k => k.startsWith('os2:')) && !!document.querySelector('#acc form[data-acf=entrar]') && document.querySelector('#acc input[name=email]').value === 'ana@exemplo.pt'));
+  // recuperar a senha com o código
+  await A.click('#acc [data-ac=m][data-v=recuperar]'); await A.fill('#acc input[name=email]', 'ana@exemplo.pt'); await A.fill('#acc input[name=codigo]', rec.toLowerCase()); await A.fill('#acc input[name=nova]', 'novasenha1'); await A.click('#acc button[type=submit]');
+  await A.waitForSelector('#acc .ac-code', { timeout: 15000 });
+  ok('Esqueci a senha: o código de recuperação muda a senha e dá um código novo', await E(A, r => document.querySelector('#acc .ac-code').textContent.trim() !== r, rec));
+  await sleep(300); await E(B, () => OS.Acc.poll && OS.Acc.poll()); await sleep(800);
+  ok('Com a senha mudada, os outros aparelhos pedem para entrar outra vez', await E(B, () => !!document.querySelector('#acc form[data-acf=entrar]')));
+  // atalho de gastos do iPhone sem script (cada perfil tem o seu link) e Jornal sem script
+  const C = await fresh(PROFILES[0]); await gateUp(C); await C.click('#acc [data-ac=m][data-v=entrar]'); await C.fill('#acc input[name=email]', 'ana@exemplo.pt'); await C.fill('#acc input[name=senha]', 'novasenha1'); await C.click('#acc button[type=submit]');
+  await C.waitForSelector('#acc .ac-p[data-ac=escolher]'); await C.click('#acc .ac-p[data-ac=escolher]'); await code(C, 'abc123');
+  await C.waitForFunction(() => !!(OS.Acc.atalho && OS.Acc.atalho()), null, { timeout: 10000 }).catch(() => { });
+  const ak = await E(C, () => OS.Acc.atalho());
+  const sr = ak ? await fetch(ak.url.replace(/^https?:\/\/[^/]+/, 'http://localhost:' + PORT), { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ k: ak.key, v: '12,40', d: 'café com a Ana' }) }).then(r => r.text()) : '';
+  const bad = ak ? await fetch('http://localhost:' + PORT + '/Oceanum/api/atalho', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ k: ak.key.slice(0, -3) + 'abc', v: '5' }) }).then(r => r.status) : 0;
+  await E(C, () => OS.Inbox.pull(false)); await sleep(500);
+  ok('Atalho de gastos do iPhone numa conta sem script: o link do perfil regista e o gasto entra nas finanças desse perfil', /registado no Náutilo/.test(sr) && bad === 403 && await E(C, () => OS.all('transactions').some(t => t.amount === 12.4 && /café/i.test(t.desc))), sr + ' / ' + bad);
+  await E(C, () => location.hash = 'definicoes.atalhos'); await sleep(500);
+  ok('Definições › Atalhos do iPhone mostra o link do perfil (sem pedir o script Google)', await E(C, () => { const t = document.querySelector('#view').innerText; return /api\/atalho\?k=/.test(t) && !/script\.google\.com\/create/.test(t); }));
+  await E(C, () => location.hash = 'jornal'); await C.waitForFunction(() => /Notícia da conta 1/.test(document.querySelector('#view').innerText), null, { timeout: 12000 }).catch(() => { });
+  ok('Jornal numa conta sem script: as notícias vêm do servidor do Náutilo', await E(C, () => /Notícia da conta 1/.test(document.querySelector('#view').innerText)));
+  // o Náutilo pessoal (do Ryan) guardado numa conta: tudo igual, o mesmo código, os marcos e textos dele
+  { const { ctx, p, errs: e3 } = await newPage(b, PROFILES[0]); ctxs.push(ctx); p.removeAllListeners('dialog'); p.on('dialog', d => d.accept()); await p.goto(BASE); await unlock(p);
+    await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.add('tasks', { title: 'Tarefa antiga do Ryan', status: 'Inbox' }); OS.add('goals', { title: 'Meta antiga do Ryan', status: 'Ativa', steps: [] }); location.hash = 'definicoes'; }); await sleep(700);
+    ok('Modo pessoal: Definições tem "Conta Náutilo" para guardar o Náutilo numa conta', await E(p, () => !!document.querySelector('#accMig [data-act=accMigNew]')));
+    await p.fill('#accMigE', 'ryan@exemplo.pt'); await p.fill('#accMigP', 'senhaDoRyan1');
+    await Promise.all([p.waitForNavigation({ timeout: 20000 }).catch(() => { }), p.click('#accMig [data-act=accMigNew]')]);
+    await unlock(p); await app(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); });
+    const m1 = await E(p, () => ({ on: OS.Acc.on, pub: OS.Acc.pub, ps: !!(OS.Acc.profile() || {}).ps, t: OS.all('tasks').some(t => t.title === 'Tarefa antiga do Ryan'), g: OS.all('goals').some(g => g.title === 'Meta antiga do Ryan'), short: OS.one('profile').short, leg: OS.Dom.LEG.int.length, who: OS.whoCtx('o Ryan (brasileiro)'), bub: !!document.querySelector('.ac-bub') }));
+    ok('Guardar na conta: este aparelho passa a usar a conta com o mesmo código e os mesmos dados; o perfil continua o do Ryan (marcos e textos dele)', m1.on && !m1.pub && m1.ps && m1.t && m1.g && m1.short === 'Ryan' && m1.leg === 100 && m1.who === 'o Ryan (brasileiro)' && m1.bub, JSON.stringify(m1));
+    const R = await fresh(PROFILES[4]); await gateUp(R); await R.click('#acc [data-ac=m][data-v=entrar]'); await R.fill('#acc input[name=email]', 'ryan@exemplo.pt'); await R.fill('#acc input[name=senha]', 'senhaDoRyan1'); await R.click('#acc button[type=submit]');
+    await R.waitForSelector('#acc .ac-p[data-ac=escolher]'); await Promise.all([R.waitForNavigation({ timeout: 20000 }).catch(() => { }), R.click('#acc .ac-p[data-ac=escolher]')]); await code(R, CODE);
+    ok('Noutro aparelho: entra na conta do Ryan e aparece tudo o que estava no Náutilo pessoal', await E(R, () => OS.all('tasks').some(t => t.title === 'Tarefa antiga do Ryan') && OS.all('goals').some(g => g.title === 'Meta antiga do Ryan') && !OS.Acc.pub && OS.Dom.LEG.int.length === 100));
+    errs.push(...e3); }
+  // outro aparelho ainda no modo pessoal: Definições oferece entrar na conta (o aviso chega pelo Google Drive)
+  { const { ctx, p } = await newPage(b, PROFILES[1]); ctxs.push(ctx); p.removeAllListeners('dialog'); p.on('dialog', d => d.accept()); await p.goto(BASE); await unlock(p);
+    await E(p, () => { OS.setOne('meta', { acc: 'ryan@exemplo.pt' }); location.hash = 'definicoes'; }); await sleep(600);
+    const has = await E(p, () => /Entrar na conta neste aparelho/.test((document.getElementById('accMig') || {}).innerText || ''));
+    await Promise.all([p.waitForNavigation({ timeout: 15000 }).catch(() => { }), p.click('#accMig [data-act=accJoin]')]); await gateUp(p);
+    const j1 = await E(p, () => ({ em: document.querySelector('#acc input[name=email]').value, keys: Object.keys(localStorage).filter(k => k.startsWith('os2:')), meta: localStorage.getItem('os2:one~meta'), tasks: OS.all('tasks').length }));
+    ok('Outro aparelho no modo pessoal: "Entrar na conta neste aparelho" leva ao ecrã de entrar, com o e-mail (os dados pessoais deste aparelho saem)', has && j1.em === 'ryan@exemplo.pt' && !/ryan@exemplo/.test(j1.meta || '') && !j1.keys.some(k => /^os2:tasks~/.test(k)), JSON.stringify(Object.assign({ has }, j1)));
+  }
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | '));
+  for (const c of ctxs) await c.close(); }
 async function domTests(b) { cur = 'Dominus'; console.log('\n=== Dominus: o herói, missões, chefe, marcos, visual e aventuras ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
   await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
@@ -2045,6 +2177,40 @@ async function domTests(b) { cur = 'Dominus'; console.log('\n=== Dominus: o her�
   await E(p, () => { const b = document.querySelector('.adv-c [data-act=advAdd]'); b && b.click(); }); await sleep(300);
   const c0 = await E(p, () => OS.Dom.state().ax.corpo); await E(p, () => { const b = document.querySelector('.adv-row [data-v="Feita"]'); b && b.click(); }); await sleep(400);
   ok('Aventura feita dá XP de Corpo e conta para a conquista "Aventureiro"', (await E(p, () => OS.Dom.state().ax.corpo)) > c0 && await E(p, () => OS.Dom.achievements().find(a => a.id === 'aventuras').v >= 1));
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+async function uniFoTests(b) { cur = 'Universidade e Floresta'; console.log('\n=== Universidade (cores, trabalhos, tutor) · Floresta (Pomodoro, pílula) ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
+  await ctx.route(/text\.pollinations\.ai/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ choices: [{ message: { content: '# Quotas constantes\n\nDivide o **valor depreciável** pelos anos de vida útil.' } }] }) }));
+  await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
+  await E(p, () => { ['Contabilidade', 'Microeconomia', 'Estatística'].forEach(n => OS.add('subjects', { name: n + ' Cor', status: 'Em curso' }, { silent: true })); const S = OS.all('subjects').filter(s => / Cor$/.test(s.name)); OS.add('classes', { subject: S[0].id, wday: String(new Date().getDay()), start: '09:00', end: '10:00' }, { silent: true });
+    OS.add('assessments', { title: 'Trabalho com nota', subject: S[1].id, type: 'Trabalho', date: OS.U.addDays(OS.U.today(), 3), weight: 30, prep: 'A preparar' }, { silent: true }); OS.emit('change'); });
+  ok('Cada disciplina tem a sua cor (cores diferentes, automáticas)', await E(p, () => { const C = OS.all('subjects').filter(s => / Cor$/.test(s.name)).map(s => OS.SJ.color(s.id)); return C.length === 3 && new Set(C).size === 3 && C.every(c => /^#/.test(c)); }));
+  ok('A aula no calendário vem com a cor da disciplina', await E(p, () => { const S = OS.all('subjects').find(s => s.name === 'Contabilidade Cor'); return OS.Cal.items(OS.U.today(), OS.U.today()).some(x => x.src === 'class' && x.color === OS.SJ.color(S.id)); }));
+  await E(p, () => OS.UI.openForm('subjects', OS.all('subjects').find(s => s.name === 'Microeconomia Cor').id)); await sleep(400);
+  await p.click('#drawer .sj-pick label:nth-child(4)'); await E(p, () => { const f = document.querySelector('#drawer form'); f.requestSubmit(); }); await sleep(400);
+  ok('Escolher a cor da disciplina (12 cores)', await E(p, () => OS.all('subjects').find(s => s.name === 'Microeconomia Cor').color === OS.SJ.PAL[2] && OS.SJ.PAL.length === 12));
+  await E(p, () => { location.hash = 'universidade.trabalhos'; }); await sleep(600);
+  ok('Universidade: aba "Trabalhos e TPC"', await E(p, () => [...document.querySelectorAll('.tabs a')].some(a => /Trabalhos e TPC/.test(a.textContent)) && !!document.querySelector('#view form[data-form=hwAdd]')));
+  await p.fill('#view form[data-form=hwAdd] input[name=t]', 'Exercícios 4 a 9 do capítulo 3'); await E(p, () => { const sel = document.querySelector('#view form[data-form=hwAdd] select[name=s]'); sel.value = OS.all('subjects').find(s => s.name === 'Estatística Cor').id; document.querySelector('#view form[data-form=hwAdd] select[name=k]').value = 'Exercícios'; document.querySelector('#view form[data-form=hwAdd] input[name=d]').value = OS.U.addDays(OS.U.today(), 1); });
+  await p.click('#view form[data-form=hwAdd] button'); await sleep(500);
+  ok('Anotar um TPC com disciplina, tipo e prazo (fica nas tarefas da Universidade)', await E(p, () => { const t = OS.all('tasks').find(x => x.title === 'Exercícios 4 a 9 do capítulo 3'); return !!t && t.area === 'Universidade' && t.hw === 'Exercícios' && t.due === OS.U.addDays(OS.U.today(), 1) && t.prio === '1' && /Estatística Cor/.test(document.querySelector('#view .hw-b.now').textContent); }));
+  ok('Os trabalhos com nota (Avaliações) aparecem ao lado, com o peso', await E(p, () => /Trabalho com nota/.test(document.querySelector('#view').textContent) && /30% da nota/.test(document.querySelector('#view').textContent)));
+  await E(p, () => { const t = OS.all('tasks').find(x => x.title === 'Exercícios 4 a 9 do capítulo 3'); document.querySelector(`#view [data-act=hwDone][data-id="${t.id}"]`).click(); }); await sleep(400);
+  ok('Marcar o TPC como feito', await E(p, () => OS.all('tasks').find(x => x.title === 'Exercícios 4 a 9 do capítulo 3').status === 'Feita' && /Feitos recentemente/.test(document.querySelector('#view').textContent)));
+  await E(p, () => { OS.setOne('diet', { aiKey: '', freeAI: true }); location.hash = 'universidade.tutor'; }); await sleep(500);
+  await p.fill('#view form[data-form=tutor] textarea', 'O que é o método das quotas constantes?'); await p.click('#view form[data-form=tutor] button.pri'); await sleep(1200);
+  ok('Tutor IA responde (mesmo sem chave do Google, pela IA de reserva)', await E(p, () => /Quotas constantes/.test((document.querySelector('#view .tu-a') || {}).textContent || '') && /valor depreciável/.test(document.querySelector('#view .tu-a').textContent)));
+  await E(p, () => { location.hash = 'floresta'; const f = OS.one('forest'); f.pomo = { on: false, f: 25, s: 5, l: 15, n: 4, auto: true }; OS.touch('forest'); }); await sleep(1200);
+  await p.click('#view [data-act=foPomo]'); await sleep(400);
+  ok('Floresta: técnica Pomodoro (foco, pausa, pausa longa, ciclos e predefinições)', await E(p, () => !!document.querySelector('#view .fo-pomo.on') && document.querySelectorAll('#view [data-act=foPre]').length === 4 && document.querySelectorAll('#view [data-po]').length === 4 && /25:00/.test(document.getElementById('foTime').textContent)));
+  await E(p, () => { Object.assign(OS.one('forest').pomo, { f: 1, s: 1, l: 2, n: 2, auto: true }); OS.touch('forest'); }); await sleep(300); await p.click('#view [data-act=foPlant]'); await sleep(500); await E(p, () => { location.hash = 'tarefas'; }); await sleep(1200);
+  const t1 = await E(p, () => (document.querySelector('#foFloat .fo-tt') || {}).textContent || ''); await sleep(2100); const t2 = await E(p, () => (document.querySelector('#foFloat .fo-tt') || {}).textContent || '');
+  ok('Floresta: a pílula noutras páginas mostra a árvore e o tempo a contar (sem 3D)', /^1\/2 · 00:5\d$/.test(t1) && t2 !== t1 && await E(p, () => !!document.querySelector('#foFloat .fo-fi').innerHTML.trim()), t1 + ' → ' + t2);
+  const fwd = () => E(p, () => { window.__off = (window.__off || 0) + 125000; if (!window.__dn) window.__dn = Date.now.bind(Date); Date.now = () => window.__dn() + window.__off; });
+  const ph = () => E(p, () => { const r = OS.Forest.run(); return r ? r.phase + (r.pomo ? ' ' + r.pomo.i + '/' + r.pomo.of : '') + (r.long ? ' longa' : '') : 'nada'; });
+  const seq = [await ph()]; for (let i = 0; i < 4; i++) { await fwd(); await sleep(1600); seq.push(await ph()); }
+  ok('Pomodoro sozinho: foco → pausa → foco → pausa longa → ciclo completo', seq.join(',') === 'grow 1/2,break 1/2,grow 2/2,break 2/2 longa,nada', seq.join(','));
+  await E(p, () => { if (window.__dn) Date.now = window.__dn; });
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
 async function oppVaultTests(b) { cur = 'Oportunidades e Senhas'; console.log('\n=== Oportunidades do e-mail e do LinkedIn · Cofre de senhas ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{},"gm":[]}' }));
@@ -2204,7 +2370,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

@@ -36,7 +36,7 @@ const subjName = id => id === 'geral' ? 'Geral' : (OS.get('subjects', id) || {})
 // a IA arruma os que as regras não souberam (Google; se não der, a IA grátis de reserva)
 const aiSort = async () => { if (aiBusy || !OS.AI || !(OS.AI.key() || (OS.AI.freeOn && OS.AI.freeOn()))) return; const S = subs(); if (!S.length) return;
   const todo = L.items.filter(it => !(it.id in L.ai) && !C().map[it.id] && !C().snd[addr(it.f)] && !byRule(it)).slice(0, 25); if (!todo.length) return; aiBusy = true;
-  try { const o = await OS.AI.json([{ text: `Separa estes e-mails da faculdade do Ryan pela disciplina (matéria) a que dizem respeito. Disciplinas: ${JSON.stringify(S.map(s => ({ id: s.id, nome: s.name, professor: s.prof || '', palavras: s.mail || '' })))}.
+  try { const o = await OS.AI.json([{ text: `Separa estes e-mails da faculdade ${OS.whoCtx('do Ryan', 'de')} pela disciplina (matéria) a que dizem respeito. Disciplinas: ${JSON.stringify(S.map(s => ({ id: s.id, nome: s.name, professor: s.prof || '', palavras: s.mail || '' })))}.
 Se o e-mail não for de nenhuma disciplina (avisos gerais, secretaria, eventos, propinas…), usa "geral". Responde APENAS JSON: {"m":[{"id":"…","disc":"id da disciplina ou geral"}]}
 E-mails: ${JSON.stringify(todo.map(it => ({ id: it.id, de: it.f, assunto: it.s, inicio: String(it.sn || '').slice(0, 220) })))}` }], .1);
     (o.m || []).forEach(r => { if (r && r.id && todo.some(t => t.id === r.id)) L.ai[r.id] = r.disc === 'geral' || S.some(s => s.id === r.disc) ? r.disc : 'geral'; });

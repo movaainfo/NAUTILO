@@ -23,8 +23,9 @@ const sha = async s => { const b = await crypto.subtle.digest('SHA-256', new Tex
 const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
 const rand = n => crypto.getRandomValues(new Uint8Array(n));
-const hash = () => (OS.one('security').hash) || DEFAULT_HASH;
+const hash = () => (OS.one('security').hash) || (OS.Acc && OS.Acc.on ? OS.Acc.lk() || '-' : DEFAULT_HASH);
 OS.ONE_DEF.security = { hash: '', changed: '' };
+L.curHash = () => hash();
 
 // memória primeiro: se o navegador bloquear o sessionStorage (vista embutida), o desbloqueio continua válido nesta sessão
 let memUnlock = false;
@@ -48,7 +49,7 @@ const bioErr = e => { const n = e && e.name;
   return 'Face ID indisponível: ' + ((e && (e.message || e.name)) || 'erro desconhecido'); };
 L.register = async () => { if (ANDROID) { OS.UI.toast('No Android a biometria está desligada. Usa "Entrar direto" em Definições.', 'warn'); return false; }
   try {
-    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'NÁUTILO' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || 'Ryan' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
+    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'NÁUTILO' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || OS.who() }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
     U.ls.set('os2bio', { id: b64u(cred.rawId), at: U.today() }); U.ls.set('os2bioAsk', true); try { OS.UI.closeModal(); } catch (e) { } OS.UI.toast('Face ID ativado. Da próxima vez entras com a cara.', 'pos'); OS.request(); return true;
   } catch (e) { U.ls.set('os2bioAsk', true); OS.UI.toast(bioErr(e), 'warn'); return false; }
 };
@@ -96,7 +97,7 @@ const scene = () => OS.Scene ? `<div class="lk-scene">${OS.Scene.svg(Math.max(32
 async function showLock() {
   const s = el(), bio = L.bioId(), can = bio && await L.bioAvailable();
   s.hidden = false; s.classList.add('lkx');
-  let name = 'Ryan', q = ''; try { name = (OS.one('profile').short || 'Ryan').split(' ')[0]; } catch (e) { } try { q = OS.Quotes ? OS.Quotes.push() : ''; } catch (e) { }
+  let name = 'Ryan', q = ''; try { name = (OS.one('profile').short || OS.who()).split(' ')[0]; } catch (e) { } try { q = OS.Quotes ? OS.Quotes.push() : ''; } catch (e) { }
   const qs = q.length < 42 ? 'l' : q.length < 75 ? 'm' : 's';
   s.innerHTML = `${scene()}<div class="lk-top"><div class="lk-time" id="lkTime">${hm()}</div><div class="lk-date">${OS.U ? OS.U.esc(OS.U.longDate(OS.U.today())) : ''}</div></div>
     <div class="lk-mid"><p class="lk-hi">${hello()}, ${OS.U ? OS.U.esc(name) : 'Ryan'}.</p>${q ? `<p class="lk-q ${qs}">${OS.U.esc(q)}</p>` : ''}</div>
@@ -105,10 +106,11 @@ async function showLock() {
       ${can ? `<button type="button" class="lk-bio" id="lkBio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2M9 9v1M15 9v1M12 9v4h-1M9 16c1.5 1 4.5 1 6 0"/></svg>Desbloquear com Face ID</button><div class="lk-or">ou código</div>` : ''}
       ${codeInput()}
       <button class="lk-go" type="submit" aria-label="Entrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-    </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div><div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div></div>`;
+    </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div>${OS.Acc && OS.Acc.on ? '<button type="button" class="lk-sw" id="lkSw">Trocar de perfil</button>' : ''}<div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div></div>`;
   clearInterval(lkTick); lkTick = setInterval(() => { const t = document.getElementById('lkTime'); if (!t || s.hidden) { clearInterval(lkTick); return; } t.textContent = hm(); }, 15000);
   if (!lkRes) { lkRes = 1; addEventListener('resize', () => { clearTimeout(lkRT); lkRT = setTimeout(() => { const sc = s.querySelector('.lk-scene'); if (sc && !s.hidden) sc.outerHTML = scene(); }, 250); }); }
   document.getElementById('lkForm').onsubmit = e => { e.preventDefault(); tryCode(document.getElementById('lkCode').value); };
+  const sw = document.getElementById('lkSw'); if (sw) sw.onclick = () => OS.Acc.switchProfile();
   const bb = document.getElementById('lkBio');
   if (bb) { const go = async auto => { if (bb.disabled || !bb.isConnected || L.unlocked()) return; bb.disabled = true; try { if (await bioUnlock(auto)) open(); } finally { bb.disabled = false; } };
     bb.onclick = () => go(false);

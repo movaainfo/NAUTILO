@@ -77,15 +77,20 @@ const plano = () => { const { out, urg } = build(), lp = OS.one('lifeplan'), f =
       ${L.length ? [1, 2, 3, 4, 5].map(lv => { const S = L.filter(s => s.lv === lv); return S.length ? `<div class="lp-lv"><div class="lp-lh"><span>${lv}</span><b>${LV[lv][0]}</b><small>${LV[lv][1]}</small></div>${S.slice(0, lv === 1 ? 3 : 6).map(s => row(s, k)).join('')}</div>` : ''; }).join('')
         : `<p class="mut" style="margin:6px 0">Ainda não há nada para ${name.toLowerCase()}. Cria uma meta e a app desenha os passos.</p>`}
       <div class="row gap8" style="margin-top:8px">${UI.addBtn('goals', 'Meta em ' + name.toLowerCase(), { cat: (CATS.find(c => c[0] === k) || [])[3][0], horizon: '1 ano' }, 'ghost sm')}</div></section>`; };
-  return `${star.length ? `<div class="pn lp-star"><div class="eyebrow">A tua estrela-guia</div>${star.map(([l, v]) => `<div class="lp-sv"><small>${l}</small><b>${esc(v)}</b></div>`).join('')}<a class="more" href="#northstar">Editar ${UI.ic('right')}</a></div>`
-      : `<div class="pn lp-star"><b>Define a tua estrela-guia</b><p class="mut" style="margin:4px 0 8px">Quem queres ser e onde queres estar daqui a 1, 3 e 5 anos. Os passos ficam alinhados com isso.</p><a class="btn sm pri" href="#northstar">Definir agora</a></div>`}
+  return `${star.length ? `<div class="pn lp-star"><div class="eyebrow">A tua estrela-guia</div>${star.map(([l, v]) => `<div class="lp-sv"><small>${l}</small><b>${esc(v)}</b></div>`).join('')}<a class="more" href="#next.estrela">Editar ${UI.ic('right')}</a></div>`
+      : `<div class="pn lp-star"><b>Define a tua estrela-guia</b><p class="mut" style="margin:4px 0 8px">Quem queres ser e onde queres estar daqui a 1, 3 e 5 anos. Os passos ficam alinhados com isso.</p><a class="btn sm pri" href="#next.estrela">Definir agora</a></div>`}
     <div class="pn lp-ai"><div class="row between gap8" style="flex-wrap:wrap"><div><b>Plano do Spyke</b><small class="mut" style="display:block">${lp.at ? 'Feito ' + U.rel(U.iso(new Date(lp.at))) + '. ' : ''}O Spyke lê toda a tua vida na app (metas, estudos, dinheiro, corpo, carreira) e sugere os passos que faltam, do pequeno ao grande.</small></div><button class="btn sm pri" data-act="lpAI" ${busy ? 'disabled' : ''}>${busy ? 'A pensar…' : lp.at ? 'Atualizar plano' : 'Pedir plano ao Spyke'}</button></div>${lp.foco ? `<p class="lp-foco">${esc(lp.foco)}</p>` : ''}</div>
     <div class="row gap8" style="flex-wrap:wrap;margin:4px 0 12px">${UI.chip('Todas · ' + total, 'lpCat', !f, 'data-v=""')}${order.map(([k, n]) => UI.chip(n + ' · ' + out[k].length, 'lpCat', f === k, `data-v="${k}"`)).join('')}</div>
     <div class="lp-g">${order.map(card).join('')}</div>`; };
-const TB = [['', 'Plano da vida'], ['agora', 'Agora']];
-V.next = sub => { const k = sub === 'agora' ? 'agora' : '';
-  const head = UI.head('Próximos passos', 'O caminho da tua vida, por áreas: do passo mais pequeno (hoje) ao maior (longo prazo), ligado às tuas metas e a tudo o que registas na app.', '', 'Direção') + UI.tabs('next', TB, k);
-  if (k === 'agora') { const h = agora ? agora(sub) : ''; return head + h.replace(/^[\s\S]*?<\/header>/, ''); }
+// uma só página: os próximos passos, o "agora", a estrela-guia e o roteiro da vida
+const estrela = V.northstar, roteiro = V.roadmap, strip = h => String(h || '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
+const TB = [['', 'Próximos passos'], ['agora', 'Agora'], ['estrela', 'Estrela-guia'], ['roteiro', 'Roteiro']];
+V.next = sub => { const k = TB.some(t => t[0] === sub) ? sub : '';
+  const acts = k === 'roteiro' ? `${UI.addBtn('milestones', 'Marco')}${UI.addBtn('goals', 'Objetivo', null, '')}` : k === 'estrela' ? UI.addBtn('goals', 'Meta') : '';
+  const head = UI.head('Plano de vida', 'Para onde vais (estrela-guia), quando (roteiro) e o que fazer a seguir (os passos, do mais pequeno ao maior), ligado às tuas metas e a tudo o que registas na app.', acts, 'Direção') + UI.tabs('next', TB, k);
+  if (k === 'agora') return head + strip(agora ? agora(sub) : '');
+  if (k === 'estrela') return head + strip(estrela ? estrela() : '');
+  if (k === 'roteiro') return head + strip(roteiro ? roteiro() : '');
   return head + plano(); };
 A.lpCat = b => OS.setUI('lpCat', b.dataset.v);
 A.lpTask = b => { const c = CATS.find(x => x[0] === b.dataset.c) || CATS[4]; OS.add('tasks', { title: b.dataset.t, status: 'Próxima', area: c[4][0] }); UI.toast('Tarefa criada', 'pos'); };
@@ -96,7 +101,7 @@ const ctx = () => { const { out } = build(), n = OS.one('northstar'), p = OS.one
     passos_atuais: Object.fromEntries(Object.entries(out).map(([k, L]) => [k, L.filter(s => !s.ai).slice(0, 10).map(s => ({ nivel: s.lv, passo: s.t }))])),
     perfil: { curso: p.course || p.uni, trabalho: p.employer, cidade: 'Aveiro' } }).slice(0, 12000); };
 A.lpAI = async () => { if (busy) return; busy = true; OS.request();
-  try { const o = await OS.AI.json([{ text: `És o Spyke, o mentor pessoal do Ryan (brasileiro, vive em Aveiro, estuda, trabalha e investe). Com base nos dados reais abaixo, cria o plano de próximos passos da vida dele para alcançar as metas e a estrela-guia.
+  try { const o = await OS.AI.json([{ text: `És o Spyke, o mentor pessoal ${OS.whoCtx('do Ryan (brasileiro, vive em Aveiro, estuda, trabalha e investe)', 'de')}. Com base nos dados reais abaixo, cria o plano de próximos passos da vida dele para alcançar as metas e a estrela-guia.
 Regras: para cada área (estudos, dinheiro, corpo, carreira, pessoal) dá 3 a 6 passos NOVOS (não repitas os "passos_atuais"), do mais pequeno ao maior, concretos e acionáveis, em português de Portugal. Nível: 1 = hoje (pequeno), 2 = esta semana, 3 = este mês, 4 = este ano, 5 = longo prazo. Se uma área não tiver metas, sugere passos para começar.
 Responde APENAS JSON: {"foco":"1 frase: o que mais importa agora","passos":[{"area":"estudos|dinheiro|corpo|carreira|pessoal","nivel":1,"passo":"…","porque":"ligação à meta ou à visão (curto)"}]}
 DADOS: ${ctx()}` }], .4);

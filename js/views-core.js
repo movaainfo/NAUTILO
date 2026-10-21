@@ -8,7 +8,7 @@ const prioL = p => (L.PRIO.find(x => x[0] === String(p)) || [, ''])[1];
 const prioT = p => ({ 1: 'neg', 2: 'warn' }[p] || '');
 const subjN = id => (OS.get('subjects', id) || {}).name || '';
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
-const dayQuote = () => L.QUOTES[U.hash(U.today()) % L.QUOTES.length];
+const dayQuote = () => OS.my(L.QUOTES[U.hash(U.today()) % L.QUOTES.length]);
 OS.srcColor = s => (Cal.src[s] || [, 'var(--mut)'])[1];
 
 /* ---------- componentes partilhados ---------- */
@@ -22,7 +22,7 @@ const agendaList = (from, to, max = 14) => {
   if (!items.length) return UI.empty('Agenda livre neste período.', UI.addBtn('events', 'Novo compromisso', null, ''));
   let cur = '', h = '';
   items.slice(0, max).forEach(x => { if (x.date !== cur) { cur = x.date; h += `<div class="agenda-day">${x.date === U.today() ? 'Hoje' : x.date === U.addDays(U.today(), 1) ? 'Amanhã' : U.longDate(x.date)}</div>`; }
-    h += `<div class="agenda-it ${x.done ? 'done' : ''}" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><span class="when">${x.start || '—'}</span><i style="background:${OS.srcColor(x.src)}"></i><div><b>${esc(x.title)}${x.imp ? ' ' + UI.badge('importante', 'warn') : ''}</b><small>${esc([Cal.src[x.src][0], x.sub].filter(Boolean).join(' · '))}</small></div></div>`; });
+    h += `<div class="agenda-it ${x.done ? 'done' : ''}" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><span class="when">${x.start || '—'}</span><i style="background:${(x.color || OS.srcColor(x.src))}"></i><div><b>${esc(x.title)}${x.imp ? ' ' + UI.badge('importante', 'warn') : ''}</b><small>${esc([Cal.src[x.src][0], x.sub].filter(Boolean).join(' · '))}</small></div></div>`; });
   return h + (items.length > max ? `<a class="btn ghost sm more" href="#calendario.semana">+${items.length - max} na agenda</a>` : '');
 };
 OS.agendaList = agendaList;
@@ -44,11 +44,11 @@ V.hoje = () => {
   const rPlan = OS.all('runplan').filter(r => r.active && String(r.wday) === String(new Date().getDay()));
   const study = St.today().slice(0, 3), minsToday = U.sum(OS.all('sessions').filter(s => s.date === t), s => s.minutes);
   const shifts = OS.all('shifts').filter(s => s.date === t);
-  const tl = timed.map(x => { const s = U.t2m(x.start), e = U.t2m(x.end || x.start) || s + 30; const cls = e < nowM ? 'past' : s <= nowM && nowM <= e ? 'now' : ''; return `<div class="tl-it ${cls}" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><span class="h">${x.start}</span><span class="ax"><i style="${cls !== 'now' ? `border-color:${OS.srcColor(x.src)}` : ''}"></i></span><div class="c"><b>${esc(x.title)}</b><small>${esc([x.end ? x.start + '–' + x.end : '', Cal.src[x.src][0], x.sub].filter(Boolean).join(' · '))}</small></div></div>`; }).join('');
+  const tl = timed.map(x => { const s = U.t2m(x.start), e = U.t2m(x.end || x.start) || s + 30; const cls = e < nowM ? 'past' : s <= nowM && nowM <= e ? 'now' : ''; return `<div class="tl-it ${cls}" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><span class="h">${x.start}</span><span class="ax"><i style="${cls !== 'now' ? `border-color:${(x.color || OS.srcColor(x.src))}` : ''}"></i></span><div class="c"><b>${esc(x.title)}</b><small>${esc([x.end ? x.start + '–' + x.end : '', Cal.src[x.src][0], x.sub].filter(Boolean).join(' · '))}</small></div></div>`; }).join('');
   const allDay = todayItems.filter(x => !x.start && !x.planned);
   return `<div class="today">
   <div><div class="eyebrow">${U.longDate(t)} · ${esc(p.city || '')}</div>
-    <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || 'Ryan')}.</h1>
+    <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || OS.who())}.</h1>
     <p class="tx2" style="margin:4px 0 0">${nextIt ? `A seguir: <b style="color:var(--tx)">${esc(nextIt.title)}</b> às ${nextIt.start}` : 'Sem mais compromissos com hora hoje.'}</p></div><div class="today-clock" data-clock>${U.hm()}</div></div>
     <p class="today-q" style="margin-top:14px">${esc(dayQuote())}</p></div>
   ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#visao">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
@@ -56,7 +56,7 @@ V.hoje = () => {
     <form class="row gap8" data-form="quickTask" data-today="1" style="margin-bottom:8px"><input class="field grow" name="t" placeholder="Nova tarefa para hoje… (@Casa, !1)" aria-label="Nova tarefa para hoje"><button class="btn">${UI.ic('plus')}</button></form>
     <div class="list">${tasks.slice(0, 7).map(x => taskRow(x)).join('') || UI.empty('Nada planeado para hoje. Puxa algo em Próximos passos.')}${doneToday.slice(0, 3).map(x => taskRow(x, { focus: false })).join('')}</div></section>
   <section><div class="sech"><div><h2>Agenda</h2><p>${timed.length} com hora${allDay.length ? ' · ' + allDay.length + ' sem hora' : ''}</p></div>${UI.addBtn('events', 'Compromisso', { date: t }, 'ghost sm')}</div>
-    ${allDay.length ? `<div class="row gap8" style="margin-bottom:10px">${allDay.map(x => `<span class="bdg out" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><i class="dot" style="background:${OS.srcColor(x.src)}"></i>${esc(x.title)}</span>`).join('')}</div>` : ''}
+    ${allDay.length ? `<div class="row gap8" style="margin-bottom:10px">${allDay.map(x => `<span class="bdg out" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><i class="dot" style="background:${(x.color || OS.srcColor(x.src))}"></i>${esc(x.title)}</span>`).join('')}</div>` : ''}
     ${tl ? `<div class="tl">${tl}</div>` : UI.empty('Sem compromissos com hora. Aulas, turnos e rotina aparecem aqui sozinhos.')}</section>
   <section><div class="sech"><div><h2>Hábitos</h2><p>${habits.filter(h => Hab.done(h, t)).length}/${habits.length} · sequência de dias perfeitos: ${Hab.perfectStreak()}</p></div><a class="btn ghost sm" href="#habitos">Ver tudo</a></div>
     <div class="hab-grid">${habits.map(h => { const d = Hab.done(h, t), auto = h.auto && Hab.autoDone(h, t); return `<div class="hab ${d ? 'on' : ''} ${auto ? 'auto' : ''}" ${auto ? '' : `data-act="habit" data-id="${h.id}" data-d="${t}" role="checkbox" aria-checked="${d}" tabindex="0"`}><input type="checkbox" class="cbx" tabindex="-1" aria-hidden="true"${d ? ' checked' : ''} ${auto ? 'disabled' : ''}><span>${esc(h.name)}</span><span class="streak">${auto ? 'auto' : Hab.streak(h) + 'd'}</span></div>`; }).join('') || UI.empty('Sem hábitos ativos.', UI.addBtn('habits', 'Criar hábito', null, ''))}</div></section>
@@ -197,18 +197,18 @@ V.calendario = sub => {
     const ym = U.ym(cur), first = ym + '-01', start = U.addDays(first, -((U.parse(first).getDay() + 6) % 7)), end = U.addDays(start, 41);
     const items = Cal.items(start, end).filter(vis); const by = U.groupBy(items, x => x.date);
     title = U.fmtYML(ym);
-    body = `<div class="pn flush" style="overflow:hidden"><div class="cal-m">${['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map(d => `<div class="wd">${d}</div>`).join('')}${U.range(start, end).map(d => { const it = by[d] || []; return `<div class="cal-d ${U.ym(d) !== ym ? 'out' : ''} ${d === U.today() ? 'today' : ''}" data-act="calDay" data-d="${d}"><span class="n">${+d.slice(8)}</span>${it.slice(0, 4).map(x => `<span class="cev ${x.done ? 'done' : ''} ${x.planned ? 'plan' : ''} ${x.late ? 'late' : ''}" title="${esc(x.title)}"><i style="background:${OS.srcColor(x.src)}"></i><span>${x.start ? x.start + ' ' : ''}${esc(x.title)}</span></span>`).join('')}${it.length > 4 ? `<span class="cev"><span class="more">+${it.length - 4}</span></span>` : ''}</div>`; }).join('')}</div></div>`;
+    body = `<div class="pn flush" style="overflow:hidden"><div class="cal-m">${['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map(d => `<div class="wd">${d}</div>`).join('')}${U.range(start, end).map(d => { const it = by[d] || []; return `<div class="cal-d ${U.ym(d) !== ym ? 'out' : ''} ${d === U.today() ? 'today' : ''}" data-act="calDay" data-d="${d}"><span class="n">${+d.slice(8)}</span>${it.slice(0, 4).map(x => `<span class="cev ${x.done ? 'done' : ''} ${x.planned ? 'plan' : ''} ${x.late ? 'late' : ''}" title="${esc(x.title)}"><i style="background:${(x.color || OS.srcColor(x.src))}"></i><span>${x.start ? x.start + ' ' : ''}${esc(x.title)}</span></span>`).join('')}${it.length > 4 ? `<span class="cev"><span class="more">+${it.length - 4}</span></span>` : ''}</div>`; }).join('')}</div></div>`;
   } else if (view === 'semana' || view === 'dia') {
     const from = view === 'dia' ? cur : U.monday(cur), days = view === 'dia' ? [cur] : U.range(from, U.addDays(from, 6));
     const items = Cal.items(days[0], days[days.length - 1]).filter(vis);
     title = view === 'dia' ? U.longDate(cur) : U.fmtDS(days[0]) + ' – ' + U.fmtDS(days[6]);
     const H0 = 6, H1 = 24, HH = 44;
     const cols = days.map(d => { const it = items.filter(x => x.date === d); const timed = it.filter(x => x.start); const all = it.filter(x => !x.start);
-      const blocks = timed.map(x => { const s = Math.max(H0 * 60, U.t2m(x.start)), e = Math.min(H1 * 60, U.t2m(x.end) || s + 45); return `<div class="cal-blk" ${x.edit ? `data-edit="${x.edit}"` : ''} style="top:${(s - H0 * 60) / 60 * HH}px;height:${Math.max(22, (e - s) / 60 * HH - 2)}px;border-left-color:${OS.srcColor(x.src)};${x.planned ? 'opacity:.6' : ''}" title="${esc(x.title)}">${esc(x.title)}<small>${x.start}${x.end ? '–' + x.end : ''}${x.sub ? ' · ' + esc(x.sub) : ''}</small></div>`; }).join('');
+      const blocks = timed.map(x => { const s = Math.max(H0 * 60, U.t2m(x.start)), e = Math.min(H1 * 60, U.t2m(x.end) || s + 45); return `<div class="cal-blk" ${x.edit ? `data-edit="${x.edit}"` : ''} style="top:${(s - H0 * 60) / 60 * HH}px;height:${Math.max(22, (e - s) / 60 * HH - 2)}px;border-left-color:${(x.color || OS.srcColor(x.src))};${x.planned ? 'opacity:.6' : ''}" title="${esc(x.title)}">${esc(x.title)}<small>${x.start}${x.end ? '–' + x.end : ''}${x.sub ? ' · ' + esc(x.sub) : ''}</small></div>`; }).join('');
       const nowL = d === U.today() ? (() => { const n = new Date(); const m = n.getHours() * 60 + n.getMinutes(); return m >= H0 * 60 ? `<div class="cal-now" style="top:${(m - H0 * 60) / 60 * HH}px"></div>` : ''; })() : '';
       return { d, all, html: `<div class="cal-grid" data-act="calSlot" data-d="${d}">${Array.from({ length: H1 - H0 }, () => '<div class="cal-hr"></div>').join('')}${blocks}${nowL}</div>` }; });
     body = `<div class="pn flush" style="overflow:auto;max-height:72vh"><div class="cal-w" style="${view === 'dia' ? 'grid-template-columns:48px 1fr;min-width:0' : ''}"><div class="hd"></div>${cols.map(c => `<div class="hd ${c.d === U.today() ? 'today' : ''}">${U.WDS[U.parse(c.d).getDay()]} <b class="mono">${+c.d.slice(8)}</b></div>`).join('')}
-      <div class="allday" style="border-left:0;font:10.5px var(--mono);color:var(--mut)">dia</div>${cols.map(c => `<div class="allday">${c.all.map(x => `<span class="cev ${x.done ? 'done' : ''} ${x.planned ? 'plan' : ''} ${x.late ? 'late' : ''}" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><i style="background:${OS.srcColor(x.src)}"></i><span>${esc(x.title)}</span></span>`).join('')}</div>`).join('')}
+      <div class="allday" style="border-left:0;font:10.5px var(--mono);color:var(--mut)">dia</div>${cols.map(c => `<div class="allday">${c.all.map(x => `<span class="cev ${x.done ? 'done' : ''} ${x.planned ? 'plan' : ''} ${x.late ? 'late' : ''}" ${x.edit ? `data-edit="${x.edit}" style="cursor:pointer"` : ''}><i style="background:${(x.color || OS.srcColor(x.src))}"></i><span>${esc(x.title)}</span></span>`).join('')}</div>`).join('')}
       <div>${Array.from({ length: H1 - H0 }, (_, i) => `<div class="cal-hr">${U.pad(H0 + i)}:00</div>`).join('')}</div>${cols.map(c => c.html).join('')}</div></div>`;
   }
   const integ = OS.one('integ');

@@ -8,6 +8,8 @@
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
 OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false, ear: 'auto', pausa: 1.2, bargeS: true, alertVoz: false };
+// numa conta (versão pública) o Spyke começa calado: sem microfone sempre ligado nem modo Jarvis ao abrir (cada pessoa liga se quiser)
+if (OS.Acc && OS.Acc.pub) Object.assign(OS.ONE_DEF.spyke, { always: false, jarvisStart: false, morning: false, siri: false, fix3: 1, fix4: 1 });
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
@@ -29,7 +31,7 @@ const wakeSplit = raw => { const T = String(raw || '').split(/\s+/).filter(Boole
 // chamar é dizer o nome no início ou no fim da frase ("Spyke, …", "…, Spyke"); o nome perdido a meio de uma conversa (televisão, outras pessoas) não o chama
 const vocative = raw => { const T = String(raw || '').split(/\s+/).filter(Boolean), k = T.findIndex(x => WAKET.test(N(x).replace(/[^\w]/g, ''))); return k >= 0 && (k <= 3 || k >= T.length - 3); };
 S._vocative = vocative;
-const name = () => OS.one('profile').short || 'Ryan';
+const name = () => OS.one('profile').short || OS.who();
 const eurS = v => { const n = Math.abs(U.num(v)); return (Math.abs(n - Math.round(n)) < .005 ? Math.round(n) : n.toFixed(2).replace('.', ',')) + ' euros'; };
 const listS = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1];
 const dayS = d => U.parse(d).toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' });

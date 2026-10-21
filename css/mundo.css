@@ -30,6 +30,10 @@
 .mu-leg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12.5px;color:var(--tx2);align-items:center}
 .mu-leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:#1B3A5C;border:1px solid rgba(120,200,255,.2)}
 .mu-leg i.v{background:#38BDF8}.mu-leg i.m{background:#2DD4BF}.mu-leg i.w{background:#B98A2E}
+.mu-isl path{fill:#6E93BC;stroke:#071A30;stroke-linejoin:round;cursor:pointer}
+.mu-isl path.v{fill:#7DD3FC}.mu-isl path.m{fill:#5EEAD4}.mu-isl path.w{fill:#E8C26A}
+.mu-leg i.isl{width:9px;height:9px;border-radius:1px;transform:rotate(45deg);margin:0 7px 0 2px;background:#7DD3FC;border-color:#071A30}
+.mu-ip{flex:0 100 auto;min-width:0;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* continentes */
 .mu-conts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}

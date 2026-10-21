@@ -138,6 +138,8 @@ function payloadFor(docId) {
   return { items: OS.all(c).filter(r => String(r._s || 0) === s) };
 }
 function flush() {
+  // a limpar o aparelho (sair da conta, trocar de perfil): nada volta a ser gravado até recarregar
+  if (OS.noSave) { dirty.clear(); return; }
   // divide shards grandes demais
   [...dirty].forEach(id => {
     const [c, s] = id.split('~'); if (c === 'one') return;

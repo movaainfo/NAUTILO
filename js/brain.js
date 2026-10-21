@@ -10,7 +10,7 @@
 const U = OS.U;
 const B = OS.Brain = {};
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
-const who = () => OS.one('profile').short || 'Ryan';
+const who = () => OS.one('profile').short || OS.who();
 const today = () => U.today();
 const cut = (o, n = 6000) => { const s = typeof o === 'string' ? o : JSON.stringify(o); return s.length > n ? s.slice(0, n) + '…' : s; };
 const safe = f => { try { return f(); } catch (e) { return null; } };
@@ -93,7 +93,7 @@ const T = [
     run: a => { const r = OS.Spyke && OS.Spyke.findRoute ? OS.Spyke.findRoute(a.pagina) : null; if (!r) return 'Não encontrei essa página.'; location.hash = r[0]; return 'Abri ' + r[1] + '.'; } }];
 
 /* ---------- instruções ---------- */
-const system = () => `És o Spyke, o assistente pessoal do ${who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco. Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.
+const system = () => `És o Spyke, o assistente pessoal ${OS.Acc && OS.Acc.pub ? OS.whoCtx('', 'de') : 'do ' + who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco.${OS.Acc && OS.Acc.pub ? '' : ' Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.'}
 Regras:
 - Responde SEMPRE em português do Brasil, para ser dito em voz alta: no máximo 3 ou 4 frases curtas, sem listas, sem markdown, sem emojis. Nunca digas o teu próprio nome.
 - Recebes um resumo atual com quase tudo da vida dele: se o resumo chega, responde logo (é mais rápido). Para detalhes que não estão lá, usa "consultar" (por área), "procurar_na_app" (procura em toda a app) ou "ler_area". Não inventes números nem factos.

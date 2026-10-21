@@ -7,7 +7,7 @@ const W = OS.Weather = {};
 const CODES = { 0: 'céu limpo', 1: 'quase limpo', 2: 'parcialmente nublado', 3: 'nublado', 45: 'nevoeiro', 48: 'nevoeiro com geada', 51: 'chuvisco fraco', 53: 'chuvisco', 55: 'chuvisco forte', 56: 'chuvisco gelado', 57: 'chuvisco gelado', 61: 'chuva fraca', 63: 'chuva', 65: 'chuva forte', 66: 'chuva gelada', 67: 'chuva gelada forte', 71: 'neve fraca', 73: 'neve', 75: 'neve forte', 77: 'grãos de neve', 80: 'aguaceiros fracos', 81: 'aguaceiros', 82: 'aguaceiros fortes', 85: 'aguaceiros de neve', 86: 'aguaceiros de neve fortes', 95: 'trovoada', 96: 'trovoada com granizo', 99: 'trovoada forte com granizo' };
 W.desc = c => CODES[c] || 'tempo variável';
 W.kind = c => c === 0 || c === 1 ? 'sol' : c === 2 ? 'sol-nuvem' : c === 3 || c === 45 || c === 48 ? 'nuvem' : c >= 71 && c <= 86 && ![80, 81, 82].includes(c) ? 'neve' : c >= 95 ? 'trovoada' : 'chuva';
-W.city = () => (OS.one('profile').city || 'Aveiro').trim();
+W.city = () => (OS.one('profile').city || (OS.Acc && OS.Acc.pub ? 'Lisboa' : 'Aveiro')).trim();
 let data = U.ls.get(K, null), busy = null;
 const geo = async name => { const g = U.ls.get('os2wxgeo', null); if (g && g.n === name) return g;
   const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=pt&name=' + encodeURIComponent(name)), j = await r.json(), x = (j.results || [])[0];

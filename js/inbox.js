@@ -10,6 +10,9 @@ const cfg = () => OS.one('inbox');
 const SEEN = 'os2inboxSeen';
 const genKey = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
 
+// no script de cada pessoa vai o nome do perfil (no modo pessoal fica "do Ryan" como sempre)
+const nm_ = () => String(OS.who()).replace(/[\\'"`$\n\r]/g, '').slice(0, 40);
+const dRyan_ = () => OS.Acc && OS.Acc.pub ? 'de ' + nm_() : 'do Ryan', oRyan_ = () => OS.Acc && OS.Acc.pub ? nm_() : 'O Ryan';
 IB.core = key => `// Náutilo · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
 const KEY = '${key}';
 function doGet(e) {
@@ -98,7 +101,7 @@ function resumo_() { let b = {}; try { b = JSON.parse(PropertiesService.getScrip
 function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || '';
   if (!q) return resumo_(); if (!gk) return 'Para te responder pela Siri, liga a IA no Náutilo e ativa as perguntas pela Siri nas definições do Spyke.';
   const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
-  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  const prompt = 'És o Spyke, o assistente pessoal ${dRyan_()} (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo ${dRyan_()} (podem ter algumas horas):\\n' + cx + '\\n\\n${oRyan_()} pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   const ms = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
   for (let i = 0; i < ms.length; i++) { try { const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + ms[i] + ':generateContent?key=' + encodeURIComponent(gk), { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } }) });
     if (r.getResponseCode() !== 200) continue; const j = JSON.parse(r.getContentText()), t = (((j.candidates || [])[0] || {}).content || {}).parts; if (t && t.length) return t.map(function (x) { return x.text || ''; }).join('').trim(); } catch (e) { } }
@@ -333,7 +336,7 @@ function iaTexto_(prompt, gk) { if (gk) { const ms = iaModelos_(gk); for (let i 
   return ''; }
 function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || ''; if (!q) return resumo_();
   const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
-  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  const prompt = 'És o Spyke, o assistente pessoal ${dRyan_()} (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo ${dRyan_()} (podem ter algumas horas):\\n' + cx + '\\n\\n${oRyan_()} pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
 // o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
 IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4() + (IB.addon5 ? '\n' + IB.addon5() : '') + (IB.addon6 ? '\n' + IB.addon6() : '') + (IB.addon7 ? '\n' + IB.addon7() : '');
@@ -354,7 +357,7 @@ const getJSON = async (url, tries = 3) => { let last = null;
   for (let i = 0; i < tries; i++) { try { const r = await fetch(url, { cache: 'no-store', credentials: 'omit' }), t = await r.text(); try { return JSON.parse(t); } catch (e) { last = new Error('resposta do Google não é JSON'); } } catch (e) { last = e; }
     await new Promise(res => setTimeout(res, 800 * (i + 1))); }
   throw last || new Error('sem resposta'); };
-IB.pull = async (manual) => { const c = cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
+IB.pull = async (manual) => { const c = OS.Acc && OS.Acc.on && !(cfg().url && cfg().key) && OS.Acc.atalho ? (OS.Acc.atalho() || cfg()) : cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
   try { const j = await getJSON(c.url + (c.url.includes('?') ? '&' : '?') + 'op=pull&k=' + encodeURIComponent(c.key) + '&_=' + Date.now());
     if (!j.ok) { if (manual) UI.toast(j.msg || 'O script recusou o pedido', 'neg'); return; }
     const seen = new Set(U.ls.get(SEEN, [])), got = [];
@@ -402,7 +405,7 @@ IB.check = async () => { const u = base(), c = cfg();
       } catch (e) { return IB.st = { ok: false, m: 'Não consegui testar a gravação no Google Drive. Tenta outra vez.' }; } }
     return IB.st = { ok: true, m: 'Ligado. A caixa de entrada está a funcionar' + ((j.v || 2) >= 3 ? ' e a gravação no Google Drive também.' : '.') };
   } catch (e) { return IB.st = { ok: false, m: 'Não consegui falar com o script. Confirma: (1) "Quem tem acesso: Qualquer pessoa"; (2) autorizaste a app com a tua conta Google; (3) o código tem "doGet" (cola-o outra vez se for antigo).' }; } };
-const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base());
+const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base()); if (OS.Acc && OS.Acc.on && !(c.url && c.key) && OS.Acc.atalhoPanel) return OS.Acc.atalhoPanel();
   return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3><span class="mut" style="font-size:12px">${c.n ? c.n + ' gastos importados' : ''}</span></div>
   ${c.url && c.key ? `<div class="ib-now"><button class="btn sm pri" data-act="ibTest">${UI.ic('sync')}Ir buscar gastos agora</button><span class="mut">${c.last ? 'última verificação: ' + new Date(c.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não verificou'}${c.err ? ' · <span class="neg">' + esc(c.err) + '</span>' : ''}</span></div>` : ''}
   <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado, sem abrir o Náutilo. Precisa de uma folha Google tua como caixa de entrada (grátis, uma vez só).</p>
@@ -436,7 +439,8 @@ const syncPanel = () => { const c = cfg(), SY = window.OceanumSync || {}, on = !
     ${ready ? `<div class="ib-s ${v3 ? 'done' : ''}"><i>B</i><div><b>Atualizar o script do Google (uma vez)</b>${v3 ? '<p class="pos">✓ O script já está atualizado e pode gravar no teu Google Drive.</p>' : `${(c.ver || 0) >= 3 && st.m && !st.ok ? `<div class="ib-st bad">✗ ${esc(st.m)}</div>` : ''}<p>A sincronização precisa da versão nova do script:</p><p>1. Toca em <b>Copiar código</b> (passo 1 do atalho, mais abaixo).<br>2. No Apps Script: apaga tudo → cola → <b>💾 Guardar</b>.<br>3. <b>Implantar → Gerenciar implantações</b> → ✏️ (lápis) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>.<br>4. Se pedir, <b>autoriza o acesso ao Google Drive</b> (Avançado → Acessar → Permitir).<br>5. Volta aqui e toca em <b>Verificar</b>.</p><button class="btn sm" data-act="syVer">Verificar</button>`}</div></div>
     <div class="ib-s"><i>C</i><div><b>Ligar a sincronização</b><p>Faz isto <b>primeiro no aparelho com os dados principais</b> (o tablet). Os outros aparelhos ligam-se depois com o código.</p><button class="btn sm pri" data-act="syOn" ${v3 ? '' : 'disabled'}>Ligar sincronização neste aparelho</button></div></div>` : ''}
   </div>`}</div>`; };
-const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + syncPanel() + panel();
+// numa conta a sincronização é a da conta (Definições › Conta e perfis): o painel do Google Drive fica só no modo pessoal
+const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (OS.Acc && OS.Acc.on ? '' : syncPanel()) + panel();
 A.syVer = async () => { UI.toast('A verificar…'); await IB.check(); const c = cfg(); UI.toast((c.ver || 0) < 3 ? 'Ainda é a versão antiga. Confirma que escolheste "Nova versão" ao implantar.' : c.drive === 0 ? 'Falta autorizar o Google Drive (vê as instruções).' : 'Script atualizado ✓', (c.ver || 0) >= 3 && c.drive !== 0 ? 'pos' : 'warn'); OS.request(); };
 A.syOn = () => { try { localStorage.setItem('os2sync', '1'); localStorage.setItem('os2syncJoined', '0'); } catch (e) { } UI.toast('A ligar…'); setTimeout(() => location.reload(), 400); };
 A.syOff = () => UI.ask('Desligar a sincronização neste aparelho?', 'Os dados ficam neste aparelho, mas deixam de ser trocados com os outros.', 'Desligar', () => { try { localStorage.removeItem('os2sync'); } catch (e) { } location.reload(); });

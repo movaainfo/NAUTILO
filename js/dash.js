@@ -38,7 +38,7 @@ V.visao = () => {
       <div class="dc-rows"><div><span>Próximo turno</span><b>${W.nx ? (W.nx.date === t ? 'hoje' : U.rel(W.nx.date)) + ' ' + esc(W.nx.start || '') + (W.nx.place ? ' · ' + esc(W.nx.place) : '') : '—'}</b></div><div><span>Próxima folga</span><b>${W.off ? (W.off.date === t ? 'hoje' : U.fmtDS(W.off.date)) : '—'}</b></div><div><span>Tarefas · projetos de trabalho</span><b class="mono">${W.tasks} · ${W.proj}</b></div>${W.rate ? `<div><span>Valor por hora</span><b class="mono">${U.eur(W.rate)}</b></div>` : ''}</div>`, { cls: 'span4', act: more('trabalho', 'Trabalho') }) : '';
   const P = safe(() => OS.PainelParts(), null), part = k => (P && P[k]) || '';
   return `<div class="dash">
-  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
+  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || OS.who())}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
     <div class="dash-ctl">${R.per === 'mes' ? `<div class="dash-month"><button class="icon-btn" data-act="dashYM" data-d="-1" aria-label="Mês anterior">${UI.ic('left')}</button><b>${R.label}</b><button class="icon-btn" data-act="dashYM" data-d="1" aria-label="Mês seguinte" ${R.ym >= U.ym(t) ? 'disabled' : ''}>${UI.ic('right')}</button></div>` : `<div class="dash-month"><b>${R.label}</b></div>`}
       <div class="dash-seg" role="group">${per.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="dashPer" data-p="${k}">${l}</button>`).join('')}</div></div>${sky()}</div>
   ${part('life')}
@@ -60,7 +60,7 @@ V.visao = () => {
   ${part('money')}
   ${part('study')}
   ${part('goals')}
-  ${part('trends')}</div>`;
+  ${OS.EvoBody ? `<section id="evo" class="evo-sec"><div class="sech"><div><h2>A tua evolução</h2><p>Onde estás e quanto evoluíste: hoje contra 30 dias, 3 meses e 1 ano, em todas as áreas.</p></div></div><div class="col gap16">${safe(() => OS.EvoBody(), '')}</div></section>` : part('trends')}</div>`;
 };
 
 /* ================= GASTO RÁPIDO: o "widget" do telemóvel ================= */
@@ -83,7 +83,7 @@ OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
   return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3></div>
     <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Náutilo sempre no Gasto rápido neste aparelho</label>
     <div class="list" style="margin-top:10px"><div class="li"><div class="li-t"><b>iPhone: registar sem abrir a app</b><small>Um atalho no Centro de Controlo pede o valor e a descrição e grava direto. Os gastos entram sozinhos.</small></div><div class="li-r"><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></div></div>
-    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>`; };
+    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>${OS.Acc && OS.Acc.on && OS.Acc.atalhoPanel && !(OS.one('inbox').url && OS.one('inbox').key) ? OS.Acc.atalhoPanel() : ''}`; };
 OS.forms = OS.forms || {};
 OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 0)) { UI.toast('Escreve o valor', 'warn'); return; }
   const cat = (f.querySelector('input[name=cat]:checked') || {}).value || '', account = (f.querySelector('input[name=acc]:checked') || {}).value || '';

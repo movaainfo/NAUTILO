@@ -5,7 +5,7 @@
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
-OS.ONE_DEF.me = { birth: '', birthplace: '', hometown: '', nationality: 'Brasileira', ptSince: '', langs: 'Português', qa: {}, bio: null, photo: '' };
+OS.ONE_DEF.me = { birth: '', birthplace: '', hometown: '', nationality: OS.Acc && OS.Acc.pub ? '' : 'Brasileira', ptSince: '', langs: 'Português', qa: {}, bio: null, photo: '' };
 OS.ONE_DEF.mever = { v: [] };
 const me = () => OS.one('me'), P = () => OS.one('profile'), today = () => U.today();
 const first = () => (P().short || (P().name || 'Ryan').split(' ')[0]);
@@ -137,7 +137,7 @@ const completeness = () => { const parts = [[filled() / KEYS.length, 3], [Math.m
 /* ---------- factos para a IA (só o que está registado) ---------- */
 const facts = () => { const m = me(), p = P(), ns = OS.one('northstar'), about = {}, qa = [];
   KEYS.forEach(k => { if (String(m[k] || '').trim()) about[k] = m[k]; });
-  qList().forEach(q => { const a = (m.qa || {})[q.id]; if (a && a.trim()) qa.push({ pergunta: q.q, resposta: a }); });
+  qList().forEach(q => { const a = (m.qa || {})[q.id]; if (a && a.trim()) qa.push({ pergunta: OS.my(q.q), resposta: a }); });
   const lst = (c, f, n = 40) => OS.all(c).slice(0, n).map(f);
   return { nome: p.name, tratamento: first(), idade: age(m.birth), cidade_atual: p.city, universidade: p.uni, curso: p.course, trabalho: [p.jobRole, p.employer].filter(Boolean).join(' em '), sobre: about, entrevista: qa,
     pessoas: lst('people', x => ({ nome: x.name, rel: x.rel, desde: x.since, como: x.how, historias: x.story, significa: x.means, onde: x.where }), 60),
@@ -210,7 +210,7 @@ const pages = w => Math.max(1, Math.round(w / 280)), pgs = w => { const n = page
 const aiOK = () => !!(OS.AI && (OS.AI.key() || (OS.AI.freeOn && OS.AI.freeOn())));
 const ALBL = Object.fromEntries(ABOUT.flatMap(s => s[1].map(f => [f[0], f[1]])));
 const matOf = p => { const m = me(), qa = m.qa || {}, ans = q => String(qa[q.id] || '').trim();
-  const resp = fuQs().filter(q => q.g === p.n).concat(QALL.filter(q => q.g === p.n)).filter(ans).map(q => ({ pergunta: q.q, resposta: ans(q) }));
+  const resp = fuQs().filter(q => q.g === p.n).concat(QALL.filter(q => q.g === p.n)).filter(ans).map(q => ({ pergunta: OS.my(q.q), resposta: ans(q) }));
   const sobre = {}; (p.about || []).forEach(k => { if (String(m[k] || '').trim()) sobre[ALBL[k] || k] = m[k]; });
   const momentos = U.sortBy(OS.all('lifeev').filter(e => (p.cats || []).includes(e.cat)), e => e.date || '').map(e => ({ data: e.date, o_que: e.title, onde: e.place, com: e.people, como_foi: e.desc, aprendi: e.lesson }));
   const pessoas = OS.all('people').filter(x => (p.ppl || []).includes(x.group || grpOf(x.rel)) || (p.rel && p.rel.test(x.rel || ''))).map(x => ({ nome: x.name, quem: x.rel, desde: x.since, como_nos_conhecemos: x.how, historias: x.story, significa: x.means }));
@@ -280,7 +280,7 @@ let FUB = false; const DR = {};
 const isAns = q => String((me().qa || {})[q.id] || '').trim();
 const pool = g => qList().filter(q => (!g || q.g === g) && !isAns(q) && !(me().skip || []).includes(q.id));
 const followUps = async q => { const a = String((me().qa || {})[q.id] || '').trim(); if (!aiOK() || a.length < 25 || me().autoFu === false) return [];
-  try { const o = await OS.AI.json([{ text: `És um biógrafo a entrevistar ${first()} para escrever o livro da vida dele. Pergunta: "${q.q}". Resposta dele: "${a.slice(0, 3000)}".
+  try { const o = await OS.AI.json([{ text: `És um biógrafo a entrevistar ${first()} para escrever o livro da vida dele. Pergunta: "${OS.my(q.q)}". Resposta dele: "${a.slice(0, 3000)}".
 Faz até 3 perguntas de seguimento curtas e concretas para tirar mais detalhes desta história (quem estava, onde, quando, o que disseram, o que sentiu, o que mudou depois). Não perguntes o que ele já respondeu. Trata-o por tu. JSON: {"q":["…"]}` }], .5);
     const L = (o.q || []).map(s => String(s).trim()).filter(s => s.length > 8).slice(0, 3), fu = me().fu = me().fu || [], have = new Set(fu.map(f => f.q));
     const add = L.filter(s => !have.has(s)).map(s => ({ id: 'f' + U.hash(q.id + '|' + s).toString(36), g: q.g === 'A IA quer saber' ? (partOf(OS.ui.meQg) || PARTS[PARTS.length - 2]).n : q.g, q: s, from: q.id }));
@@ -408,15 +408,15 @@ T.entrevista = () => { const qa = me().qa || {}, all = qList(), g = OS.ui.meQg |
   const head = `<div class="pn me-ivh"><div class="row between gap8" style="flex-wrap:wrap"><div><h3 style="margin:0">Entrevista da tua vida</h3><small class="mut">Uma pergunta de cada vez, como numa conversa com um biógrafo. Depois de cada resposta, a IA pergunta mais sobre essa história.</small></div><span class="mono">${n}/${all.length}</span></div>${UI.bar(n / Math.max(1, all.length), 'pos')}
     <small class="mut">${U.nf(words)} palavras contadas · dá para ${pgs(Math.round(words * 2.4))} de livro</small>
     <label class="me-psel"><span>Parte do livro</span><select class="field" id="meQsel" aria-label="Parte do livro"><option value=""${!g ? ' selected' : ''}>Tudo, pela ordem do livro</option>${aiL.length ? `<option value="A IA quer saber"${g === 'A IA quer saber' ? ' selected' : ''}>A IA quer saber (${aiL.filter(isAns).length}/${aiL.length})</option>` : ''}${counts.map(([p, t, a]) => `<option value="${esc(p.n)}"${g === p.n ? ' selected' : ''}>${esc(p.n)} (${a}/${t})</option>`).join('')}<option value="_done"${g === '_done' ? ' selected' : ''}>Ver e editar as respondidas</option></select></label></div></div>`;
-  if (g === '_done') return head + (all.filter(isAns).map(q => `<div class="pn me-qa"><div class="eyebrow">${esc(q.g)}${q.fu ? ' · seguimento' : ''}</div><label for="meq-${q.id}"><b>${esc(q.q)}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="4">${esc(qa[q.id] || '')}</textarea></div>`).join('') || UI.empty('Ainda não respondeste a nenhuma.'));
+  if (g === '_done') return head + (all.filter(isAns).map(q => `<div class="pn me-qa"><div class="eyebrow">${esc(q.g)}${q.fu ? ' · seguimento' : ''}</div><label for="meq-${q.id}"><b>${esc(OS.my(q.q))}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="4">${esc(qa[q.id] || '')}</textarea></div>`).join('') || UI.empty('Ainda não respondeste a nenhuma.'));
   const card = cur ? `<div class="pn me-iv"><div class="eyebrow">${esc(cur.g)}${cur.fu ? ' · <span class="acc">a IA quer saber mais</span>' : ''} · pergunta ${idx}</div>
-    <label for="meqCur" class="me-ivq">${esc(cur.q)}</label>
+    <label for="meqCur" class="me-ivq">${esc(OS.my(cur.q))}</label>
     <textarea class="field me-iva" id="meqCur" data-id="${cur.id}" rows="7" placeholder="Conta com calma, com pormenores: quem, onde, quando, o que sentiste… (ou toca em Ditar e fala)">${esc(DR[cur.id] || '')}</textarea>
     <div class="row gap8 me-ivb"><button class="btn" data-act="meQDict">${UI.ic('mic')}Ditar</button><button class="btn pri grow" data-act="meQSave" ${FUB ? 'disabled' : ''}>${FUB ? 'A pensar na próxima pergunta…' : 'Guardar e seguinte'}</button><button class="btn ghost" data-act="meQSkip">Saltar</button></div>
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-act="meFuTg" ${me().autoFu === false ? '' : 'checked'}><span></span>A IA faz perguntas de seguimento depois de cada resposta</label></div>`
     : `<div class="pn">${UI.empty(g ? `Respondeste a todas as perguntas de "${esc(g)}".` : 'Respondeste a todas as perguntas!', gp ? `<button class="btn pri" data-act="meQMore" data-p="${gp.k}" ${FUB ? 'disabled' : ''}>${UI.ic('zap')}A IA faz mais perguntas sobre "${esc(gp.n)}"</button>` : '')}</div>`;
   const rest = (g ? all.filter(q => q.g === g) : []).filter(isAns);
-  return head + card + (rest.length ? UI.toggle(`As tuas respostas em "${esc(g)}" (${rest.length})`, rest.map(q => `<div class="me-qa"><label for="meq-${q.id}"><b>${esc(q.q)}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="3">${esc(qa[q.id] || '')}</textarea></div>`).join(''), 'meQr_' + (gp ? gp.k : 'x')) : '')
+  return head + card + (rest.length ? UI.toggle(`As tuas respostas em "${esc(g)}" (${rest.length})`, rest.map(q => `<div class="me-qa"><label for="meq-${q.id}"><b>${esc(OS.my(q.q))}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="3">${esc(qa[q.id] || '')}</textarea></div>`).join(''), 'meQr_' + (gp ? gp.k : 'x')) : '')
     + (!g && gp == null ? `<div class="pn"><div class="pn-h"><h3>Partes do livro</h3></div><div class="me-pl">${counts.map(([p, t, a]) => `<button class="me-pi" data-act="meQg" data-v="${esc(p.n)}"><b>${esc(p.t)}</b><small>${a}/${t} respondidas</small>${UI.bar(a / Math.max(1, t), a >= t ? 'pos' : '')}</button>`).join('')}</div></div>` : ''); };
 A.meQg = b => { OS.setUI('meQi', ''); OS.setUI('meQg', b.dataset.v); };
 document.addEventListener('change', e => { if (e.target && e.target.id === 'meQsel') { OS.setUI('meQi', ''); OS.setUI('meQg', e.target.value); } });
