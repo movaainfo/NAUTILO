@@ -3118,6 +3118,78 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(242,196,141,.22),0 8px 22px rgba(0
 
 </style>
 <style>
+/* NÁUTILO — ecrã da conta e perfis: o mesmo mar do ecrã de entrada, com os formulários por baixo, à luz do farol. */
+#acc{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;justify-content:flex-end;background:#04070D;overflow:hidden auto;color:#E9E3D8;-webkit-overflow-scrolling:touch}
+#acc[hidden]{display:none}
+html.ac-open,html.ac-open body{overflow:hidden}
+#acc .lk-scene{position:fixed}
+#acc .lk-scene::after{background:linear-gradient(180deg,rgba(4,7,13,.55) 0%,rgba(4,7,13,.05) 22%,rgba(4,7,13,.35) 40%,rgba(4,7,13,.88) 62%,rgba(4,7,13,.97) 82%)}
+.ac-in{position:relative;z-index:1;width:100%;max-width:460px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.ac-brand{display:flex;align-items:center;gap:9px;font:500 24px/1 var(--serif);letter-spacing:.02em;color:#E9E3D8}
+.ac-hi{margin:0;font:italic 500 21px/1.25 var(--serif);color:#E9E3D8;max-width:22em}
+.ac-h{margin:4px 0 2px;font:400 34px/1.02 var(--display);letter-spacing:.01em;text-transform:uppercase;color:#F6F7F9;text-wrap:balance;text-shadow:0 2px 20px rgba(0,0,0,.5)}
+.ac-card{display:flex;flex-direction:column;gap:14px}
+.ac-card h2{margin:4px 0 0;font:400 28px/1.05 var(--display);letter-spacing:.01em;text-transform:uppercase;color:#F6F7F9}
+.ac-sub{margin:0;font-size:14px;line-height:1.5;color:#A9B2BF}
+.ac-tabs{display:flex;gap:22px;border-bottom:1px solid rgba(233,227,216,.16)}
+.ac-tabs button{background:none;border:0;padding:8px 0 10px;margin-bottom:-1px;font:500 16px var(--sans);color:#8A93A0;border-bottom:2px solid transparent;cursor:pointer}
+.ac-tabs button.on{color:#F5E2C8;border-bottom-color:var(--farol,#F2C48D)}
+.ac-f{display:flex;flex-direction:column;gap:6px}
+.ac-f>span{font:italic 500 15px/1.2 var(--serif);color:#B9B2A6}
+.ac-f input:not([type=radio]){width:100%;background:transparent;border:0;border-bottom:1px solid rgba(233,227,216,.32);border-radius:0;color:#F1F4F8;-webkit-text-fill-color:#F1F4F8;caret-color:var(--farol,#F2C48D);font:500 17px var(--sans);padding:8px 0;outline:none;-webkit-appearance:none;appearance:none}
+.ac-f input:focus{border-bottom-color:var(--farol,#F2C48D)}
+.ac-f input::placeholder{color:#6F7885;-webkit-text-fill-color:#6F7885}
+.ac-f input:-webkit-autofill{-webkit-box-shadow:0 0 0 40px #0A1018 inset;-webkit-text-fill-color:#F1F4F8}
+.ac-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--farol,#F2C48D);background:var(--farol,#F2C48D);color:#1A1208;font:600 15.5px var(--sans);cursor:pointer}
+.ac-btn.wide{width:100%}
+.ac-btn.ghost{background:transparent;color:#F5E2C8;border-color:rgba(242,196,141,.45)}
+.ac-btn.neg{background:#C9584F;border-color:#C9584F;color:#fff}
+.ac-btn:disabled{opacity:.6;cursor:progress}
+.ac-btn:focus-visible,.ac-link:focus-visible,.ac-p:focus-visible,.ac-tabs button:focus-visible,.ac-bub:focus-visible{outline:2px solid var(--farol,#F2C48D);outline-offset:3px}
+.ac-link{align-self:flex-start;background:none;border:0;padding:6px 0;font:italic 500 16px var(--serif);color:#C7BFB2;text-decoration:underline;text-decoration-color:rgba(199,191,178,.35);text-underline-offset:4px;cursor:pointer}
+.ac-link.neg{color:#F0A29D}
+.ac-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.ac-more{display:flex;flex-wrap:wrap;gap:4px 18px;padding-top:6px;border-top:1px solid rgba(233,227,216,.1)}
+.ac-msg{margin:0;padding:10px 12px;border-radius:10px;background:rgba(240,162,157,.1);border:1px solid rgba(240,162,157,.3);color:#F6C3BF;font-size:14px;line-height:1.4}
+.ac-code{font:600 22px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;color:#F5E2C8;padding:16px;border:1px dashed rgba(242,196,141,.55);border-radius:12px;text-align:center;background:rgba(242,196,141,.06);user-select:all;-webkit-user-select:all;word-break:break-all}
+/* perfis, como na Netflix */
+.ac-who{display:flex;flex-direction:column;gap:18px}
+.ac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:18px 12px}
+.ac-p{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;padding:4px;color:#E9E3D8;cursor:pointer;border-radius:16px}
+.ac-p b{font:500 17px/1.2 var(--serif);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-p em{font:600 11px var(--sans);font-style:normal;color:#F5E2C8;margin-top:-4px}
+.ac-p:hover .ac-av{transform:translateY(-2px);box-shadow:0 0 0 2px #F6F7F9}
+.ac-p.edit .ac-av{opacity:.75;box-shadow:0 0 0 2px rgba(242,196,141,.8)}
+.ac-av{--c:#F2C48D;flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:color-mix(in srgb,var(--c) 26%,#0C1420);border:1.5px solid var(--c);color:#F6F1E8;font:600 15px/1 var(--sans);transition:transform .15s,box-shadow .15s}
+.ac-av.big{width:88px;height:88px;font:400 38px/1 var(--display);border-width:2px}
+.ac-av.plus{--c:rgba(233,227,216,.45);background:transparent;border-style:dashed;color:#C7BFB2;font:300 40px/1 var(--sans)}
+.ac-sw,.ac-avs{display:flex;flex-wrap:wrap;gap:8px}
+.ac-sw label,.ac-avs label{position:relative;cursor:pointer}
+.ac-sw input,.ac-avs input{position:absolute;opacity:0;width:1px;height:1px}
+.ac-sw i{display:block;width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
+.ac-sw input:checked+i{box-shadow:0 0 0 2px #04070D,0 0 0 4px #F6F7F9}
+.ac-avs i{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid rgba(233,227,216,.18);font-style:normal;font-size:20px;color:#C7BFB2}
+.ac-avs label:first-child i{font:600 13px var(--sans)}
+.ac-avs input:checked+i{border-color:var(--farol,#F2C48D);background:rgba(242,196,141,.12)}
+.ac-sw input:focus-visible+i,.ac-avs input:focus-visible+i{outline:2px solid var(--farol,#F2C48D);outline-offset:2px}
+@media (min-width:900px){.ac-in{margin-left:8vw;max-width:520px;padding-bottom:56px}.ac-h{font-size:46px}.ac-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}.ac-av.big{width:104px;height:104px;font-size:44px}}
+@media (max-height:700px){.ac-hi{font-size:18px}.ac-h{font-size:28px}}
+/* dentro da app: a bolinha do perfil, o menu e Definições › Conta */
+.ac-bub{display:grid;place-items:center;width:38px;height:38px;padding:0;background:none;border:0;border-radius:50%;cursor:pointer;margin:0 2px}
+.ac-bub .ac-av{width:30px;height:30px;font-size:13.5px}
+.ac-modal{max-width:400px}
+.ac-menu{padding:18px}
+.ac-mh{display:flex;align-items:center;gap:14px;margin-bottom:12px}.ac-mh b{display:block;font:500 22px/1.2 var(--serif)}.ac-mh .ac-av.big{width:56px;height:56px;font-size:24px}
+.ac-menu .li{width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer}
+.ac-plist{display:flex;flex-wrap:wrap;gap:10px 18px}
+.ac-pl{display:flex;align-items:center;gap:8px}.ac-pl b{font-weight:500}
+.ac-danger{border-color:rgba(240,162,157,.25)}
+/* ecrã de bloqueio numa conta: trocar de perfil */
+.lk-sw{align-self:center;background:none;border:0;padding:6px 10px;font:italic 500 16px var(--serif);color:#C7BFB2;text-decoration:underline;text-decoration-color:rgba(199,191,178,.35);text-underline-offset:4px;cursor:pointer}
+.ac-p.add b{white-space:normal;text-align:center;line-height:1.15}
+
+</style>
+<style>
 /* NÁUTILO — modo leve: sem efeitos que esgotam a memória gráfica (tablets e telemóveis Android, aparelhos com pouca RAM).
    Sempre ativo: sem desfoque por trás, sem fundos fixos, animações infinitas limitadas. */
 *,*::before,*::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
@@ -3138,7 +3210,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.28", "date": "21/10/2026", "notes": ["Universidade: cada disciplina tem a sua cor. Fica automática ou escolhes uma das 12 ao editar a disciplina. A cor aparece nas listas, nos cartões das disciplinas, no horário, nas avaliações, nas sessões e nas aulas e avaliações do calendário.", "Universidade › Trabalhos e TPC: uma aba nova para anotar as lições, os exercícios, as leituras e os trabalhos que tens para fazer, com disciplina, tipo e prazo. Separados em atrasados, hoje e amanhã, próximos 7 dias, mais tarde e sem prazo; marcas como feito com um toque. Os trabalhos com nota (das Avaliações) aparecem ao lado até os entregares. A Visão da Universidade mostra o que tens para entregar e deixa anotar logo ali.", "Tutor IA arranjado: responde em texto (mais rápido e sem falhar nas respostas longas), funciona também com a IA grátis de reserva quando não há chave do Google, e tem \"Tentar outra vez\" quando a IA não responde.", "Floresta › técnica Pomodoro: liga o modo Pomodoro e escolhe o ritmo (Clássico 25/5, Profundo 50/10, Maratona 90/20, Curto 15/3 ou o teu): foco, pausa curta e uma pausa longa a cada ciclo. A pausa e o foco seguinte começam sozinhos (podes desligar), com as bolinhas do ciclo à vista. Se desistires de uma árvore, o ciclo recomeça.", "Floresta › janela flutuante (a pílula): já não trava. A árvore pequena e o tempo atualizam-se todos os segundos noutras páginas, com uma barra de progresso; já não desenha a árvore em 3D por trás (era isso que a prendia no iPhone).", "Direção › Plano de vida: a Estrela-guia, o Roteiro da vida e os Próximos passos estão agora numa só página, com 4 separadores (Próximos passos, Agora, Estrela-guia e Roteiro). O menu fica com uma só entrada e os endereços antigos abrem o separador certo.", "Painel › A tua evolução: a Minha Evolução passou para o fim do Painel (sem repetir o que o Painel já mostrava): evolução por área a 30 dias e a 1 ano, a análise do Spyke, hoje contra 30 dias, 3 meses e 1 ano, o gráfico de 26 semanas, os totais desde sempre, a projeção do património, a educação (ECTS), as grandes metas, o radar da carreira, os marcos e conquistas e o Life Analytics. O endereço antigo abre o Painel já nessa secção.", "Mundo › Ilhas e territórios: 191 ilhas, arquipélagos e territórios que não contam como países, da Madeira, Porto Santo, as 9 dos Açores, as Berlengas, Noronha, Ilha Grande, Ilhabela, Florianópolis, as Canárias, as Baleares, as ilhas gregas, a Gronelândia, as Faroé, Porto Rico, as Caraíbas, as Galápagos, Zanzibar, a Reunião, Bali, o Havai e o Taiti. Marcas cada uma como visitei, morei ou quero ir; aparecem no mapa como pequenos losangos (todas quando escolhes um continente), contam no topo da página e cada ilha conhecida dá 500 XP de Mente no Dominus."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.29", "date": "21/10/2026", "notes": ["Contas Náutilo: qualquer pessoa pode criar a sua conta com e-mail e senha. Os dados ficam na conta, cifrados, e aparecem iguais no telemóvel e no computador.", "Perfis como na Netflix: até 5 perfis em cada conta, cada um com nome, avatar, cor, código de bloqueio e os seus próprios dados. A bolinha do perfil fica na barra de cima: toca para trocar de perfil ou ver a conta.", "O ecrã de bloqueio é o mesmo de sempre, com o código de cada perfil e \"Trocar de perfil\". Esqueceste o código? Mudas com a senha da conta.", "Definições › Conta e perfis: mudar a senha, código de recuperação novo, sincronizar agora, sair dos outros aparelhos e apagar a conta. Esqueceste a senha? Usa o código de recuperação que recebes ao criar a conta.", "O teu Náutilo pessoal: em Definições › Geral › Conta Náutilo tocas em \"Criar conta e guardar\" e tudo o que tens (dados, metas, jogo, definições, ligações) vai para a tua conta, com o mesmo código. Os outros aparelhos mostram \"Entrar na conta\".", "Contas novas começam limpas, com o nome de quem as criou: sem nada do perfil do Ryan. As funcionalidades são as mesmas para todos: o atalho de gastos do iPhone funciona com um link do perfil (sem script Google) e o Jornal busca as notícias pelo servidor do Náutilo.", "Mundo › Ilhas: a lista abre no grupo de Portugal (a página fica mais rápida); \"Todas\" mostra as 191."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -3411,6 +3483,8 @@ function payloadFor(docId) {
   return { items: OS.all(c).filter(r => String(r._s || 0) === s) };
 }
 function flush() {
+  // a limpar o aparelho (sair da conta, trocar de perfil): nada volta a ser gravado até recarregar
+  if (OS.noSave) { dirty.clear(); return; }
   // divide shards grandes demais
   [...dirty].forEach(id => {
     const [c, s] = id.split('~'); if (c === 'one') return;
@@ -3878,6 +3952,13 @@ OS.ONE_DEF.fin = { cats: {
   Receita: { 'Salário': ['Salário', 'Horas extra', 'Subsídios'], 'Mova': ['Distribuição de lucro'], 'Serviços próprios': ['Freelance', 'Serviços'], 'Família': ['Mesada', 'Ajuda'], 'Investimentos': ['Dividendos', 'Juros', 'Mais-valias'], 'Bolsas': ['Bolsa de estudo'], 'Outros': ['Reembolsos', 'Vendas', 'Diversos'] }
 } };
 OS.ONE_DEF.fit = { split: { 1: 'Peito & Tríceps', 2: 'Costas & Bíceps', 3: 'Pernas', 4: 'Ombros & Core', 5: 'Full Body', 6: 'Corrida', 0: 'Mobilidade' } };
+// quem usa a app: no modo pessoal é o Ryan (os textos de sempre); numa conta é o nome do perfil e o que ele disser (cidade, curso, trabalho)
+OS.who = () => OS.one('profile').short || (OS.Acc && OS.Acc.pub ? 'o utilizador' : 'Ryan');
+const whoBits = () => { const p = OS.one('profile'); return [p.city && 'vive em ' + p.city, p.uni && 'estuda em ' + p.uni + (p.course ? ', ' + p.course : ''), p.jobRole && 'trabalha como ' + p.jobRole].filter(Boolean); };
+OS.whoCtx = (ryan, prep = '') => { if (!(OS.Acc && OS.Acc.pub)) return ryan; const b = whoBits(); return (prep ? prep + ' ' : '') + OS.who() + (b.length ? ' (' + b.join('; ') + ')' : ''); };
+// textos fixos com o nome do Ryan ("o Ryan de daqui a 5 anos"): numa conta passam a "o teu eu de…"
+OS.my = s => OS.Acc && OS.Acc.pub ? String(s || '').replace(/\b(o|O|ao|Ao|no|do) Ryan de\b/g, '$1 teu eu de') : s;
+OS.whoFlat = ryan => OS.Acc && OS.Acc.pub ? [OS.who()].concat(whoBits()).join(', ') : ryan;
 OS.ONE_DEF.mova = { name: 'Mova', what: '', offer: '', customer: '', stage: 'Ideia', founded: '', revenueTarget: '', clientsTarget: '', marginTarget: '', notes: '' };
 OS.ONE_DEF.northstar = { h3m: '', h1y: '', h3y: '', h5y: '', hlong: '', values: '', identity: '', notAccept: '' };
 OS.ONE_DEF.plan = { week: {}, month: {}, mit: {} };
@@ -4519,6 +4600,12 @@ const EXERCISES = [['Supino reto com barra', 'Peito', ['Tríceps', 'Ombros'], 'B
   ['Abdominal na roda', 'Abdómen', ['Oblíquos'], 'Outro'], ['Elevação de pernas suspenso', 'Abdómen', ['Antebraços'], 'Peso corporal'], ['Russian twist', 'Oblíquos', ['Abdómen'], 'Peso corporal'], ['Hiperextensão lombar', 'Lombar', ['Glúteos'], 'Máquina'], ['Farmer walk', 'Antebraços', ['Trapézio', 'Abdómen'], 'Halteres']];
 OS.on('seed', () => {
   const meta = OS.one('meta'); if (meta.seeded) return;
+  // conta nova (versão pública): só o essencial, sem nada do Ryan
+  if (OS.Acc && OS.Acc.pub) { OS.touch('profile'); OS.touch('fin'); OS.touch('fit');
+    if (!OS.all('accounts').length) { OS.add('accounts', { name: 'Conta principal', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); OS.add('accounts', { name: 'Fundo de emergência', type: 'Reserva', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); }
+    if (!OS.all('exercises').length) EXERCISES.forEach(([name, muscle, secondary, equip]) => OS.add('exercises', { name, muscle, secondary, equip }, { silent: true }));
+    if (!OS.all('habits').length) [['Acordar à hora, sem snooze', 'Manhã', 1], ['2 blocos de foco (100 min)', 'Dia', 1, 'study100'], ['Treino ou corrida', 'Dia', 1, 'workout'], ['20 páginas de leitura', 'Noite', 1], ['Registar gastos do dia', 'Noite', 0, 'cash'], ['Telemóvel fora do quarto', 'Noite', 0]].forEach(([name, group, core, auto]) => OS.add('habits', { name, group, core: !!core, freq: name.startsWith('Treino') ? 'Dias úteis' : 'Diário', active: true, log: {}, auto: auto || '', area: 'Pessoal' }, { silent: true }));
+    meta.seeded = true; OS.touch('meta'); return; }
   const p = OS.one('profile'); OS.touch('profile'); OS.touch('fin'); OS.touch('fit'); OS.touch('mova');
   if (!OS.all('subjects').length) {
     [['Informática Organizacional', 'Média', 5], ['Introdução à Contabilidade', 'Alta', 6]].forEach(([n, d, h]) => OS.add('subjects', { name: n, sem: '1.º Semestre 26/27', status: 'Em curso', target: 15, hoursWeek: h, diff: d, ects: 6 }, { silent: true }));
@@ -4574,6 +4661,352 @@ OS.on('migrate', async () => {
   (t.net || []).forEach(c => OS.add('contacts', { name: c.pessoa, role: c.desc, contact: c.contacto, last: c.ult, strength: 3 }, { silent: true }));
   meta.migrated = true; OS.touch('meta');
 });
+})();
+
+</script>
+<script>
+/* NÁUTILO — contas e perfis (a versão para o público).
+   Modo pessoal: os aparelhos que já tinham o Náutilo (o do Ryan) continuam exatamente iguais: o mesmo código, o mesmo Google Drive.
+   Modo conta: entras com e-mail e senha, escolhes o perfil (como na Netflix) e os dados desse perfil ficam na nuvem do Náutilo
+   (Vercel Blob privado, cifrado) e iguais no telemóvel e no computador. O ecrã de bloqueio é o mesmo, com o código de cada perfil.
+   O motor de dados (core.js) fala com uma "base de dados" com collection().onSnapshot() e doc().set(); aqui essa base é api/dados. */
+(() => {
+'use strict';
+const U = OS.U, esc = U.esc;
+const LS = { get: (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }, del: k => { try { localStorage.removeItem(k); } catch (e) { } },
+  keys: () => { try { return Object.keys(localStorage); } catch (e) { return []; } } };
+const K = { s: 'nau:s', p: 'nau:p', data: 'nau:pd', owner: 'nau:owner', pers: 'nau:pessoal', reset: 'nau:lkreset' };
+const SALT = 'oceanum-v1|';
+const sha = async s => { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); };
+
+/* ---------- que modo é este aparelho ---------- */
+if (/^#pessoal\b/.test(location.hash)) { LS.set(K.pers, 1); try { history.replaceState(null, '', location.pathname + '#visao'); } catch (e) { } }
+let S = LS.get(K.s, null);
+const hasLocal = LS.keys().some(k => k.startsWith('os2:'));
+const accDevice = !!(S || LS.get(K.owner, ''));
+const personal = !accDevice && !!(LS.get(K.pers, 0) || hasLocal || /ligar=/.test(location.hash) || LS.get('os2sync', 0));
+/* ---------- pedidos ao servidor ---------- */
+const api = async (path, opt = {}, tries = 3) => { let last = null;
+  for (let i = 0; i < tries; i++) {
+    try { const r = await fetch('api/' + path, Object.assign({ cache: 'no-store', credentials: 'omit' }, opt)); let j = null; try { j = await r.json(); } catch (e) { }
+      if (j && j.ok) return j;
+      const e = new Error((j && j.msg) || (r.status === 404 ? 'O servidor das contas não respondeu.' : 'Erro ' + r.status)); e.status = r.status; e.code = j && j.code;
+      if (r.status < 500 && r.status !== 429) throw e; last = e; }
+    catch (e) { if (e.status && e.status < 500 && e.status !== 429) throw e; last = e.status ? e : Object.assign(new Error('Sem ligação à internet.'), { net: true }); }
+    await new Promise(res => setTimeout(res, 600 * (i + 1))); }
+  throw last; };
+const conta = (op, body = {}) => api('conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, S ? { authorization: 'Bearer ' + S.t } : {}), body: JSON.stringify(Object.assign({ op }, body)) });
+const saveS = () => { if (S) LS.set(K.s, S); else LS.del(K.s); };
+const takeConta = (j, email) => { S = Object.assign(S || {}, { t: j.token || (S && S.t), e: (j.conta && j.conta.email) || email || (S && S.e), n: (j.conta && j.conta.nome) || '', perfis: (j.conta && j.conta.perfis) || [] }); saveS(); };
+
+const Acc = OS.Acc = { on: !personal };
+const A = OS.act = OS.act || {}; OS.forms = OS.forms || {};
+if (personal) {
+  /* ---------- modo pessoal: guardar este Náutilo numa conta (o que é do Ryan vai para a conta dele) ---------- */
+  const moved = () => OS.one('meta').acc || '';
+  // cria (ou entra n)a conta, cria o perfil pessoal com o mesmo código de bloqueio e envia todos os dados deste aparelho
+  Acc.migrate = async (email, senha, criar) => { email = String(email || '').trim().toLowerCase();
+    const j = await conta(criar ? 'registar' : 'entrar', criar ? { email, senha, nome: OS.one('profile').name || '' } : { email, senha }); takeConta(j, email);
+    let p = (S.perfis || []).find(x => x.ps);
+    if (!p) { const r = await conta('perfil', { acao: 'criar', perfil: { nome: String(OS.one('profile').short || 'Ryan').slice(0, 24), cor: '#7FA9DA', av: '', lk: OS.Lock.curHash(), ps: true } }); takeConta(r); p = r.perfil; }
+    OS.setOne('meta', { acc: email });
+    const now = Date.now(), docs = [], known = {};
+    Object.keys(OS.D).forEach(c => { const by = {}; OS.all(c).forEach(r => { (by[r._s || 0] = by[r._s || 0] || []).push(r); }); Object.entries(by).forEach(([k, items]) => docs.push([c + '~' + k, { t: now, items }])); });
+    Object.keys(OS.ONE).forEach(k => docs.push(['one~' + k, { t: now, data: OS.ONE[k] }]));
+    let part = {}, n = 0, cnt = 0;
+    const send = async () => { if (!cnt) return; const r = await api('dados', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'gravar', p: p.id, docs: part }) }); Object.assign(known, r.etags); part = {}; n = 0; cnt = 0; };
+    for (const [id, d] of docs) { const sz = JSON.stringify(d).length; if (cnt && (n + sz > 1.5e6 || cnt >= 300)) await send(); part[id] = d; n += sz; cnt++; }
+    await send();
+    // os outros aparelhos ficam a saber pelo Google Drive (espera um pouco que o aviso lá chegue)
+    for (let i = 0; i < 20 && OS.sync.status === 'busy'; i++) await new Promise(r => setTimeout(r, 200));
+    LS.set(K.p, p.id); LS.set(K.data, p.id); LS.set(K.owner, email); LS.set('nau:k:' + p.id, known); LS.del(K.pers); LS.del('os2sync');
+    return { perfil: p, docs: docs.length }; };
+  const go = async criar => { const em = document.getElementById('accMigE'), pw = document.getElementById('accMigP'); if (!em || !pw) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em.value.trim())) return OS.UI.toast('Escreve o teu e-mail.', 'warn');
+    if (pw.value.length < 8) return OS.UI.toast('A senha precisa de pelo menos 8 caracteres.', 'warn');
+    OS.UI.toast('A guardar o teu Náutilo na conta…');
+    try { const r = await Acc.migrate(em.value, pw.value, criar); OS.UI.toast(`Guardado: ${r.docs} partes dos teus dados na conta. A abrir com a conta…`, 'pos'); setTimeout(() => location.reload(), 900); }
+    catch (e) { OS.UI.toast(e.net ? 'Sem internet. Tenta outra vez.' : e.message, 'neg'); } };
+  A.accMigNew = () => go(true); A.accMigIn = () => go(false);
+  // noutro aparelho do Ryan: o Náutilo já está na conta → entrar nela aqui (os dados vêm da conta)
+  A.accJoin = () => { const em = moved(); if (!em) return; OS.UI.closeModal();
+    if (!confirm(`Este aparelho passa a usar a conta ${em}. Os dados vêm da conta (o que mudaste só aqui e ainda não sincronizou pelo Google Drive perde-se). Continuar?`)) return;
+    OS.noSave = true; LS.keys().forEach(k => { if (!/^(nau:|os2lite$|__)/.test(k)) LS.del(k); }); LS.set(K.owner, em); LS.del(K.pers); location.reload(); };
+  A.accJoinLater = () => { LS.set('nau:joinAsk', Date.now()); OS.UI.closeModal(); };
+  const panel = () => { const em = moved(), e = U.esc;
+    return `<div class="pn" id="accMig"><div class="pn-h"><h3>${OS.UI.ic('user')}Conta Náutilo</h3>${em ? `<span class="mut">${e(em)}</span>` : ''}</div>
+    ${em ? `<p class="mut" style="margin:0 0 10px">O teu Náutilo está guardado na conta <b>${e(em)}</b>. Este aparelho ainda usa o modo antigo (só neste aparelho e no Google Drive).</p><button class="btn pri" data-act="accJoin">Entrar na conta neste aparelho</button>`
+    : `<p class="mut" style="margin:0 0 12px">Guarda o teu Náutilo numa conta: tudo o que tens aqui (dados, metas, jogo, definições, ligações) vai para a tua conta, cifrado, com o mesmo código de bloqueio. Depois entras com e-mail e senha em qualquer aparelho e podes criar outros perfis.</p>
+      <div class="col gap8"><label>E-mail<input class="field" id="accMigE" type="email" autocomplete="email"></label><label>Senha da conta (pelo menos 8 caracteres)<input class="field" id="accMigP" type="password" autocomplete="new-password"></label>
+      <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="accMigNew">Criar conta e guardar</button><button class="btn" data-act="accMigIn">Já tenho conta: entrar e guardar</button></div></div>`}</div>`; };
+  OS.on('ready', () => { const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (String(sub || '') === '' ? panel() : '');
+    const ask = LS.get('nau:joinAsk', 0); if (moved() && !navigator.webdriver && (!ask || Date.now() - ask > 3 * 864e5)) setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">O teu Náutilo está na conta</h3><p class="mut" style="margin:0 0 14px">Guardaste o teu Náutilo na conta <b>${U.esc(moved())}</b>. Entra nela também neste aparelho para ficar tudo igual em todo o lado.</p><div class="row gap8"><button class="btn pri" data-act="accJoin">Entrar na conta</button><button class="btn ghost" data-act="accJoinLater">Agora não</button></div></div>`), 1800); });
+  return;
+}
+
+/* ---------- daqui para baixo: modo conta ---------- */
+const PCOL = ['#F2C48D', '#7FA9DA', '#3FCF8E', '#E0896A', '#9A8CF5', '#F28CB1', '#5CC8E6', '#F2B544'];
+const AVS = ['', '🌊', '⚓', '🧭', '🐋', '🦈', '🐢', '🌙', '☀️', '🔥', '🌿', '🎯', '📚', '💼', '🏃', '🎧', '🦊', '🐺', '🦁', '🐼'];
+const pid = () => LS.get(K.p, '');
+const profiles = () => (S && S.perfis) || [];
+const cur = () => profiles().find(p => p.id === pid()) || null;
+const first = n => String(n || '').trim().split(/\s+/)[0] || '';
+// pub: perfil de uma pessoa qualquer (textos e valores neutros); o perfil pessoal (ps) é o Náutilo do Ryan passado para a conta: fica como era
+Object.assign(Acc, { sess: () => S, profiles, profile: cur, email: () => (S && S.e) || '', lk: () => (cur() || {}).lk || '', pub: !(cur() && cur().ps) });
+
+// numa conta nova nada do Ryan: o perfil começa com o nome de quem o criou (o resto preenche em Definições)
+if (Acc.pub) { Object.assign(OS.ONE_DEF.profile, { name: '', short: '', city: '', uni: '', course: '', year: '', semester: '', semStart: '', semEnd: '' }); if (OS.ONE_DEF.mova) OS.ONE_DEF.mova.name = 'O meu negócio'; }
+
+/* ---------- dados locais de cada perfil ---------- */
+// guarda: a sessão e as escolhas do aparelho; o resto (dados do perfil, preferências do perfil) sai ao trocar de perfil ou de conta
+const KEEP = /^(nau:|os2lite$|__)/;
+const wipeLocal = () => { OS.noSave = true; LS.keys().forEach(k => { if (!KEEP.test(k)) LS.del(k); }); LS.keys().filter(k => /^nau:(k|pend):/.test(k)).forEach(LS.del);
+  try { sessionStorage.removeItem('os2unlock'); } catch (e) { } try { indexedDB.deleteDatabase('oceanum-reset'); } catch (e) { } LS.del(K.data); };
+
+/* ---------- a base de dados do motor (como no sync.js, mas com a conta) ---------- */
+const P = () => pid();
+const kKnown = () => 'nau:k:' + P(), kPend = () => 'nau:pend:' + P();
+let known = LS.get(kKnown(), {}), pend = new Set(LS.get(kPend(), [])), lastM = null, queue = {}, waiters = [], timer = 0, polling = false, prefetched = null;
+const SY = Acc.sync = { state: 'a ligar…', last: 0, err: '' };
+const saveKnown = () => LS.set(kKnown(), known), savePend = () => LS.set(kPend(), [...pend]);
+const dados = (op, body, get) => api('dados' + (get ? '?' + new URLSearchParams({ op, p: P(), _: Date.now() }) : ''), get ? { headers: { authorization: 'Bearer ' + S.t } } : { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify(Object.assign({ op, p: P() }, body)) })
+  .catch(e => { if (e.status === 401) ended(); else if (e.status === 404 && e.code === 'perfil') gone(); throw e; });
+const fetchIds = async ids => { const docs = {}, etags = {}; let todo = ids.slice();
+  while (todo.length) { const part = todo.splice(0, 150), j = await dados('ler', { ids: part }); Object.assign(docs, j.docs); Object.assign(etags, j.etags); if (j.mais && j.mais.length) todo = j.mais.concat(todo); }
+  return { docs, etags }; };
+const snap = (entries, empty) => ({ empty, docs: entries.map(([id, d]) => ({ id, data: () => d })) });
+const size = o => JSON.stringify(o).length;
+const flushPut = async () => { timer = 0; const batch = queue, ws = waiters; queue = {}; waiters = []; const ids = Object.keys(batch); if (!ids.length) return;
+  try { let part = {}, n = 0;
+    const send = async () => { if (!Object.keys(part).length) return; const j = await dados('gravar', { docs: part }); Object.assign(known, j.etags); lastM = j.m; Object.keys(part).forEach(id => pend.delete(id)); part = {}; n = 0; };
+    for (const id of ids) { const sz = size(batch[id]); if (n && n + sz > 1.5e6) await send(); part[id] = batch[id]; n += sz; }
+    await send(); saveKnown(); savePend(); SY.last = Date.now(); SY.err = ''; SY.state = 'sincronizada'; ws.forEach(w => w.ok()); }
+  catch (e) { SY.err = e.message; SY.state = 'sem ligação (guardado neste aparelho)'; savePend(); ws.forEach(w => w.ko({ code: 'unavailable' })); setTimeout(repush, 15000); }
+  try { OS.request(); } catch (e) { } };
+const put = (id, data) => new Promise((ok, ko) => { queue[id] = data; pend.add(id); savePend(); waiters.push({ ok, ko }); clearTimeout(timer); timer = setTimeout(flushPut, 900); });
+const payload = id => { const [c, s] = id.split('~'); return c === 'one' ? { data: OS.one(s) } : { items: OS.all(c).filter(r => String(r._s || 0) === s) }; };
+const repush = () => { if (!navigator.onLine) return; [...pend].filter(id => !queue[id]).forEach(id => put(id, Object.assign({ t: Date.now() }, payload(id))).catch(() => { })); };
+// espera também pelo que já ia a caminho (até ~3 s), para "sincronizado" ser verdade
+Acc.flush = async () => { clearTimeout(timer); for (let i = 0; i < 20 && (Object.keys(queue).length || pend.size); i++) { if (Object.keys(queue).length) await flushPut(); else await new Promise(r => setTimeout(r, 150)); } return !pend.size; };
+
+// primeira leitura: antes de o motor arrancar (assim um telemóvel lento nunca cria dados de exemplo por cima dos teus)
+const prefetch = async () => { const L = await dados('lista', {}, true); lastM = L.m; const remote = L.docs || {}, ids = Object.keys(remote);
+  const mine = LS.get(K.data, '') === P() && hasLocal;
+  if (!mine) { known = {}; pend = new Set(); }
+  const need = ids.filter(id => !pend.has(id) && (!mine || known[id] !== remote[id]));
+  const got = need.length ? await fetchIds(need) : { docs: {}, etags: {} };
+  Object.assign(known, got.etags); saveKnown(); LS.set(K.data, P()); SY.state = 'sincronizada'; SY.last = Date.now();
+  return { empty: !ids.length, entries: Object.entries(got.docs) }; };
+let started = false;
+const start = (cb, errCb) => { if (started) return; started = true;
+  const pre = prefetched; prefetched = null;
+  if (pre) cb(snap(pre.entries, pre.empty));
+  else { // sem rede ao abrir: abre com o que está no aparelho e liga quando houver internet
+    const retry = async () => { try { const f = await prefetch(); cb(snap(f.entries, f.empty)); } catch (e) { SY.state = 'sem ligação (guardado neste aparelho)'; errCb && errCb({ code: 'unavailable' }); setTimeout(retry, 20000); } }; retry(); }
+  if (pend.size) setTimeout(repush, 1500);
+  const poll = async () => { if (document.hidden || !navigator.onLine || polling || !S) return; polling = true;
+    try { const j = await dados('marca', {}, true);
+      if (j.m && j.m !== lastM) { const L = await dados('lista', {}, true); lastM = L.m;
+        const ch = Object.keys(L.docs || {}).filter(id => L.docs[id] !== known[id] && !pend.has(id) && !queue[id]);
+        if (ch.length) { const got = await fetchIds(ch); Object.assign(known, got.etags); saveKnown(); cb(snap(Object.entries(got.docs), false)); } }
+      SY.last = Date.now(); SY.err = ''; SY.state = 'sincronizada'; }
+    catch (e) { SY.err = e.message; SY.state = 'sem ligação (guardado neste aparelho)'; }
+    finally { polling = false; } };
+  Acc.poll = poll;
+  setInterval(poll, window.__accPoll || 20000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { poll(); if (pend.size) repush(); } });
+  addEventListener('online', () => { poll(); if (pend.size) repush(); }); };
+const DB = { collection: () => ({ onSnapshot: (cb, err) => { start(cb, err); return () => { }; } }), doc: path => ({ set: data => put(path.split('/').slice(1).join('/'), data) }) };
+
+// o motor pede a base de dados ao arrancar: só a entregamos depois de entrares e escolheres o perfil
+let release; const ready = new Promise(r => { release = r; });
+window.claude = { use: async cap => { if (cap !== 'db') return null; await ready; return DB; } };
+
+/* ---------- sessão terminada, perfil apagado noutro aparelho ---------- */
+let endedOnce = false;
+const ended = () => { if (endedOnce) return; endedOnce = true; S = null; saveS(); showGate('entrar', 'A sessão terminou (a senha mudou ou saíste noutro aparelho). Entra outra vez.'); };
+const gone = () => { if (endedOnce) return; endedOnce = true; LS.del(K.p); wipeLocal(); showGate('perfis', 'Este perfil foi apagado noutro aparelho.'); };
+
+/* ---------- ecrã da conta (por cima de tudo, com o mesmo mar do ecrã de entrada) ---------- */
+let G = null, gMode = 'entrar', gMsg = '', gEdit = null, gManage = false, gBusy = false, gRec = '';
+const scene = () => OS.Scene ? `<div class="lk-scene">${OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { id: 'acs' })}</div>` : '';
+const avatar = (p, big) => `<span class="ac-av${big ? ' big' : ''}" style="--c:${esc(p.cor || PCOL[0])}">${esc(p.av || first(p.nome).slice(0, 1).toUpperCase() || '?')}</span>`;
+const field = (n, label, type = 'text', extra = '') => `<label class="ac-f"><span>${label}</span><input name="${n}" type="${type}" ${extra}></label>`;
+const lockFields = () => `${field('c1', 'Código de bloqueio do perfil', 'password', 'minlength="6" autocomplete="new-password" required placeholder="pelo menos 6 caracteres"')}${field('c2', 'Repete o código', 'password', 'minlength="6" autocomplete="new-password" required')}`;
+const swatches = sel => `<div class="ac-sw" role="radiogroup" aria-label="Cor">${PCOL.map(c => `<label><input type="radio" name="cor" value="${c}" ${c === sel ? 'checked' : ''}><i style="--c:${c}"></i></label>`).join('')}</div>`;
+const avPick = sel => `<div class="ac-avs" role="radiogroup" aria-label="Avatar">${AVS.map(a => `<label><input type="radio" name="av" value="${a}" ${a === (sel || '') ? 'checked' : ''}><i>${a || 'Aa'}</i></label>`).join('')}</div>`;
+const view = () => {
+  const m = gMode, msg = gMsg ? `<p class="ac-msg" role="status">${esc(gMsg)}</p>` : '';
+  if (m === 'perfis') { const L = profiles();
+    return `<div class="ac-who"><h1 class="ac-h">${L.length ? 'Quem está a usar o Náutilo?' : 'Cria o teu primeiro perfil'}</h1>${msg}
+      <div class="ac-grid">${L.map(p => `<button class="ac-p${gManage ? ' edit' : ''}" data-ac="${gManage ? 'editar' : 'escolher'}" data-id="${p.id}">${avatar(p, 1)}<b>${esc(p.nome)}</b>${gManage ? `<em>Editar</em>` : ''}</button>`).join('')}
+      ${L.length < 5 ? `<button class="ac-p add" data-ac="novo"><span class="ac-av big plus">+</span><b>Adicionar perfil</b></button>` : ''}</div>
+      <div class="ac-row">${L.length ? `<button class="ac-btn ghost" data-ac="gerir">${gManage ? 'Feito' : 'Gerir perfis'}</button>` : ''}<button class="ac-link" data-ac="sair">Sair da conta${S && S.e ? ' (' + esc(S.e) + ')' : ''}</button></div></div>`; }
+  if (m === 'novo' || m === 'editar') { const p = m === 'editar' ? profiles().find(x => x.id === gEdit) || {} : { cor: PCOL[profiles().length % PCOL.length] };
+    return `<form class="ac-card" data-acf="${m}"><h2>${m === 'novo' ? 'Novo perfil' : 'Editar perfil'}</h2>
+      <p class="ac-sub">${m === 'novo' ? 'Cada perfil tem os seus próprios dados, metas, finanças e jogo. O código de bloqueio é pedido ao abrir o Náutilo com este perfil.' : 'Muda o nome, a cor ou o avatar. O código e os dados ficam como estão.'}</p>
+      ${field('nome', 'Nome', 'text', `maxlength="24" required autocomplete="off" value="${esc(p.nome || '')}"`)}
+      <div class="ac-f"><span>Avatar</span>${avPick(p.av)}</div><div class="ac-f"><span>Cor</span>${swatches(p.cor)}</div>
+      ${m === 'novo' ? lockFields() : ''}${msg}
+      <div class="ac-row"><button class="ac-btn" type="submit" ${gBusy ? 'disabled' : ''}>${m === 'novo' ? 'Criar perfil' : 'Guardar'}</button><button class="ac-btn ghost" type="button" data-ac="voltar">Cancelar</button></div>
+      ${m === 'editar' ? `<div class="ac-more"><button class="ac-link" type="button" data-ac="codigo">Esqueci o código deste perfil</button><button class="ac-link neg" type="button" data-ac="apagarp">Apagar este perfil</button></div>` : ''}</form>`; }
+  if (m === 'codigo' || m === 'apagarp') { const p = profiles().find(x => x.id === gEdit) || {};
+    return `<form class="ac-card" data-acf="${m}"><h2>${m === 'codigo' ? 'Novo código para ' + esc(p.nome || '') : 'Apagar ' + esc(p.nome || '')}</h2>
+      <p class="ac-sub">${m === 'codigo' ? 'Confirma com a senha da conta e escolhe o código novo. Vale em todos os aparelhos.' : 'Apaga o perfil e todos os dados dele, em todos os aparelhos. Não dá para desfazer.'}</p>
+      ${field('senha', 'Senha da conta', 'password', 'required autocomplete="current-password"')}${m === 'codigo' ? lockFields() : ''}${msg}
+      <div class="ac-row"><button class="ac-btn${m === 'apagarp' ? ' neg' : ''}" type="submit" ${gBusy ? 'disabled' : ''}>${m === 'codigo' ? 'Mudar o código' : 'Apagar para sempre'}</button><button class="ac-btn ghost" type="button" data-ac="voltar">Cancelar</button></div></form>`; }
+  if (m === 'codigo-rec') return `<div class="ac-card"><h2>Guarda o teu código de recuperação</h2>
+      <p class="ac-sub">Se te esqueceres da senha, é com este código que a recuperas. Aparece só agora: tira uma fotografia, guarda-o nas notas ou no gestor de senhas.</p>
+      <div class="ac-code" id="acRec">${esc(gRec)}</div><div class="ac-row"><button class="ac-btn ghost" type="button" data-ac="copiar">Copiar</button><button class="ac-btn" type="button" data-ac="guardei">Já guardei</button></div></div>`;
+  const tabs = `<div class="ac-tabs" role="tablist"><button role="tab" aria-selected="${m === 'entrar'}" class="${m === 'entrar' ? 'on' : ''}" data-ac="m" data-v="entrar">Entrar</button><button role="tab" aria-selected="${m === 'criar'}" class="${m === 'criar' ? 'on' : ''}" data-ac="m" data-v="criar">Criar conta</button></div>`;
+  if (m === 'criar') return `<form class="ac-card" data-acf="criar">${tabs}
+      ${field('nome', 'O teu nome', 'text', 'maxlength="40" autocomplete="name" required')}${field('email', 'E-mail', 'email', 'autocomplete="email" required')}${field('senha', 'Senha', 'password', 'minlength="8" autocomplete="new-password" required placeholder="pelo menos 8 caracteres"')}
+      <p class="ac-sub">Os teus dados ficam na tua conta, cifrados, e aparecem iguais no telemóvel e no computador. Podes ter até 5 perfis.</p>${msg}
+      <button class="ac-btn wide" type="submit" ${gBusy ? 'disabled' : ''}>${gBusy ? 'A criar…' : 'Criar conta'}</button></form>`;
+  if (m === 'recuperar') return `<form class="ac-card" data-acf="recuperar"><h2>Recuperar a senha</h2><p class="ac-sub">Usa o código de recuperação que guardaste quando criaste a conta.</p>
+      ${field('email', 'E-mail', 'email', 'autocomplete="email" required')}${field('codigo', 'Código de recuperação', 'text', 'autocomplete="off" required placeholder="XXXX-XXXX-XXXX-XXXX"')}${field('nova', 'Senha nova', 'password', 'minlength="8" autocomplete="new-password" required')}${msg}
+      <div class="ac-row"><button class="ac-btn" type="submit" ${gBusy ? 'disabled' : ''}>Mudar a senha</button><button class="ac-btn ghost" type="button" data-ac="m" data-v="entrar">Voltar</button></div></form>`;
+  return `<form class="ac-card" data-acf="entrar">${tabs}
+      ${field('email', 'E-mail', 'email', `autocomplete="email" required value="${esc(LS.get(K.owner, '') || '')}"`)}${field('senha', 'Senha', 'password', 'autocomplete="current-password" required')}${msg}
+      <button class="ac-btn wide" type="submit" ${gBusy ? 'disabled' : ''}>${gBusy ? 'A entrar…' : 'Entrar'}</button>
+      <button class="ac-link" type="button" data-ac="m" data-v="recuperar">Esqueci a senha</button></form>`; };
+const paint = () => { if (!G) return; const box = G.querySelector('.ac-in');
+  // ao mostrar um erro, o que já escreveste fica (menos as senhas e códigos)
+  const was = box.querySelector('form[data-acf]'), keep = {}; if (was) [...was.querySelectorAll('input[type=text],input[type=email],input[type=radio]:checked')].forEach(i => { keep[i.name] = i.value; });
+  const kind = was && was.dataset.acf;
+  box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Náutilo</span></div>${gMode === 'perfis' || gMode === 'codigo-rec' ? '' : '<p class="ac-hi">O sistema operativo da tua vida: dinheiro, estudos, treino, metas e o teu jogo, num só sítio.</p>'}${view()}`;
+  const now = box.querySelector('form[data-acf]'); if (now && kind === now.dataset.acf) Object.entries(keep).forEach(([n, v]) => { const L = [...now.querySelectorAll(`input[name="${n}"]`)]; if (L[0] && L[0].type === 'radio') L.forEach(r => { r.checked = r.value === v; }); else if (L[0] && v) L[0].value = v; });
+  const f = box.querySelector('input:not([type=radio])'); if (f && !f.value && matchMedia('(pointer:fine)').matches) setTimeout(() => f.focus(), 60); };
+const set = (mode, msg) => { gMode = mode; gMsg = msg || ''; gBusy = false; paint(); };
+const showGate = (mode, msg) => { if (!G) { G = document.createElement('div'); G.id = 'acc'; G.className = 'acx'; G.setAttribute('role', 'dialog'); G.setAttribute('aria-modal', 'true'); G.setAttribute('aria-label', 'Conta Náutilo');
+    G.innerHTML = `${scene()}<div class="ac-in"></div>`; document.body.appendChild(G); G.addEventListener('click', onClick); G.addEventListener('submit', onSubmit); }
+  G.hidden = false; document.documentElement.classList.add('ac-open'); gManage = false; set(mode, msg); };
+const hideGate = () => { if (G) { G.hidden = true; G.innerHTML = ''; G.remove(); G = null; } document.documentElement.classList.remove('ac-open'); };
+
+// escolher o perfil: se este aparelho tinha os dados de outro, limpa-os e recomeça; senão o motor arranca já
+const choose = async id => { const was = LS.get(K.data, ''), booted = !!OS.dbRef, p = profiles().find(x => x.id === id) || {};
+  if (booted || (was && was !== id) || !!p.ps === Acc.pub) {
+    if (booted && pend.size && !(await Acc.flush().catch(() => false)) && !confirm('Há alterações deste perfil que ainda não chegaram à nuvem (sem internet?). Se trocares agora, perdem-se. Trocar na mesma?')) return;
+    LS.set(K.p, id); if (was !== id) wipeLocal(); try { sessionStorage.removeItem('os2unlock'); } catch (e) { } location.reload(); return; }
+  LS.set(K.p, id); known = LS.get(kKnown(), {}); pend = new Set(LS.get(kPend(), []));
+  gMsg = ''; const box = G && G.querySelector('.ac-in'); if (box) box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Náutilo</span></div><p class="ac-hi">A abrir o perfil de ${esc(first((cur() || {}).nome))}…</p>`;
+  try { prefetched = await prefetch(); } catch (e) { if (!hasLocal) { set('perfis', e.net ? 'Sem internet. Para abrir este perfil pela primeira vez neste aparelho precisas de rede.' : e.message); return; } }
+  hideGate(); release(); };
+const afterLogin = (j, email) => { if (LS.get(K.owner, '') && LS.get(K.owner, '') !== email) { LS.del(K.p); wipeLocal(); } LS.set(K.owner, email); takeConta(j, email); endedOnce = false; };
+
+async function onSubmit(e) { const f = e.target.closest('form[data-acf]'); if (!f) return; e.preventDefault(); if (gBusy) return;
+  const v = n => (f.elements[n] ? f.elements[n].value : ''), kind = f.dataset.acf, val = n => { const r = [...f.querySelectorAll(`input[name=${n}]`)].find(x => x.checked); return r ? r.value : ''; };
+  const fail = err => { gBusy = false; gMsg = err.net ? 'Sem ligação à internet. Tenta outra vez.' : err.message; paint(); };
+  const code = async () => { if (v('c1').length < 6) throw new Error('O código precisa de pelo menos 6 caracteres.'); if (v('c1') !== v('c2')) throw new Error('Os dois códigos não são iguais.'); return sha(SALT + v('c1')); };
+  gBusy = true; paint();
+  try {
+    if (kind === 'entrar') { const email = v('email').trim().toLowerCase(), j = await conta('entrar', { email, senha: v('senha') }); afterLogin(j, email); set('perfis'); return; }
+    if (kind === 'criar') { const email = v('email').trim().toLowerCase(), j = await conta('registar', { email, senha: v('senha'), nome: v('nome') }); afterLogin(j, email); gRec = j.recuperacao; S.novo = v('nome'); saveS(); set('codigo-rec'); return; }
+    if (kind === 'recuperar') { const email = v('email').trim().toLowerCase(), j = await conta('recuperar', { email, codigo: v('codigo'), nova: v('nova') }); afterLogin(j, email); gRec = j.recuperacao; set('codigo-rec'); return; }
+    if (kind === 'novo') { const lk = await code(), j = await conta('perfil', { acao: 'criar', perfil: { nome: v('nome'), cor: val('cor'), av: val('av'), lk } }); takeConta(j); set('perfis'); return; }
+    if (kind === 'editar') { const j = await conta('perfil', { acao: 'editar', id: gEdit, perfil: { nome: v('nome'), cor: val('cor'), av: val('av') } }); takeConta(j); set('perfis'); return; }
+    if (kind === 'codigo') { const lk = await code(), j = await conta('codigo', { id: gEdit, senha: v('senha'), lk }); takeConta(j); const r = LS.get(K.reset, {}); r[gEdit] = lk; LS.set(K.reset, r); set('perfis', 'Código mudado. Usa o novo ao abrir este perfil.'); return; }
+    if (kind === 'apagarp') { const j = await conta('perfil', { acao: 'apagar', id: gEdit, senha: v('senha') }); takeConta(j); LS.del('nau:k:' + gEdit); LS.del('nau:pend:' + gEdit); const here = LS.get(K.data, '') === gEdit; if (here) wipeLocal(); if (pid() === gEdit) LS.del(K.p); if (here && OS.dbRef) { location.reload(); return; } set('perfis', 'Perfil apagado.'); return; }
+  } catch (err) { fail(err); } }
+async function onClick(e) { const b = e.target.closest('[data-ac]'); if (!b || gBusy) return; const a = b.dataset.ac;
+  if (a === 'm') return set(b.dataset.v);
+  if (a === 'escolher') return choose(b.dataset.id);
+  if (a === 'novo') { gEdit = null; return set('novo'); }
+  if (a === 'editar') { gEdit = b.dataset.id; return set('editar'); }
+  if (a === 'gerir') { gManage = !gManage; return paint(); }
+  if (a === 'voltar') { gManage = false; return set('perfis'); }
+  if (a === 'codigo' || a === 'apagarp') return set(a);
+  if (a === 'copiar') { try { await navigator.clipboard.writeText(gRec); b.textContent = 'Copiado'; } catch (err) { const r = document.createRange(); r.selectNodeContents(document.getElementById('acRec')); getSelection().removeAllRanges(); getSelection().addRange(r); } return; }
+  if (a === 'guardei') { gRec = ''; if (!profiles().length) { gEdit = null; set('novo'); const n = G && G.querySelector('input[name=nome]'); if (n && S && S.novo) n.value = first(S.novo); return; } return set('perfis'); }
+  if (a === 'sair') return logout(); }
+
+/* ---------- sair, trocar de perfil ---------- */
+const logout = async () => {
+  if (pend.size && OS.dbRef && !(await Acc.flush().catch(() => false)) && !confirm('Há alterações que ainda não chegaram à nuvem (sem internet?). Se saíres agora, perdem-se neste aparelho. Sair na mesma?')) return;
+  S = null; saveS(); LS.del(K.p); wipeLocal(); location.replace(location.pathname + '#visao'); location.reload(); };
+Acc.logout = logout;
+Acc.switchProfile = () => { gManage = false; showGate('perfis'); };
+
+/* ---------- arranque ---------- */
+const boot = () => {
+  if (!S) return showGate(LS.get(K.owner, '') ? 'entrar' : 'criar');
+  if (!cur()) return showGate('perfis');
+  // sessão e perfil prontos: abre já; a lista de perfis atualiza-se por trás
+  (async () => { try { prefetched = await prefetch(); }
+    catch (e) { if (e.status === 401 || e.status === 404) return; if (!hasLocal) return showGate('perfis', 'Sem internet. Para abrir este perfil neste aparelho precisas de rede: toca nele outra vez quando tiveres ligação.'); }
+    release(); })();
+  conta('eu').then(j => { takeConta(j); if (!cur() && !endedOnce) gone(); }).catch(() => { });
+};
+document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : setTimeout(boot, 0);
+
+/* ---------- dentro da app ---------- */
+OS.on('ready', () => { const p = cur(); if (!p) return;
+  const pr = OS.one('profile'); if (!pr.short && !pr.name) OS.setOne('profile', { name: p.nome, short: first(p.nome) });
+  const sec = OS.one('security'), r = LS.get(K.reset, {});
+  if (r[p.id]) { OS.setOne('security', { hash: r[p.id], changed: U.today() }); delete r[p.id]; LS.set(K.reset, r); }
+  else if (!sec.hash && p.lk) OS.setOne('security', { hash: p.lk, changed: U.today() });
+  // o código mudado em Definições passa também para a conta (para o "Esqueci o código" e os outros aparelhos)
+  OS.on('one:security', () => { const h = OS.one('security').hash, q = cur(); if (h && q && h !== q.lk) conta('perfil', { acao: 'editar', id: q.id, perfil: { lk: h } }).then(takeConta).catch(() => { }); });
+  // Definições › Conta e perfis
+  if (OS.SETT && !OS.SETT.some(t => t[0] === 'conta')) OS.SETT.splice(1, 0, ['conta', 'Conta e perfis']);
+  const sv = OS.settingsView; if (sv && !sv.__acc) { OS.settingsView = s => String(s || '') === 'conta' ? settings() : sv(s); OS.settingsView.__acc = 1; }
+});
+// a bolinha do perfil na barra de cima (como na Netflix): toca para trocar de perfil ou ver a conta
+Acc.bubble = () => { const p = cur(); return p ? `<button class="ac-bub" data-act="accMenu" aria-label="Perfil ${esc(p.nome)}" title="${esc(p.nome)}">${avatar(p)}</button>` : ''; };
+A.accMenu = () => { const p = cur(); if (!p) return; OS.UI.modal(`<div class="ac-menu"><div class="ac-mh">${avatar(p, 1)}<div><b>${esc(p.nome)}</b><small class="mut">${esc(Acc.email())}</small></div></div>
+  <div class="list"><button class="li" data-act="accSwitch"><div class="li-t"><b>Trocar de perfil</b><small>${profiles().length} ${profiles().length === 1 ? 'perfil' : 'perfis'} nesta conta</small></div><span class="mut">›</span></button>
+  <a class="li" href="#definicoes.conta" data-mclose><div class="li-t"><b>Conta e perfis</b><small>Senha, código de recuperação, sincronização</small></div><span class="mut">›</span></a>
+  <button class="li" data-act="accOut"><div class="li-t"><b>Sair da conta</b><small>Os dados ficam guardados na conta</small></div><span class="mut">›</span></button></div></div>`, 'ac-modal'); };
+A.accSwitch = () => { OS.UI.closeModal(); Acc.switchProfile(); };
+A.accOut = () => { OS.UI.closeModal(); logout(); };
+A.accSync = async () => { OS.UI.toast('A sincronizar…'); await Acc.flush().catch(() => { }); if (Acc.poll) await Acc.poll(); OS.UI.toast(SY.err ? 'Sem ligação: fica guardado neste aparelho' : 'Tudo sincronizado', SY.err ? 'warn' : 'pos'); OS.request(); };
+A.accAll = async () => { try { const j = await conta('sairtodos'); S.t = j.token; saveS(); OS.UI.toast('Saíste de todos os outros aparelhos', 'pos'); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+OS.forms = OS.forms || {};
+/* ---------- atalho de gastos do iPhone sem script: cada perfil tem o seu link (a caixa fica na conta) ---------- */
+const AKK = () => 'nau:ak:' + pid();
+Acc.atalho = () => { const k = LS.get(AKK(), ''); return k ? { url: new URL('api/atalho', document.baseURI).href, key: k } : null; };
+const ensureAk = async nova => { if (!cur() || (!nova && LS.get(AKK(), ''))) return; const j = await conta('atalho', { id: pid(), nova: !!nova }); LS.set(AKK(), j.chave); };
+OS.on('ready', () => setTimeout(() => ensureAk().then(() => { const c = OS.one('inbox'); if (!(c.url && c.key) && OS.Inbox && OS.Inbox.pull) OS.Inbox.pull(false); }).catch(() => { }), 1500));
+const akLink = () => { const a = Acc.atalho(); return a ? a.url + '?k=' + encodeURIComponent(a.key) : ''; };
+A.accAkCopy = async () => { const l = akLink(); if (!l) { await ensureAk().catch(() => { }); OS.request(); return; } try { await navigator.clipboard.writeText(l); OS.UI.toast('Link copiado: cola-o no atalho', 'pos'); } catch (e) { OS.UI.toast('Toca no link, seleciona e copia', 'warn'); } };
+A.accAkNew = async () => { if (!confirm('Criar um link novo? O atalho antigo deixa de funcionar até colares o novo.')) return; try { await ensureAk(true); OS.UI.toast('Link novo criado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+A.accAkTest = async () => { const a = Acc.atalho(); if (!a) return; try { const r = await fetch(a.url, { method: 'POST', body: new URLSearchParams({ k: a.key, v: '1', d: '__teste__' }) }); if (!r.ok) throw new Error(await r.text());
+    OS.Inbox.testOk = false; await OS.Inbox.pull(false); OS.UI.toast(OS.Inbox.testOk ? 'O atalho está a funcionar: o Náutilo recebeu o teste (não conta nas finanças).' : 'O teste ainda não chegou. Tenta outra vez.', OS.Inbox.testOk ? 'pos' : 'warn'); }
+  catch (e) { OS.UI.toast('O teste falhou: ' + e.message, 'neg'); } };
+Acc.atalhoPanel = () => { const l = akLink(), UI = OS.UI;
+  return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3></div>
+  <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado neste perfil, sem abrir o Náutilo. Não precisas de configurar nada fora do Náutilo.</p>
+  <div class="ib-w"><div class="ib-s"><i>1</i><div><b>O teu link</b><p>É só deste perfil. Não o partilhes: quem o tiver pode registar gastos aqui.</p>
+    ${l ? `<div class="ib-link"><code>${esc(l)}</code><button class="btn sm pri" data-act="accAkCopy">Copiar link</button></div><div class="row gap8" style="margin-top:8px"><button class="btn sm" data-act="accAkTest">Testar agora</button><button class="btn sm ghost" data-act="accAkNew">Criar link novo</button></div>` : `<button class="btn sm pri" data-act="accAkCopy">Criar o link</button>`}</div></div>
+    <div class="ib-s"><i>2</i><div><b>Criar o atalho (3 ações)</b><p>App <b>Atalhos</b> → <b>+</b> → nome "Gasto". Adiciona:</p>
+      <div class="ib-sc"><div><b>1 · Pedir entrada</b> → toca em "Texto" e muda para <b>Número</b> → pergunta: <i>Quanto gastaste?</i></div><div><b>2 · Pedir entrada</b> → Texto → pergunta: <i>Em quê?</i></div><div><b>3 · Obter conteúdo do URL</b> → cola o <b>link</b> → ▸ (mostrar mais) → Método: <b>POST</b> → Corpo do pedido: <b>Formulário</b> → <b>Adicionar campo → Texto</b>: chave <code>v</code> com a 1.ª <b>Entrada fornecida</b>; chave <code>d</code> com a 2.ª.</div></div>
+      <p>Toca em ▶️ para experimentar: deve aparecer "✓ … registado no Náutilo".</p></div></div>
+    <div class="ib-s"><i>3</i><div><b>Pôr no Centro de Controlo</b><p>Centro de Controlo → <b>+</b> → <b>Adicionar controlo</b> → <b>Atalhos</b> → <b>Atalho</b> → <b>Escolher</b> → "Gasto". Também podes pô-lo no <b>botão de Ação</b> ou no ecrã principal.</p></div></div></div>
+  <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças quando abres o Náutilo, com a categoria adivinhada pela descrição e a etiqueta <i>atalho</i>.</p></div>`; };
+OS.forms.accPw = async f => { try { const j = await conta('senha', { atual: f.elements.atual.value, nova: f.elements.nova.value }); takeConta(j); OS.UI.toast('Senha mudada. Os outros aparelhos vão pedir a senha nova.', 'pos'); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+OS.forms.accRec = async f => { try { const j = await conta('novocodigo', { senha: f.elements.senha.value }); OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">Código de recuperação novo</h3><p class="mut">O antigo deixou de valer. Guarda este:</p><div class="ac-code">${esc(j.recuperacao)}</div><div class="row gap8" style="margin-top:14px"><button class="btn pri" data-mclose>Já guardei</button></div></div>`); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+OS.forms.accName = async f => { try { const j = await conta('nome', { nome: f.elements.nome.value }); takeConta(j); OS.UI.toast('Nome guardado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+OS.forms.accDel = async f => { if (!confirm('Apagar a conta, todos os perfis e todos os dados, em todos os aparelhos? Não dá para desfazer.')) return;
+  try { await conta('apagar', { senha: f.elements.senha.value }); S = null; saveS(); LS.del(K.owner); LS.del(K.p); wipeLocal(); location.replace(location.pathname); location.reload(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+const settings = () => { const UI = OS.UI, p = cur() || {}, L = profiles(), ago = SY.last ? Math.max(0, Math.round((Date.now() - SY.last) / 1000)) : null;
+  const head = UI.head('Definições', 'A tua conta Náutilo: perfis, senha e sincronização entre aparelhos.', '', 'Sistema') + UI.tabs('definicoes', OS.SETT, 'conta');
+  return head + `<div class="set-page ac-set">
+  <div class="pn"><div class="pn-h"><h3>${UI.ic('user')}Conta</h3><span class="mut">${esc(Acc.email())}</span></div>
+    <form data-form="accName" class="row gap8" style="align-items:flex-end"><label class="grow">Nome da conta<input class="field" name="nome" maxlength="40" value="${esc((S && S.n) || '')}"></label><button class="btn">Guardar</button></form></div>
+  <div class="pn"><div class="pn-h"><h3>${UI.ic('users')}Perfis</h3><span class="mut">${L.length} de 5</span></div>
+    <div class="ac-plist">${L.map(x => `<div class="ac-pl">${avatar(x)}<b>${esc(x.nome)}</b>${x.id === p.id ? '<small class="mu-tag">a usar</small>' : ''}</div>`).join('')}</div>
+    <div class="row gap8" style="margin-top:12px"><button class="btn pri" data-act="accSwitch">Trocar ou gerir perfis</button></div></div>
+  <div class="pn"><div class="pn-h"><h3>${UI.ic('sync')}Sincronização</h3><span class="mut">${esc(SY.state)}</span></div>
+    <p class="mut" style="margin:0 0 10px">Tudo o que registas neste perfil vai sozinho para a tua conta, cifrado, e aparece nos teus outros aparelhos em segundos.${ago != null ? ` Última vez: há ${ago < 60 ? ago + ' s' : Math.round(ago / 60) + ' min'}.` : ''}${pend.size ? ` ${pend.size} ${pend.size === 1 ? 'alteração por enviar' : 'alterações por enviar'}.` : ''}</p>
+    <div class="row gap8"><button class="btn" data-act="accSync">Sincronizar agora</button></div></div>
+  <div class="pn"><div class="pn-h"><h3>${UI.ic('key')}Senha</h3></div>
+    <form data-form="accPw" class="col gap8"><label>Senha atual<input class="field" name="atual" type="password" autocomplete="current-password" required></label><label>Senha nova<input class="field" name="nova" type="password" minlength="8" autocomplete="new-password" required></label><div><button class="btn">Mudar a senha</button></div></form>
+    <form data-form="accRec" class="row gap8" style="align-items:flex-end;margin-top:14px"><label class="grow">Novo código de recuperação (pede a senha)<input class="field" name="senha" type="password" autocomplete="current-password" required></label><button class="btn ghost">Gerar</button></form></div>
+  <div class="pn"><div class="pn-h"><h3>${UI.ic('lock')}Aparelhos</h3></div><p class="mut" style="margin:0 0 10px">Perdeste um telemóvel? Termina a sessão em todos os outros aparelhos (este fica).</p>
+    <div class="row gap8"><button class="btn" data-act="accAll">Sair dos outros aparelhos</button><button class="btn ghost" data-act="accOut">Sair da conta neste aparelho</button></div></div>
+  <div class="pn ac-danger"><div class="pn-h"><h3>Apagar a conta</h3></div><p class="mut" style="margin:0 0 10px">Apaga a conta, os ${L.length} ${L.length === 1 ? 'perfil' : 'perfis'} e todos os dados, em todos os aparelhos.</p>
+    <form data-form="accDel" class="row gap8" style="align-items:flex-end"><label class="grow">Senha da conta<input class="field" name="senha" type="password" autocomplete="current-password" required></label><button class="btn neg">Apagar a conta</button></form></div></div>`; };
 })();
 
 </script>
@@ -4834,7 +5267,7 @@ const prioL = p => (L.PRIO.find(x => x[0] === String(p)) || [, ''])[1];
 const prioT = p => ({ 1: 'neg', 2: 'warn' }[p] || '');
 const subjN = id => (OS.get('subjects', id) || {}).name || '';
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
-const dayQuote = () => L.QUOTES[U.hash(U.today()) % L.QUOTES.length];
+const dayQuote = () => OS.my(L.QUOTES[U.hash(U.today()) % L.QUOTES.length]);
 OS.srcColor = s => (Cal.src[s] || [, 'var(--mut)'])[1];
 
 /* ---------- componentes partilhados ---------- */
@@ -4874,7 +5307,7 @@ V.hoje = () => {
   const allDay = todayItems.filter(x => !x.start && !x.planned);
   return `<div class="today">
   <div><div class="eyebrow">${U.longDate(t)} · ${esc(p.city || '')}</div>
-    <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || 'Ryan')}.</h1>
+    <div class="row between gap16" style="align-items:flex-end;margin-top:6px"><div><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${greet()}, ${esc(p.short || OS.who())}.</h1>
     <p class="tx2" style="margin:4px 0 0">${nextIt ? `A seguir: <b style="color:var(--tx)">${esc(nextIt.title)}</b> às ${nextIt.start}` : 'Sem mais compromissos com hora hoje.'}</p></div><div class="today-clock" data-clock>${U.hm()}</div></div>
     <p class="today-q" style="margin-top:14px">${esc(dayQuote())}</p></div>
   ${urgent.length ? `<div class="pn" style="border-color:rgba(242,109,109,.3)"><div class="pn-h"><h3>${UI.ic('radar')}Urgente</h3><a class="more" href="#visao">Painel ${UI.ic('right')}</a></div><div class="att">${urgent.slice(0, 4).map(attRow).join('')}</div></div>` : ''}
@@ -5801,7 +6234,7 @@ const readSim = () => { const v = document.getElementById('view'); if (!v) retur
   return { simulador: tab.trim() || cur, inputs, opcoes_escolhidas: seg, resultados: kpis, notas: notes, taxas_ao_vivo: live };
 };
 const PROMPT = (q, sim, hist) => { const f = OS.FinCountry ? OS.FinCountry.get() : {}, c = OS.Country ? OS.Country.get()[1] : 'Portugal';
-  return `És o assistente financeiro pessoal da app Náutilo. O utilizador (Ryan, brasileiro, vive em Aveiro, Portugal) está a usar um SIMULADOR e quer ajuda para tomar a MELHOR decisão.
+  return `És o assistente financeiro pessoal da app Náutilo. O utilizador (${OS.whoFlat('Ryan, brasileiro, vive em Aveiro, Portugal')}) está a usar um SIMULADOR e quer ajuda para tomar a MELHOR decisão.
 Escreve em português de Portugal, direto e concreto, como um amigo que percebe muito de finanças. Usa os números da simulação e da vida real dele; não inventes taxas nem dados que não estão aqui (se faltar algo, diz o que falta). Aplica as regras do país escolhido (${c}: moeda ${f.cur || 'EUR'}, impostos: ${f.taxL || ''}). Lembra que as taxas ao vivo são médias de mercado. Não recomendes produtos de uma empresa específica; fala de tipos de produto. Se a decisão for má para a situação dele (ex.: sem reserva de emergência, dívidas caras, prestação pesada), diz claramente.
 PAÍS E REGRAS: ${strip(f.note || '')}
 SIMULAÇÃO ATUAL: ${JSON.stringify(sim)}
@@ -6748,7 +7181,7 @@ IA.ask = async (q, opt = {}) => { const facts = IA.facts(opt.extra || {}); let r
   if (opt.web) research = await IA.research(q + (opt.asset ? ' — ativo ' + opt.asset : ''));
   const hist = (IA.hist || []).slice(-4);
   const WZ = OS.InvWisdom, lens = opt.lens && opt.lens.length ? opt.lens : null;
-  const p1 = `És o assistente de investimentos pessoal da app Náutilo para o Ryan (brasileiro, vive em Aveiro, Portugal). Raciocinas como um conselho formado pelos maiores investidores e pensadores de todos os tempos e segues RIGOROSAMENTE o regulamento.\n${RULES}\n\n${WZ ? WZ.prompt(lens) + '\n' + WZ.CONSENSO : ''}\nCOMO RACIOCINAR: aplica o regulamento primeiro; depois passa a situação pelas lentes dos mestres${lens ? ' escolhidos pelo utilizador' : ' mais relevantes para o pedido (3 a 5)'}; quando concordam, segue o consenso; quando discordam, explica a divergência e escolhe o lado que melhor serve o perfil e a política do utilizador; identifica vieses comportamentais (Kahneman, Housel). Cada recomendação diz que mestres a sustentam.\n\nFACTOS (calculados pelo Náutilo agora; valores em EUR salvo indicação; null = sem dados):\n${JSON.stringify(facts)}\n${research ? `\nPESQUISA WEB RECENTE (com fontes; usa só o que for relevante e cita a fonte pelo nome):\n${research.txt}\nFONTES: ${research.src.map(s => s.t).join('; ')}\n` : ''}${hist.length ? '\nCONVERSA ANTERIOR: ' + JSON.stringify(hist) : ''}\n\nPEDIDO: ${q}\n\nPensa passo a passo em privado (prioridades R1 → perfil → alocação → risco → custos/impostos) e responde APENAS com JSON: ${SCHEMA}\nMáximo 5 itens por lista. Valores em euros com base nos FACTOS.`;
+  const p1 = `És o assistente de investimentos pessoal da app Náutilo para ${OS.whoCtx('o Ryan (brasileiro, vive em Aveiro, Portugal)')}. Raciocinas como um conselho formado pelos maiores investidores e pensadores de todos os tempos e segues RIGOROSAMENTE o regulamento.\n${RULES}\n\n${WZ ? WZ.prompt(lens) + '\n' + WZ.CONSENSO : ''}\nCOMO RACIOCINAR: aplica o regulamento primeiro; depois passa a situação pelas lentes dos mestres${lens ? ' escolhidos pelo utilizador' : ' mais relevantes para o pedido (3 a 5)'}; quando concordam, segue o consenso; quando discordam, explica a divergência e escolhe o lado que melhor serve o perfil e a política do utilizador; identifica vieses comportamentais (Kahneman, Housel). Cada recomendação diz que mestres a sustentam.\n\nFACTOS (calculados pelo Náutilo agora; valores em EUR salvo indicação; null = sem dados):\n${JSON.stringify(facts)}\n${research ? `\nPESQUISA WEB RECENTE (com fontes; usa só o que for relevante e cita a fonte pelo nome):\n${research.txt}\nFONTES: ${research.src.map(s => s.t).join('; ')}\n` : ''}${hist.length ? '\nCONVERSA ANTERIOR: ' + JSON.stringify(hist) : ''}\n\nPEDIDO: ${q}\n\nPensa passo a passo em privado (prioridades R1 → perfil → alocação → risco → custos/impostos) e responde APENAS com JSON: ${SCHEMA}\nMáximo 5 itens por lista. Valores em euros com base nos FACTOS.`;
   const d1 = parseJ(textOf(await raw({ contents: [{ parts: [{ text: p1 }] }], generationConfig: { temperature: .2, responseMimeType: 'application/json' } })));
   let ver = null, final = d1;
   try { const p2 = `És o VERIFICADOR de conformidade de um conselho de investimento. Compara a RESPOSTA com o REGULAMENTO, os FACTOS e os princípios dos mestres.\n${RULES}\n${WZ ? WZ.CONSENSO : ''}\nFACTOS: ${JSON.stringify(facts)}\nRESPOSTA A VERIFICAR: ${JSON.stringify(d1)}\nVerifica: (a) números que não existem nos FACTOS nem resultam de contas simples; (b) violações do regulamento (ex.: recomendar risco sem reserva de emergência, ultrapassar limites da política, ignorar o perfil, prometer retorno, recomendar marca específica); (c) contradições internas; (d) falta de avisos importantes; (e) recomendações que contrariam o consenso dos mestres sem explicar porquê, ou mestres citados com ideias que não são deles.\nResponde APENAS com JSON: {"aprovado":true|false,"problemas":["…"],"resposta_corrigida": <mesmo formato da RESPOSTA, já corrigida; se aprovado, repete-a>}`;
@@ -7800,7 +8233,7 @@ let WB = false, WERR = '';
 A.feWord = async () => { if (WB) return; const d = todayDevo() || {}, ctx = dayContext();
   if (!(OS.AI && OS.AI.key())) { const R = pickByMood(d.moods, 'w'); cfg().word = { date: today(), ref: R.b + ' ' + R.c + ':' + R.v1 + (R.v2 !== R.v1 ? '-' + R.v2 : ''), frase: (d.moods || []).map(m => PHR[m]).filter(Boolean)[0] || 'Deus está contigo neste dia — em cada tarefa, em cada conversa, em cada silêncio.', porque: (d.moods || []).length ? 'Escolhido para quem hoje se sente ' + d.moods.join(', ') + '.' : 'O versículo do dia.', ai: false }; OS.touch('faith'); return; }
   WB = true; WERR = ''; OS.request();
-  try { const o = await OS.AI.json([{ text: `És um conselheiro devocional cristão, fiel à Bíblia, caloroso e sem julgamentos, a falar com o Ryan (brasileiro, vive em Aveiro, Portugal, estudante). Com base em como ele está hoje e no que a vida dele mostra (dados do Náutilo abaixo), escolhe a palavra de Deus que ele provavelmente PRECISA de ouvir hoje.
+  try { const o = await OS.AI.json([{ text: `És um conselheiro devocional cristão, fiel à Bíblia, caloroso e sem julgamentos, a falar com ${OS.whoCtx('o Ryan (brasileiro, vive em Aveiro, Portugal, estudante)')}. Com base em como ele está hoje e no que a vida dele mostra (dados do Náutilo abaixo), escolhe a palavra de Deus que ele provavelmente PRECISA de ouvir hoje.
 DADOS DE HOJE: ${JSON.stringify(ctx)}
 Regras: usa versículos reais e adequados ao contexto (não tires versículos do contexto para prometer riqueza ou sucesso); não inventes factos sobre a vida dele; português de Portugal, 2.ª pessoa (tu); a frase deve ser curta e memorável; se houver sinais de sofrimento grave ou risco, preenche "alerta" com uma mensagem de cuidado.
 Responde APENAS JSON: {"frase":"máx 25 palavras","ref":{"livro":"código USFM de 3 letras (GEN, EXO, PSA, PRO, ISA, MAT, MRK, LUK, JHN, ACT, ROM, 1CO, 2CO, GAL, EPH, PHP, COL, 1TH, 2TI, HEB, JAS, 1PE, 1JN, REV…)","cap":numero,"v1":numero,"v2":numero},"porque":"1–2 frases a ligar a palavra ao dia dele, concreto","reflexao":"3 a 5 frases","oracao":"oração curta em 1.ª pessoa","passo":"um passo prático de fé para hoje","alerta":null}` }], .4);
@@ -7833,7 +8266,7 @@ A.feGo = b => { OS.setUI('bRef', b.dataset.r); OS.setUI('bSel', []); location.ha
 
 /* ---------- ecrã principal ---------- */
 const TABS = [['', 'Hoje com Deus'], ['biblia', 'Bíblia'], ['devocional', 'Meu devocional'], ['oracoes', 'Orações'], ['planos', 'Planos de leitura']];
-V.fe = sub => { bible(); const h = new Date().getHours(), nm = (OS.one('profile').short || 'Ryan');
+V.fe = sub => { bible(); const h = new Date().getHours(), nm = (OS.one('profile').short || OS.who());
   return UI.head(`${h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'}, ${esc(nm)}`, 'Um tempo dedicado a Deus: a Palavra, a oração e o que Ele te diz hoje.', '', 'Fé & Devoção') + UI.tabs('fe', TABS, sub || '') + `<div class="fe">${(T[sub || ''] || T[''])()}</div>`; };
 const T = {};
 const verseCard = (R, title, extra = '') => { const vs = verses(R); return `<div class="fe-v"><div class="eyebrow">${title}</div><blockquote>${vs.map(([n, t]) => `<sup>${n}</sup>${esc(t)}`).join(' ') || '…'}</blockquote><div class="fe-vr"><b>${esc(label(R))}</b><span class="mut">${esc(VERS[ver()])}</span></div>
@@ -7843,7 +8276,7 @@ A.feUse = b => { const R = parseRef(b.dataset.ref); devoSet('ref', label(R)); de
 /* explicação do versículo do dia (IA, uma vez por dia, ligada ao teu dia) */
 let VXB = false;
 const vodExplain = (force) => { const R = FB.vod(), key = R.b + ' ' + R.c + ':' + R.v1, c = cfg(); if (VXB || !(OS.AI && OS.AI.key())) return; if (!force && c.vodx && c.vodx.date === today() && c.vodx.ref === key) return; VXB = true;
-  OS.AI.json([{ text: `Explica o versículo do dia ao Ryan (cristão, estudante, vive em Aveiro) de forma fiel à Bíblia, simples e calorosa, em português de Portugal. Versículo: ${label(R)} — "${textOf(R)}". Contexto do capítulo: "${verses({ b: R.b, c: R.c }).map(x => x[1]).join(' ').slice(0, 2500)}". O dia dele: ${JSON.stringify(dayContext())}.
+  OS.AI.json([{ text: `Explica o versículo do dia ${OS.whoCtx('ao Ryan (cristão, estudante, vive em Aveiro)', 'a')} de forma fiel à Bíblia, simples e calorosa, em português de Portugal. Versículo: ${label(R)} — "${textOf(R)}". Contexto do capítulo: "${verses({ b: R.b, c: R.c }).map(x => x[1]).join(' ').slice(0, 2500)}". O dia dele: ${JSON.stringify(dayContext())}.
 Responde APENAS JSON: {"contexto":"quem escreveu, para quem e em que situação (1–2 frases)","significado":"o que o versículo quer dizer (2–3 frases)","hoje":"como viver isto hoje, ligado ao dia dele quando fizer sentido (1–2 frases)"}` }], .3)
     .then(o => { c.vodx = { date: today(), ref: key, contexto: String(o.contexto || '').slice(0, 400), significado: String(o.significado || '').slice(0, 700), hoje: String(o.hoje || '').slice(0, 400) }; OS.touch('faith'); })
     .catch(() => { }).finally(() => { VXB = false; OS.request(); }); };
@@ -7972,7 +8405,7 @@ T.devocional = () => { const d = todayDevo() || {}, R = d.ref ? FB.parseHuman(d.
 const reflHTML = r => `<div class="fe-refl"><div class="eyebrow">Reflexão</div>${r.contexto ? `<p class="mut">${esc(r.contexto)}</p>` : ''}<p>${esc(r.mensagem || '')}</p>${(r.licoes || []).length ? `<b>O que aprender</b><ul>${r.licoes.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${(r.perguntas || []).length ? `<b>Perguntas para meditar</b><ul>${r.perguntas.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${r.oracao ? `<div class="fe-pray"><b>Oração</b><p>${esc(r.oracao)}</p></div>` : ''}${(r.ligacoes || []).length ? `<small class="mut">Para aprofundar: ${r.ligacoes.map(esc).join(' · ')}</small>` : ''}</div>`;
 A.feReflect = async () => { const d = todayDevo() || {}, R = d.ref ? FB.parseHuman(d.ref) : null; if (!R || RB) return; if (!(OS.AI && OS.AI.key())) { UI.toast('Liga o Spyke (IA) em Definições → Spyke', 'warn'); return; }
   RB = true; RERR = ''; OS.request();
-  try { const o = await OS.AI.json([{ text: `És um mestre da Palavra, fiel às Escrituras, que ajuda num devocional pessoal (o Ryan, cristão, estudante em Portugal). Passagem: ${label(R)} (${VERS[ver()]}): "${textOf(R).slice(0, 6000)}"
+  try { const o = await OS.AI.json([{ text: `És um mestre da Palavra, fiel às Escrituras, que ajuda num devocional pessoal (${OS.whoFlat('o Ryan, cristão, estudante em Portugal')}). Passagem: ${label(R)} (${VERS[ver()]}): "${textOf(R).slice(0, 6000)}"
 O que ele escreveu: observação: "${d.obs || ''}"; aplicação: "${d.app || ''}"; como está hoje: ${(d.moods || []).join(', ') || 'não disse'}.
 Dá uma reflexão devocional sólida (contexto histórico e literário breve, mensagem central, aplicação prática), em português de Portugal, sem inventar e sem forçar o texto. Responde APENAS JSON: {"contexto":"1–2 frases de contexto","mensagem":"4–6 frases","licoes":["…"],"perguntas":["2–3 perguntas para meditar"],"oracao":"oração curta em 1.ª pessoa","ligacoes":["2–3 passagens relacionadas, ex.: Salmos 23"]}` }], .3);
     devoSet('refl', { ref: d.ref, contexto: String(o.contexto || '').slice(0, 500), mensagem: String(o.mensagem || '').slice(0, 1500), licoes: (o.licoes || []).slice(0, 4).map(String), perguntas: (o.perguntas || []).slice(0, 3).map(String), oracao: String(o.oracao || '').slice(0, 800), ligacoes: (o.ligacoes || []).slice(0, 3).map(String) }); }
@@ -8030,7 +8463,7 @@ const ED = { PT: ['Portugal', '🇵🇹', 'hl=pt-PT&gl=PT&ceid=PT:pt-150', 'pt']
   ZA: ['África do Sul', '🇿🇦', 'hl=en-ZA&gl=ZA&ceid=ZA:en', 'en'], NG: ['Nigéria', '🇳🇬', 'hl=en-NG&gl=NG&ceid=NG:en', 'en'], PL: ['Polónia', '🇵🇱', 'hl=pl&gl=PL&ceid=PL:pl', 'pl'], SE: ['Suécia', '🇸🇪', 'hl=sv&gl=SE&ceid=SE:sv', 'sv'], NO: ['Noruega', '🇳🇴', 'hl=no&gl=NO&ceid=NO:no', 'no'], GR: ['Grécia', '🇬🇷', 'hl=el&gl=GR&ceid=GR:el', 'el'] };
 const TOPICS = [['TOP', 'Destaques'], ['WORLD', 'Mundo'], ['NATION', 'País'], ['BUSINESS', 'Economia'], ['TECHNOLOGY', 'Tecnologia'], ['SCIENCE', 'Ciência'], ['HEALTH', 'Saúde'], ['SPORTS', 'Desporto'], ['ENTERTAINMENT', 'Cultura']];
 const NW = OS.News = { cache: {} };
-const scr = () => { const c = OS.one('inbox'); return c && c.url && c.key ? c : null; };
+const scr = () => { const c = OS.one('inbox'); return c && c.url && c.key ? c : OS.Acc && OS.Acc.on ? { url: new URL('api/noticias', document.baseURI).href, key: '-' } : null; };
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 /* que feeds formam cada vista */
 const specs = (tab, topic, theme) => { if (theme) return tab === 'W' ? [{ id: 'q:PT:' + theme, q: theme, ed: ED.PT[2] }, { id: 'q:BR:' + theme, q: theme, ed: ED.BR[2] }] : [{ id: 'q:' + tab + ':' + theme, q: theme, ed: ED[tab][2] }];
@@ -8074,7 +8507,7 @@ const sig = items => items.slice(0, 20).map(x => norm(x.t).slice(0, 30)).join('|
 const briefing = async (key, items, place, force) => { if (BRB || !(OS.AI && OS.AI.key()) || items.length < 5) return; const s = sig(items), b = BR[key];
   if (!force && b && (b.sig === s || Date.now() - b.at < 90 * 6e4)) return; BRB = key; OS.request();
   try { const list = items.slice(0, 35).map((x, i) => ({ i, t: x.t, fonte: x.s, quando: ago(x.d) }));
-    const o = await OS.AI.json([{ text: `És o editor de um jornal. A partir APENAS destas manchetes reais de ${place} (agora: ${new Date().toLocaleString('pt-PT')}), escreve "O essencial agora" em português de Portugal para o Ryan (brasileiro, vive em Aveiro, estudante, investe). Junta manchetes do mesmo assunto, ordena por importância e não inventes factos que não estejam nas manchetes; se algo for incerto, diz que ainda está em desenvolvimento.
+    const o = await OS.AI.json([{ text: `És o editor de um jornal. A partir APENAS destas manchetes reais de ${place} (agora: ${new Date().toLocaleString('pt-PT')}), escreve "O essencial agora" em português de Portugal para ${OS.whoCtx('o Ryan (brasileiro, vive em Aveiro, estudante, investe)')}. Junta manchetes do mesmo assunto, ordena por importância e não inventes factos que não estejam nas manchetes; se algo for incerto, diz que ainda está em desenvolvimento.
 MANCHETES: ${JSON.stringify(list)}
 Responde APENAS JSON: {"titulo":"a frase que resume o dia (máx 14 palavras)","pontos":[{"titulo":"…","resumo":"2 frases","porque":"porque importa (1 frase)","idx":[índices das manchetes]}],"para_ti":"1–2 frases: o que isto pode significar para a vida dele (Portugal, Brasil, estudos, dinheiro), sem alarmismo"}. Entre 4 e 7 pontos.` }], .2);
     BR[key] = { at: Date.now(), sig: s, titulo: String(o.titulo || '').slice(0, 160), pontos: (o.pontos || []).slice(0, 7).map(p => ({ titulo: String(p.titulo || '').slice(0, 140), resumo: String(p.resumo || '').slice(0, 500), porque: String(p.porque || '').slice(0, 250), idx: (p.idx || []).filter(n => Number.isInteger(n) && items[n]).slice(0, 4).map(n => ({ t: items[n].t, s: items[n].s, l: items[n].l })) })), para_ti: String(o.para_ti || '').slice(0, 400) };
@@ -8184,7 +8617,7 @@ OS.on('ready', () => { setInterval(() => { if (document.hidden || !scr()) return
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
-OS.ONE_DEF.me = { birth: '', birthplace: '', hometown: '', nationality: 'Brasileira', ptSince: '', langs: 'Português', qa: {}, bio: null, photo: '' };
+OS.ONE_DEF.me = { birth: '', birthplace: '', hometown: '', nationality: OS.Acc && OS.Acc.pub ? '' : 'Brasileira', ptSince: '', langs: 'Português', qa: {}, bio: null, photo: '' };
 OS.ONE_DEF.mever = { v: [] };
 const me = () => OS.one('me'), P = () => OS.one('profile'), today = () => U.today();
 const first = () => (P().short || (P().name || 'Ryan').split(' ')[0]);
@@ -8316,7 +8749,7 @@ const completeness = () => { const parts = [[filled() / KEYS.length, 3], [Math.m
 /* ---------- factos para a IA (só o que está registado) ---------- */
 const facts = () => { const m = me(), p = P(), ns = OS.one('northstar'), about = {}, qa = [];
   KEYS.forEach(k => { if (String(m[k] || '').trim()) about[k] = m[k]; });
-  qList().forEach(q => { const a = (m.qa || {})[q.id]; if (a && a.trim()) qa.push({ pergunta: q.q, resposta: a }); });
+  qList().forEach(q => { const a = (m.qa || {})[q.id]; if (a && a.trim()) qa.push({ pergunta: OS.my(q.q), resposta: a }); });
   const lst = (c, f, n = 40) => OS.all(c).slice(0, n).map(f);
   return { nome: p.name, tratamento: first(), idade: age(m.birth), cidade_atual: p.city, universidade: p.uni, curso: p.course, trabalho: [p.jobRole, p.employer].filter(Boolean).join(' em '), sobre: about, entrevista: qa,
     pessoas: lst('people', x => ({ nome: x.name, rel: x.rel, desde: x.since, como: x.how, historias: x.story, significa: x.means, onde: x.where }), 60),
@@ -8389,7 +8822,7 @@ const pages = w => Math.max(1, Math.round(w / 280)), pgs = w => { const n = page
 const aiOK = () => !!(OS.AI && (OS.AI.key() || (OS.AI.freeOn && OS.AI.freeOn())));
 const ALBL = Object.fromEntries(ABOUT.flatMap(s => s[1].map(f => [f[0], f[1]])));
 const matOf = p => { const m = me(), qa = m.qa || {}, ans = q => String(qa[q.id] || '').trim();
-  const resp = fuQs().filter(q => q.g === p.n).concat(QALL.filter(q => q.g === p.n)).filter(ans).map(q => ({ pergunta: q.q, resposta: ans(q) }));
+  const resp = fuQs().filter(q => q.g === p.n).concat(QALL.filter(q => q.g === p.n)).filter(ans).map(q => ({ pergunta: OS.my(q.q), resposta: ans(q) }));
   const sobre = {}; (p.about || []).forEach(k => { if (String(m[k] || '').trim()) sobre[ALBL[k] || k] = m[k]; });
   const momentos = U.sortBy(OS.all('lifeev').filter(e => (p.cats || []).includes(e.cat)), e => e.date || '').map(e => ({ data: e.date, o_que: e.title, onde: e.place, com: e.people, como_foi: e.desc, aprendi: e.lesson }));
   const pessoas = OS.all('people').filter(x => (p.ppl || []).includes(x.group || grpOf(x.rel)) || (p.rel && p.rel.test(x.rel || ''))).map(x => ({ nome: x.name, quem: x.rel, desde: x.since, como_nos_conhecemos: x.how, historias: x.story, significa: x.means }));
@@ -8459,7 +8892,7 @@ let FUB = false; const DR = {};
 const isAns = q => String((me().qa || {})[q.id] || '').trim();
 const pool = g => qList().filter(q => (!g || q.g === g) && !isAns(q) && !(me().skip || []).includes(q.id));
 const followUps = async q => { const a = String((me().qa || {})[q.id] || '').trim(); if (!aiOK() || a.length < 25 || me().autoFu === false) return [];
-  try { const o = await OS.AI.json([{ text: `És um biógrafo a entrevistar ${first()} para escrever o livro da vida dele. Pergunta: "${q.q}". Resposta dele: "${a.slice(0, 3000)}".
+  try { const o = await OS.AI.json([{ text: `És um biógrafo a entrevistar ${first()} para escrever o livro da vida dele. Pergunta: "${OS.my(q.q)}". Resposta dele: "${a.slice(0, 3000)}".
 Faz até 3 perguntas de seguimento curtas e concretas para tirar mais detalhes desta história (quem estava, onde, quando, o que disseram, o que sentiu, o que mudou depois). Não perguntes o que ele já respondeu. Trata-o por tu. JSON: {"q":["…"]}` }], .5);
     const L = (o.q || []).map(s => String(s).trim()).filter(s => s.length > 8).slice(0, 3), fu = me().fu = me().fu || [], have = new Set(fu.map(f => f.q));
     const add = L.filter(s => !have.has(s)).map(s => ({ id: 'f' + U.hash(q.id + '|' + s).toString(36), g: q.g === 'A IA quer saber' ? (partOf(OS.ui.meQg) || PARTS[PARTS.length - 2]).n : q.g, q: s, from: q.id }));
@@ -8587,15 +9020,15 @@ T.entrevista = () => { const qa = me().qa || {}, all = qList(), g = OS.ui.meQg |
   const head = `<div class="pn me-ivh"><div class="row between gap8" style="flex-wrap:wrap"><div><h3 style="margin:0">Entrevista da tua vida</h3><small class="mut">Uma pergunta de cada vez, como numa conversa com um biógrafo. Depois de cada resposta, a IA pergunta mais sobre essa história.</small></div><span class="mono">${n}/${all.length}</span></div>${UI.bar(n / Math.max(1, all.length), 'pos')}
     <small class="mut">${U.nf(words)} palavras contadas · dá para ${pgs(Math.round(words * 2.4))} de livro</small>
     <label class="me-psel"><span>Parte do livro</span><select class="field" id="meQsel" aria-label="Parte do livro"><option value=""${!g ? ' selected' : ''}>Tudo, pela ordem do livro</option>${aiL.length ? `<option value="A IA quer saber"${g === 'A IA quer saber' ? ' selected' : ''}>A IA quer saber (${aiL.filter(isAns).length}/${aiL.length})</option>` : ''}${counts.map(([p, t, a]) => `<option value="${esc(p.n)}"${g === p.n ? ' selected' : ''}>${esc(p.n)} (${a}/${t})</option>`).join('')}<option value="_done"${g === '_done' ? ' selected' : ''}>Ver e editar as respondidas</option></select></label></div></div>`;
-  if (g === '_done') return head + (all.filter(isAns).map(q => `<div class="pn me-qa"><div class="eyebrow">${esc(q.g)}${q.fu ? ' · seguimento' : ''}</div><label for="meq-${q.id}"><b>${esc(q.q)}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="4">${esc(qa[q.id] || '')}</textarea></div>`).join('') || UI.empty('Ainda não respondeste a nenhuma.'));
+  if (g === '_done') return head + (all.filter(isAns).map(q => `<div class="pn me-qa"><div class="eyebrow">${esc(q.g)}${q.fu ? ' · seguimento' : ''}</div><label for="meq-${q.id}"><b>${esc(OS.my(q.q))}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="4">${esc(qa[q.id] || '')}</textarea></div>`).join('') || UI.empty('Ainda não respondeste a nenhuma.'));
   const card = cur ? `<div class="pn me-iv"><div class="eyebrow">${esc(cur.g)}${cur.fu ? ' · <span class="acc">a IA quer saber mais</span>' : ''} · pergunta ${idx}</div>
-    <label for="meqCur" class="me-ivq">${esc(cur.q)}</label>
+    <label for="meqCur" class="me-ivq">${esc(OS.my(cur.q))}</label>
     <textarea class="field me-iva" id="meqCur" data-id="${cur.id}" rows="7" placeholder="Conta com calma, com pormenores: quem, onde, quando, o que sentiste… (ou toca em Ditar e fala)">${esc(DR[cur.id] || '')}</textarea>
     <div class="row gap8 me-ivb"><button class="btn" data-act="meQDict">${UI.ic('mic')}Ditar</button><button class="btn pri grow" data-act="meQSave" ${FUB ? 'disabled' : ''}>${FUB ? 'A pensar na próxima pergunta…' : 'Guardar e seguinte'}</button><button class="btn ghost" data-act="meQSkip">Saltar</button></div>
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-act="meFuTg" ${me().autoFu === false ? '' : 'checked'}><span></span>A IA faz perguntas de seguimento depois de cada resposta</label></div>`
     : `<div class="pn">${UI.empty(g ? `Respondeste a todas as perguntas de "${esc(g)}".` : 'Respondeste a todas as perguntas!', gp ? `<button class="btn pri" data-act="meQMore" data-p="${gp.k}" ${FUB ? 'disabled' : ''}>${UI.ic('zap')}A IA faz mais perguntas sobre "${esc(gp.n)}"</button>` : '')}</div>`;
   const rest = (g ? all.filter(q => q.g === g) : []).filter(isAns);
-  return head + card + (rest.length ? UI.toggle(`As tuas respostas em "${esc(g)}" (${rest.length})`, rest.map(q => `<div class="me-qa"><label for="meq-${q.id}"><b>${esc(q.q)}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="3">${esc(qa[q.id] || '')}</textarea></div>`).join(''), 'meQr_' + (gp ? gp.k : 'x')) : '')
+  return head + card + (rest.length ? UI.toggle(`As tuas respostas em "${esc(g)}" (${rest.length})`, rest.map(q => `<div class="me-qa"><label for="meq-${q.id}"><b>${esc(OS.my(q.q))}</b></label><textarea class="field" id="meq-${q.id}" data-meq="${q.id}" rows="3">${esc(qa[q.id] || '')}</textarea></div>`).join(''), 'meQr_' + (gp ? gp.k : 'x')) : '')
     + (!g && gp == null ? `<div class="pn"><div class="pn-h"><h3>Partes do livro</h3></div><div class="me-pl">${counts.map(([p, t, a]) => `<button class="me-pi" data-act="meQg" data-v="${esc(p.n)}"><b>${esc(p.t)}</b><small>${a}/${t} respondidas</small>${UI.bar(a / Math.max(1, t), a >= t ? 'pos' : '')}</button>`).join('')}</div></div>` : ''); };
 A.meQg = b => { OS.setUI('meQi', ''); OS.setUI('meQg', b.dataset.v); };
 document.addEventListener('change', e => { if (e.target && e.target.id === 'meQsel') { OS.setUI('meQi', ''); OS.setUI('meQg', e.target.value); } });
@@ -9906,7 +10339,7 @@ A.tuClear = () => { TU = { log: [] }; U.ls.set(TK, TU); OS.request(); };
 OS.forms.tutor = async (f, v) => { const q = f.elements.q.value.trim(), s = v('s'), mode = OS.ui.tuM || 'explicar'; if (!q || TB) return; if (!tutorAI()) { UI.toast('Liga a IA em Definições → Spyke', 'warn'); return; }
   TB = true; OS.request(); const ent = { q, s, mode, d: today() };
   // resposta em texto simples (markdown): mais rápida e sem falhar por JSON partido nas respostas longas
-  const sys = `És um tutor universitário excelente, paciente e rigoroso, a ajudar o Ryan (estudante em Portugal, ${OS.one('profile').uni || ''}${OS.one('profile').course ? ', curso de ' + OS.one('profile').course : ''}). Disciplina: ${s ? subjN(s) : 'geral'}. Responde em português de Portugal.
+  const sys = `És um tutor universitário excelente, paciente e rigoroso, a ajudar ${OS.Acc && OS.Acc.pub ? OS.whoCtx('') : `o Ryan (estudante em Portugal, ${OS.one('profile').uni || ''}${OS.one('profile').course ? ', curso de ' + OS.one('profile').course : ''})`}. Disciplina: ${s ? subjN(s) : 'geral'}. Responde em português de Portugal.
 Regras: sê correto acima de tudo; se não tiveres a certeza, diz; se citares normas/leis portuguesas (SNC, CIRC, CIVA…), sê exato; usa **negrito** para conceitos-chave e listas com "- " quando ajudar; sem enchimento.
 Começa SEMPRE com uma linha "# " com um título curto e depois a resposta.`;
   try { const ctx = TU.log.filter(m => !m.err).slice(-3).map(m => `Pergunta anterior: ${m.q.slice(0, 400)}\nResposta: ${(m.a || '').slice(0, 600)}`).join('\n\n');
@@ -9993,7 +10426,7 @@ A.dpPractice = b => { OS.setUI('qbS', b.dataset.s); const has = OS.all('qbank').
 A.dpTutor = b => { OS.setUI('tuS', b.dataset.s); OS.setUI('tuM', 'explicar'); location.hash = 'universidade.tutor'; setTimeout(() => { const t = document.querySelector('form[data-form=tutor] textarea'); if (t) { t.value = 'Explica-me "' + b.dataset.t + '" do início, com exemplos e os erros mais comuns em exame.'; t.focus(); } }, 120); };
 A.dpAI = async b => { if (DPB) return; const sid = b.dataset.s, s = OS.get('subjects', sid), P = perf(sid); DPB = true; OS.request();
   const data = { disciplina: s.name, notas: OS.all('assessments').filter(a => a.subject === sid).map(a => ({ prova: a.title, data: a.date, peso: a.weight, nota: a.grade })), alvo: s.target, temas: P.L.map(o => ({ tema: o.t, acerto: o.acc == null ? null : Math.round(o.acc * 100), respostas: o.n, estado: o.status, erros: o.err })), simulados: OS.all('quizzes').filter(q => q.subject === sid).slice(-6).map(q => ({ data: q.date, nota: q.score })), erros: OS.all('errors').filter(e => e.subject === sid).slice(-10).map(e => ({ erro: e.title, tipo: e.type })), proximaProva: P.next ? { prova: P.next.title, dias: P.days } : null };
-  try { const o = await OS.AI.json([{ text: `És um orientador de estudo universitário exigente e prático. Analisa os dados reais do Ryan em "${s.name}" e diz-lhe onde tem de melhorar, em português de Portugal. Baseia-te SÓ nos dados.
+  try { const o = await OS.AI.json([{ text: `És um orientador de estudo universitário exigente e prático. Analisa os dados reais ${OS.whoCtx('do Ryan', 'de')} em "${s.name}" e diz-lhe onde tem de melhorar, em português de Portugal. Baseia-te SÓ nos dados.
 Dados: ${JSON.stringify(data)}
 Para cada foco: porque é prioritário (com números dos dados), exercícios específicos e concretos que deve fazer (tipo de exercício, quantidade), e 2-3 pesquisas curtas de aulas para o YouTube (só o texto da pesquisa, não inventes links).
 JSON: {"diagnostico":"…","focos":[{"tema":"…","porque":"…","exercicios":["…"],"aulas":["…"]}],"dicas":["…"],"plano":"plano curto dia a dia para esta semana"}` }], .4);
@@ -10341,7 +10774,7 @@ SV.coach = (s, c) => { const k = 'oc_spcoach_' + s.id, last = U.ls.get(k, null),
   ${last && last.o ? `<div class="pn sp-coach"><h3>${esc(last.o.titulo || 'Plano')}</h3>${last.o.analise ? `<p class="sp-p">${esc(last.o.analise)}</p>` : ''}${(last.o.semanas || []).map(w => `<div class="sp-w"><b>${esc(w.semana || '')} — ${esc(w.foco || '')}</b><ul class="sp-ul">${(w.sessoes || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}${(last.o.dicas || []).length ? `<div class="eyebrow">Dicas</div><ul class="sp-ul">${last.o.dicas.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}<small class="mut">${new Date(last.at).toLocaleString('pt-PT')}</small></div>` : ''}${last && last.err ? `<p class="neg">${esc(last.err)}</p>` : ''}`; };
 OS.forms.spCoach = async (f, v) => { if (CO.busy) return; const s = OS.get('sports', f.dataset.id), c = cat(s), q = f.elements.q.value.trim(), k = 'oc_spcoach_' + s.id; if (!q) return UI.toast('Escreve o que queres melhorar', 'neg'); CO.busy = true; OS.request();
   const L = logs(s.id).slice(0, 15).map(l => ({ data: l.date, tipo: l.kind, min: l.mins, rpe: l.rpe, res: l.res, stats: l.st, treinos: l.drills, notas: l.notes }));
-  try { const o = await OS.AI.json([{ text: `És um treinador de ${c.n} experiente e cuidadoso com lesões. Atleta: Ryan, ${weightKg()} kg, nível ${s.level || '—'}, posição/estilo ${s.pos || '—'}, objetivo "${s.goal || ''}", treina ~${s.freq || 2}×/semana. Últimas práticas: ${JSON.stringify(L)}.
+  try { const o = await OS.AI.json([{ text: `És um treinador de ${c.n} experiente e cuidadoso com lesões. Atleta: ${OS.who()}, ${weightKg()} kg, nível ${s.level || '—'}, posição/estilo ${s.pos || '—'}, objetivo "${s.goal || ''}", treina ~${s.freq || 2}×/semana. Últimas práticas: ${JSON.stringify(L)}.
 Pedido: "${q}". Cria um plano prático de 4 semanas em português de Portugal, específico deste desporto, com sessões concretas (exercícios, séries/tempo), progressão e uma análise curta do que os dados mostram. Não inventes dados. JSON: {"titulo":"…","analise":"…","semanas":[{"semana":"Semana 1","foco":"…","sessoes":["…"]}],"dicas":["…"]}` }], .5);
     U.ls.set(k, { q, o, at: Date.now() }); } catch (e) { U.ls.set(k, { q, err: e.message || 'Erro da IA', at: Date.now() }); } CO.busy = false; OS.request(); };
 
@@ -10943,7 +11376,7 @@ const shrink = f => new Promise((res, rej) => { const r = new FileReader(); r.on
 W.foto = () => { const p = OS.one('profile'), hasAI = OS.AI && OS.AI.key && OS.AI.key(), t = today(), from = OS.ui.wsFrom || t, to = OS.ui.wsTo || U.addDays(t, 13);
   return `${hasAI ? '' : `<div class="pn">${OS.AI && OS.AI.setup ? OS.AI.setup('') : ''}</div>`}<div class="pn"><div class="pn-h"><h3>Importar a escala a partir de foto</h3></div>
     <p class="mut" style="margin:0 0 10px">Tira foto (ou print) da escala que o teu trabalho envia. A IA lê os teus turnos e folgas e atualiza a tua semana — <b>só os dias de hoje em diante</b> e só dentro do período que escolheres. O que já passou nunca é alterado.</p>
-    <div class="ws-form"><label>O teu nome na escala<input class="field" data-bind="profile.schedName" value="${esc(p.schedName || p.short || 'Ryan')}" placeholder="ex.: Ryan M."></label><label>De<input class="field" type="date" data-uiv="wsFrom" value="${from}" min="${t}"></label><label>Até<input class="field" type="date" data-uiv="wsTo" value="${to}" min="${from}"></label>
+    <div class="ws-form"><label>O teu nome na escala<input class="field" data-bind="profile.schedName" value="${esc(p.schedName || p.short || OS.who())}" placeholder="ex.: Ryan M."></label><label>De<input class="field" type="date" data-uiv="wsFrom" value="${from}" min="${t}"></label><label>Até<input class="field" type="date" data-uiv="wsTo" value="${to}" min="${from}"></label>
       <label>Local (opcional)<input class="field" data-bind="profile.schedPlace" value="${esc(p.schedPlace || '')}" placeholder="ex.: Loja Aveiro"></label></div>
     <div class="row gap8" style="flex-wrap:wrap;margin-top:10px"><label class="btn">Escolher foto(s)<input type="file" accept="image/*" multiple id="wsFile" hidden></label><label class="btn ghost">Tirar foto<input type="file" accept="image/*" capture="environment" id="wsCam" hidden></label>${IM.files.length ? `<button class="btn pri" data-act="wsRead" ${IM.busy || !hasAI ? 'disabled' : ''}>${IM.busy ? 'A ler a escala…' : 'Ler escala com IA'}</button><button class="btn ghost" data-act="wsClear">Limpar</button>` : ''}</div>
     ${IM.files.length ? `<div class="ws-thumbs">${IM.files.map(f => `<img src="${f.url}" alt="escala">`).join('')}</div>` : ''}${IM.err ? `<p class="neg">${esc(IM.err)}</p>` : ''}</div>
@@ -10951,7 +11384,7 @@ W.foto = () => { const p = OS.one('profile'), hasAI = OS.AI && OS.AI.key && OS.A
 document.addEventListener('change', async e => { if (e.target.id !== 'wsFile' && e.target.id !== 'wsCam') return; const fs = [...e.target.files].slice(0, 4); try { IM.files = IM.files.concat(await Promise.all(fs.map(shrink))).slice(0, 4); IM.err = ''; IM.res = null; } catch (er) { IM.err = 'Não consegui abrir a imagem.'; } OS.request(); });
 A.wsClear = () => { IM = { files: [], busy: false, err: '', res: null }; OS.request(); };
 A.wsRead = async () => { if (IM.busy || !IM.files.length) return; const p = OS.one('profile'), t = today(), from = OS.ui.wsFrom || t, to = OS.ui.wsTo || U.addDays(t, 13); IM.busy = true; IM.err = ''; OS.request();
-  try { const o = await OS.AI.json([{ text: `Isto é a escala/horário de trabalho de uma equipa (foto). Lê APENAS a linha/coluna da pessoa "${p.schedName || p.short || 'Ryan'}". Hoje é ${t} (${U.WDS[U.parse(t).getDay()]}). O período pedido é de ${from} a ${to}. Converte cada dia em data completa AAAA-MM-DD (usa o mês/ano mais provável perto de hoje; se a escala só tiver dias da semana, assume a semana que contém essas datas no período pedido).
+  try { const o = await OS.AI.json([{ text: `Isto é a escala/horário de trabalho de uma equipa (foto). Lê APENAS a linha/coluna da pessoa "${p.schedName || p.short || OS.who()}". Hoje é ${t} (${U.WDS[U.parse(t).getDay()]}). O período pedido é de ${from} a ${to}. Converte cada dia em data completa AAAA-MM-DD (usa o mês/ano mais provável perto de hoje; se a escala só tiver dias da semana, assume a semana que contém essas datas no período pedido).
 Para cada dia: se for folga/descanso/F/D/off → {"data","folga":true,"tipo":"Folga"|"Férias"|"Feriado"}; se trabalhar → {"data","entrada":"HH:MM","saida":"HH:MM","pausa_min":número ou 0}. Turnos que passam da meia-noite: saída depois da entrada no dia seguinte, mantém a data de início. Se não conseguires ler um dia, não o inventes.
 JSON: {"pessoa_encontrada":true,"dias":[...],"observacoes":"…"}` }].concat(IM.files.map(f => ({ inline_data: { mime_type: f.mime, data: f.data } }))), .1);
     if (o.pessoa_encontrada === false) throw new Error(`Não encontrei "${p.schedName || p.short}" na escala. Confirma o teu nome como aparece na foto.`);
@@ -11204,7 +11637,7 @@ const fetchQ = async (q, n) => { const all = []; const S = sources();
 const aiOn = () => OS.AI && OS.AI.key && OS.AI.key();
 const classify = async items => { const todo = items.filter(x => !M.ai[x.id]).slice(0, 30); if (!todo.length && M.sum) return;
   const p = OS.one('profile');
-  const o = await OS.AI.json([{ text: `És o assistente de e-mail de ${p.short || 'Ryan'} (estudante no ISCA-UA em Aveiro, trabalha, brasileiro a viver em Portugal). Hoje é ${U.today()}.
+  const o = await OS.AI.json([{ text: `És o assistente de e-mail de ${OS.whoCtx((p.short || 'Ryan') + ' (estudante no ISCA-UA em Aveiro, trabalha, brasileiro a viver em Portugal)')}. Hoje é ${U.today()}.
 Classifica cada e-mail numa categoria: "urgente" (prazo hoje/amanhã, pagamento em atraso, segurança da conta, universidade/trabalho a pedir ação já), "responder" (uma pessoa real espera resposta dele), "atencao" (importante ler, sem resposta), "info" (notificações, recibos, confirmações), "promo" (marketing, newsletters), "spam" (suspeito: phishing, burla, pede dados ou dinheiro, remetente estranho).
 Para cada e-mail: {"id","c","porque":"máx. 12 palavras","acao":"o que fazer, máx. 8 palavras, ou vazio","prazo":"AAAA-MM-DD ou null","evento":null ou {"titulo","data":"AAAA-MM-DD","hora":"HH:MM" ou null,"fim":"HH:MM" ou null,"local":"…" ou null}}.
 "evento" só quando o e-mail marca algo com data concreta para ele: reunião, entrevista, aula, consulta, exame, evento, entrega com prazo. Converte datas relativas ("amanhã", "sexta") usando a data do e-mail.
@@ -11221,7 +11654,7 @@ const refresh = async (manual) => { if (busy || !ready()) { if (manual && !ready
   busy = ''; OS.request(); };
 const refreshLi = async (manual) => { if (busy || !ready()) return; busy = 'li'; err = ''; if (manual) OS.request();
   try { const items = await fetchQ(cfg().liq, 40); M.li = { at: Date.now(), items, sum: liGuess(items) };
-    if (aiOn() && items.length) { try { const o = await OS.AI.json([{ text: `Estes são e-mails de notificação do LinkedIn do ${OS.one('profile').short || 'Ryan'}. Extrai SÓ o que está nos e-mails (não inventes):
+    if (aiOn() && items.length) { try { const o = await OS.AI.json([{ text: `Estes são e-mails de notificação do LinkedIn de ${OS.who()}. Extrai SÓ o que está nos e-mails (não inventes):
 JSON {"resumo":"2 frases: o que vale a pena fazer no LinkedIn agora","mensagens":[{"de","texto":"máx. 20 palavras","id"}],"convites":[{"nome","cargo","id"}],"vagas":[{"titulo","empresa","local","id"}],"visualizacoes":número ou null,"publicacoes":[{"texto":"máx. 15 palavras","id"}]}
 E-mails: ${JSON.stringify(items.slice(0, 35).map(x => ({ id: x.id, assunto: x.s, data: x.d.slice(0, 10), inicio: x.sn.slice(0, 300) })))}` }], .1); M.li.sum = Object.assign(liGuess(items), o, { ai: true }); } catch (e) { err = 'IA: ' + (e.message || '') ; } }
     save(); } catch (e) { err = e.message || 'Não consegui ir buscar o LinkedIn.'; }
@@ -11335,7 +11768,7 @@ if (OS.Cal && OS.Cal.items) { OS.Cal.src.mail = ['E-mail', '#f59e0b']; const _it
 /* ---------- responder: o texto fica como rascunho no teu Gmail ---------- */
 const postTo = async (u, o) => { const r = await fetch(u, { method: 'POST', body: new URLSearchParams(Object.assign({ k: OS.one('inbox').key }, o)), credentials: 'omit', cache: 'no-store' }); const t = await r.text(); try { return JSON.parse(t); } catch (e) { return { ok: false, msg: t.slice(0, 160) }; } };
 const compose = async (it, instr) => { const p = OS.one('profile');
-  const o = await OS.AI.json([{ text: `Escreve a resposta de ${p.name || p.short || 'Ryan'} a este e-mail. Língua: a mesma do e-mail (se for português, usa o português de quem escreveu). Tom: educado, direto e humano; curto (2 a 6 frases). Termina com "${p.short || 'Ryan'}". Não inventes factos, datas ou compromissos que ele não disse.
+  const o = await OS.AI.json([{ text: `Escreve a resposta de ${p.name || OS.who()} a este e-mail. Língua: a mesma do e-mail (se for português, usa o português de quem escreveu). Tom: educado, direto e humano; curto (2 a 6 frases). Termina com "${OS.who()}". Não inventes factos, datas ou compromissos que ele não disse.
 O que ele quer dizer: ${instr || '(responde de forma adequada e prática)'}
 E-mail de ${it.f} · assunto: ${it.s}
 Texto: ${it.sn.slice(0, 900)}
@@ -11421,7 +11854,7 @@ const subjName = id => id === 'geral' ? 'Geral' : (OS.get('subjects', id) || {})
 // a IA arruma os que as regras não souberam (Google; se não der, a IA grátis de reserva)
 const aiSort = async () => { if (aiBusy || !OS.AI || !(OS.AI.key() || (OS.AI.freeOn && OS.AI.freeOn()))) return; const S = subs(); if (!S.length) return;
   const todo = L.items.filter(it => !(it.id in L.ai) && !C().map[it.id] && !C().snd[addr(it.f)] && !byRule(it)).slice(0, 25); if (!todo.length) return; aiBusy = true;
-  try { const o = await OS.AI.json([{ text: `Separa estes e-mails da faculdade do Ryan pela disciplina (matéria) a que dizem respeito. Disciplinas: ${JSON.stringify(S.map(s => ({ id: s.id, nome: s.name, professor: s.prof || '', palavras: s.mail || '' })))}.
+  try { const o = await OS.AI.json([{ text: `Separa estes e-mails da faculdade ${OS.whoCtx('do Ryan', 'de')} pela disciplina (matéria) a que dizem respeito. Disciplinas: ${JSON.stringify(S.map(s => ({ id: s.id, nome: s.name, professor: s.prof || '', palavras: s.mail || '' })))}.
 Se o e-mail não for de nenhuma disciplina (avisos gerais, secretaria, eventos, propinas…), usa "geral". Responde APENAS JSON: {"m":[{"id":"…","disc":"id da disciplina ou geral"}]}
 E-mails: ${JSON.stringify(todo.map(it => ({ id: it.id, de: it.f, assunto: it.s, inicio: String(it.sn || '').slice(0, 220) })))}` }], .1);
     (o.m || []).forEach(r => { if (r && r.id && todo.some(t => t.id === r.id)) L.ai[r.id] = r.disc === 'geral' || S.some(s => s.id === r.disc) ? r.disc : 'geral'; });
@@ -11532,7 +11965,7 @@ const W = OS.Weather = {};
 const CODES = { 0: 'céu limpo', 1: 'quase limpo', 2: 'parcialmente nublado', 3: 'nublado', 45: 'nevoeiro', 48: 'nevoeiro com geada', 51: 'chuvisco fraco', 53: 'chuvisco', 55: 'chuvisco forte', 56: 'chuvisco gelado', 57: 'chuvisco gelado', 61: 'chuva fraca', 63: 'chuva', 65: 'chuva forte', 66: 'chuva gelada', 67: 'chuva gelada forte', 71: 'neve fraca', 73: 'neve', 75: 'neve forte', 77: 'grãos de neve', 80: 'aguaceiros fracos', 81: 'aguaceiros', 82: 'aguaceiros fortes', 85: 'aguaceiros de neve', 86: 'aguaceiros de neve fortes', 95: 'trovoada', 96: 'trovoada com granizo', 99: 'trovoada forte com granizo' };
 W.desc = c => CODES[c] || 'tempo variável';
 W.kind = c => c === 0 || c === 1 ? 'sol' : c === 2 ? 'sol-nuvem' : c === 3 || c === 45 || c === 48 ? 'nuvem' : c >= 71 && c <= 86 && ![80, 81, 82].includes(c) ? 'neve' : c >= 95 ? 'trovoada' : 'chuva';
-W.city = () => (OS.one('profile').city || 'Aveiro').trim();
+W.city = () => (OS.one('profile').city || (OS.Acc && OS.Acc.pub ? 'Lisboa' : 'Aveiro')).trim();
 let data = U.ls.get(K, null), busy = null;
 const geo = async name => { const g = U.ls.get('os2wxgeo', null); if (g && g.n === name) return g;
   const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=pt&name=' + encodeURIComponent(name)), j = await r.json(), x = (j.results || [])[0];
@@ -11649,6 +12082,8 @@ E.stt = async b64 => { const lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
 OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false, ear: 'auto', pausa: 1.2, bargeS: true, alertVoz: false };
+// numa conta (versão pública) o Spyke começa calado: sem microfone sempre ligado nem modo Jarvis ao abrir (cada pessoa liga se quiser)
+if (OS.Acc && OS.Acc.pub) Object.assign(OS.ONE_DEF.spyke, { always: false, jarvisStart: false, morning: false, siri: false, fix3: 1, fix4: 1 });
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
@@ -11670,7 +12105,7 @@ const wakeSplit = raw => { const T = String(raw || '').split(/\s+/).filter(Boole
 // chamar é dizer o nome no início ou no fim da frase ("Spyke, …", "…, Spyke"); o nome perdido a meio de uma conversa (televisão, outras pessoas) não o chama
 const vocative = raw => { const T = String(raw || '').split(/\s+/).filter(Boolean), k = T.findIndex(x => WAKET.test(N(x).replace(/[^\w]/g, ''))); return k >= 0 && (k <= 3 || k >= T.length - 3); };
 S._vocative = vocative;
-const name = () => OS.one('profile').short || 'Ryan';
+const name = () => OS.one('profile').short || OS.who();
 const eurS = v => { const n = Math.abs(U.num(v)); return (Math.abs(n - Math.round(n)) < .005 ? Math.round(n) : n.toFixed(2).replace('.', ',')) + ' euros'; };
 const listS = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1];
 const dayS = d => U.parse(d).toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -12308,7 +12743,7 @@ S.morning = () => { const b = document.createElement('button'); b.type = 'button
 const U = OS.U;
 const B = OS.Brain = {};
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
-const who = () => OS.one('profile').short || 'Ryan';
+const who = () => OS.one('profile').short || OS.who();
 const today = () => U.today();
 const cut = (o, n = 6000) => { const s = typeof o === 'string' ? o : JSON.stringify(o); return s.length > n ? s.slice(0, n) + '…' : s; };
 const safe = f => { try { return f(); } catch (e) { return null; } };
@@ -12391,7 +12826,7 @@ const T = [
     run: a => { const r = OS.Spyke && OS.Spyke.findRoute ? OS.Spyke.findRoute(a.pagina) : null; if (!r) return 'Não encontrei essa página.'; location.hash = r[0]; return 'Abri ' + r[1] + '.'; } }];
 
 /* ---------- instruções ---------- */
-const system = () => `És o Spyke, o assistente pessoal do ${who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco. Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.
+const system = () => `És o Spyke, o assistente pessoal ${OS.Acc && OS.Acc.pub ? OS.whoCtx('', 'de') : 'do ' + who()} (estilo J.A.R.V.I.S.): pensas por ti, és direto, calmo, confiante e leal, com um toque de humor seco.${OS.Acc && OS.Acc.pub ? '' : ' Ele é brasileiro, vive em Aveiro (Portugal), estuda na universidade, trabalha e investe.'}
 Regras:
 - Responde SEMPRE em português do Brasil, para ser dito em voz alta: no máximo 3 ou 4 frases curtas, sem listas, sem markdown, sem emojis. Nunca digas o teu próprio nome.
 - Recebes um resumo atual com quase tudo da vida dele: se o resumo chega, responde logo (é mais rápido). Para detalhes que não estão lá, usa "consultar" (por área), "procurar_na_app" (procura em toda a app) ou "ler_area". Não inventes números nem factos.
@@ -12488,7 +12923,7 @@ const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
 const J = OS.Jarvis = {};
 const cfg = () => Object.assign({ jarvisStart: true }, OS.one('spyke'));
 let el = null, fab = null, raf = 0, dataAt = 0, newsX = 0, newsW = 0;
-const name = () => OS.one('profile').short || 'Ryan';
+const name = () => OS.one('profile').short || OS.who();
 const eur = v => U.eur(v);
 const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'; };
 
@@ -12979,7 +13414,7 @@ let busy = false, lastAI = 0;
 const aiOn = () => OS.AI && OS.AI.key && OS.AI.key();
 const aiScan = async (force) => { if (busy || !aiOn() || (!force && Date.now() - lastAI < 10 * 60e3)) return; const todo = sources().map(([it, info]) => [it, info]).filter(([it, info]) => it && it.id && !AI[it.id] && !(info && info.c === 'spam') && !NOT.test((it.s || '') + ' ' + (it.sn || ''))).slice(0, 25);
   if (!todo.length) return; busy = true; lastAI = Date.now(); const p = OS.one('profile');
-  try { const o = await OS.AI.json([{ text: `${p.short || 'Ryan'} é estudante no ISCA-UA (Aveiro, Portugal), trabalha e quer crescer na carreira (finanças, contabilidade, gestão, empreender). Hoje é ${U.today()}.
+  try { const o = await OS.AI.json([{ text: `${OS.Acc && OS.Acc.pub ? OS.whoCtx('') + ' quer crescer na carreira.' : (p.short || 'Ryan') + ' é estudante no ISCA-UA (Aveiro, Portugal), trabalha e quer crescer na carreira (finanças, contabilidade, gestão, empreender).'} Hoje é ${U.today()}.
 Destes e-mails (Gmail e notificações do LinkedIn), diz quais trazem uma OPORTUNIDADE concreta para ele: vaga, estágio, bolsa, curso, certificação, evento, palestra, competição, programa universitário, mentoria ou negócio.
 Não contes: publicidade genérica, faturas, segurança, convites para ligar, quem viu o perfil, reações e newsletters sem nada concreto.
 Para cada e-mail: {"id","ok":true/false,"titulo":"nome curto da oportunidade","instituicao":"quem oferece","tipo":"Curso|Certificação|Evento|Palestra|Programa universitário|Estágio|Emprego|Projeto|Competição|Networking|Bolsa|Negócio","prazo":"AAAA-MM-DD ou null","porque":"porque lhe interessa, máx. 14 palavras"}
@@ -13136,7 +13571,7 @@ function decDrawer(id) {
   const ar = alphaRes(d.alpha, Math.max(0, ...alts.map(a => U.num(a.cost))));
   UI.drawer(`<div class="drw-h"><div><div class="eyebrow">Decisão · ${esc(d.status)}</div><h3>${esc(d.title)}</h3></div><div class="row gap4"><button class="btn sm ghost" data-edit="decisions:${d.id}">${UI.ic('edit')}Editar</button><button type="button" class="icon-btn" data-close aria-label="Fechar">${UI.ic('x')}</button></div></div>
   <div class="drw-b">${d.context ? `<p class="tx2" style="margin:0">${esc(d.context)}</p>` : ''}
-    <div><div class="eyebrow" style="margin-bottom:8px">Filtro Alpha (as tuas 5 perguntas)</div>${ALPHA.map((q, i) => `<div class="row between gap8" style="padding:5px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${i + 1}. ${q}</span>${UI.seg('x', [['Sim', 'Sim'], ['Não', 'Não']], (d.alpha || {})['q' + i]).replace(/data-ui="x"/g, `data-alpha="${d.id}" data-q="q${i}"`)}</div>`).join('')}<div class="row gap8" style="margin-top:8px">${UI.badge(ar[0], ar[1])}<span class="mut" style="font-size:12px">Regra: emoção = Sim, ou qualquer outra = Não → esperar 24 h. Dinheiro acima de € 50 → esperar 3 dias.</span></div></div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Filtro Alpha (as tuas 5 perguntas)</div>${ALPHA.map(OS.my).map((q, i) => `<div class="row between gap8" style="padding:5px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${i + 1}. ${q}</span>${UI.seg('x', [['Sim', 'Sim'], ['Não', 'Não']], (d.alpha || {})['q' + i]).replace(/data-ui="x"/g, `data-alpha="${d.id}" data-q="q${i}"`)}</div>`).join('')}<div class="row gap8" style="margin-top:8px">${UI.badge(ar[0], ar[1])}<span class="mut" style="font-size:12px">Regra: emoção = Sim, ou qualquer outra = Não → esperar 24 h. Dinheiro acima de € 50 → esperar 3 dias.</span></div></div>
     <div><div class="row between"><div class="eyebrow">Alternativas lado a lado</div><button class="btn sm" data-act="altAdd" data-id="${d.id}">${UI.ic('plus')}Alternativa</button></div>
     ${alts.length ? `<div class="tblw" style="margin-top:8px"><table class="tbl matrix"><thead><tr><th>Critério</th><th>Peso</th>${alts.map((a, i) => `<th><input value="${esc(a.name || '')}" data-alt="${d.id}" data-i="${i}" data-k="name" placeholder="Alternativa ${i + 1}" aria-label="Nome da alternativa ${i + 1}"></th>`).join('')}</tr></thead><tbody>
       ${CRIT.map(([k, l, t2, up]) => `<tr><td>${l}<div class="mut" style="font-size:11px">${up ? 'mais é melhor' : 'menos é melhor'}</div></td><td><select data-wt="${d.id}" data-k="${k}" aria-label="Peso ${l}">${[0, 1, 2, 3, 4, 5].map(n => `<option${+w[k] === n ? ' selected' : ''}>${n}</option>`).join('')}</select></td>${alts.map((a, i) => `<td class="${best[k] != null && a[k] !== '' && a[k] != null && +a[k] === best[k] ? 'best' : ''}">${t2 === 'r' ? `<select data-alt="${d.id}" data-i="${i}" data-k="${k}" aria-label="${l}"><option value="">—</option>${[1, 2, 3, 4, 5].map(n => `<option${+a[k] === n ? ' selected' : ''}>${n}</option>`).join('')}</select>` : `<input type="number" step="any" value="${a[k] ?? ''}" data-alt="${d.id}" data-i="${i}" data-k="${k}" aria-label="${l}">`}</td>`).join('')}</tr>`).join('')}
@@ -13166,9 +13601,9 @@ const decCtx = d => { const L = [], add = (k, v) => { if (v) L.push(k + ': ' + v
   add('Decisão', d.title); add('Contexto', d.context); add('Decidir até', d.deadline); add('Estado', d.status);
   (d.alts || []).forEach((a, i) => add('Alternativa ' + (i + 1), [a.name || 'sem nome'].concat(CRIT.filter(([k]) => a[k] !== '' && a[k] != null).map(([k, l]) => l + ' = ' + a[k]), a.notes ? ['notas: ' + a.notes] : []).join('; ')));
   add('Pesos que ele deu (0–5)', CRIT.map(([k, l]) => l + ' ' + Object.assign({}, W0, d.weights || {})[k]).join(', '));
-  add('Filtro Alpha', ALPHA.map((q, i) => q + ' ' + ((d.alpha || {})['q' + i] || 'sem resposta')).join(' | '));
+  add('Filtro Alpha', ALPHA.map(OS.my).map((q, i) => q + ' ' + ((d.alpha || {})['q' + i] || 'sem resposta')).join(' | '));
   return L.join('\n'); };
-const who = () => OS.one('profile').short || 'Ryan';
+const who = () => OS.one('profile').short || OS.who();
 const decPrompt = (d, task) => [{ text: `És o Spyke, o assistente pessoal do ${who()}. Ajudas a pensar uma decisão importante: és honesto, concreto e usas os dados dele; não decides por ele. Escreve em português claro (de Portugal), sem emojis, frases curtas.
 DECISÃO:
 ${decCtx(d)}
@@ -13293,7 +13728,7 @@ A.evoAI = async () => { if (EVAI.busy) return; if (!(OS.AI && (OS.AI.key() || (O
   EVAI.busy = true; EVAI.err = ''; OS.request(); const by = evoData();
   const lines = Object.values(by).map(x => `${x.m.l}: hoje ${x.v[0] == null ? '—' : x.m.fmt(x.v[0])} | 30 dias ${x.v[1] == null ? '—' : x.m.fmt(x.v[1])} | 3 meses ${x.v[2] == null ? '—' : x.m.fmt(x.v[2])} | 1 ano ${x.v[3] == null ? '—' : x.m.fmt(x.v[3])}`).join('\n');
   const goals = OS.all('goals').filter(g => g.status === 'Ativa').map(g => { const i = Goal.info(g); return `${g.title} (${g.horizon || ''}): ${Math.round(i.p * 100)}%${i.exp != null ? ', esperado ' + Math.round(i.exp * 100) + '%' : ''}${i.late ? ', atrasada' : i.behind ? ', atrás do ritmo' : ''}`; }).join('\n');
-  try { const r = await OS.AI.json([{ text: `És o Spyke, o assistente do ${OS.one('profile').short || 'Ryan'}. Analisa a EVOLUÇÃO dele em todas as áreas da vida (desporto, estudos, carreira, dinheiro, hábitos, metas), com honestidade e números. Português de Portugal, sem emojis.
+  try { const r = await OS.AI.json([{ text: `És o Spyke, o assistente de ${OS.who()}. Analisa a EVOLUÇÃO dele em todas as áreas da vida (desporto, estudos, carreira, dinheiro, hábitos, metas), com honestidade e números. Português de Portugal, sem emojis.
 MÉTRICAS (hoje vs 30 dias, 3 meses e 1 ano atrás):
 ${lines}
 METAS ATIVAS:
@@ -13609,7 +14044,7 @@ const ctx = () => { const { out } = build(), n = OS.one('northstar'), p = OS.one
     passos_atuais: Object.fromEntries(Object.entries(out).map(([k, L]) => [k, L.filter(s => !s.ai).slice(0, 10).map(s => ({ nivel: s.lv, passo: s.t }))])),
     perfil: { curso: p.course || p.uni, trabalho: p.employer, cidade: 'Aveiro' } }).slice(0, 12000); };
 A.lpAI = async () => { if (busy) return; busy = true; OS.request();
-  try { const o = await OS.AI.json([{ text: `És o Spyke, o mentor pessoal do Ryan (brasileiro, vive em Aveiro, estuda, trabalha e investe). Com base nos dados reais abaixo, cria o plano de próximos passos da vida dele para alcançar as metas e a estrela-guia.
+  try { const o = await OS.AI.json([{ text: `És o Spyke, o mentor pessoal ${OS.whoCtx('do Ryan (brasileiro, vive em Aveiro, estuda, trabalha e investe)', 'de')}. Com base nos dados reais abaixo, cria o plano de próximos passos da vida dele para alcançar as metas e a estrela-guia.
 Regras: para cada área (estudos, dinheiro, corpo, carreira, pessoal) dá 3 a 6 passos NOVOS (não repitas os "passos_atuais"), do mais pequeno ao maior, concretos e acionáveis, em português de Portugal. Nível: 1 = hoje (pequeno), 2 = esta semana, 3 = este mês, 4 = este ano, 5 = longo prazo. Se uma área não tiver metas, sugere passos para começar.
 Responde APENAS JSON: {"foco":"1 frase: o que mais importa agora","passos":[{"area":"estudos|dinheiro|corpo|carreira|pessoal","nivel":1,"passo":"…","porque":"ligação à meta ou à visão (curto)"}]}
 DADOS: ${ctx()}` }], .4);
@@ -15688,7 +16123,7 @@ V.visao = () => {
       <div class="dc-rows"><div><span>Próximo turno</span><b>${W.nx ? (W.nx.date === t ? 'hoje' : U.rel(W.nx.date)) + ' ' + esc(W.nx.start || '') + (W.nx.place ? ' · ' + esc(W.nx.place) : '') : '—'}</b></div><div><span>Próxima folga</span><b>${W.off ? (W.off.date === t ? 'hoje' : U.fmtDS(W.off.date)) : '—'}</b></div><div><span>Tarefas · projetos de trabalho</span><b class="mono">${W.tasks} · ${W.proj}</b></div>${W.rate ? `<div><span>Valor por hora</span><b class="mono">${U.eur(W.rate)}</b></div>` : ''}</div>`, { cls: 'span4', act: more('trabalho', 'Trabalho') }) : '';
   const P = safe(() => OS.PainelParts(), null), part = k => (P && P[k]) || '';
   return `<div class="dash">
-  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || 'Ryan')}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
+  <div class="dash-top"><div><div class="eyebrow">${U.longDate(t)}</div><h1>${greet()}, ${esc(p.short || OS.who())}</h1>${part('summary').replace('<p>', '<p class="dash-sum">')}</div>
     <div class="dash-ctl">${R.per === 'mes' ? `<div class="dash-month"><button class="icon-btn" data-act="dashYM" data-d="-1" aria-label="Mês anterior">${UI.ic('left')}</button><b>${R.label}</b><button class="icon-btn" data-act="dashYM" data-d="1" aria-label="Mês seguinte" ${R.ym >= U.ym(t) ? 'disabled' : ''}>${UI.ic('right')}</button></div>` : `<div class="dash-month"><b>${R.label}</b></div>`}
       <div class="dash-seg" role="group">${per.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="dashPer" data-p="${k}">${l}</button>`).join('')}</div></div>${sky()}</div>
   ${part('life')}
@@ -15733,7 +16168,7 @@ OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
   return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3></div>
     <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Náutilo sempre no Gasto rápido neste aparelho</label>
     <div class="list" style="margin-top:10px"><div class="li"><div class="li-t"><b>iPhone: registar sem abrir a app</b><small>Um atalho no Centro de Controlo pede o valor e a descrição e grava direto. Os gastos entram sozinhos.</small></div><div class="li-r"><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></div></div>
-    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>`; };
+    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>${OS.Acc && OS.Acc.on && OS.Acc.atalhoPanel && !(OS.one('inbox').url && OS.one('inbox').key) ? OS.Acc.atalhoPanel() : ''}`; };
 OS.forms = OS.forms || {};
 OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 0)) { UI.toast('Escreve o valor', 'warn'); return; }
   const cat = (f.querySelector('input[name=cat]:checked') || {}).value || '', account = (f.querySelector('input[name=acc]:checked') || {}).value || '';
@@ -16311,7 +16746,11 @@ const goldOf = st => { const c = counts(st); let g = st.mis.gold + st.H.l * 25; 
 
 /* ================= CODEX (os teus marcos por pilar: o Notion original atualizado com o Dominus 2.0) =================
    A lista é tua: podes tirar marcos que já não fazem sentido e acrescentar novos. Cada marco feito guarda o texto e o dia. */
-const LEG = {"int":["Passar a Introdução à Contabilidade com nota ≥ 14","Passar a Informática Organizacional com nota ≥ 14","Excel intermédio (tabelas dinâmicas, PROCV/XLOOKUP)","Rotina de estudo de 90 dias sem falhar 2 dias seguidos","Inglês B2 certificado","Ler 12 livros num ano","Fechar o 1.º ano sem nenhuma cadeira em atraso","Iniciar Python para análise de dados","Publicar 15 textos/análises online","Média do ano ≥ 15","Estruturar rotina inegociável (sono, treino, foco profundo)","Consolidar o controlo da ansiedade (sistema anti-burnout)","Criar portfólio intelectual online","Contabilidade Financeira 1 e 2 com nota ≥ 15","Dominar Estatística e Métodos Quantitativos","Fundamentos de Macroeconomia acima da média","Excel avançado (modelos financeiros, Power Query)","Power BI aplicado (Business Intelligence)","Ler 25 livros num ano","Publicar 40 textos analíticos","Concluir um curso de finanças online com certificado","Dominar renda fixa e macro aplicada","Projeto completo em Python com dados reais","Inglês C1","Construir networking académico estratégico (professores e investigadores)","Estágio em contabilidade, auditoria ou finanças","Dominar Fiscalidade e Direito Fiscal portugueses","Dominar Análise Financeira e Finanças Empresariais","Ler Macroeconomics integralmente","Estudar profundamente política monetária","Publicar artigo técnico estruturado","Concluir a licenciatura no ISCA-UA com média ≥ 15","Inscrever-se na Ordem dos Contabilistas Certificados (estágio OCC)","Passar no exame da OCC (Contabilista Certificado)","Dominar econometria básica","Publicar 80 textos autorais","Iniciar mestrado competitivo (Finanças ou Economia)","Publicar artigo académico nacional","Iniciar o estudo de espanhol","Trabalhar em área macro, financeira ou institucional","Publicar 120 textos analíticos","Espanhol intermédio","Concluir o mestrado com destaque","Publicar o primeiro livro técnico","Iniciar doutoramento estratégico","Publicar artigo internacional","Inglês C2","Atuar num órgão estratégico (Banco de Portugal, BCE ou Banco Central)","Espanhol fluente","Publicar investigação original relevante","Iniciar o estudo de francês","Concluir o doutoramento com tese relevante","Tornar-se professor universitário","Publicar segundo livro (macro estratégica)","Tornar-se referência nacional emergente","Francês intermédio","Influenciar decisões técnicas institucionais","Iniciar estudo estruturado de mandarim","Criar núcleo de investigação próprio","Professor de destaque numa grande universidade","Publicar obra de impacto nacional","Mandarim intermédio funcional","Participar na formulação de políticas públicas","Criar think tank formal","Tornar-se conselheiro económico estratégico","Publicar obra traduzida internacionalmente","Orientar doutorandos de excelência","Expandir o think tank internacionalmente","Iniciar estudo formal de Libras (ou Língua Gestual Portuguesa)","Tornar-se referência continental","Libras para comunicação funcional","Assumir cargo institucional de alto impacto","Influenciar reformas estruturais","Estruturar fundo patrimonial educacional","Consolidar escola própria de pensamento económico","Publicar a obra-síntese do teu pensamento","Estruturar o projeto de universidade própria","Reunir corpo docente de elite","Criar modelo académico inovador","Formalizar a fundação da universidade","Universidade reconhecida nacionalmente","Centro avançado de investigação macroeconómica","Programa de formação de líderes públicos","Universidade financeiramente autossustentável","Reconhecimento internacional da universidade","Formar sucessores intelectuais","Obras adotadas como referência académica","Escola intelectual consolidada","Influência estrutural permanente no país","Legado académico consolidado","Instituições a funcionar sem depender de ti","Produzir a obra final definitiva","Mentorar jovens líderes estratégicos","Influência contínua em políticas públicas","Universidade expandida internacionalmente","Apresentar trabalho académico numa conferência","Ser convidado para júri ou banca académica","Biblioteca pessoal de 1.000 livros","Nome consolidado como arquiteto de sistemas económicos","Legado intelectual e institucional além da tua geração"],"for":["Orçamento mensal feito e seguido por 3 meses","Cortar 20–30% dos gastos supérfluos","Fundo de emergência de € 1.000","Poupar automaticamente 20% de tudo o que entra","Conseguir fonte de renda (trabalho ou serviço próprio)","Primeiro cliente pago do serviço","Abrir atividade nas Finanças e emitir o 1.º recibo","Abrir conta numa corretora","Investir os primeiros € 500 (ex.: ETF/Certificados de Aforro)","Fundo de emergência de 3 meses de despesas","Património investido de € 5.000","Iniciar estudos para certificação financeira","Obter a primeira certificação financeira","Investir os primeiros € 1.000","Iniciar aportes mensais regulares","Iniciar estudos para certificação avançada","Estágio em banco/corretora","Investir em ações e fundos imobiliários","Atingir património investido de € 10.000","Criar portfólio diversificado inicial","Reinvestir todos os dividendos","Construir reserva de emergência de 6 meses","Aumentar aportes mensais","Atingir património líquido de € 25.000","Obter certificação avançada","Estudar valuation e análise de balanços","Investir 10.000 adicionais em ações","Atingir património líquido de € 50.000","Expandir investimentos para ETFs internacionais","Criar fundo de oportunidades","Aumentar aportes para 2.000/mês","Atingir património de € 75.000","Iniciar preparação para CFA Level I","Construir portfólio internacional de 20.000","Criar fundo seed money para empresa","Atingir património de € 100.000","Criar plano estratégico formal da Crumbel Royal","Realizar estudo de viabilidade","Validar modelo de negócio","Definir proposta de valor","Estruturar plano financeiro da empresa","Definir modelo societário","Registar a empresa","Obter número fiscal da empresa","Abrir conta bancária empresarial","Separar finanças pessoais e empresariais","Criar contrato social estruturado","Definir capital social inicial","Estruturar contabilidade e regime tributário","Criar marca, identidade visual e posicionamento","Lançar oficialmente a Crumbel Royal","Alcançar faturamento mensal de 10.000","Gerar lucro mensal de 3.000","Reinvestir 50–70% do lucro","Criar KPIs e indicadores de desempenho","Contratar primeiro colaborador estratégico","Criar processo operacional padronizado","Criar fundo de expansão","Atingir património pessoal de € 250.000","Expandir portfólio para 200.000 investidos","Construir fluxo de caixa passivo de 2.000/mês","Concluir CFA Level I","Atingir património de € 500.000","Expandir empresa para outro mercado","Faturamento anual > 500.000","Lucro anual > 150.000","Criar holding patrimonial","Separar ativos pessoais na holding","Investir 200.000 em ETFs e fundos imobiliários","Criar fundo de aquisições","Atingir património líquido de € 1.000.000","Fluxo de caixa passivo de 10.000/mês","Faturamento anual da empresa > 1.000.000","Lucro anual > 300.000","Investir em startups","Expandir equipa executiva","Criar conselho consultivo","Expandir para novos produtos/serviços","Património líquido de € 2.500.000","Investimentos internacionais > 500.000","Fluxo de caixa passivo total de 25.000/mês","Expandir Crumbel Royal internacionalmente","Faturamento anual > 5.000.000","Lucro anual > 1.500.000","Património líquido > € 5.000.000","Comprar fazenda estratégica","Estruturar equipa agrícola","Implementar produção rentável","Gerar renda da fazenda de 10.000/mês","Integrar fazenda à holding","Fluxo de caixa passivo total > 50.000/mês","Património líquido > € 20.000.000","Faturamento empresa > 10.000.000/ano","Lucro > 3.000.000/ano","Criar fundo próprio de investimentos","Investir em private equity global","Estruturar fundo fiduciário familiar","Fluxo de caixa passivo > 500.000/mês","Património líquido > € 100.000.000","Tornar-se bilionário, com empresa global, fazenda lucrativa e fundo patrimonial intergeracional"],"cor":["Dormir 7h30–8h por 90 dias seguidos","Acordar à mesma hora por 60 dias","Check-up completo no Centro de Saúde","Treinar 4x/semana durante 3 meses","80% de alimentação limpa por 90 dias","Correr 5 km < 25 min","Correr 5 km < 22 min","Postura corrigida (core + lombar fortes)","Ganhar 3 kg de massa magra","1 prova oficial de 10 km","Vitamina D entre 40–60 ng/mL","Testosterona total > 600 ng/dL","Glicemia de jejum < 90 mg/dL","PCR < 1.0 mg/L","Pressão arterial < 12×8","FC de repouso < 60 bpm","Atualizar grau da visão e manter acuidade 100%","Reduzir tempo de ecrã noturno < 1h/dia por 60 dias","Exercícios visuais 5×/semana","Avaliar escoliose/hipercifose","Consultar alergologista; melhorar nariz e visão","Reduzir crises alérgicas em 80%","Beber 35 ml/kg de água por dia","Manter exames ideais por 6 meses","Reduzir gordura corporal para 15%","Reduzir gordura corporal para 12%","Manter 12–14% por 12 meses","Ganhar 4–5 kg de massa magra","Ombros +15 cm da cintura","Abdómen visível contraído","Abdómen parcialmente visível relaxado","Manter peso estável por 6 meses","Fotos comparativas anuais","Pele saudável, rotina de skincare","Ajuste da estética dental","Presença corporal confiante","Energia estável diariamente","Correr 5 km < 20 min","Correr 10 km < 45 min","VO2max > 55 ml/kg/min","Correr 15 km contínuos","Meia maratona (21 km)","Meia maratona < 1h40","Recuperar FC < 120 bpm em 2 min pós-esforço","1 ano de corrida sem lesão","FC de repouso < 55 bpm","Correr 25 km contínuos","Correr 30 km contínuos","Volume semanal de 50 km sustentado","Completar maratona (42,2 km)","Escolher um desporto olímpico (voleibol)","Iniciar treino técnico formal","Aprender fundamentos: passe, saque, ataque","Treinar 3×/semana com equipa local","Melhorar salto vertical > 50 cm","Treinar resistência específica 2×/semana","Jogar 10 partidas amistosas","Participar em campeonatos regionais","Ser selecionado para equipa regional","Tempo de reação e agilidade < 0,3 s","Treinar estratégia tática semanalmente","Ser convocado para competição nacional","Participar em seleção de pré-olímpico","Ser medalhista nacional","Participar nos Jogos Olímpicos","Aprender 3 estilos de natação e surfar","Nadar 1 km contínuo","Nadar 2 km contínuos","Nadar 3 km contínuos","Travessia de 2 km em águas abertas","Pedalar 40 km contínuos","Pedalar 80 km contínuos","Pedalar 120 km contínuos","Pedalar 150 km contínuos","Integrar pedal + corrida no mesmo treino","Triathlon sprint","Triathlon olímpico","Meio Ironman (70.3)","70.3 abaixo de 6 h","Treino simulado > 6 h","Ajuste de composição corporal","Controlo de hidratação e nutrição","Recuperar totalmente em 21 dias","Completar Ironman oficial","Ironman < 12 h","Idade biológica 5 anos abaixo da cronológica","Manter gordura corporal 10–12% sustentável","Manter massa muscular após os 40","Manter VO2max acima da média após os 40","Manter densidade óssea alta","Chegar aos 40 a correr 10 km < 45 min","Chegar aos 50 a correr 5 km < 25 min","Chegar aos 60 independente fisicamente","Chegar aos 70 a caminhar 5 km sem limitação","Mobilidade completa após os 60","Memória e cognição elevadas","Exames clínicos ideais por 10 anos seguidos","Sem doenças metabólicas","Prática desportiva ativa até idade avançada","Viver o máximo possível com autonomia, força, energia e lucidez"],"inf":["5 contactos estratégicos em Aveiro","LinkedIn completo (foto, resumo, conquistas)","Entrar numa associação/núcleo de estudantes do ISCA-UA","1 evento de networking por mês durante 3 meses","Falar com 3 professores fora da aula","30 dias a ouvir sem interromper","Apresentação pessoal de 5 min treinada e gravada","10 recomendações/endossos no LinkedIn","Criar grupo de estudo","Apresentar um projeto para 20+ pessoas","Conectar-se com 10 pessoas novas num mês","Publicar 1 post de valor no LinkedIn","Obter feedback positivo de 2 colegas sobre comunicação","Rotina de follow-up semanal com 5 contactos","Mapear 20 pessoas influentes na tua cidade","Participar em 1 grupo online de interesse profissional","Falar em público para grupos de 10 pessoas com confiança","Um reconhecimento genuíno por dia durante 30 dias","Dominar técnicas básicas de persuasão (rapport, espelhamento)","Analisar 5 líderes e documentar padrões","Criar identidade pessoal clara (propósito + valores)","Conectar-se com 2 pessoas de empresas ou instituições desejadas","Ter 50 contactos estratégicos ativos","Fazer 5 colaborações pequenas","Participar em 3 eventos universitários ou de negócios","Realizar 5 apresentações formais de 10 minutos","Obter 5 recomendações de mentores ou professores","Criar mailing list com 50 contactos estratégicos","Conectar-se com 5 alumni de universidades de interesse","Publicar conteúdo de valor 2× por semana","Manter contacto com 20 pessoas-chave semanalmente","Participar em 2 debates académicos","Participar em 2 projetos colaborativos com impacto visível","Mentorar 2 colegas informalmente","Ser recomendado publicamente por 3 pessoas-chave","Obter feedback estruturado sobre comunicação e presença","Participar em 3 reuniões estratégicas com líderes locais","Mini-projeto com +30 pessoas impactadas","Melhorar persuasão e negociação com 10 exercícios práticos","Conectar-se com 10 contactos estratégicos de empresas ou bancos","Ter 100 contactos estratégicos ativos","Ser convidado a palestrar num evento universitário ou de startups","Criar workshop próprio com 20–50 participantes","Publicar 1 artigo educativo por mês","Participar em 2 competições académicas ou empresariais","+5 recomendações públicas no LinkedIn","Ser referência numa comunidade local","Mailing list com 100 contactos","Mentorar formalmente 3–5 pessoas","Dar 1 palestra formal para 50+ pessoas","Participar em 3 projetos colaborativos de impacto nacional","Criar parceria estratégica entre 2 organizações","Ser citado ou recomendado por um líder nacional","Liderar projeto com +50 pessoas impactadas","Participar em 5 conferências nacionais","Rotina de conexão semanal com 20–30 líderes","Ser reconhecido como solucionador de problemas na rede","Publicar artigo com >1.000 visualizações","+10 recomendações públicas de líderes","Convite para evento internacional de networking","Ter 250 contactos estratégicos ativos em 2 países","Participar em conferência internacional","Ser palestrante em painel internacional com 100+ pessoas","5 mentorias formais de especialistas internacionais","Mentorar 5–10 pessoas de outros países","Conteúdo com alcance internacional (5.000+ visualizações)","Projeto colaborativo internacional (10–50 pessoas)","Reconhecimento público de uma autoridade global","Convite para podcast internacional","Rede de mastermind global de 20–50 líderes","Participar em reuniões estratégicas de alto impacto","+20 recomendações públicas de líderes internacionais","Influenciar decisões em projetos internacionais","Programa de mentorias internacional estruturado","Ter +500 contactos estratégicos ativos","Ser referência num fórum global da tua área","Colaboração internacional com +100 pessoas impactadas","Conteúdo com engajamento global (>10.000 visualizações)","Menção numa publicação internacional","Convite para aconselhar organizações globais","Liderar projeto de grande impacto com 50–100 pessoas","Ter +1.000 contactos estratégicos ativos","Mentorar 10–20 líderes emergentes","Ser citado em media especializada global","Programa de networking/mentoria para jovens talentos","3–5 colaborações estratégicas internacionais","Conselheiro de uma organização de relevância global","+50 recomendações públicas","Influenciar decisões estratégicas de empresas, governos ou ONG","Metodologia própria reconhecida internacionalmente","Referência consolidada em fóruns internacionais","Rede de mentores em 3 continentes","Impacto mensurável em +500 pessoas","Palestrante num evento global de +1.000 pessoas","Publicar livro de referência na tua área","Rede global envolvida em projetos estratégicos","Ser citado por autoridades globais como referência","Legado institucional ligado à tua autoridade","Influenciar políticas de alto impacto","Deixar um legado global de influência que dure décadas"],"esp":["Oração da manhã 7 dias seguidos","Ler 1 capítulo da Bíblia por dia durante 7 dias","3 gratidões escritas por dia durante 7 dias","1 hora sem telemóvel (silêncio) 7 dias seguidos","Oração da manhã 30 dias seguidos","30 dias de gratidão seguidos","Ler um livro bíblico inteiro","Ler os 4 Evangelhos","Encontrar uma igreja em Aveiro e ir com regularidade","Oração de manhã e à noite durante 30 dias","Memorizar 10 versículos","Ler Provérbios inteiro (um capítulo por dia)","Ler os Salmos inteiros","Primeiro jejum de um dia com propósito","Concluir um plano de leitura de 90 dias","Devocional diário durante 60 dias","Ler o Novo Testamento completo","Diário espiritual com 100 reflexões escritas","Participar num grupo de estudo bíblico","Servir num ministério ou voluntariado da igreja","Ajudar alguém em necessidade sem que ninguém saiba","Ofertar ou dizimar com regularidade durante 6 meses","Ler 3 clássicos cristãos (C. S. Lewis, Tozer, Bonhoeffer…)","Retiro espiritual de um fim de semana","Memorizar 30 versículos","Oração e leitura diárias durante 100 dias seguidos","Perdoar alguém de quem guardavas mágoa","Pedir perdão a alguém que magoaste","Ler a Bíblia inteira","Jejum de 3 dias","Partilhar a tua fé com um amigo","Levar alguém à igreja","Domingo de descanso sem ecrãs durante 3 meses","Ler os livros de sabedoria (Jó, Salmos, Provérbios, Eclesiastes)","365 dias de gratidão escrita","Estudar Romanos em profundidade","Fazer um curso de teologia básica","Liderar um grupo de estudo bíblico","Ser mentor de alguém mais novo na fé","Ler a Bíblia inteira pela segunda vez","Uma semana de missão ou voluntariado","Doar 10% do rendimento durante um ano inteiro","Memorizar 100 versículos","Escrever o teu testemunho de fé","Partilhar o testemunho em público","Oração diária durante 365 dias","Ler 12 livros cristãos num ano","Estudar a história da Igreja","Visitar a Terra Santa","Ler a Bíblia inteira noutra língua","Fazer uma mensagem ou pregação num culto ou grupo","Discipular 3 pessoas","Servir com regularidade durante 3 anos","Criar um projeto social ligado à fé","Apoiar um missionário com regularidade","Curso de teologia avançado","Escrever um devocional de 30 dias","Publicar o devocional","Ler a Bíblia inteira 3 vezes","Construir uma família com a fé no centro","Culto ou oração em família todas as semanas","Ensinar a fé à geração seguinte","Doar 15% do rendimento","Financiar uma igreja ou escola num lugar carente","Liderar uma missão internacional","Criar bolsas de estudo para jovens carentes","Ética inegociável em todos os negócios","Ser conhecido como homem de palavra","Mentorar 10 jovens líderes cristãos","Escrever um livro sobre fé e disciplina","Criar uma fundação filantrópica com propósito cristão","Programa de apoio a imigrantes recém-chegados","Ler as Confissões de Santo Agostinho","Caminho de Santiago (ou peregrinação) em oração","Oração e leitura diárias durante 5 anos","Doar 20% do rendimento","Apoiar 10 missionários","Construir uma escola ou centro comunitário","Família com tradição de fé consolidada","Ler a Bíblia inteira 5 vezes","Ensinar ética e fé num curso","Fundação a financiar 100 bolsas","Impacto social mensurável em +1.000 pessoas","Discipulado em 3 países","Valores cristãos no centro da universidade própria","Livro de fé publicado e traduzido","Fé que atravessa crises sem ruir","Paz interior estável em qualquer circunstância","Ler a Bíblia inteira 10 vezes","Legado de generosidade na família","Obras de caridade a funcionar sem ti","Mentor espiritual de líderes","Fundo perpétuo de missões","Ser lembrado pela bondade, não pela riqueza","Viver de acordo com o que acreditas, todos os dias","Os teus filhos e netos a caminhar na fé","Uma vida de oração até ao fim","Combater o bom combate e guardar a fé (2 Tm 4:7)","Deixar um legado espiritual que dure gerações","Ouvir \"Muito bem, servo bom e fiel\""]};
+const LEG0 = {"int":["Passar a Introdução à Contabilidade com nota ≥ 14","Passar a Informática Organizacional com nota ≥ 14","Excel intermédio (tabelas dinâmicas, PROCV/XLOOKUP)","Rotina de estudo de 90 dias sem falhar 2 dias seguidos","Inglês B2 certificado","Ler 12 livros num ano","Fechar o 1.º ano sem nenhuma cadeira em atraso","Iniciar Python para análise de dados","Publicar 15 textos/análises online","Média do ano ≥ 15","Estruturar rotina inegociável (sono, treino, foco profundo)","Consolidar o controlo da ansiedade (sistema anti-burnout)","Criar portfólio intelectual online","Contabilidade Financeira 1 e 2 com nota ≥ 15","Dominar Estatística e Métodos Quantitativos","Fundamentos de Macroeconomia acima da média","Excel avançado (modelos financeiros, Power Query)","Power BI aplicado (Business Intelligence)","Ler 25 livros num ano","Publicar 40 textos analíticos","Concluir um curso de finanças online com certificado","Dominar renda fixa e macro aplicada","Projeto completo em Python com dados reais","Inglês C1","Construir networking académico estratégico (professores e investigadores)","Estágio em contabilidade, auditoria ou finanças","Dominar Fiscalidade e Direito Fiscal portugueses","Dominar Análise Financeira e Finanças Empresariais","Ler Macroeconomics integralmente","Estudar profundamente política monetária","Publicar artigo técnico estruturado","Concluir a licenciatura no ISCA-UA com média ≥ 15","Inscrever-se na Ordem dos Contabilistas Certificados (estágio OCC)","Passar no exame da OCC (Contabilista Certificado)","Dominar econometria básica","Publicar 80 textos autorais","Iniciar mestrado competitivo (Finanças ou Economia)","Publicar artigo académico nacional","Iniciar o estudo de espanhol","Trabalhar em área macro, financeira ou institucional","Publicar 120 textos analíticos","Espanhol intermédio","Concluir o mestrado com destaque","Publicar o primeiro livro técnico","Iniciar doutoramento estratégico","Publicar artigo internacional","Inglês C2","Atuar num órgão estratégico (Banco de Portugal, BCE ou Banco Central)","Espanhol fluente","Publicar investigação original relevante","Iniciar o estudo de francês","Concluir o doutoramento com tese relevante","Tornar-se professor universitário","Publicar segundo livro (macro estratégica)","Tornar-se referência nacional emergente","Francês intermédio","Influenciar decisões técnicas institucionais","Iniciar estudo estruturado de mandarim","Criar núcleo de investigação próprio","Professor de destaque numa grande universidade","Publicar obra de impacto nacional","Mandarim intermédio funcional","Participar na formulação de políticas públicas","Criar think tank formal","Tornar-se conselheiro económico estratégico","Publicar obra traduzida internacionalmente","Orientar doutorandos de excelência","Expandir o think tank internacionalmente","Iniciar estudo formal de Libras (ou Língua Gestual Portuguesa)","Tornar-se referência continental","Libras para comunicação funcional","Assumir cargo institucional de alto impacto","Influenciar reformas estruturais","Estruturar fundo patrimonial educacional","Consolidar escola própria de pensamento económico","Publicar a obra-síntese do teu pensamento","Estruturar o projeto de universidade própria","Reunir corpo docente de elite","Criar modelo académico inovador","Formalizar a fundação da universidade","Universidade reconhecida nacionalmente","Centro avançado de investigação macroeconómica","Programa de formação de líderes públicos","Universidade financeiramente autossustentável","Reconhecimento internacional da universidade","Formar sucessores intelectuais","Obras adotadas como referência académica","Escola intelectual consolidada","Influência estrutural permanente no país","Legado académico consolidado","Instituições a funcionar sem depender de ti","Produzir a obra final definitiva","Mentorar jovens líderes estratégicos","Influência contínua em políticas públicas","Universidade expandida internacionalmente","Apresentar trabalho académico numa conferência","Ser convidado para júri ou banca académica","Biblioteca pessoal de 1.000 livros","Nome consolidado como arquiteto de sistemas económicos","Legado intelectual e institucional além da tua geração"],"for":["Orçamento mensal feito e seguido por 3 meses","Cortar 20–30% dos gastos supérfluos","Fundo de emergência de € 1.000","Poupar automaticamente 20% de tudo o que entra","Conseguir fonte de renda (trabalho ou serviço próprio)","Primeiro cliente pago do serviço","Abrir atividade nas Finanças e emitir o 1.º recibo","Abrir conta numa corretora","Investir os primeiros € 500 (ex.: ETF/Certificados de Aforro)","Fundo de emergência de 3 meses de despesas","Património investido de € 5.000","Iniciar estudos para certificação financeira","Obter a primeira certificação financeira","Investir os primeiros € 1.000","Iniciar aportes mensais regulares","Iniciar estudos para certificação avançada","Estágio em banco/corretora","Investir em ações e fundos imobiliários","Atingir património investido de € 10.000","Criar portfólio diversificado inicial","Reinvestir todos os dividendos","Construir reserva de emergência de 6 meses","Aumentar aportes mensais","Atingir património líquido de € 25.000","Obter certificação avançada","Estudar valuation e análise de balanços","Investir 10.000 adicionais em ações","Atingir património líquido de € 50.000","Expandir investimentos para ETFs internacionais","Criar fundo de oportunidades","Aumentar aportes para 2.000/mês","Atingir património de € 75.000","Iniciar preparação para CFA Level I","Construir portfólio internacional de 20.000","Criar fundo seed money para empresa","Atingir património de € 100.000","Criar plano estratégico formal da Crumbel Royal","Realizar estudo de viabilidade","Validar modelo de negócio","Definir proposta de valor","Estruturar plano financeiro da empresa","Definir modelo societário","Registar a empresa","Obter número fiscal da empresa","Abrir conta bancária empresarial","Separar finanças pessoais e empresariais","Criar contrato social estruturado","Definir capital social inicial","Estruturar contabilidade e regime tributário","Criar marca, identidade visual e posicionamento","Lançar oficialmente a Crumbel Royal","Alcançar faturamento mensal de 10.000","Gerar lucro mensal de 3.000","Reinvestir 50–70% do lucro","Criar KPIs e indicadores de desempenho","Contratar primeiro colaborador estratégico","Criar processo operacional padronizado","Criar fundo de expansão","Atingir património pessoal de € 250.000","Expandir portfólio para 200.000 investidos","Construir fluxo de caixa passivo de 2.000/mês","Concluir CFA Level I","Atingir património de € 500.000","Expandir empresa para outro mercado","Faturamento anual > 500.000","Lucro anual > 150.000","Criar holding patrimonial","Separar ativos pessoais na holding","Investir 200.000 em ETFs e fundos imobiliários","Criar fundo de aquisições","Atingir património líquido de € 1.000.000","Fluxo de caixa passivo de 10.000/mês","Faturamento anual da empresa > 1.000.000","Lucro anual > 300.000","Investir em startups","Expandir equipa executiva","Criar conselho consultivo","Expandir para novos produtos/serviços","Património líquido de € 2.500.000","Investimentos internacionais > 500.000","Fluxo de caixa passivo total de 25.000/mês","Expandir Crumbel Royal internacionalmente","Faturamento anual > 5.000.000","Lucro anual > 1.500.000","Património líquido > € 5.000.000","Comprar fazenda estratégica","Estruturar equipa agrícola","Implementar produção rentável","Gerar renda da fazenda de 10.000/mês","Integrar fazenda à holding","Fluxo de caixa passivo total > 50.000/mês","Património líquido > € 20.000.000","Faturamento empresa > 10.000.000/ano","Lucro > 3.000.000/ano","Criar fundo próprio de investimentos","Investir em private equity global","Estruturar fundo fiduciário familiar","Fluxo de caixa passivo > 500.000/mês","Património líquido > € 100.000.000","Tornar-se bilionário, com empresa global, fazenda lucrativa e fundo patrimonial intergeracional"],"cor":["Dormir 7h30–8h por 90 dias seguidos","Acordar à mesma hora por 60 dias","Check-up completo no Centro de Saúde","Treinar 4x/semana durante 3 meses","80% de alimentação limpa por 90 dias","Correr 5 km < 25 min","Correr 5 km < 22 min","Postura corrigida (core + lombar fortes)","Ganhar 3 kg de massa magra","1 prova oficial de 10 km","Vitamina D entre 40–60 ng/mL","Testosterona total > 600 ng/dL","Glicemia de jejum < 90 mg/dL","PCR < 1.0 mg/L","Pressão arterial < 12×8","FC de repouso < 60 bpm","Atualizar grau da visão e manter acuidade 100%","Reduzir tempo de ecrã noturno < 1h/dia por 60 dias","Exercícios visuais 5×/semana","Avaliar escoliose/hipercifose","Consultar alergologista; melhorar nariz e visão","Reduzir crises alérgicas em 80%","Beber 35 ml/kg de água por dia","Manter exames ideais por 6 meses","Reduzir gordura corporal para 15%","Reduzir gordura corporal para 12%","Manter 12–14% por 12 meses","Ganhar 4–5 kg de massa magra","Ombros +15 cm da cintura","Abdómen visível contraído","Abdómen parcialmente visível relaxado","Manter peso estável por 6 meses","Fotos comparativas anuais","Pele saudável, rotina de skincare","Ajuste da estética dental","Presença corporal confiante","Energia estável diariamente","Correr 5 km < 20 min","Correr 10 km < 45 min","VO2max > 55 ml/kg/min","Correr 15 km contínuos","Meia maratona (21 km)","Meia maratona < 1h40","Recuperar FC < 120 bpm em 2 min pós-esforço","1 ano de corrida sem lesão","FC de repouso < 55 bpm","Correr 25 km contínuos","Correr 30 km contínuos","Volume semanal de 50 km sustentado","Completar maratona (42,2 km)","Escolher um desporto olímpico (voleibol)","Iniciar treino técnico formal","Aprender fundamentos: passe, saque, ataque","Treinar 3×/semana com equipa local","Melhorar salto vertical > 50 cm","Treinar resistência específica 2×/semana","Jogar 10 partidas amistosas","Participar em campeonatos regionais","Ser selecionado para equipa regional","Tempo de reação e agilidade < 0,3 s","Treinar estratégia tática semanalmente","Ser convocado para competição nacional","Participar em seleção de pré-olímpico","Ser medalhista nacional","Participar nos Jogos Olímpicos","Aprender 3 estilos de natação e surfar","Nadar 1 km contínuo","Nadar 2 km contínuos","Nadar 3 km contínuos","Travessia de 2 km em águas abertas","Pedalar 40 km contínuos","Pedalar 80 km contínuos","Pedalar 120 km contínuos","Pedalar 150 km contínuos","Integrar pedal + corrida no mesmo treino","Triathlon sprint","Triathlon olímpico","Meio Ironman (70.3)","70.3 abaixo de 6 h","Treino simulado > 6 h","Ajuste de composição corporal","Controlo de hidratação e nutrição","Recuperar totalmente em 21 dias","Completar Ironman oficial","Ironman < 12 h","Idade biológica 5 anos abaixo da cronológica","Manter gordura corporal 10–12% sustentável","Manter massa muscular após os 40","Manter VO2max acima da média após os 40","Manter densidade óssea alta","Chegar aos 40 a correr 10 km < 45 min","Chegar aos 50 a correr 5 km < 25 min","Chegar aos 60 independente fisicamente","Chegar aos 70 a caminhar 5 km sem limitação","Mobilidade completa após os 60","Memória e cognição elevadas","Exames clínicos ideais por 10 anos seguidos","Sem doenças metabólicas","Prática desportiva ativa até idade avançada","Viver o máximo possível com autonomia, força, energia e lucidez"],"inf":["5 contactos estratégicos em Aveiro","LinkedIn completo (foto, resumo, conquistas)","Entrar numa associação/núcleo de estudantes do ISCA-UA","1 evento de networking por mês durante 3 meses","Falar com 3 professores fora da aula","30 dias a ouvir sem interromper","Apresentação pessoal de 5 min treinada e gravada","10 recomendações/endossos no LinkedIn","Criar grupo de estudo","Apresentar um projeto para 20+ pessoas","Conectar-se com 10 pessoas novas num mês","Publicar 1 post de valor no LinkedIn","Obter feedback positivo de 2 colegas sobre comunicação","Rotina de follow-up semanal com 5 contactos","Mapear 20 pessoas influentes na tua cidade","Participar em 1 grupo online de interesse profissional","Falar em público para grupos de 10 pessoas com confiança","Um reconhecimento genuíno por dia durante 30 dias","Dominar técnicas básicas de persuasão (rapport, espelhamento)","Analisar 5 líderes e documentar padrões","Criar identidade pessoal clara (propósito + valores)","Conectar-se com 2 pessoas de empresas ou instituições desejadas","Ter 50 contactos estratégicos ativos","Fazer 5 colaborações pequenas","Participar em 3 eventos universitários ou de negócios","Realizar 5 apresentações formais de 10 minutos","Obter 5 recomendações de mentores ou professores","Criar mailing list com 50 contactos estratégicos","Conectar-se com 5 alumni de universidades de interesse","Publicar conteúdo de valor 2× por semana","Manter contacto com 20 pessoas-chave semanalmente","Participar em 2 debates académicos","Participar em 2 projetos colaborativos com impacto visível","Mentorar 2 colegas informalmente","Ser recomendado publicamente por 3 pessoas-chave","Obter feedback estruturado sobre comunicação e presença","Participar em 3 reuniões estratégicas com líderes locais","Mini-projeto com +30 pessoas impactadas","Melhorar persuasão e negociação com 10 exercícios práticos","Conectar-se com 10 contactos estratégicos de empresas ou bancos","Ter 100 contactos estratégicos ativos","Ser convidado a palestrar num evento universitário ou de startups","Criar workshop próprio com 20–50 participantes","Publicar 1 artigo educativo por mês","Participar em 2 competições académicas ou empresariais","+5 recomendações públicas no LinkedIn","Ser referência numa comunidade local","Mailing list com 100 contactos","Mentorar formalmente 3–5 pessoas","Dar 1 palestra formal para 50+ pessoas","Participar em 3 projetos colaborativos de impacto nacional","Criar parceria estratégica entre 2 organizações","Ser citado ou recomendado por um líder nacional","Liderar projeto com +50 pessoas impactadas","Participar em 5 conferências nacionais","Rotina de conexão semanal com 20–30 líderes","Ser reconhecido como solucionador de problemas na rede","Publicar artigo com >1.000 visualizações","+10 recomendações públicas de líderes","Convite para evento internacional de networking","Ter 250 contactos estratégicos ativos em 2 países","Participar em conferência internacional","Ser palestrante em painel internacional com 100+ pessoas","5 mentorias formais de especialistas internacionais","Mentorar 5–10 pessoas de outros países","Conteúdo com alcance internacional (5.000+ visualizações)","Projeto colaborativo internacional (10–50 pessoas)","Reconhecimento público de uma autoridade global","Convite para podcast internacional","Rede de mastermind global de 20–50 líderes","Participar em reuniões estratégicas de alto impacto","+20 recomendações públicas de líderes internacionais","Influenciar decisões em projetos internacionais","Programa de mentorias internacional estruturado","Ter +500 contactos estratégicos ativos","Ser referência num fórum global da tua área","Colaboração internacional com +100 pessoas impactadas","Conteúdo com engajamento global (>10.000 visualizações)","Menção numa publicação internacional","Convite para aconselhar organizações globais","Liderar projeto de grande impacto com 50–100 pessoas","Ter +1.000 contactos estratégicos ativos","Mentorar 10–20 líderes emergentes","Ser citado em media especializada global","Programa de networking/mentoria para jovens talentos","3–5 colaborações estratégicas internacionais","Conselheiro de uma organização de relevância global","+50 recomendações públicas","Influenciar decisões estratégicas de empresas, governos ou ONG","Metodologia própria reconhecida internacionalmente","Referência consolidada em fóruns internacionais","Rede de mentores em 3 continentes","Impacto mensurável em +500 pessoas","Palestrante num evento global de +1.000 pessoas","Publicar livro de referência na tua área","Rede global envolvida em projetos estratégicos","Ser citado por autoridades globais como referência","Legado institucional ligado à tua autoridade","Influenciar políticas de alto impacto","Deixar um legado global de influência que dure décadas"],"esp":["Oração da manhã 7 dias seguidos","Ler 1 capítulo da Bíblia por dia durante 7 dias","3 gratidões escritas por dia durante 7 dias","1 hora sem telemóvel (silêncio) 7 dias seguidos","Oração da manhã 30 dias seguidos","30 dias de gratidão seguidos","Ler um livro bíblico inteiro","Ler os 4 Evangelhos","Encontrar uma igreja em Aveiro e ir com regularidade","Oração de manhã e à noite durante 30 dias","Memorizar 10 versículos","Ler Provérbios inteiro (um capítulo por dia)","Ler os Salmos inteiros","Primeiro jejum de um dia com propósito","Concluir um plano de leitura de 90 dias","Devocional diário durante 60 dias","Ler o Novo Testamento completo","Diário espiritual com 100 reflexões escritas","Participar num grupo de estudo bíblico","Servir num ministério ou voluntariado da igreja","Ajudar alguém em necessidade sem que ninguém saiba","Ofertar ou dizimar com regularidade durante 6 meses","Ler 3 clássicos cristãos (C. S. Lewis, Tozer, Bonhoeffer…)","Retiro espiritual de um fim de semana","Memorizar 30 versículos","Oração e leitura diárias durante 100 dias seguidos","Perdoar alguém de quem guardavas mágoa","Pedir perdão a alguém que magoaste","Ler a Bíblia inteira","Jejum de 3 dias","Partilhar a tua fé com um amigo","Levar alguém à igreja","Domingo de descanso sem ecrãs durante 3 meses","Ler os livros de sabedoria (Jó, Salmos, Provérbios, Eclesiastes)","365 dias de gratidão escrita","Estudar Romanos em profundidade","Fazer um curso de teologia básica","Liderar um grupo de estudo bíblico","Ser mentor de alguém mais novo na fé","Ler a Bíblia inteira pela segunda vez","Uma semana de missão ou voluntariado","Doar 10% do rendimento durante um ano inteiro","Memorizar 100 versículos","Escrever o teu testemunho de fé","Partilhar o testemunho em público","Oração diária durante 365 dias","Ler 12 livros cristãos num ano","Estudar a história da Igreja","Visitar a Terra Santa","Ler a Bíblia inteira noutra língua","Fazer uma mensagem ou pregação num culto ou grupo","Discipular 3 pessoas","Servir com regularidade durante 3 anos","Criar um projeto social ligado à fé","Apoiar um missionário com regularidade","Curso de teologia avançado","Escrever um devocional de 30 dias","Publicar o devocional","Ler a Bíblia inteira 3 vezes","Construir uma família com a fé no centro","Culto ou oração em família todas as semanas","Ensinar a fé à geração seguinte","Doar 15% do rendimento","Financiar uma igreja ou escola num lugar carente","Liderar uma missão internacional","Criar bolsas de estudo para jovens carentes","Ética inegociável em todos os negócios","Ser conhecido como homem de palavra","Mentorar 10 jovens líderes cristãos","Escrever um livro sobre fé e disciplina","Criar uma fundação filantrópica com propósito cristão","Programa de apoio a imigrantes recém-chegados","Ler as Confissões de Santo Agostinho","Caminho de Santiago (ou peregrinação) em oração","Oração e leitura diárias durante 5 anos","Doar 20% do rendimento","Apoiar 10 missionários","Construir uma escola ou centro comunitário","Família com tradição de fé consolidada","Ler a Bíblia inteira 5 vezes","Ensinar ética e fé num curso","Fundação a financiar 100 bolsas","Impacto social mensurável em +1.000 pessoas","Discipulado em 3 países","Valores cristãos no centro da universidade própria","Livro de fé publicado e traduzido","Fé que atravessa crises sem ruir","Paz interior estável em qualquer circunstância","Ler a Bíblia inteira 10 vezes","Legado de generosidade na família","Obras de caridade a funcionar sem ti","Mentor espiritual de líderes","Fundo perpétuo de missões","Ser lembrado pela bondade, não pela riqueza","Viver de acordo com o que acreditas, todos os dias","Os teus filhos e netos a caminhar na fé","Uma vida de oração até ao fim","Combater o bom combate e guardar a fé (2 Tm 4:7)","Deixar um legado espiritual que dure gerações","Ouvir \"Muito bem, servo bom e fiel\""]};
+// numa conta (versão pública) ficam os marcos gerais: saem os que são só do Ryan (faculdade, OCC, empresa, Aveiro, voleibol, fazenda, think tank…)
+const PUBX = /ISCA|OCC|Contabilist|Aveiro|Crumbel|Banco de Portugal|BCE|Testosterona|escoliose|hipercifose|voleibol|alergolog|alérgic|Introdução à Contabilidade|Informática Organizacional|Contabilidade Financeira|Macroecon|macroecon|económic|macro aplicada|área macro|macro estratégica|Fiscalidade|política monetária|políticas públicas|reformas estruturais|think tank|universidade própria|corpo docente|da universidade|Universidade (reconhecida|financeiramente|expandida)|escola própria de pensamento|Escola intelectual|arquiteto de sistemas|doutorandos|Centro avançado|líderes públicos|Libras|Centro de Saúde|estética dental|PCR <|Vitamina D|Glicemia|campeonatos regionais|equipa regional|desporto olímpico|olímpic|Olímpic|medalhista|convocado|tática|Tempo de reação|fundamentos: passe|salto vertical|partidas amistosas|treino técnico formal|equipa local|Ombros \+15|grau da visão|Exercícios visuais|nariz|CFA|seed money|empresa|societário|contrato social|capital social|Lançar oficialmente|colaborador estratégico|regime tributário|número fiscal|viabilidade|modelo de negócio|proposta de valor|marca, identidade|processo operacional|fundo de expansão|fazenda|agrícola|Abrir atividade nas Finanças|Terra Santa|Evangelhos|Bíblia|bíblic|igreja|Igreja|versículo|testemunho|teolog|ministério|dizim|Culto|culto|pregação|missionári|missões|Discipul|discipul|C\. S\. Lewis|Romanos|Provérbios|Salmos|cristão|Jó|jejum|Jejum|missão|devocional|Devocional|Santo Agostinho|servo bom|Novo Testamento|imigrantes/;
+const PUBR = [[/ \(ex\.: ETF\/Certificados de Aforro\)/, ' (ex.: ETF)'], [/homem de palavra/, 'pessoa de palavra'], [/ \(Finanças ou Economia\)/, ''], [/ em contabilidade, auditoria ou finanças/, ' na tua área']];
+const LEG = OS.Acc && OS.Acc.pub ? Object.fromEntries(Object.entries(LEG0).map(([k, v]) => [k, v.filter(t => !PUBX.test(t)).map(t => PUBR.reduce((x, [a, b]) => x.replace(a, b), t))])) : LEG0;
 const LEGA = { int: 'intelecto', for: 'fortuna', cor: 'corpo', inf: 'relacoes', esp: 'espirito' }, LEGN = { int: 'Intelecto', for: 'Fortuna', cor: 'Corpo', inf: 'Influência', esp: 'Espírito' };
 D.LEG = LEG; D.PK = Object.keys(LEG); D.LEGN = LEGN;
 const legx = () => { const s = S(); if (!s.legx || typeof s.legx !== 'object') s.legx = {}; s.legx.add = s.legx.add || {}; s.legx.off = s.legx.off || {}; return s.legx; };
@@ -16448,6 +16887,8 @@ const bodyOf = tc => { const b = tc >= 4 ? 2 : tc >= 2 ? 1 : 0, t = tc >= 3 ? 1 
   return P; };
 const DEF_LOOK = { skin: 6, hair: 'cacheado curto', hairColor: 'preto', eyes: 'castanho escuro', brows: 'grossas', beard: 'cavanhaque', glasses: 'retangulares', head: '', headColor: 3,
   top: 'tshirt', topColor: 0, legs: 'jeans', legsColor: 3, feet: 'tenis', feetColor: 2, cape: '', hand: '', shield: '', acc: '' };
+// numa conta o herói começa neutro (o visual do Ryan só no modo pessoal)
+if (OS.Acc && OS.Acc.pub) Object.assign(DEF_LOOK, { skin: 3, hair: 'liso curto', hairColor: 'castanho', eyes: 'castanho', brows: 'finas', beard: 'nenhuma', glasses: '' });
 D.DEF_LOOK = DEF_LOOK;
 D.pixel = (look = {}, o = {}) => { const L = Object.assign({}, DEF_LOOK, look), tc = o.corpo || 0, mood = o.mood || 'forma', C = mkC(), B = bodyOf(tc);
   const sk = SKINS[L.skin] != null ? SKINS[L.skin] : SKINS[6], SK = SKR(sk), hc = HAIRCOL[L.hairColor] || HAIRCOL.preto, HC = RAMP(hc);
@@ -17190,7 +17631,7 @@ T.marcos = () => { const s = S(), p = D.PK.includes(OS.ui.d3Leg) ? OS.ui.d3Leg :
     ${off ? `<p class="dm">Tiraste ${off} ${off === 1 ? 'marco' : 'marcos'} desta lista. <button class="d3-link" data-act="d3LegReset" data-p="${p}">Repor</button></p>` : ''}</section>
   ${done.length ? `<section class="d3-card"><div class="d3-h"><span class="cz">Feitos</span><span class="dm mono">${done.length}</span></div>${done.map(t => row(t, L.indexOf(t))).join('')}</section>` : ''}
   <section class="d3-card"><details><summary class="cz">Ver os ${L.length} marcos de ${esc(LEGN[p])}</summary><div class="d3-legall">${L.map(row).join('')}</div></details></section>
-  <p class="dm d3-note">Os teus marcos vêm do teu Notion (Dominus original + Dominus 2.0) e estão atualizados com o que mudou: a vida em Aveiro, o ISCA-UA e o pilar Espiritual. Tira os que já não fazem sentido e acrescenta os novos.</p>`; };
+  <p class="dm d3-note">${OS.Acc && OS.Acc.pub ? 'Marcos reais e difíceis nos 5 pilares, do primeiro passo ao legado. Tira os que não são para ti e acrescenta os teus.' : 'Os teus marcos vêm do teu Notion (Dominus original + Dominus 2.0) e estão atualizados com o que mudou: a vida em Aveiro, o ISCA-UA e o pilar Espiritual. Tira os que já não fazem sentido e acrescenta os novos.'}</p>`; };
 
 // diário: quando cada nível foi alcançado, a partir do histórico
 const timeline = st => { const ev = st.all.slice().sort((a, b) => a.d.localeCompare(b.d)), acc = Object.fromEntries(AK.map(k => [k, 0])), lv = Object.fromEntries(AK.map(k => [k, 0])), out = []; let tot = 0, hl = 0;
@@ -17246,6 +17687,9 @@ const cfg = () => OS.one('inbox');
 const SEEN = 'os2inboxSeen';
 const genKey = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
 
+// no script de cada pessoa vai o nome do perfil (no modo pessoal fica "do Ryan" como sempre)
+const nm_ = () => String(OS.who()).replace(/[\\'"`$\n\r]/g, '').slice(0, 40);
+const dRyan_ = () => OS.Acc && OS.Acc.pub ? 'de ' + nm_() : 'do Ryan', oRyan_ = () => OS.Acc && OS.Acc.pub ? nm_() : 'O Ryan';
 IB.core = key => `// Náutilo · caixa de entrada de gastos + sincronização entre aparelhos. Não partilhes este código: a chave abaixo é a tua.
 const KEY = '${key}';
 function doGet(e) {
@@ -17334,7 +17778,7 @@ function resumo_() { let b = {}; try { b = JSON.parse(PropertiesService.getScrip
 function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || '';
   if (!q) return resumo_(); if (!gk) return 'Para te responder pela Siri, liga a IA no Náutilo e ativa as perguntas pela Siri nas definições do Spyke.';
   const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
-  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  const prompt = 'És o Spyke, o assistente pessoal ${dRyan_()} (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo ${dRyan_()} (podem ter algumas horas):\\n' + cx + '\\n\\n${oRyan_()} pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   const ms = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
   for (let i = 0; i < ms.length; i++) { try { const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + ms[i] + ':generateContent?key=' + encodeURIComponent(gk), { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4 } }) });
     if (r.getResponseCode() !== 200) continue; const j = JSON.parse(r.getContentText()), t = (((j.candidates || [])[0] || {}).content || {}).parts; if (t && t.length) return t.map(function (x) { return x.text || ''; }).join('').trim(); } catch (e) { } }
@@ -17569,7 +18013,7 @@ function iaTexto_(prompt, gk) { if (gk) { const ms = iaModelos_(gk); for (let i 
   return ''; }
 function pergunta_(q) { const P = PropertiesService.getScriptProperties(), gk = P.getProperty('GK'), cx = P.getProperty('CX') || ''; if (!q) return resumo_();
   const agora = Utilities.formatDate(new Date(), 'Europe/Lisbon', 'yyyy-MM-dd HH:mm');
-  const prompt = 'És o Spyke, o assistente pessoal do Ryan (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo do Ryan (podem ter algumas horas):\\n' + cx + '\\n\\nO Ryan pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
+  const prompt = 'És o Spyke, o assistente pessoal ${dRyan_()} (estilo J.A.R.V.I.S.): direto, calmo, confiante, com um toque de humor. Agora em Portugal: ' + agora + '.\\nDados do Náutilo ${dRyan_()} (podem ter algumas horas):\\n' + cx + '\\n\\n${oRyan_()} pergunta: ' + q + '\\nResponde em português do Brasil, no máximo 3 frases curtas, para serem ditas em voz alta: sem listas, sem markdown, sem emojis. Usa só os dados acima; se não souberes, diz que não sabes.';
   return iaTexto_(prompt, gk) || 'Não consegui falar com a IA agora. Tenta daqui a pouco.'; }`;
 // o script completo (para quem cola tudo de uma vez num só ficheiro): partes 1+2 e as partes 3 e 4 por baixo
 IB.script = key => IB.core(key) + '\n' + IB.addon() + '\n' + IB.addon4() + (IB.addon5 ? '\n' + IB.addon5() : '') + (IB.addon6 ? '\n' + IB.addon6() : '') + (IB.addon7 ? '\n' + IB.addon7() : '');
@@ -17590,7 +18034,7 @@ const getJSON = async (url, tries = 3) => { let last = null;
   for (let i = 0; i < tries; i++) { try { const r = await fetch(url, { cache: 'no-store', credentials: 'omit' }), t = await r.text(); try { return JSON.parse(t); } catch (e) { last = new Error('resposta do Google não é JSON'); } } catch (e) { last = e; }
     await new Promise(res => setTimeout(res, 800 * (i + 1))); }
   throw last || new Error('sem resposta'); };
-IB.pull = async (manual) => { const c = cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
+IB.pull = async (manual) => { const c = OS.Acc && OS.Acc.on && !(cfg().url && cfg().key) && OS.Acc.atalho ? (OS.Acc.atalho() || cfg()) : cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
   try { const j = await getJSON(c.url + (c.url.includes('?') ? '&' : '?') + 'op=pull&k=' + encodeURIComponent(c.key) + '&_=' + Date.now());
     if (!j.ok) { if (manual) UI.toast(j.msg || 'O script recusou o pedido', 'neg'); return; }
     const seen = new Set(U.ls.get(SEEN, [])), got = [];
@@ -17638,7 +18082,7 @@ IB.check = async () => { const u = base(), c = cfg();
       } catch (e) { return IB.st = { ok: false, m: 'Não consegui testar a gravação no Google Drive. Tenta outra vez.' }; } }
     return IB.st = { ok: true, m: 'Ligado. A caixa de entrada está a funcionar' + ((j.v || 2) >= 3 ? ' e a gravação no Google Drive também.' : '.') };
   } catch (e) { return IB.st = { ok: false, m: 'Não consegui falar com o script. Confirma: (1) "Quem tem acesso: Qualquer pessoa"; (2) autorizaste a app com a tua conta Google; (3) o código tem "doGet" (cola-o outra vez se for antigo).' }; } };
-const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base());
+const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base()); if (OS.Acc && OS.Acc.on && !(c.url && c.key) && OS.Acc.atalhoPanel) return OS.Acc.atalhoPanel();
   return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3><span class="mut" style="font-size:12px">${c.n ? c.n + ' gastos importados' : ''}</span></div>
   ${c.url && c.key ? `<div class="ib-now"><button class="btn sm pri" data-act="ibTest">${UI.ic('sync')}Ir buscar gastos agora</button><span class="mut">${c.last ? 'última verificação: ' + new Date(c.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não verificou'}${c.err ? ' · <span class="neg">' + esc(c.err) + '</span>' : ''}</span></div>` : ''}
   <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado, sem abrir o Náutilo. Precisa de uma folha Google tua como caixa de entrada (grátis, uma vez só).</p>
@@ -17672,7 +18116,8 @@ const syncPanel = () => { const c = cfg(), SY = window.OceanumSync || {}, on = !
     ${ready ? `<div class="ib-s ${v3 ? 'done' : ''}"><i>B</i><div><b>Atualizar o script do Google (uma vez)</b>${v3 ? '<p class="pos">✓ O script já está atualizado e pode gravar no teu Google Drive.</p>' : `${(c.ver || 0) >= 3 && st.m && !st.ok ? `<div class="ib-st bad">✗ ${esc(st.m)}</div>` : ''}<p>A sincronização precisa da versão nova do script:</p><p>1. Toca em <b>Copiar código</b> (passo 1 do atalho, mais abaixo).<br>2. No Apps Script: apaga tudo → cola → <b>💾 Guardar</b>.<br>3. <b>Implantar → Gerenciar implantações</b> → ✏️ (lápis) → em <b>Versão</b> escolhe <b>Nova versão</b> → <b>Implantar</b>.<br>4. Se pedir, <b>autoriza o acesso ao Google Drive</b> (Avançado → Acessar → Permitir).<br>5. Volta aqui e toca em <b>Verificar</b>.</p><button class="btn sm" data-act="syVer">Verificar</button>`}</div></div>
     <div class="ib-s"><i>C</i><div><b>Ligar a sincronização</b><p>Faz isto <b>primeiro no aparelho com os dados principais</b> (o tablet). Os outros aparelhos ligam-se depois com o código.</p><button class="btn sm pri" data-act="syOn" ${v3 ? '' : 'disabled'}>Ligar sincronização neste aparelho</button></div></div>` : ''}
   </div>`}</div>`; };
-const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + syncPanel() + panel();
+// numa conta a sincronização é a da conta (Definições › Conta e perfis): o painel do Google Drive fica só no modo pessoal
+const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (OS.Acc && OS.Acc.on ? '' : syncPanel()) + panel();
 A.syVer = async () => { UI.toast('A verificar…'); await IB.check(); const c = cfg(); UI.toast((c.ver || 0) < 3 ? 'Ainda é a versão antiga. Confirma que escolheste "Nova versão" ao implantar.' : c.drive === 0 ? 'Falta autorizar o Google Drive (vê as instruções).' : 'Script atualizado ✓', (c.ver || 0) >= 3 && c.drive !== 0 ? 'pos' : 'warn'); OS.request(); };
 A.syOn = () => { try { localStorage.setItem('os2sync', '1'); localStorage.setItem('os2syncJoined', '0'); } catch (e) { } UI.toast('A ligar…'); setTimeout(() => location.reload(), 400); };
 A.syOff = () => UI.ask('Desligar a sincronização neste aparelho?', 'Os dados ficam neste aparelho, mas deixam de ser trocados com os outros.', 'Desligar', () => { try { localStorage.removeItem('os2sync'); } catch (e) { } location.reload(); });
@@ -18273,8 +18718,9 @@ const sha = async s => { const b = await crypto.subtle.digest('SHA-256', new Tex
 const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
 const rand = n => crypto.getRandomValues(new Uint8Array(n));
-const hash = () => (OS.one('security').hash) || DEFAULT_HASH;
+const hash = () => (OS.one('security').hash) || (OS.Acc && OS.Acc.on ? OS.Acc.lk() || '-' : DEFAULT_HASH);
 OS.ONE_DEF.security = { hash: '', changed: '' };
+L.curHash = () => hash();
 
 // memória primeiro: se o navegador bloquear o sessionStorage (vista embutida), o desbloqueio continua válido nesta sessão
 let memUnlock = false;
@@ -18298,7 +18744,7 @@ const bioErr = e => { const n = e && e.name;
   return 'Face ID indisponível: ' + ((e && (e.message || e.name)) || 'erro desconhecido'); };
 L.register = async () => { if (ANDROID) { OS.UI.toast('No Android a biometria está desligada. Usa "Entrar direto" em Definições.', 'warn'); return false; }
   try {
-    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'NÁUTILO' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || 'Ryan' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
+    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'NÁUTILO' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || OS.who() }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
     U.ls.set('os2bio', { id: b64u(cred.rawId), at: U.today() }); U.ls.set('os2bioAsk', true); try { OS.UI.closeModal(); } catch (e) { } OS.UI.toast('Face ID ativado. Da próxima vez entras com a cara.', 'pos'); OS.request(); return true;
   } catch (e) { U.ls.set('os2bioAsk', true); OS.UI.toast(bioErr(e), 'warn'); return false; }
 };
@@ -18346,7 +18792,7 @@ const scene = () => OS.Scene ? `<div class="lk-scene">${OS.Scene.svg(Math.max(32
 async function showLock() {
   const s = el(), bio = L.bioId(), can = bio && await L.bioAvailable();
   s.hidden = false; s.classList.add('lkx');
-  let name = 'Ryan', q = ''; try { name = (OS.one('profile').short || 'Ryan').split(' ')[0]; } catch (e) { } try { q = OS.Quotes ? OS.Quotes.push() : ''; } catch (e) { }
+  let name = 'Ryan', q = ''; try { name = (OS.one('profile').short || OS.who()).split(' ')[0]; } catch (e) { } try { q = OS.Quotes ? OS.Quotes.push() : ''; } catch (e) { }
   const qs = q.length < 42 ? 'l' : q.length < 75 ? 'm' : 's';
   s.innerHTML = `${scene()}<div class="lk-top"><div class="lk-time" id="lkTime">${hm()}</div><div class="lk-date">${OS.U ? OS.U.esc(OS.U.longDate(OS.U.today())) : ''}</div></div>
     <div class="lk-mid"><p class="lk-hi">${hello()}, ${OS.U ? OS.U.esc(name) : 'Ryan'}.</p>${q ? `<p class="lk-q ${qs}">${OS.U.esc(q)}</p>` : ''}</div>
@@ -18355,10 +18801,11 @@ async function showLock() {
       ${can ? `<button type="button" class="lk-bio" id="lkBio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2M9 9v1M15 9v1M12 9v4h-1M9 16c1.5 1 4.5 1 6 0"/></svg>Desbloquear com Face ID</button><div class="lk-or">ou código</div>` : ''}
       ${codeInput()}
       <button class="lk-go" type="submit" aria-label="Entrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-    </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div><div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div></div>`;
+    </form><div class="lk-msg" id="lkMsg" role="status" aria-live="polite"></div>${OS.Acc && OS.Acc.on ? '<button type="button" class="lk-sw" id="lkSw">Trocar de perfil</button>' : ''}<div class="sp-foot">MIND CONTROL${window.OceanumVersion && window.OceanumVersion.v ? ' · v' + window.OceanumVersion.v : ''}</div></div>`;
   clearInterval(lkTick); lkTick = setInterval(() => { const t = document.getElementById('lkTime'); if (!t || s.hidden) { clearInterval(lkTick); return; } t.textContent = hm(); }, 15000);
   if (!lkRes) { lkRes = 1; addEventListener('resize', () => { clearTimeout(lkRT); lkRT = setTimeout(() => { const sc = s.querySelector('.lk-scene'); if (sc && !s.hidden) sc.outerHTML = scene(); }, 250); }); }
   document.getElementById('lkForm').onsubmit = e => { e.preventDefault(); tryCode(document.getElementById('lkCode').value); };
+  const sw = document.getElementById('lkSw'); if (sw) sw.onclick = () => OS.Acc.switchProfile();
   const bb = document.getElementById('lkBio');
   if (bb) { const go = async auto => { if (bb.disabled || !bb.isConnected || L.unlocked()) return; bb.disabled = true; try { if (await bioUnlock(auto)) open(); } finally { bb.disabled = false; } };
     bb.onclick = () => go(false);
@@ -18471,7 +18918,7 @@ function renderTop(cur) {
   <button class="icon-btn spy-tb" data-act="spyOpen" aria-label="Spyke" title="Spyke (assistente de voz)">${UI.ic('mic')}</button>
   <button class="icon-btn" data-act="cmdOpen" aria-label="Procurar (Ctrl K)" title="Procurar (Ctrl K)">${UI.ic('search')}</button>
   <button class="icon-btn tn-hide-s" data-act="focusStart" aria-label="Modo foco" title="Modo foco">${UI.ic('focus')}</button>
-  <a class="icon-btn" href="#definicoes" aria-label="Definições" title="Definições">${UI.ic('settings')}</a>
+  <a class="icon-btn" href="#definicoes" aria-label="Definições" title="Definições">${UI.ic('settings')}</a>${OS.Acc && OS.Acc.on && OS.Acc.bubble ? OS.Acc.bubble() : ''}
   <button class="btn pri sm tn-add" data-act="quickAdd" aria-label="Registar">${UI.ic('plus')}<span>Registar</span></button></div>`);
 }
 function renderTab(cur) {
