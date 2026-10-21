@@ -41,6 +41,7 @@ if (personal) {
   // cria (ou entra n)a conta, cria o perfil pessoal com o mesmo código de bloqueio e envia todos os dados deste aparelho
   Acc.migrate = async (email, senha, criar) => { email = String(email || '').trim().toLowerCase();
     const j = await conta(criar ? 'registar' : 'entrar', criar ? { email, senha, nome: OS.one('profile').name || '' } : { email, senha }); takeConta(j, email);
+    if (j.recuperacao) LS.set('nau:rec', j.recuperacao); // mostrado uma vez, depois de abrir com a conta
     let p = (S.perfis || []).find(x => x.ps);
     if (!p) { const r = await conta('perfil', { acao: 'criar', perfil: { nome: String(OS.one('profile').short || 'Ryan').slice(0, 24), cor: '#7FA9DA', av: '', lk: OS.Lock.curHash(), ps: true } }); takeConta(r); p = r.perfil; }
     OS.setOne('meta', { acc: email });
@@ -275,6 +276,8 @@ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded'
 
 /* ---------- dentro da app ---------- */
 OS.on('ready', () => { const p = cur(); if (!p) return;
+  // conta criada ao guardar o Náutilo pessoal: o código de recuperação aparece uma vez
+  const rc = LS.get('nau:rec', ''); if (rc) { LS.del('nau:rec'); setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">Guarda o teu código de recuperação</h3><p class="mut" style="margin:0 0 12px">Se te esqueceres da senha da conta, é com este código que a recuperas. Aparece só agora: tira uma fotografia ou guarda-o no gestor de senhas.</p><div class="ac-code">${esc(rc)}</div><div class="row gap8" style="margin-top:14px"><button class="btn pri" data-mclose>Já guardei</button></div></div>`), 900); }
   const pr = OS.one('profile'); if (!pr.short && !pr.name) OS.setOne('profile', { name: p.nome, short: first(p.nome) });
   const sec = OS.one('security'), r = LS.get(K.reset, {});
   if (r[p.id]) { OS.setOne('security', { hash: r[p.id], changed: U.today() }); delete r[p.id]; LS.set(K.reset, r); }

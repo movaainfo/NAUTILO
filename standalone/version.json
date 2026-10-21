@@ -1,6 +1,6 @@
 {
- "n": 129,
- "hash": "fc1ad3cc328e",
+ "n": 130,
+ "hash": "44ad655f5da5",
  "notes": [
   "Contas Náutilo: qualquer pessoa pode criar a sua conta com e-mail e senha. Os dados ficam na conta, cifrados, e aparecem iguais no telemóvel e no computador.",
   "Perfis como na Netflix: até 5 perfis em cada conta, cada um com nome, avatar, cor, código de bloqueio e os seus próprios dados. A bolinha do perfil fica na barra de cima: toca para trocar de perfil ou ver a conta.",
@@ -8,7 +8,8 @@
   "Definições › Conta e perfis: mudar a senha, código de recuperação novo, sincronizar agora, sair dos outros aparelhos e apagar a conta. Esqueceste a senha? Usa o código de recuperação que recebes ao criar a conta.",
   "O teu Náutilo pessoal: em Definições › Geral › Conta Náutilo tocas em \"Criar conta e guardar\" e tudo o que tens (dados, metas, jogo, definições, ligações) vai para a tua conta, com o mesmo código. Os outros aparelhos mostram \"Entrar na conta\".",
   "Contas novas começam limpas, com o nome de quem as criou: sem nada do perfil do Ryan. As funcionalidades são as mesmas para todos: o atalho de gastos do iPhone funciona com um link do perfil (sem script Google) e o Jornal busca as notícias pelo servidor do Náutilo.",
-  "Mundo › Ilhas: a lista abre no grupo de Portugal (a página fica mais rápida); \"Todas\" mostra as 191."
+  "Mundo › Ilhas: a lista abre no grupo de Portugal (a página fica mais rápida); \"Todas\" mostra as 191.",
+  "Ao guardar o teu Náutilo numa conta nova, o código de recuperação da senha aparece logo a seguir (guarda-o)."
  ],
  "date": "21/10/2026"
 }
