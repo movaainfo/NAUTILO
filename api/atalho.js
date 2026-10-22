@@ -1,4 +1,4 @@
-// NÁUTILO · atalho de gastos do iPhone para todas as contas (função do Vercel). Faz o mesmo que a folha Google pessoal:
+// NÁUTILO · atalhos do iPhone para todas as contas (função do Vercel): gastos e o sono do app Saúde. Faz o mesmo que a folha Google pessoal:
 //   o atalho envia v (valor), d (descrição) e c (conta) com a chave do perfil → fica numa caixa de entrada cifrada;
 //   a app vai lá buscar (op=pull) e confirma o que guardou (op=ack). Cada perfil tem a sua chave (Definições › Atalhos do iPhone).
 'use strict';
@@ -24,10 +24,14 @@ module.exports = N.handler(async (req, res) => {
     return N.send(res, 200, { ok: true, items: items.sort((a, c) => String(a.t).localeCompare(String(c.t))) }); }
   if (b.op === 'ack') { const ids = new Set(String(b.ids || '').split(',').filter(x => /^[a-z0-9-]{6,40}$/.test(x)));
     const L = (await s.list(base)).filter(x => ids.has(x.pathname.slice(base.length))); if (L.length) await s.del(L); return N.send(res, 200, { ok: true, n: L.length }); }
+  if ((await s.list(base)).length >= 500) return text(res, 429, 'A caixa do atalho está cheia: abre o Náutilo para os registos entrarem.');
+  const id = Date.now().toString(36) + '-' + N.crypto.randomBytes(5).toString('hex');
+  // sono do app Saúde (automação "Despertar"): as amostras "Valor|Início|Fim" seguem para a app, que junta as noites
+  if (b.tipo === 'sono') { const sm = String(b.s || '').slice(0, 60000); if (!/\|/.test(sm)) return text(res, 400, 'Sem amostras de sono: confirma o campo s no atalho.');
+    await s.put(base + id, N.seal(key, { id, t: new Date().toISOString(), tipo: 'sono', s: sm }), { overwrite: false });
+    return text(res, 200, '✓ Sono enviado para o Náutilo'); }
   // gasto novo (do atalho)
   const v = Number(String(b.v || '').replace(/[^0-9,.-]/g, '').replace(',', '.')); if (!(v > 0) || v > 1e7) return text(res, 400, 'Valor inválido');
-  if ((await s.list(base)).length >= 500) return text(res, 429, 'A caixa do atalho está cheia: abre o Náutilo para os gastos entrarem.');
-  const id = Date.now().toString(36) + '-' + N.crypto.randomBytes(5).toString('hex');
   await s.put(base + id, N.seal(key, { id, t: new Date().toISOString(), v, d: String(b.d || '').slice(0, 200), c: String(b.c || '').slice(0, 80) }), { overwrite: false });
   text(res, 200, '✓ ' + String(v).replace('.', ',') + ' € registado no Náutilo');
 }, { anyOrigin: true });
