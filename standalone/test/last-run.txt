@@ -1,0 +1,156 @@
+
+=== iPhone ===
+  ✓ [iPhone] abre o ecrã do código — 460 ms
+  ✓ [iPhone] versão visível no ecrã do código — MIND CONTROL · v1.13
+  ✓ [iPhone] não abre o pedido biométrico sozinho
+  ✓ [iPhone] campo do código sem gestor de palavras-passe — {"t":"text","sec":"disc","bg":"rgba(0, 0, 0, 0)","ac":"off"}
+  ✓ [iPhone] modo leve conforme o aparelho
+  ✓ [iPhone] código errado é recusado
+  ✓ [iPhone] código certo abre a Visão Geral
+  ✓ [iPhone] sem animações infinitas nem desfoque de fundo — {"inf":0,"bf":0,"fixedBg":"scroll"}
+  ✓ [iPhone] parado não se redesenha (Visão Geral) — 0 renders em 4 s
+  ✓ [iPhone] 85 páginas abrem com conteúdo
+  ✓ [iPhone] nada sai para o lado
+  ✓ [iPhone] páginas rápidas — máx 31 ms
+  ✓ [iPhone] 69 botões carregados sem erro
+  ✓ [iPhone] com o menu aberto só o menu rola
+  ✓ [iPhone] com um formulário aberto a página de trás não rola
+  ✓ [iPhone] rodar o ecrã 8 vezes
+  ✓ [iPhone] sem fugas de memória (200 mudanças de página) — heap +0 MB · 596 elementos
+  ✓ [iPhone] sem erros de JavaScript nesta sessão
+
+=== Android tel ===
+  ✓ [Android tel] abre o ecrã do código — 457 ms
+  ✓ [Android tel] versão visível no ecrã do código — MIND CONTROL · v1.13
+  ✓ [Android tel] não abre o pedido biométrico sozinho
+  ✓ [Android tel] campo do código sem gestor de palavras-passe — {"t":"text","sec":"disc","bg":"rgba(0, 0, 0, 0)","ac":"off"}
+  ✓ [Android tel] modo leve ligado (Android)
+  ✓ [Android tel] código errado é recusado
+  ✓ [Android tel] código certo abre a Visão Geral
+  ✓ [Android tel] sem animações infinitas nem desfoque de fundo — {"inf":0,"bf":0,"fixedBg":"scroll"}
+  ✓ [Android tel] parado não se redesenha (Visão Geral) — 0 renders em 4 s
+  ✓ [Android tel] 85 páginas abrem com conteúdo
+  ✓ [Android tel] nada sai para o lado
+  ✓ [Android tel] páginas rápidas — máx 32 ms
+  ✓ [Android tel] 69 botões carregados sem erro
+  ✓ [Android tel] com o menu aberto só o menu rola
+  ✓ [Android tel] com um formulário aberto a página de trás não rola
+  ✓ [Android tel] rodar o ecrã 8 vezes
+  ✓ [Android tel] sem fugas de memória (200 mudanças de página) — heap +0 MB · 596 elementos
+  ✓ [Android tel] sem erros de JavaScript nesta sessão
+
+=== Tablet horiz ===
+  ✓ [Tablet horiz] abre o ecrã do código — 1226 ms
+  ✓ [Tablet horiz] versão visível no ecrã do código — MIND CONTROL · v1.13
+  ✓ [Tablet horiz] não abre o pedido biométrico sozinho
+  ✓ [Tablet horiz] campo do código sem gestor de palavras-passe — {"t":"text","sec":"disc","bg":"rgba(0, 0, 0, 0)","ac":"off"}
+  ✓ [Tablet horiz] modo leve ligado (Android)
+  ✓ [Tablet horiz] código errado é recusado
+  ✓ [Tablet horiz] código certo abre a Visão Geral
+  ✓ [Tablet horiz] sem animações infinitas nem desfoque de fundo — {"inf":0,"bf":0,"fixedBg":"scroll"}
+  ✓ [Tablet horiz] parado não se redesenha (Visão Geral) — 0 renders em 4 s
+  ✓ [Tablet horiz] 85 páginas abrem com conteúdo
+  ✓ [Tablet horiz] nada sai para o lado
+  ✓ [Tablet horiz] páginas rápidas (processador 6× mais lento) — máx 256 ms
+  ✓ [Tablet horiz] 69 botões carregados sem erro
+  ✓ [Tablet horiz] com o menu aberto só o menu rola
+  ✓ [Tablet horiz] com um formulário aberto a página de trás não rola
+  ✓ [Tablet horiz] rodar o ecrã 8 vezes
+  ✓ [Tablet horiz] sem fugas de memória (200 mudanças de página) — heap +0 MB · 604 elementos
+  ✓ [Tablet horiz] sem erros de JavaScript nesta sessão
+
+=== Tablet vert ===
+  ✓ [Tablet vert] abre o ecrã do código — 500 ms
+  ✓ [Tablet vert] versão visível no ecrã do código — MIND CONTROL · v1.13
+  ✓ [Tablet vert] não abre o pedido biométrico sozinho
+  ✓ [Tablet vert] campo do código sem gestor de palavras-passe — {"t":"text","sec":"disc","bg":"rgba(0, 0, 0, 0)","ac":"off"}
+  ✓ [Tablet vert] modo leve ligado (Android)
+  ✓ [Tablet vert] código errado é recusado
+  ✓ [Tablet vert] código certo abre a Visão Geral
+  ✓ [Tablet vert] sem animações infinitas nem desfoque de fundo — {"inf":0,"bf":0,"fixedBg":"scroll"}
+  ✓ [Tablet vert] parado não se redesenha (Visão Geral) — 0 renders em 4 s
+  ✓ [Tablet vert] 85 páginas abrem com conteúdo
+  ✓ [Tablet vert] nada sai para o lado
+  ✓ [Tablet vert] páginas rápidas — máx 34 ms
+  ✓ [Tablet vert] 69 botões carregados sem erro
+  ✓ [Tablet vert] com o menu aberto só o menu rola
+  ✓ [Tablet vert] com um formulário aberto a página de trás não rola
+  ✓ [Tablet vert] rodar o ecrã 8 vezes
+  ✓ [Tablet vert] sem fugas de memória (200 mudanças de página) — heap +0 MB · 604 elementos
+  ✓ [Tablet vert] sem erros de JavaScript nesta sessão
+
+=== Computador ===
+  ✓ [Computador] abre o ecrã do código — 463 ms
+  ✓ [Computador] versão visível no ecrã do código — MIND CONTROL · v1.13
+  ✓ [Computador] não abre o pedido biométrico sozinho
+  ✓ [Computador] campo do código sem gestor de palavras-passe — {"t":"text","sec":"disc","bg":"rgba(0, 0, 0, 0)","ac":"off"}
+  ✓ [Computador] modo leve conforme o aparelho
+  ✓ [Computador] código errado é recusado
+  ✓ [Computador] código certo abre a Visão Geral
+  ✓ [Computador] sem animações infinitas nem desfoque de fundo — {"inf":0,"bf":0,"fixedBg":"scroll"}
+  ✓ [Computador] parado não se redesenha (Visão Geral) — 0 renders em 4 s
+  ✓ [Computador] 85 páginas abrem com conteúdo
+  ✓ [Computador] nada sai para o lado
+  ✓ [Computador] páginas rápidas — máx 34 ms
+  ✓ [Computador] 69 botões carregados sem erro
+  ✓ [Computador] com o menu aberto só o menu rola
+  ✓ [Computador] com um formulário aberto a página de trás não rola
+  ✓ [Computador] sem fugas de memória (200 mudanças de página) — heap +0 MB · 604 elementos
+  ✓ [Computador] sem erros de JavaScript nesta sessão
+
+=== Testes gerais (iPhone) ===
+  ✓ [Geral] os 44 formulários gravam
+  ✓ [Geral] gasto rápido fica guardado depois de recarregar
+  ✓ [Geral] exportar e importar devolve tudo — 2 movimentos
+  ✓ [Geral] atalho: verificação da ligação
+  ✓ [Geral] atalho: o Google falha à 1.ª e a app tenta de novo · "18, uber" → 18 € · Uber — 1 encontrados
+  ✓ [Geral] atalho de uma pergunta: "99 pizza 2 pessoas" → 99 € · Pizza 2 pessoas — [99]
+  ✓ [Geral] atalho: gasto enviado entra nas Finanças com categoria — [[8.5,"Uber para a faculdade","Transporte"],[99,"Pizza 2 pessoas","Alimentação"],[18,"Uber","Transporte"]]
+  ✓ [Geral] atalho: não duplica
+  ✓ [Geral] jogo: subir de nível mostra parabéns com 2 recompensas à escolha — 2 opções
+  ✓ [Geral] jogo: escolher recompensa guarda-a
+  ✓ [Geral] jogo: colmeia com 61 favos
+  ✓ [Geral] sem erros de JavaScript
+  ✓ [Geral] abre sem internet
+  ✓ [Geral] atualização: aparece "A atualizar o Oceanum…"
+  ✓ [Geral] atualização: depois mostra "Atualizado" e a versão nova — Atualizado · versão 9.9 · 01/10/2026 · Sincronização entre aparelhos (uma só con
+  ✓ [Geral] modo de segurança (?seguro) limpa a cache e liga o modo leve
+  ✓ [Geral] iPhone: engrenagem das Definições visível no topo
+  ✓ [Geral] iPhone: tocar na engrenagem abre as Definições
+  ✓ [Geral] iPhone: "Definições" no topo do menu ☰, visível sem rolar
+  ✓ [Geral] iPhone: tocar no menu abre as Definições
+  ✓ [Geral] sem erros de JavaScript
+  ✓ [Geral] iPhone: depois do código aparece "Ativar o Face ID?"
+  ✓ [Geral] iPhone: "Ativar Face ID" regista o rosto
+  ✓ [Geral] iPhone: ao bloquear aparece "Desbloquear com Face ID"
+  ✓ [Geral] iPhone: não pede o Face ID sozinho
+  ✓ [Geral] iPhone: entrar com o Face ID abre a app
+  ✓ [Geral] sem erros de JavaScript
+  ✓ [Geral] Tablet horiz: sem convite nem botão de Face ID
+  ✓ [Geral] Tablet horiz: Definições dizem "só no iPhone"
+  ✓ [Geral] Computador: sem convite nem botão de Face ID
+  ✓ [Geral] Computador: Definições dizem "só no iPhone"
+  ✓ [Geral] sync: o tablet envia os seus dados para o Google
+  ✓ [Geral] limpeza: "18, uber" passa a "Uber"
+  ✓ [Geral] sync: o iPhone liga-se com o código e recebe os dados do tablet
+  ✓ [Geral] sync: a configuração do atalho também passa para o iPhone
+  ✓ [Geral] sync: o que registas no iPhone aparece no tablet
+  ✓ [Geral] sync: apagar num aparelho apaga no outro
+  ✓ [Geral] sync: gasto do atalho entra uma só vez e aparece nos dois aparelhos — tablet 1 · iPhone 1
+  ✓ [Geral] sem erros de JavaScript (2 aparelhos)
+  ✓ [Geral] Android: sem botão de biometria e registo antigo apagado
+  ✓ [Geral] Android: nenhum pedido biométrico ao abrir
+  ✓ [Geral] "Entrar direto": abre sem pedir código
+  ✓ [Geral] cadeado volta a pedir o código
+  ✓ [Geral] sem erros de JavaScript
+  ✓ [Geral] manifesto sem orientação forçada
+  ✓ [Geral] todos os ficheiros da cache offline existem
+
+=== Stress: 3 anos de dados num tablet fraco (CPU 6× mais lenta) ===
+  ✓ [Stress] dados de teste criados — 7665 registos
+  ✓ [Stress] com 3 anos de dados nenhuma página bloqueia (> 2,5 s) — máx 808 ms
+  ✓ [Stress] guardar tudo é rápido — 162 ms
+  ✓ [Stress] sem erros de JavaScript
+
+────────
+139/139 testes passaram em 315 s

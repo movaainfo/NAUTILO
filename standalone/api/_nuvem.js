@@ -41,7 +41,7 @@ const blobStore = token => {
     async head(p) { try { const r = await api('?' + new URLSearchParams({ url: full(p) })); return { etag: r.etag, size: r.size, at: r.uploadedAt }; } catch (e) { if (e.code === 'not_found' || e.status === 404) return null; throw e; } },
     async list(prefix) { const out = []; let cursor = '';
       for (let i = 0; i < 50; i++) { const q = new URLSearchParams({ prefix, limit: '1000' }); if (cursor) q.set('cursor', cursor);
-        const r = await api('?' + q); (r.blobs || []).forEach(b => out.push({ pathname: b.pathname, etag: b.etag, size: b.size, url: b.url }));
+        const r = await api('?' + q); (r.blobs || []).forEach(b => out.push({ pathname: b.pathname, etag: b.etag, size: b.size, url: b.url, at: b.uploadedAt }));
         if (!r.hasMore || !r.cursor) break; cursor = r.cursor; }
       return out; },
     async del(items) { const urls = items.map(b => b.url || full(b.pathname || b)).filter(Boolean); for (let i = 0; i < urls.length; i += 100) await api('/delete', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ urls: urls.slice(i, i + 100) }) }); }
@@ -59,7 +59,9 @@ const dirStore = dir => {
       fs.mkdirSync(path.dirname(f(p)), { recursive: true }); fs.writeFileSync(f(p), buf); return { etag: tag(buf), url: p }; },
     async get(p) { const b = read(p); return b ? { buf: b, etag: tag(b) } : null; },
     async head(p) { const b = read(p); return b ? { etag: tag(b), size: b.length } : null; },
-    async list(prefix) { return walk(dir, '', []).filter(p => p.startsWith(prefix)).sort().map(p => { const b = read(p); return { pathname: p, etag: tag(b), size: b.length, url: p }; }); },
+    // só percorre a subpasta do prefixo (a pasta inteira ficava lenta com muitas contas)
+    async list(prefix) { const base = prefix.includes('/') ? prefix.slice(0, prefix.lastIndexOf('/')) : '', d = base ? f(base) : dir;
+      return walk(d, base, []).filter(p => p.startsWith(prefix)).sort().map(p => { const b = read(p); return { pathname: p, etag: tag(b), size: b.length, url: p }; }); },
     async del(items) { items.forEach(b => { try { fs.unlinkSync(f(b.pathname || b.url || b)); } catch (e) { } }); }
   };
 };
@@ -114,7 +116,10 @@ const HITS = new Map();
 const limit = (req, key, n, ms) => { const ip = String(req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || '').split(',')[0].trim(), k = key + '|' + ip, now = Date.now();
   const h = (HITS.get(k) || []).filter(t => now - t < ms); h.push(now); HITS.set(k, h); if (HITS.size > 5000) HITS.delete(HITS.keys().next().value); return h.length > n; };
 const body = async req => { if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) return req.body;
-  const form = /x-www-form-urlencoded/i.test(req.headers['content-type'] || ''), parse = t => { if (form) return Object.fromEntries(new URLSearchParams(t)); try { return JSON.parse(t || '{}'); } catch (e) { return {}; } };
+  const ct = req.headers['content-type'] || '', form = /x-www-form-urlencoded/i.test(ct), mb = (ct.match(/multipart\/form-data;\s*boundary="?([^";]+)"?/i) || [])[1];
+  // o Formulário dos Atalhos do iPhone pode chegar como multipart: só os campos de texto
+  const multi = t => { const o = {}; t.split('--' + mb).forEach(part => { const m = part.match(/name="([^"]+)"(?:;[^\r\n]*)?\r?\n(?:[^\r\n]+\r?\n)*\r?\n([\s\S]*?)\r?\n?$/); if (m && !/filename=/.test(part.split(/\r?\n\r?\n/)[0])) o[m[1]] = m[2]; }); return o; };
+  const parse = t => { if (mb) return multi(t); if (form) return Object.fromEntries(new URLSearchParams(t)); try { return JSON.parse(t || '{}'); } catch (e) { return {}; } };
   if (typeof req.body === 'string') return parse(req.body);
   const chunks = []; let n = 0; for await (const c of req) { n += c.length; if (n > 4.4e6) throw err('grande', 'pedido grande demais', 413); chunks.push(c); }
   return parse(Buffer.concat(chunks).toString()); };

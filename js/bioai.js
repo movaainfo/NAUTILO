@@ -7,20 +7,42 @@ const n = v => U.num(v) || 0;
 
 /* ================= IA (Google Gemini, chave grátis do utilizador) ================= */
 const AI = OS.AI = {};
-AI.key = () => OS.one('diet').aiKey || '';
+/* Numa conta Náutilo a IA funciona sem configurar nada: sem chave própria, os pedidos no formato do Gemini vão para o servidor
+   do Náutilo (api/ia), que usa a chave Google do projeto ou, sem ela, a IA grátis (só texto). A chave própria continua opcional. */
+const SRV = 'nautilo-servidor', GURL = 'https://generativelanguage.googleapis.com/';
+AI.own = () => OS.one('diet').aiKey || '';
+AI.srv = () => !!(OS.Acc && OS.Acc.on && OS.Acc.token && OS.Acc.token());
+AI.srvGoogle = () => !!(U.ls.get('os2iaSrv', {}) || {}).g;
+AI.key = () => AI.own() || (AI.srv() ? SRV : '');
+// para voz e fotos: só a chave própria ou o servidor com a chave Google
+AI.gkey = () => AI.own() || (AI.srv() && AI.srvGoogle() ? SRV : '');
+AI.viaSrv = () => !AI.own() && AI.srv();
+{ const of = window.fetch && window.fetch.bind(window);
+  if (of) window.fetch = (u, o) => { const s = typeof u === 'string' ? u : (u && u.url) || '';
+    if (s.startsWith(GURL) && s.includes('key=' + SRV)) { const path = s.slice(GURL.length).replace(/([?&])key=[^&]*&?/, '$1').replace(/[?&]$/, ''), h = Object.assign({}, (o && o.headers) || {}, { authorization: 'Bearer ' + OS.Acc.token() });
+      return of(new URL('api/ia?p=' + encodeURIComponent(path), document.baseURI).href, Object.assign({}, o || {}, { headers: h }, o && typeof o.body === 'string' && OS.aiN ? { body: OS.aiN(o.body) } : {})); }
+    // os pedidos à IA levam o nome que a pessoa deu à sua IA
+    if (o && typeof o.body === 'string' && OS.aiN && /generativelanguage|pollinations|anthropic|api\/ia/.test(s)) o = Object.assign({}, o, { body: OS.aiN(o.body) });
+    return of(u, o); }; }
+OS.on('ready', () => { if (!AI.srv()) return; const c = U.ls.get('os2iaSrv', null); if (c && Date.now() - c.at < 6 * 36e5) return;
+  fetch(new URL('api/ia?p=estado', document.baseURI).href).then(r => r.json()).then(j => { U.ls.set('os2iaSrv', { g: !!j.google, at: Date.now() }); }).catch(() => { }); });
 /* A IA do NÁUTILO é o Spyke: uma só chave (Gemini, grátis) liga tudo o que usa IA — exames, fotos da comida, investimentos,
    universidade, e-mails, notícias, decisões, conversa com o Spyke. Liga-se num só sítio: Definições → Spyke. */
 AI.uses = ['conversar com o Spyke e a voz Gemini', 'decisões (Centro de decisões)', 'e-mails e LinkedIn', 'notícias resumidas e traduzidas', 'fotos da comida', 'exames de bioimpedância', 'investimentos e empresas', 'universidade (resumos, cartões, testes)', 'escala do trabalho por foto', 'Fé, biografia e treinador de desporto'];
 const STEPS = `<ol class="ai-steps"><li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> com a tua conta Google.</li><li>Toca em <b>Create API key</b> (Criar chave) e copia a chave.</li><li>Cola-a aqui e toca em <b>Ligar</b>.</li></ol>`;
 const FORM = act => `<div class="row gap8 ai-row"><input class="field grow" data-aikey placeholder="Cola aqui a chave (começa por AIza…)" autocomplete="off" autocapitalize="none" spellcheck="false"><button class="btn pri" data-act="aiKeySave" data-next="${act || ''}">Ligar</button></div>`;
-const moved = () => OS.Move && !OS.Move.isOld && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
+const moved = () => OS.Move && !OS.Move.isOld && !(OS.Acc && OS.Acc.on) && !U.ls.get('os2sync', 0) ? `<small class="mut">Já tinhas o Spyke ligado no endereço antigo? <a href="#definicoes" data-act="mvWelcome">Traz os teus dados</a> e a chave vem com eles.</small>` : '';
 // cartão pequeno onde uma função precisa da IA: o mesmo em toda a app. A configuração (chave, passos) vive só em Definições → Spyke.
 AI.setup = act => `<div class="ai-off"><div class="ai-h"><span class="ai-orb" aria-hidden="true"></span><div><b>Esta função usa o Spyke, a IA do NÁUTILO</b><small>Liga a IA uma vez em Definições e tudo o que usa IA passa a funcionar na app inteira.</small></div></div>
   <a class="btn pri sm ai-go" href="#definicoes.spyke">${UI.ic('settings')}Ligar em Definições → Spyke</a></div>`;
 // dentro de uma janela, o botão leva às Definições e fecha a janela logo a seguir (depois de navegar)
 document.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('#modal .ai-go')) setTimeout(() => UI.closeModal(), 0); });
 // secção central (Definições → Spyke)
-AI.panel = () => { const k = AI.key(), st = U.ls.get('os2aiOk', null);
+AI.panel = () => { if (AI.viaSrv() && !OS.ui.aiChg) return `<div class="pn" id="spyBrain"><div class="pn-h"><h3>Cérebro do Spyke (IA)</h3><span class="bdg pos">ligado</span></div>
+    <p class="mut" style="margin:0 0 8px;font-size:13px">A IA já funciona na tua conta, sem configurares nada: ${AI.uses.join(', ')}.</p>
+    <div class="ai-eng">${AI.srvGoogle() ? 'Usa a IA do Google através do Náutilo: lê texto, fotos e PDFs.' : 'Usa a IA grátis do Náutilo para texto (conversa, resumos, e-mails, notícias, decisões). <b>Para ler fotos e PDFs</b> (comida, exames, escala), liga a tua chave grátis do Google: demora 1 minuto.'}</div>
+    <div class="row gap8" style="margin-top:10px"><button class="btn sm" data-act="aiTest">${UI.ic('zap')}Testar</button><button class="btn sm ghost" data-act="aiChange">Usar a minha chave Google (opcional)</button></div></div>`;
+  const k = AI.own(), st = U.ls.get('os2aiOk', null);
   return `<div class="pn" id="spyBrain"><div class="pn-h"><h3>Cérebro do Spyke (IA)</h3><span class="bdg ${k ? (st && st.ok === false ? 'neg' : 'pos') : ''}">${k ? (st && st.ok === false ? 'chave com problema' : 'ligado') : 'desligado'}</span></div>
     <p class="mut" style="margin:0 0 8px;font-size:13px">Uma só ligação para a app inteira: ${AI.uses.join(', ')}.</p>
     <div class="ai-eng"><b>Sem limites e sem pagar:</b> a app usa os modelos mais recentes do Google (descobertos sozinhos: ${esc(MODELS.slice(0, 3).join(', '))}${MODELS.length > 3 ? '…' : ''}) e, quando a cota grátis de um acaba, passa logo ao seguinte. Se todos acabarem, responde a <b>IA grátis de reserva</b> (modelo aberto GPT-OSS, sem chave).${AI.lastEngine ? ` <small class="mut">Última resposta: ${esc(AI.lastEngine === 'reserva' ? 'IA de reserva' : AI.lastEngine)}.</small>` : ''}
@@ -103,7 +125,7 @@ OS.on('ready', () => { if (AI.key()) setTimeout(() => AI.discover(), 5000); });
 const FIELDS = { weight: 'peso total em kg', bf: 'percentagem de gordura corporal (PBF, %)', fatKg: 'massa de gordura corporal em kg (Body Fat Mass)', muscleKg: 'massa muscular esquelética em kg (SMM)', leanKg: 'massa livre de gordura / massa magra em kg (FFM, LBM)', water: 'água corporal em % do peso', waterL: 'água corporal total em litros (TBW)', protein: 'proteína em % do peso (se só houver kg, converte para % do peso)', bone: 'minerais / massa óssea em kg', visceral: 'nível de gordura visceral (número)', subq: 'gordura subcutânea em %', bmr: 'taxa metabólica basal em kcal', metAge: 'idade metabólica em anos', lArmL: 'massa magra braço esquerdo kg', lArmR: 'massa magra braço direito kg', lTrunk: 'massa magra tronco kg', lLegL: 'massa magra perna esquerda kg', lLegR: 'massa magra perna direita kg', gArmL: 'gordura braço esquerdo em %', gArmR: 'gordura braço direito em %', gTrunk: 'gordura tronco em %', gLegL: 'gordura perna esquerda em %', gLegR: 'gordura perna direita em %', ecw: 'rácio água extracelular / água total (ECW/TBW, ex. 0.380)', phase: 'ângulo de fase em graus', score: 'pontuação do aparelho (ex. InBody score)', waist: 'perímetro da cintura cm', hip: 'perímetro da anca cm', neck: 'pescoço cm', chest: 'peito cm', abdomen: 'abdómen cm', armLc: 'braço esquerdo cm', armRc: 'braço direito cm', thighL: 'coxa esquerda cm', thighR: 'coxa direita cm', calf: 'gémeo cm' };
 const READ = `Esta imagem (ou PDF) é o resultado de um exame de bioimpedância (InBody, Tanita, Omron ou outro). Lê TODOS os valores com atenção. Responde APENAS com JSON com estas chaves (número sem unidades, ponto decimal; null se não aparecer; NÃO inventes valores): {"date":"AAAA-MM-DD ou null","device":"nome do aparelho ou null",${Object.entries(FIELDS).map(([k, d]) => `"${k}": "${d}"`).join(',')},"legivel": true/false}. Se a análise segmentar só mostrar percentagens do normal, ignora-as. Atenção a esquerda/direita.`;
 let SC = null; // { step:'pick'|'busy'|'err', err }
-const scanHTML = () => { if (!AI.key()) return AI.setup('bioScan');
+const scanHTML = () => { if (!AI.gkey()) return AI.setup('bioScan');
   if (SC.step === 'busy') return `<div class="fd-ai" style="align-items:center;text-align:center"><div class="fd-spin"></div><h3>A ler o exame…</h3><p class="mut">A IA está a ler todos os valores. Demora uns segundos.</p></div>`;
   return `<div class="fd-ai"><h3>Ler exame de bioimpedância</h3><p class="mut">Tira uma foto ao papel do resultado (bem direito, com luz e sem reflexos) ou escolhe o PDF / captura de ecrã da app da balança. A IA preenche tudo e depois diz-te onde melhorar.</p>
     <label class="fd-cam" for="bioFile">${UI.ic('camera')}<b>Tirar foto ou escolher ficheiro</b><small>Foto, captura de ecrã ou PDF</small></label><input id="bioFile" type="file" accept="image/*,application/pdf" hidden>${SC.err ? `<p class="neg">${esc(SC.err)}</p>` : ''}</div>`; };
@@ -202,7 +224,7 @@ const exBody = () => { const v = EX.v, step = EX.step, num = (k, l, u, ph, help)
     <div class="ex-g">${num('waist', 'Cintura', 'cm', '', 'na linha do umbigo, barriga relaxada, depois de expirar')}${num('neck', 'Pescoço', 'cm', '', 'logo abaixo da maçã de Adão')}${num('hip', 'Anca', 'cm', '', 'na parte mais larga dos glúteos' + (v.sex === 'F' ? ' (obrigatório)' : ' (opcional)'))}${num('armRc', 'Braço contraído', 'cm', '', 'opcional')}${num('thighR', 'Coxa', 'cm', '', 'opcional, a meio da coxa')}</div>
     ${EX.err ? `<p class="neg">${esc(EX.err)}</p>` : ''}<div class="row gap8 end"><button class="btn ghost" data-mclose>Cancelar</button><button class="btn pri" data-act="exNext">Continuar</button></div>`;
   if (step === 2) return `${dots}<h3>Fotos do corpo</h3><p class="mut">Opcional, mas torna o resultado bem mais preciso. Roupa justa ou de treino, corpo inteiro, boa luz, braços ligeiramente afastados. As fotos só servem para a análise: <b>não ficam guardadas</b>.</p>
-    ${AI.key() ? `<div class="ex-ph">${PHOTOS.map(([k, l]) => `<label class="ex-pc ${EX.ph[k] ? 'on' : ''}" for="exph_${k}">${EX.ph[k] ? `<img src="data:image/jpeg;base64,${EX.ph[k]}" alt="">` : UI.ic('camera')}<b>${l}</b></label><input id="exph_${k}" data-exph="${k}" type="file" accept="image/*" capture="environment" hidden>`).join('')}</div>` : `<div class="note">Para usar fotos, liga a IA (grátis) aqui em baixo. Também podes continuar só com as medidas.</div>${AI.setup('exShow')}`}
+    ${AI.gkey() ? `<div class="ex-ph">${PHOTOS.map(([k, l]) => `<label class="ex-pc ${EX.ph[k] ? 'on' : ''}" for="exph_${k}">${EX.ph[k] ? `<img src="data:image/jpeg;base64,${EX.ph[k]}" alt="">` : UI.ic('camera')}<b>${l}</b></label><input id="exph_${k}" data-exph="${k}" type="file" accept="image/*" capture="environment" hidden>`).join('')}</div>` : `<div class="note">Para usar fotos, liga a IA (grátis) aqui em baixo. Também podes continuar só com as medidas.</div>${AI.setup('exShow')}`}
     ${EX.err ? `<p class="neg">${esc(EX.err)}</p>` : ''}<div class="row gap8 end"><button class="btn ghost" data-act="exBack">Voltar</button><button class="btn pri" data-act="exRun">${UI.ic('zap')}${Object.values(EX.ph).some(Boolean) ? 'Fazer o exame' : 'Fazer só com as medidas'}</button></div>`;
   return `${dots}<div class="fd-ai" style="align-items:center;text-align:center"><div class="fd-spin"></div><h3>A fazer o exame…</h3><p class="mut">${EX.msg || 'A analisar as tuas medidas e fotos.'}</p></div>`; };
 const exDraw = () => { const b = document.getElementById('exBox'); if (b) b.innerHTML = exBody(); };

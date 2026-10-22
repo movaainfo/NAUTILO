@@ -11,6 +11,14 @@ OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', alw
 // numa conta (versão pública) o Spyke começa calado: sem microfone sempre ligado nem modo Jarvis ao abrir (cada pessoa liga se quiser)
 if (OS.Acc && OS.Acc.pub) Object.assign(OS.ONE_DEF.spyke, { always: false, jarvisStart: false, morning: false, siri: false, fix3: 1, fix4: 1 });
 const cfg = () => Object.assign({}, OS.ONE_DEF.spyke, OS.one('spyke'));
+/* o nome da IA: cada pessoa dá o seu (Spyke por omissão) e diz se é "o" ou "a", para o português sair certo.
+   Tudo o que a app mostra, diz e pede à IA com "Spyke" passa a usar o nome escolhido. */
+OS.aiName = () => String(cfg().nome || '').trim().slice(0, 24) || 'Spyke';
+OS.aiFem = () => !!cfg().nome && cfg().art === 'a';
+OS.aiN = s => { const n = OS.aiName(); if (n === 'Spyke' || typeof s !== 'string' || s.indexOf('Spyke') < 0) return s;
+  if (OS.aiFem()) s = s.replace(/\b([dnDN]|[pP]el)o Spyke\b/g, (m, p) => p + 'a ' + n).replace(/\bao Spyke\b/g, 'à ' + n).replace(/\bAo Spyke\b/g, 'À ' + n).replace(/\bo Spyke\b/g, 'a ' + n).replace(/\bO Spyke\b/g, 'A ' + n);
+  return s.replace(/Spyke/g, n); };
+OS.aiNameOk = v => /^[\p{L}][\p{L}\p{N} '-]{0,23}$/u.test(String(v || '').trim());
 // vozes masculinas do ElevenLabs (as tuas próprias vozes aparecem quando carregas a lista)
 const EL = [['onwK4e9ZLuTAKqWW03F9', 'Daniel · grave e elegante (estilo Jarvis)'], ['pNInz6obpgDQGcFmaJgB', 'Adam · grave e firme'], ['nPczCjzI2devNBz1zQrb', 'Brian · grave e calmo'], ['JBFqnCBsd6RMkjVDRZzb', 'George · quente'], ['N2lVS1w4EtoT3dr4eOWO', 'Callum · rouco']];
 const S = OS.Spyke = {};
@@ -18,11 +26,18 @@ OS.S.spymem = { label: 'Memória do Spyke', title: r => String(r.text || '').sli
 OS.S.spyroutines = { label: 'Rotina de voz', title: r => r.phrase || 'Rotina', fields: [{ k: 'phrase', l: 'Quando eu disser', t: 'text', req: 1, ph: 'ex.: modo leitura' }, { k: 'steps', l: 'O Spyke faz (um comando por linha)', t: 'area', rows: 5, req: 1, ph: 'abre as Leituras\nclima\nnotícias' }, { k: 'reply', l: 'E diz no fim (opcional)', t: 'text' }] };
 const N = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w\s€.,:%-]/g, ' ').replace(/\s+/g, ' ').trim();
 // o nome dele como o ditado do iPhone o escreve: Spyke, Spike, Spaik, Espaique, Spike's, Speak…
-const WAKE_L = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|e?spa[iy]\w*|espi[ck]\w*|speak|spy)\b/;
+const WAKE_L0 = /\b(e?sp[aeiy]{1,2}[ck]+[eiy]?s?|spike|spyke|spaik\w*|e?spa[iy]\w*|espi[ck]\w*|speak|spy)\b/;
 // com o ouvido silencioso a transcrição escreve o que ouviu (Spike, Spyke, Spaik, Espaique…): só essas formas contam, nada de palavras parecidas
-const WAKE_S = /\b(e?spaik\w*|e?spaiq\w*|e?spaic\w*|e?spyk\w*|e?spikes?|e?spaiky?)\b/;
+const WAKE_S0 = /\b(e?spaik\w*|e?spaiq\w*|e?spaic\w*|e?spyk\w*|e?spikes?|e?spaiky?)\b/;
+let WAKE_L = WAKE_L0, WAKE_S = WAKE_S0, strictNow = false;
 let WAKE = WAKE_L, WAKET = new RegExp('^' + WAKE.source.replace(/\\b/g, '') + '$');
-const wakeMode = strict => { const r = strict ? WAKE_S : WAKE_L; if (r !== WAKE) { WAKE = r; WAKET = new RegExp('^' + r.source.replace(/\\b/g, '') + '$'); } };
+const wakeMode = strict => { strictNow = !!strict; const r = strict ? WAKE_S : WAKE_L; if (r !== WAKE) { WAKE = r; WAKET = new RegExp('^' + r.source.replace(/\\b/g, '') + '$'); } };
+// com outro nome, chama-se por esse nome (a primeira palavra, como o ditado a escreve)
+S.setWakeName = () => { const n = OS.aiName(); if (n === 'Spyke') { WAKE_L = WAKE_L0; WAKE_S = WAKE_S0; }
+  else { const w = N(n).replace(/[^\w ]/g, '').split(' ').filter(Boolean)[0] || 'spyke'; WAKE_L = WAKE_S = new RegExp('\\b(' + w + 's?)\\b'); }
+  WAKE = null; wakeMode(strictNow); };
+OS.on('ready', () => S.setWakeName()); OS.on('one:spyke', () => S.setWakeName());
+{ const t0 = UI.toast, m0 = UI.modal; UI.toast = (m, ...r) => t0(OS.aiN(m), ...r); UI.modal = (h, ...r) => m0(OS.aiN(h), ...r); }
 S._wakeMode = wakeMode; S._isWake = t => WAKE.test(N(t));
 const FILLW = new Set(['ei', 'hey', 'oi', 'ola', 'ok', 'okay', 'e', 'ai', 'eai', 'fala', 'o', 'ah', 'eh']);
 // tira o nome (e o "ei", "olá", "e aí" logo antes) e devolve o resto, com acentos: "Bom dia, Spike" → "Bom dia"; "Spike" → ""; sem nome → null
@@ -121,7 +136,7 @@ const ttsModels = async key => { const c = U.ls.get('os2ttsl', null); if (c && D
 // A língua vai na configuração da voz (languageCode), não no texto: antes as instruções iam escritas no pedido e o modelo às vezes
 // lia-as em voz alta ("fala sempre em português…") antes do resumo. Agora o pedido leva SÓ o texto a dizer.
 const TTSTO = 40000; let noLang = U.ls.get('os2ttsnl', 0);
-const gemClip = async text => { const key = OS.AI && OS.AI.key(); if (!key) throw new Error('sem chave da IA'); const c = cfg(), ck = 'g' + c.voice + c.accent + text; if (cache.has(ck)) return cache.get(ck);
+const gemClip = async text => { const key = OS.AI && OS.AI.gkey(); if (!key) throw new Error('sem chave da IA'); const c = cfg(), ck = 'g' + c.voice + c.accent + text; if (cache.has(ck)) return cache.get(ck);
   const lang = c.accent === 'PT' ? 'pt-PT' : 'pt-BR';
   const best = U.ls.get('os2ttsm', ''), found = await ttsModels(key), all = found.concat(TTS.filter(m => !found.includes(m))), list = best ? [best].concat(all.filter(m => m !== best)) : all; let last = '';
   const call = async (m, withLang) => { const ctl = window.AbortController ? new AbortController() : null, to = ctl ? setTimeout(() => ctl.abort(), TTSTO) : 0;
@@ -174,7 +189,7 @@ let paused = '';
 S.pauseVoice = () => { try { if (AU && !AU.paused && playing) { AU.pause(); paused = 'au'; } } catch (e) { } try { if (window.speechSynthesis && speechSynthesis.speaking && !speechSynthesis.paused) { speechSynthesis.pause(); paused = paused || 'ss'; } } catch (e) { } return !!paused; };
 S.resumeVoice = () => { const p = paused; paused = ''; try { if (p === 'au' && AU && playing) { const r = AU.play(); r && r.catch && r.catch(() => { }); } } catch (e) { } try { if (window.speechSynthesis && speechSynthesis.paused) speechSynthesis.resume(); } catch (e) { } };
 S.stop = () => { tok++; paused = ''; try { playing && playing.stop(); } catch (e) { } playing = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { } try { rec && rec.abort(); } catch (e) { } setSt('idle'); };
-const order = () => { const c = cfg(), has = { azure: !!c.azKey, eleven: !!c.elKey, gemini: !!(OS.AI && OS.AI.key()), device: true }, pref = c.eng === 'gemini' ? ['gemini', 'azure', 'eleven', 'device'] : c.eng === 'eleven' ? ['eleven', 'azure', 'gemini', 'device'] : c.eng === 'device' ? ['device'] : ['azure', 'eleven', 'gemini', 'device']; return pref.filter(e => has[e]); };
+const order = () => { const c = cfg(), has = { azure: !!c.azKey, eleven: !!c.elKey, gemini: !!(OS.AI && OS.AI.gkey()), device: true }, pref = c.eng === 'gemini' ? ['gemini', 'azure', 'eleven', 'device'] : c.eng === 'eleven' ? ['eleven', 'azure', 'gemini', 'device'] : c.eng === 'device' ? ['device'] : ['azure', 'eleven', 'gemini', 'device']; return pref.filter(e => has[e]); };
 S.say = async (text, o = {}) => { if (!text) return; S.stop(); const my = ++tok; curSay = N(text); if (!o.bg) { open(); if (!o.again) push('spyke', text); } else UI.toast(text.slice(0, 160)); setSt('thinking'); hist.push({ r: 'spyke', t: text }); needTap = ''; voiceErr = '';
   let res = '';
   const ord = o.eng ? [o.eng].concat(order().filter(x => x !== o.eng)) : order();
@@ -351,6 +366,31 @@ S.memAdd = memAdd;
 
 /* ================= rotinas ================= */
 // junta o que cada passo diria e fala tudo de uma vez no fim
+{ const say0 = S.say; S.say = (t, o) => say0(OS.aiN(t), o); }
+/* ---------- o nome da tua IA ---------- */
+const NAMES = ['Spyke', 'Atlas', 'Nova', 'Luna', 'Orion', 'Aurora', 'Max', 'Íris'];
+S.namePanel = () => { const c = cfg(), n = c.nome || '';
+  return `<div class="pn" id="aiName"><div class="pn-h"><h3>Nome da tua IA</h3><span class="mut" style="font-size:12px">${esc(OS.aiName())}</span></div>
+    <p class="mut" style="margin:0 0 10px;font-size:13px">É assim que a chamas por voz ("${esc(OS.aiName())}, como está o meu dia?") e como ela aparece em toda a app.</p>
+    <form class="col gap8" data-form="aiNameSave">${nameFields(n, c.art)}<div><button class="btn pri sm">Guardar o nome</button></div></form></div>`; };
+const nameFields = (n, art) => `<input class="field" name="nome" maxlength="24" placeholder="ex.: Nova" value="${esc(n)}" aria-label="Nome da IA" autocomplete="off">
+  <div class="row gap6" style="flex-wrap:wrap">${NAMES.map(x => `<button type="button" class="chip" data-act="aiNamePick" data-n="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+  <div class="seg" role="radiogroup" aria-label="Tratar por"><label><input type="radio" name="art" value="o" ${art !== 'a' ? 'checked' : ''}> é ele</label><label><input type="radio" name="art" value="a" ${art === 'a' ? 'checked' : ''}> é ela</label></div>`;
+A.aiNamePick = b => { const f = b.closest('form'), i = f && f.elements.nome; if (i) { i.value = b.dataset.n; if (f.elements.art) [...f.querySelectorAll('input[name=art]')].forEach(r => { r.checked = r.value === (/a$/i.test(b.dataset.n) ? 'a' : 'o'); }); } };
+OS.forms = OS.forms || {};
+OS.forms.aiNameSave = f => { const v = String(f.elements.nome.value || '').trim(), art = ([...f.querySelectorAll('input[name=art]')].find(r => r.checked) || {}).value || 'o';
+  if (!OS.aiNameOk(v)) { UI.toast('Escolhe um nome com letras (até 24).', 'warn'); return; }
+  OS.setOne('spyke', { nome: v === 'Spyke' ? '' : v, art, nomeAt: U.today() }); S.setWakeName(); UI.closeModal(); UI.toast('A tua IA chama-se ' + v, 'pos'); OS.request(); };
+// numa conta nova: perguntar o nome uma vez (depois de aceitar os termos)
+const asked = () => { try { return !!sessionStorage.getItem('os2aiNameAsk'); } catch (e) { return false; } };
+const askName = () => { if (!(OS.Acc && OS.Acc.pub) || window.__noAsk || cfg().nomeAt || asked() || document.getElementById('modal') && !document.getElementById('modal').hidden || (OS.Legal && OS.Legal.pending && OS.Legal.pending())) return false;
+  try { sessionStorage.setItem('os2aiNameAsk', '1'); } catch (e) { }
+  UI.modal(`<form style="padding:20px" class="col gap10" data-form="aiNameSave"><h3 style="margin:0">Dá um nome à tua IA</h3>
+    <p class="mut" style="margin:0">A tua assistente pessoal conversa contigo, organiza o dia, resume e-mails e notícias e ajuda-te a decidir. Já está ligada: só falta o nome. Chamas por ela pelo nome.</p>
+    ${nameFields('', 'o')}<div class="row gap8"><button class="btn pri">Guardar</button><button type="button" class="btn ghost" data-act="aiNameLater">Fica Spyke</button></div></form>`, 'ai-name'); return true; };
+A.aiNameLater = () => { OS.setOne('spyke', { nomeAt: U.today() }); UI.closeModal(); };
+S.askName = askName;
+OS.on('ready', () => setTimeout(askName, 2500));
 const runRoutine = async R => { const real = S.say, said = []; S.say = (txt) => { if (txt) said.push(txt); return Promise.resolve(); };
   try { for (const step of String(R.steps || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 12)) await S.handle(step, { quiet: true, inRoutine: true }); } finally { S.say = real; }
   return S.say([...said, R.reply || ''].filter(Boolean).join(' ') || 'Rotina feita.'); };
@@ -467,7 +507,7 @@ const ib = () => OS.one('inbox');
 const siriReady = () => !!(ib().url && ib().key && +(ib().ver || 0) >= 9 && cfg().siri);
 S.push = async force => { if (!siriReady() || !OS.Inbox || !OS.Inbox.post) return false; const last = U.ls.get('os2spPush', 0); if (!force && Date.now() - last < 10 * 60e3) return false;
   const t = U.today(), t2 = U.addDays(t, 1), o = { op: 'br', j: JSON.stringify({ d: t, t: S.brief(t), d2: t2, t2: S.brief(t2), at: Date.now() }), cx: S.ctx() };
-  if (cfg().siriAsk && OS.AI && OS.AI.key()) o.gk = OS.AI.key(); else o.nogk = '1';
+  if (cfg().siriAsk && OS.AI && OS.AI.own()) o.gk = OS.AI.own(); else o.nogk = '1';
   try { const j = await OS.Inbox.post(o); if (j && j.ok) { U.ls.set('os2spPush', Date.now()); return true; } } catch (e) { } return false; };
 OS.on('ready', () => setTimeout(() => S.push(), 9000)); setInterval(() => { if (!document.hidden) S.push(); }, 15 * 60e3);
 document.addEventListener('visibilitychange', () => { if (document.hidden && Date.now() - U.ls.get('os2spPush', 0) > 3 * 60e3) S.push(true); });
@@ -486,16 +526,16 @@ const setSt = s => { if ((st === 'speaking') !== (s === 'speaking')) { earMark()
   const talk = s === 'speaking' || s === 'thinking'; if (talk && !hush && !cfg().barge && !silent()) { hush = true; earOff(); } else if (!talk && hush) { hush = false; setTimeout(bgSync, 350); }
   st = s; if (s === 'speaking' && !silent()) setTimeout(bargeOn, 400); else bargeOff(); if (el) { el.dataset.st = s; const l = el.querySelector('.spy-st'); if (l) l.textContent = STL[s] || idleTxt(); el.querySelectorAll('.spy-m.talking').forEach(x => x.classList.remove('talking')); if (s === 'speaking') { const m = el.querySelectorAll('.spy-m.spyke'); m.length && m[m.length - 1].classList.add('talking'); } } if (s === 'idle') setTimeout(bgSync, 300); orb(); };
 const bubbles = () => msgs.map(m => `<div class="spy-m ${m.r}"><div class="spy-bb">${esc(m.t)}${m.tap ? `<button class="btn xs pri spy-tap" data-act="spyTap">${UI.ic('play')}Ouvir</button>` : ''}</div></div>`).join('') + (live ? `<div class="spy-m user live"><div class="spy-bb">${esc(live)}</div></div>` : '');
-const renderChat = () => { if (!el) return; const c = el.querySelector('.spy-chat'); if (!c) return; c.innerHTML = bubbles() || `<div class="spy-empty">Diz "Bom dia", pede uma tarefa ou pergunta qualquer coisa.</div>`; c.scrollTop = c.scrollHeight; if (st === 'speaking') setSt('speaking'); };
+const renderChat = () => { if (!el) return; const c = el.querySelector('.spy-chat'); if (!c) return; c.innerHTML = OS.aiN(bubbles()) || `<div class="spy-empty">Diz "Bom dia", pede uma tarefa ou pergunta qualquer coisa.</div>`; c.scrollTop = c.scrollHeight; if (st === 'speaking') setSt('speaking'); };
 const push = (r, t) => { live = ''; msgs.push({ r, t: String(t) }); if (msgs.length > 40) msgs = msgs.slice(-40); renderChat(); };
 const cap = (who, t) => { if (who === 'user') { live = t; renderChat(); } else push('spyke', t); };
 const SUG = ['Bom dia', 'O que faço agora?', 'Agenda de amanhã', 'Os meus e-mails', 'Quanto gastei este mês?', 'Hábitos que faltam', 'Dá-me uma frase', 'Abre a Floresta'];
-function draw() { if (!el) return; el.innerHTML = `<div class="spy-bg" data-act="spyClose"></div><div class="spy-card" role="dialog" aria-modal="true" aria-label="Spyke">
-  <div class="spy-h"><b>SPYKE</b>${SR && cfg().always ? `<button type="button" class="spy-on" data-act="spyEar">${ear ? 'a ouvir · desligar' : 'microfone desligado · ligar'}</button>` : `<span class="spy-on">${cfg().clap ? 'palmas' : ''}</span>`}<button type="button" class="icon-btn" data-act="spyCfg" aria-label="Definições do Spyke">${UI.ic('settings')}</button><button class="icon-btn" data-act="spyClose" aria-label="Fechar">${UI.ic('x')}</button></div>
+function draw() { if (!el) return; el.innerHTML = OS.aiN(`<div class="spy-bg" data-act="spyClose"></div><div class="spy-card" role="dialog" aria-modal="true" aria-label="Spyke">
+  <div class="spy-h"><b>${esc(OS.aiName().toUpperCase())}</b>${SR && cfg().always ? `<button type="button" class="spy-on" data-act="spyEar">${ear ? 'a ouvir · desligar' : 'microfone desligado · ligar'}</button>` : `<span class="spy-on">${cfg().clap ? 'palmas' : ''}</span>`}<button type="button" class="icon-btn" data-act="spyCfg" aria-label="Definições do Spyke">${UI.ic('settings')}</button><button class="icon-btn" data-act="spyClose" aria-label="Fechar">${UI.ic('x')}</button></div>
   <div class="spy-top"><canvas class="spy-orb" width="360" height="360" aria-hidden="true"></canvas><div class="spy-st"></div><div class="spy-dg"></div></div>
   <div class="spy-chat" aria-live="polite"></div>
   <div class="spy-dock"><div class="spy-sug">${SUG.map(s => `<button class="chip" data-act="spySug" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>
-    <form class="spy-f" data-form="spyAsk" autocomplete="off"><button type="button" class="spy-mic" data-act="spyListen" aria-label="Falar com o Spyke">${UI.ic('mic')}</button><input id="spyIn" name="q" class="field" placeholder="Escreve ou toca no microfone…" aria-label="Pergunta ao Spyke"><button class="btn spy-send" aria-label="Enviar">${UI.ic('right')}</button><button type="button" class="btn ghost spy-stop" data-act="spyStop" aria-label="Parar">${UI.ic('stop')}</button></form></div></div>`; renderChat(); setSt(st); diag(); }
+    <form class="spy-f" data-form="spyAsk" autocomplete="off"><button type="button" class="spy-mic" data-act="spyListen" aria-label="Falar com o Spyke">${UI.ic('mic')}</button><input id="spyIn" name="q" class="field" placeholder="Escreve ou toca no microfone…" aria-label="Pergunta ao Spyke"><button class="btn spy-send" aria-label="Enviar">${UI.ic('right')}</button><button type="button" class="btn ghost spy-stop" data-act="spyStop" aria-label="Parar">${UI.ic('stop')}</button></form></div></div>`); renderChat(); setSt(st); diag(); }
 const open = () => { if (!el) { el = document.createElement('div'); el.id = 'spy'; document.body.appendChild(el); } if (el.hidden !== false || !el.innerHTML) { el.hidden = false; draw(); } document.documentElement.classList.add('spy-open'); };
 const close = () => { if (!el) return; S.stop(); armed = 0; conv = false; tapEar = 0; clearTimeout(lsT); el.hidden = true; cancelAnimationFrame(raf); raf = 0; document.documentElement.classList.remove('spy-open'); };
 S.open = open; S.close = close; S.state = () => st; S.msgs = () => msgs.slice();

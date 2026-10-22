@@ -834,7 +834,7 @@ const SETS = [['dia', 'Do dia a dia', { head: '', top: 'tshirt', topColor: 0, le
   ['dragao', 'Senhor dos dragões', { head: 'dragao', top: 'a-dragao', legs: 'l-dragao', feet: 'f-ferro', hand: 'machado', shield: '', cape: 'preta', acc: '' }],
   ['rei', 'Rei', { head: 'coroa', top: 'manto', legs: 'social', legsColor: 6, feet: 'sociais', hand: 'trofeu', shield: '', cape: 'real', acc: 'colar' }],
   ['dominus', 'Dominus', { head: 'coroa', top: 'a-dominus', legs: 'l-dominus', feet: 'f-dominus', hand: 'tridente', shield: 'dominus', cape: 'dominus', acc: '' }]];
-D.PX = PX; D.SETS = SETS;
+D.PX = PX; D.SETS = SETS; D.PW = PW; D.PH = PH;
 const PXC = {};
 // dataURL → blob: (o HTML leva um endereço curto em vez da imagem inteira)
 const blobUrl = du => { try { const b = atob(du.split(',')[1]), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return URL.createObjectURL(new Blob([u], { type: 'image/png' })); } catch (e) { return du; } };

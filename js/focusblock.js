@@ -172,6 +172,6 @@ OS.on('ready', () => { draw(); if (B && B.phase !== 'end') wake(); });
 OS.on('ready', () => { const h = V.hoje; if (h && !h._fb) { V.hoje = s => h(s).replace(/(<a class="btn ghost sm" href="#next">[\s\S]*?<\/a>)/, `<div class="row gap6" style="flex-wrap:wrap;justify-content:flex-end"><a class="btn sm pri fb-hb" href="#foco">${UI.ic('lock')}Bloco de foco</a>$1</div>`); V.hoje._fb = 1; } });
 // Definições → Atalhos do iPhone: que apps bloquear e como (modo Foco + Atalhos)
 const fbSettings = () => { const c = cfg(); return `<div class="pn" id="fbSet"><div class="pn-h"><h3>Bloquear apps no iPhone (Bloco de foco)</h3><span class="bdg ${c.sc ? 'pos' : ''}">${c.sc ? 'ligado' : 'desligado'}</span></div>
-  <p class="mut" style="margin:0 0 8px">Apps a bloquear durante um bloco de foco:</p><div class="fb-apps">${APPS.map(a => `<button type="button" class="chip ${c.apps.includes(a) ? 'on' : ''}" data-act="fbApp" data-a="${esc(a)}">${esc(a)}</button>`).join('')}</div></div>${P.apps()}`; };
+  <p class="mut" style="margin:0 0 8px">Apps a bloquear durante um bloco de foco:</p><div class="fb-apps">${APPS.map(a => `<button type="button" class="chip ${c.apps.includes(a) ? 'on' : ''}" data-act="fbApp" data-a="${esc(a)}">${esc(a)}</button>`).join('')}</div><div class="fb-guide">${P.apps()}</div></div>`; };
 OS.FocusBlock = { settings: fbSettings, preset: th => { DR = { th, sel: {}, mins: {}, extra: [] }; OS.request(); }, cands, state: () => B, finish: e => B && finish(e), _set: v => { B = v; save(); draw(); } };
 })();

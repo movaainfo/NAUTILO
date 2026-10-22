@@ -31,7 +31,7 @@ const api = async (path, opt = {}, tries = 3) => { let last = null;
   throw last; };
 const conta = (op, body = {}) => api('conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, S ? { authorization: 'Bearer ' + S.t } : {}), body: JSON.stringify(Object.assign({ op }, body)) });
 const saveS = () => { if (S) LS.set(K.s, S); else LS.del(K.s); };
-const takeConta = (j, email) => { S = Object.assign(S || {}, { t: j.token || (S && S.t), e: (j.conta && j.conta.email) || email || (S && S.e), n: (j.conta && j.conta.nome) || '', perfis: (j.conta && j.conta.perfis) || [] }); saveS(); };
+const takeConta = (j, email) => { S = Object.assign(S || {}, { t: j.token || (S && S.t), e: (j.conta && j.conta.email) || email || (S && S.e), n: (j.conta && j.conta.nome) || '', perfis: (j.conta && j.conta.perfis) || [], adm: j.conta ? !!j.conta.adm : !!(S && S.adm), termos: j.conta ? j.conta.termos || '' : S && S.termos, termosAt: j.conta ? j.conta.termosAt || '' : S && S.termosAt }); saveS(); if (OS.Acc && OS.Acc.navAdm) OS.Acc.navAdm(); };
 
 const Acc = OS.Acc = { on: !personal };
 const A = OS.act = OS.act || {}; OS.forms = OS.forms || {};
@@ -39,8 +39,8 @@ if (personal) {
   /* ---------- modo pessoal: guardar este Náutilo numa conta (o que é do Ryan vai para a conta dele) ---------- */
   const moved = () => OS.one('meta').acc || '';
   // cria (ou entra n)a conta, cria o perfil pessoal com o mesmo código de bloqueio e envia todos os dados deste aparelho
-  Acc.migrate = async (email, senha, criar) => { email = String(email || '').trim().toLowerCase();
-    const j = await conta(criar ? 'registar' : 'entrar', criar ? { email, senha, nome: OS.one('profile').name || '' } : { email, senha }); takeConta(j, email);
+  Acc.migrate = async (email, senha, criar, termos) => { email = String(email || '').trim().toLowerCase();
+    const j = await conta(criar ? 'registar' : 'entrar', criar ? Object.assign({ email, senha, nome: OS.one('profile').name || '' }, termos || {}) : { email, senha }); takeConta(j, email);
     if (j.recuperacao) LS.set('nau:rec', j.recuperacao); // mostrado uma vez, depois de abrir com a conta
     let p = (S.perfis || []).find(x => x.ps);
     if (!p) { const r = await conta('perfil', { acao: 'criar', perfil: { nome: String(OS.one('profile').short || 'Ryan').slice(0, 24), cor: '#7FA9DA', av: '', lk: OS.Lock.curHash(), ps: true } }); takeConta(r); p = r.perfil; }
@@ -59,8 +59,9 @@ if (personal) {
   const go = async criar => { const em = document.getElementById('accMigE'), pw = document.getElementById('accMigP'); if (!em || !pw) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em.value.trim())) return OS.UI.toast('Escreve o teu e-mail.', 'warn');
     if (pw.value.length < 8) return OS.UI.toast('A senha precisa de pelo menos 8 caracteres.', 'warn');
+    const tm = OS.Legal ? OS.Legal.read(document.getElementById('accMig')) : null; if (criar && !tm) return OS.UI.toast('Para criar a conta, marca as três caixas (termos, dados de saúde e de fé, idade).', 'warn');
     OS.UI.toast('A guardar o teu Náutilo na conta…');
-    try { const r = await Acc.migrate(em.value, pw.value, criar); OS.UI.toast(`Guardado: ${r.docs} partes dos teus dados na conta. A abrir com a conta…`, 'pos'); setTimeout(() => location.reload(), 900); }
+    try { const r = await Acc.migrate(em.value, pw.value, criar, tm); OS.UI.toast(`Guardado: ${r.docs} partes dos teus dados na conta. A abrir com a conta…`, 'pos'); setTimeout(() => location.reload(), 900); }
     catch (e) { OS.UI.toast(e.net ? 'Sem internet. Tenta outra vez.' : e.message, 'neg'); } };
   A.accMigNew = () => go(true); A.accMigIn = () => go(false);
   // noutro aparelho do Ryan: o Náutilo já está na conta → entrar nela aqui (os dados vêm da conta)
@@ -72,7 +73,7 @@ if (personal) {
     return `<div class="pn" id="accMig"><div class="pn-h"><h3>${OS.UI.ic('user')}Conta Náutilo</h3>${em ? `<span class="mut">${e(em)}</span>` : ''}</div>
     ${em ? `<p class="mut" style="margin:0 0 10px">O teu Náutilo está guardado na conta <b>${e(em)}</b>. Este aparelho ainda usa o modo antigo (só neste aparelho e no Google Drive).</p><button class="btn pri" data-act="accJoin">Entrar na conta neste aparelho</button>`
     : `<p class="mut" style="margin:0 0 12px">Guarda o teu Náutilo numa conta: tudo o que tens aqui (dados, metas, jogo, definições, ligações) vai para a tua conta, cifrado, com o mesmo código de bloqueio. Depois entras com e-mail e senha em qualquer aparelho e podes criar outros perfis.</p>
-      <div class="col gap8"><label>E-mail<input class="field" id="accMigE" type="email" autocomplete="email"></label><label>Senha da conta (pelo menos 8 caracteres)<input class="field" id="accMigP" type="password" autocomplete="new-password"></label>
+      <div class="col gap8"><label>E-mail<input class="field" id="accMigE" type="email" autocomplete="email"></label><label>Senha da conta (pelo menos 8 caracteres)<input class="field" id="accMigP" type="password" autocomplete="new-password"></label>${OS.Legal ? OS.Legal.checks() : ''}
       <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="accMigNew">Criar conta e guardar</button><button class="btn" data-act="accMigIn">Já tenho conta: entrar e guardar</button></div></div>`}</div>`; };
   OS.on('ready', () => { const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (String(sub || '') === '' ? panel() : '');
     const ask = LS.get('nau:joinAsk', 0); if (moved() && !navigator.webdriver && (!ask || Date.now() - ask > 3 * 864e5)) setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">O teu Náutilo está na conta</h3><p class="mut" style="margin:0 0 14px">Guardaste o teu Náutilo na conta <b>${U.esc(moved())}</b>. Entra nela também neste aparelho para ficar tudo igual em todo o lado.</p><div class="row gap8"><button class="btn pri" data-act="accJoin">Entrar na conta</button><button class="btn ghost" data-act="accJoinLater">Agora não</button></div></div>`), 1800); });
@@ -165,11 +166,54 @@ const gone = () => { if (endedOnce) return; endedOnce = true; LS.del(K.p); wipeL
 /* ---------- ecrã da conta (por cima de tudo, com o mesmo mar do ecrã de entrada) ---------- */
 let G = null, gMode = 'entrar', gMsg = '', gEdit = null, gManage = false, gBusy = false, gRec = '';
 const scene = () => OS.Scene ? `<div class="lk-scene">${OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { id: 'acs' })}</div>` : '';
-const avatar = (p, big) => `<span class="ac-av${big ? ' big' : ''}" style="--c:${esc(p.cor || PCOL[0])}">${esc(p.av || first(p.nome).slice(0, 1).toUpperCase() || '?')}</span>`;
+const okImg = s => typeof s === 'string' && s.length <= 60000 && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(s);
+const avatar = (p, big) => `<span class="ac-av${big ? ' big' : ''}${okImg(p.img) ? ' im' : ''}" style="--c:${esc(p.cor || PCOL[0])}">${okImg(p.img) ? `<img src="${p.img}" alt="">` : esc(p.av || first(p.nome).slice(0, 1).toUpperCase() || '?')}</span>`;
 const field = (n, label, type = 'text', extra = '') => `<label class="ac-f"><span>${label}</span><input name="${n}" type="${type}" ${extra}></label>`;
 const lockFields = () => `${field('c1', 'Código de bloqueio do perfil', 'password', 'minlength="6" autocomplete="new-password" required placeholder="pelo menos 6 caracteres"')}${field('c2', 'Repete o código', 'password', 'minlength="6" autocomplete="new-password" required')}`;
 const swatches = sel => `<div class="ac-sw" role="radiogroup" aria-label="Cor">${PCOL.map(c => `<label><input type="radio" name="cor" value="${c}" ${c === sel ? 'checked' : ''}><i style="--c:${c}"></i></label>`).join('')}</div>`;
 const avPick = sel => `<div class="ac-avs" role="radiogroup" aria-label="Avatar">${AVS.map(a => `<label><input type="radio" name="av" value="${a}" ${a === (sel || '') ? 'checked' : ''}><i>${a || 'Aa'}</i></label>`).join('')}</div>`;
+/* avatar do perfil: emoji, uma foto (cortada em quadrado, ~10 KB) ou um personagem do Dominus em pixel art */
+const avEditor = p => { const im = okImg(p.img) ? p.img : '';
+  return `<div class="ac-f ac-ave"><span>Avatar</span><div class="ac-avtop"><span class="ac-avprev">${avatar(Object.assign({}, p, { img: im }), 1)}</span>
+    <div class="ac-avbtns"><label class="ac-btn ghost sm"><input type="file" accept="image/*" data-acx="foto" class="ac-file">Escolher foto</label><button type="button" class="ac-btn ghost sm" data-acx="dom" aria-expanded="false">Personagem do Dominus</button><button type="button" class="ac-link" data-acx="tirar" ${im ? '' : 'hidden'}>Tirar a imagem</button></div></div>
+    <input type="hidden" name="img" value="${esc(im)}"><div class="ac-domg" hidden></div>${avPick(p.av)}</div>`; };
+// busto 128×128 a partir de uma grelha de píxeis (herói 48×72 ou monstro 64×64)
+const bust = (px, w, h, bx, by, bs, bg) => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 128);
+  g.addColorStop(0, bg[0]); g.addColorStop(1, bg[1]); x.fillStyle = g; x.fillRect(0, 0, 128, 128); const sc = 128 / bs;
+  for (let yy = 0; yy < bs; yy++) for (let xx = 0; xx < bs; xx++) { const sx = bx + xx, sy = by + yy; if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue; const v = px[sy * w + sx]; if (!v) continue; x.fillStyle = v; x.fillRect(Math.floor(xx * sc), Math.floor(yy * sc), Math.ceil(sc), Math.ceil(sc)); }
+  return c.toDataURL('image/png'); };
+const heroBust = look => { const D = OS.Dom, W = D.PW || 48, H = D.PH || 72, px = D.pixel(look || {}); let top = 0; while (top < 30 && !px.slice(top * W + 10, top * W + 38).some(Boolean)) top++; return bust(px, W, H, 8, Math.max(0, top - 3), 32, ['#24476E', '#0B1A2E']); };
+const HEROES = [{ skin: 2, hair: 'liso curto', hairColor: 'loiro', beard: 'nenhuma', glasses: '', top: 'hoodie', topColor: 1 }, { skin: 6, hair: 'cacheado curto', hairColor: 'preto', beard: 'cavanhaque', glasses: 'retangulares', top: 'tshirt', topColor: 0 },
+  { skin: 8, hair: 'tranças', hairColor: 'preto', beard: 'nenhuma', glasses: '', top: 'camisa', topColor: 2 }, { skin: 4, hair: 'comprido', hairColor: 'ruivo', beard: 'nenhuma', glasses: 'redondos', top: 'polo', topColor: 4 },
+  { skin: 3, hair: 'coque', hairColor: 'castanho escuro', beard: 'nenhuma', glasses: '', top: 'blazer', topColor: 3 }, { skin: 9, hair: 'afro', hairColor: 'preto', beard: 'barba curta', glasses: '', top: 'couro', topColor: 0 },
+  { skin: 5, hair: 'moicano', hairColor: 'azul', beard: 'por fazer', glasses: 'sol', top: 'regata', topColor: 5 }, { skin: 1, hair: 'cacheado comprido', hairColor: 'castanho', beard: 'nenhuma', glasses: '', top: 'mago', head: 'mago', headColor: 4 },
+  { skin: 7, hair: 'rapado', hairColor: 'preto', beard: 'barba cheia', glasses: '', top: 'a-ferro', head: 'espartano' }, { skin: 2, hair: 'comprido', hairColor: 'grisalho', beard: 'lenhador', glasses: '', top: 'monge' },
+  { skin: 6, hair: 'liso curto', hairColor: 'preto', beard: 'nenhuma', glasses: '', top: 'a-cavaleiro', head: 'cavaleiro' }, { skin: 4, hair: 'dreads', hairColor: 'castanho escuro', beard: 'bigode', glasses: 'aviador', top: 'fato', topColor: 0 }];
+let GAL = null;
+const gallery = () => { if (GAL) return GAL; GAL = []; const D = OS.Dom, M = OS.Monstros;
+  try { const d = OS.one && OS.one('dominus'); if (D && d && d.born && d.look && LS.get(K.data, '') === (gEdit || pid())) GAL.push({ n: 'O teu herói', src: heroBust(d.look) }); } catch (e) { }
+  if (D && D.pixel) HEROES.forEach((l, i) => { try { GAL.push({ n: 'Herói ' + (i + 1), src: heroBust(Object.assign({ eyes: 'castanho', brows: 'finas', legs: 'jeans', feet: 'tenis' }, l)) }); } catch (e) { } });
+  if (M && M.pixels) M.BOSSES.slice(0, 8).concat(M.MINIONS.slice(0, 4)).forEach(id => { try { GAL.push({ n: M.name ? M.name(id) : id, src: bust(M.pixels(id), 64, 64, 0, 0, 64, ['#2A1F3A', '#0E0A16']) }); } catch (e) { } });
+  return GAL; };
+// foto: corta ao centro, 160×160, JPEG leve (cabe no perfil e aparece em todos os aparelhos)
+const photo = file => new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image();
+  im.onload = () => { const c = document.createElement('canvas'), Z = 160, w = im.naturalWidth, h = im.naturalHeight, q0 = Math.min(w, h); c.width = c.height = Z; const x = c.getContext('2d'); x.imageSmoothingQuality = 'high';
+    x.drawImage(im, (w - q0) / 2, (h - q0) / 2, q0, q0, 0, 0, Z, Z); URL.revokeObjectURL(u); let q = .86, d = c.toDataURL('image/jpeg', q); while (d.length > 56000 && q > .4) { q -= .12; d = c.toDataURL('image/jpeg', q); } res(d); };
+  im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('Não consegui ler esta imagem. Experimenta outra (JPG ou PNG).')); }; im.src = u; });
+const formVal = (f, n) => { const r = [...f.querySelectorAll(`input[name=${n}]`)].find(x => x.checked); return r ? r.value : ''; };
+const avPrev = f => { const box = f.querySelector('.ac-avprev'), img = f.elements.img ? f.elements.img.value : ''; if (!box) return;
+  box.innerHTML = avatar({ nome: (f.elements.nome || {}).value || '', cor: formVal(f, 'cor') || PCOL[0], av: formVal(f, 'av'), img }, 1); const t = f.querySelector('[data-acx=tirar]'); if (t) t.hidden = !img; };
+const setImg = (f, src) => { if (f.elements.img) f.elements.img.value = src || ''; avPrev(f); };
+document.addEventListener('change', async e => { const t = e.target, f = t.closest && t.closest('form'); if (!f || !f.querySelector('.ac-ave')) return;
+  if (t.matches('[data-acx=foto]')) { const file = t.files && t.files[0]; t.value = ''; if (!file) return;
+    try { setImg(f, await photo(file)); } catch (err) { if (G && G.contains(f)) { gMsg = err.message; const m = f.querySelector('.ac-msg'); if (m) m.textContent = err.message; else OS.UI && OS.UI.toast(err.message, 'neg'); } else OS.UI.toast(err.message, 'neg'); } return; }
+  if (t.name === 'av') return setImg(f, '');
+  if (t.name === 'cor') avPrev(f); });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-acx]'); if (!b || b.dataset.acx === 'foto') return; const f = b.closest('form'); if (!f) return; const a = b.dataset.acx;
+  if (a === 'dom') { e.preventDefault(); const g = f.querySelector('.ac-domg'), open = g.hidden; g.hidden = !open; b.setAttribute('aria-expanded', String(open));
+    if (open && !g.firstChild) g.innerHTML = gallery().map((x, i) => `<button type="button" data-acx="pick" data-i="${i}" title="${esc(x.n)}" aria-label="${esc(x.n)}"><img src="${x.src}" alt=""></button>`).join('') || '<p class="ac-sub">O Dominus ainda não carregou. Tenta daqui a um segundo.</p>'; return; }
+  if (a === 'pick') { e.preventDefault(); const x = gallery()[+b.dataset.i]; if (x) setImg(f, x.src); f.querySelectorAll('.ac-domg button').forEach(y => y.classList.toggle('on', y === b)); return; }
+  if (a === 'tirar') { e.preventDefault(); setImg(f, ''); } });
 const view = () => {
   const m = gMode, msg = gMsg ? `<p class="ac-msg" role="status">${esc(gMsg)}</p>` : '';
   if (m === 'perfis') { const L = profiles();
@@ -179,9 +223,9 @@ const view = () => {
       <div class="ac-row">${L.length ? `<button class="ac-btn ghost" data-ac="gerir">${gManage ? 'Feito' : 'Gerir perfis'}</button>` : ''}<button class="ac-link" data-ac="sair">Sair da conta${S && S.e ? ' (' + esc(S.e) + ')' : ''}</button></div></div>`; }
   if (m === 'novo' || m === 'editar') { const p = m === 'editar' ? profiles().find(x => x.id === gEdit) || {} : { cor: PCOL[profiles().length % PCOL.length] };
     return `<form class="ac-card" data-acf="${m}"><h2>${m === 'novo' ? 'Novo perfil' : 'Editar perfil'}</h2>
-      <p class="ac-sub">${m === 'novo' ? 'Cada perfil tem os seus próprios dados, metas, finanças e jogo. O código de bloqueio é pedido ao abrir o Náutilo com este perfil.' : 'Muda o nome, a cor ou o avatar. O código e os dados ficam como estão.'}</p>
+      <p class="ac-sub">${m === 'novo' ? 'Cada perfil tem os seus próprios dados, metas, finanças e jogo. O código de bloqueio é pedido ao abrir o Náutilo com este perfil.' : 'Muda o nome, a cor ou o avatar (emoji, uma foto tua ou um personagem do Dominus). O código e os dados ficam como estão.'}</p>
       ${field('nome', 'Nome', 'text', `maxlength="24" required autocomplete="off" value="${esc(p.nome || '')}"`)}
-      <div class="ac-f"><span>Avatar</span>${avPick(p.av)}</div><div class="ac-f"><span>Cor</span>${swatches(p.cor)}</div>
+      ${avEditor(p)}<div class="ac-f"><span>Cor</span>${swatches(p.cor)}</div>
       ${m === 'novo' ? lockFields() : ''}${msg}
       <div class="ac-row"><button class="ac-btn" type="submit" ${gBusy ? 'disabled' : ''}>${m === 'novo' ? 'Criar perfil' : 'Guardar'}</button><button class="ac-btn ghost" type="button" data-ac="voltar">Cancelar</button></div>
       ${m === 'editar' ? `<div class="ac-more"><button class="ac-link" type="button" data-ac="codigo">Esqueci o código deste perfil</button><button class="ac-link neg" type="button" data-ac="apagarp">Apagar este perfil</button></div>` : ''}</form>`; }
@@ -196,8 +240,13 @@ const view = () => {
   const tabs = `<div class="ac-tabs" role="tablist"><button role="tab" aria-selected="${m === 'entrar'}" class="${m === 'entrar' ? 'on' : ''}" data-ac="m" data-v="entrar">Entrar</button><button role="tab" aria-selected="${m === 'criar'}" class="${m === 'criar' ? 'on' : ''}" data-ac="m" data-v="criar">Criar conta</button></div>`;
   if (m === 'criar') return `<form class="ac-card" data-acf="criar">${tabs}
       ${field('nome', 'O teu nome', 'text', 'maxlength="40" autocomplete="name" required')}${field('email', 'E-mail', 'email', 'autocomplete="email" required')}${field('senha', 'Senha', 'password', 'minlength="8" autocomplete="new-password" required placeholder="pelo menos 8 caracteres"')}
-      <p class="ac-sub">Os teus dados ficam na tua conta, cifrados, e aparecem iguais no telemóvel e no computador. Podes ter até 5 perfis.</p>${msg}
+      <p class="ac-sub">Os teus dados ficam na tua conta, cifrados, e aparecem iguais no telemóvel e no computador. Podes ter até 5 perfis.</p>${OS.Legal ? OS.Legal.checks() : ''}${msg}
       <button class="ac-btn wide" type="submit" ${gBusy ? 'disabled' : ''}>${gBusy ? 'A criar…' : 'Criar conta'}</button></form>`;
+  if (m === 'termos') return `<form class="ac-card" data-acf="termos"><h2>Antes de continuar</h2>
+      <p class="ac-sub">O Náutilo tem agora Termos de Serviço e uma Política de Privacidade (LGPD e RGPD). Lê-os e aceita uma vez: fica guardado na tua conta, em todos os aparelhos.</p>
+      ${OS.Legal ? OS.Legal.checks() : ''}${msg}
+      <button class="ac-btn wide" type="submit" ${gBusy ? 'disabled' : ''}>${gBusy ? 'A guardar…' : 'Aceitar e continuar'}</button>
+      <button class="ac-link" type="button" data-ac="sair">Não aceito: sair da conta</button></form>`;
   if (m === 'recuperar') return `<form class="ac-card" data-acf="recuperar"><h2>Recuperar a senha</h2><p class="ac-sub">Usa o código de recuperação que guardaste quando criaste a conta.</p>
       ${field('email', 'E-mail', 'email', 'autocomplete="email" required')}${field('codigo', 'Código de recuperação', 'text', 'autocomplete="off" required placeholder="XXXX-XXXX-XXXX-XXXX"')}${field('nova', 'Senha nova', 'password', 'minlength="8" autocomplete="new-password" required')}${msg}
       <div class="ac-row"><button class="ac-btn" type="submit" ${gBusy ? 'disabled' : ''}>Mudar a senha</button><button class="ac-btn ghost" type="button" data-ac="m" data-v="entrar">Voltar</button></div></form>`;
@@ -207,11 +256,12 @@ const view = () => {
       <button class="ac-link" type="button" data-ac="m" data-v="recuperar">Esqueci a senha</button></form>`; };
 const paint = () => { if (!G) return; const box = G.querySelector('.ac-in');
   // ao mostrar um erro, o que já escreveste fica (menos as senhas e códigos)
-  const was = box.querySelector('form[data-acf]'), keep = {}; if (was) [...was.querySelectorAll('input[type=text],input[type=email],input[type=radio]:checked')].forEach(i => { keep[i.name] = i.value; });
+  const was = box.querySelector('form[data-acf]'), keep = {}; if (was) [...was.querySelectorAll('input[type=text],input[type=email],input[type=radio]:checked,input[type=hidden][name=img]')].forEach(i => { keep[i.name] = i.value; });
   const kind = was && was.dataset.acf;
-  box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Náutilo</span></div>${gMode === 'perfis' || gMode === 'codigo-rec' ? '' : '<p class="ac-hi">O sistema operativo da tua vida: dinheiro, estudos, treino, metas e o teu jogo, num só sítio.</p>'}${view()}`;
-  const now = box.querySelector('form[data-acf]'); if (now && kind === now.dataset.acf) Object.entries(keep).forEach(([n, v]) => { const L = [...now.querySelectorAll(`input[name="${n}"]`)]; if (L[0] && L[0].type === 'radio') L.forEach(r => { r.checked = r.value === v; }); else if (L[0] && v) L[0].value = v; });
-  const f = box.querySelector('input:not([type=radio])'); if (f && !f.value && matchMedia('(pointer:fine)').matches) setTimeout(() => f.focus(), 60); };
+  box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Náutilo</span></div>${gMode === 'perfis' || gMode === 'codigo-rec' ? '' : '<p class="ac-hi">O sistema operativo da tua vida: dinheiro, estudos, treino, metas e o teu jogo, num só sítio.</p>'}${view()}<nav class="ac-foot" aria-label="Documentos legais"><a href="#" data-lgl="termos">Termos</a><a href="#" data-lgl="privacidade">Privacidade</a><a href="#" data-lgl="cookies">Cookies</a><a href="#" data-lgl="acessibilidade">Acessibilidade</a></nav>`;
+  const now = box.querySelector('form[data-acf]'); if (now && kind === now.dataset.acf) { Object.entries(keep).forEach(([n, v]) => { const L = [...now.querySelectorAll(`input[name="${n}"]`)]; if (L[0] && L[0].type === 'radio') L.forEach(r => { r.checked = r.value === v; }); else if (L[0] && v) L[0].value = v; }); if (now.querySelector('.ac-ave')) avPrev(now); }
+  // cursor no primeiro campo, mas nunca a meio do que já estás a escrever noutro
+  const f = box.querySelector('input:not([type=radio])'); if (f && !f.value && matchMedia('(pointer:fine)').matches) setTimeout(() => { const a = document.activeElement; if (!G || (a && a !== document.body && G.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return; f.focus(); }, 60); };
 const set = (mode, msg) => { gMode = mode; gMsg = msg || ''; gBusy = false; paint(); };
 const showGate = (mode, msg) => { if (!G) { G = document.createElement('div'); G.id = 'acc'; G.className = 'acx'; G.setAttribute('role', 'dialog'); G.setAttribute('aria-modal', 'true'); G.setAttribute('aria-label', 'Conta Náutilo');
     G.innerHTML = `${scene()}<div class="ac-in"></div>`; document.body.appendChild(G); G.addEventListener('click', onClick); G.addEventListener('submit', onSubmit); }
@@ -235,11 +285,14 @@ async function onSubmit(e) { const f = e.target.closest('form[data-acf]'); if (!
   const code = async () => { if (v('c1').length < 6) throw new Error('O código precisa de pelo menos 6 caracteres.'); if (v('c1') !== v('c2')) throw new Error('Os dois códigos não são iguais.'); return sha(SALT + v('c1')); };
   gBusy = true; paint();
   try {
-    if (kind === 'entrar') { const email = v('email').trim().toLowerCase(), j = await conta('entrar', { email, senha: v('senha') }); afterLogin(j, email); set('perfis'); return; }
-    if (kind === 'criar') { const email = v('email').trim().toLowerCase(), j = await conta('registar', { email, senha: v('senha'), nome: v('nome') }); afterLogin(j, email); gRec = j.recuperacao; S.novo = v('nome'); saveS(); set('codigo-rec'); return; }
+    if (kind === 'entrar') { const email = v('email').trim().toLowerCase(), j = await conta('entrar', { email, senha: v('senha') }); afterLogin(j, email); set(needTerms() ? 'termos' : 'perfis'); return; }
+    if (kind === 'termos') { const t = OS.Legal ? OS.Legal.read(f) : null; if (!t) throw new Error('Para continuar, marca as três caixas.'); const j = await conta('termos', t); takeConta(j);
+      if (!booting || !cur()) { set('perfis'); return; } hideGate(); OS.request && OS.request(); return; }
+    if (kind === 'criar') { const t = OS.Legal ? OS.Legal.read(f) : {}; if (!t) throw new Error('Para criar a conta, marca as três caixas: termos e privacidade, dados de saúde e de fé, e idade.');
+      const email = v('email').trim().toLowerCase(), j = await conta('registar', Object.assign({ email, senha: v('senha'), nome: v('nome') }, t)); afterLogin(j, email); gRec = j.recuperacao; S.novo = v('nome'); saveS(); set('codigo-rec'); return; }
     if (kind === 'recuperar') { const email = v('email').trim().toLowerCase(), j = await conta('recuperar', { email, codigo: v('codigo'), nova: v('nova') }); afterLogin(j, email); gRec = j.recuperacao; set('codigo-rec'); return; }
-    if (kind === 'novo') { const lk = await code(), j = await conta('perfil', { acao: 'criar', perfil: { nome: v('nome'), cor: val('cor'), av: val('av'), lk } }); takeConta(j); set('perfis'); return; }
-    if (kind === 'editar') { const j = await conta('perfil', { acao: 'editar', id: gEdit, perfil: { nome: v('nome'), cor: val('cor'), av: val('av') } }); takeConta(j); set('perfis'); return; }
+    if (kind === 'novo') { const lk = await code(), j = await conta('perfil', { acao: 'criar', perfil: { nome: v('nome'), cor: val('cor'), av: val('av'), img: v('img'), lk } }); takeConta(j); set('perfis'); return; }
+    if (kind === 'editar') { const j = await conta('perfil', { acao: 'editar', id: gEdit, perfil: { nome: v('nome'), cor: val('cor'), av: val('av'), img: v('img') } }); takeConta(j); set('perfis'); return; }
     if (kind === 'codigo') { const lk = await code(), j = await conta('codigo', { id: gEdit, senha: v('senha'), lk }); takeConta(j); const r = LS.get(K.reset, {}); r[gEdit] = lk; LS.set(K.reset, r); set('perfis', 'Código mudado. Usa o novo ao abrir este perfil.'); return; }
     if (kind === 'apagarp') { const j = await conta('perfil', { acao: 'apagar', id: gEdit, senha: v('senha') }); takeConta(j); LS.del('nau:k:' + gEdit); LS.del('nau:pend:' + gEdit); const here = LS.get(K.data, '') === gEdit; if (here) wipeLocal(); if (pid() === gEdit) LS.del(K.p); if (here && OS.dbRef) { location.reload(); return; } set('perfis', 'Perfil apagado.'); return; }
   } catch (err) { fail(err); } }
@@ -252,7 +305,7 @@ async function onClick(e) { const b = e.target.closest('[data-ac]'); if (!b || g
   if (a === 'voltar') { gManage = false; return set('perfis'); }
   if (a === 'codigo' || a === 'apagarp') return set(a);
   if (a === 'copiar') { try { await navigator.clipboard.writeText(gRec); b.textContent = 'Copiado'; } catch (err) { const r = document.createRange(); r.selectNodeContents(document.getElementById('acRec')); getSelection().removeAllRanges(); getSelection().addRange(r); } return; }
-  if (a === 'guardei') { gRec = ''; if (!profiles().length) { gEdit = null; set('novo'); const n = G && G.querySelector('input[name=nome]'); if (n && S && S.novo) n.value = first(S.novo); return; } return set('perfis'); }
+  if (a === 'guardei') { gRec = ''; if (needTerms()) return set('termos'); if (!profiles().length) { gEdit = null; set('novo'); const n = G && G.querySelector('input[name=nome]'); if (n && S && S.novo) n.value = first(S.novo); return; } return set('perfis'); }
   if (a === 'sair') return logout(); }
 
 /* ---------- sair, trocar de perfil ---------- */
@@ -263,16 +316,92 @@ Acc.logout = logout;
 Acc.switchProfile = () => { gManage = false; showGate('perfis'); };
 
 /* ---------- arranque ---------- */
+let booting = false;
+const needTerms = () => !!S && !!OS.Legal && S.termos !== OS.Legal.V;
+Acc.termos = () => S ? { v: S.termos || '', at: S.termosAt || '' } : null;
+Acc.pedido = (tipo, msg) => conta('pedido', { tipo, msg });
 const boot = () => {
   if (!S) return showGate(LS.get(K.owner, '') ? 'entrar' : 'criar');
-  if (!cur()) return showGate('perfis');
+  if (typeof S.termos === 'string' && needTerms()) { showGate('termos'); if (!cur()) return; }
+  else if (!cur()) return showGate('perfis');
   // sessão e perfil prontos: abre já; a lista de perfis atualiza-se por trás
-  (async () => { try { prefetched = await prefetch(); }
+  booting = true; (async () => { try { prefetched = await prefetch(); }
     catch (e) { if (e.status === 401 || e.status === 404) return; if (!hasLocal) return showGate('perfis', 'Sem internet. Para abrir este perfil neste aparelho precisas de rede: toca nele outra vez quando tiveres ligação.'); }
     release(); })();
-  conta('eu').then(j => { takeConta(j); if (!cur() && !endedOnce) gone(); }).catch(() => { });
+  conta('eu').then(j => { takeConta(j); if (!cur() && !endedOnce) return gone(); if (needTerms() && !(G && gMode === 'termos')) showGate('termos'); }).catch(() => { });
 };
 document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : setTimeout(boot, 0);
+
+/* ---------- tempo de uso (para o separador de administração): minutos com a app aberta e à vista, por dia ---------- */
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+let useMin = 0, useDay = today();
+const sendUse = keep => { if (!S || (!useMin && keep !== 0)) return; const min = useMin, dia = useDay; useMin = 0; useDay = today();
+  try { fetch(new URL('api/conta', document.baseURI).href, { method: 'POST', keepalive: !!keep, headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'uso', min, dia }) }).catch(() => { useMin += min; }); } catch (e) { } };
+const locked = () => { const l = document.getElementById('lkCode'); return !!(l && l.offsetParent) || !!document.getElementById('acc'); };
+setInterval(() => { if (!S || !cur() || document.hidden || locked()) return; if (useDay !== today()) sendUse(); useMin++; if (useMin >= 5) sendUse(); }, window.__useTick || 60e3);
+addEventListener('pagehide', () => sendUse(1)); document.addEventListener('visibilitychange', () => { if (document.hidden) sendUse(1); });
+OS.on('ready', () => setTimeout(() => sendUse(0), 4000));
+
+/* ---------- separador de administração (só na conta de quem está em NAUTILO_ADMIN no servidor) ---------- */
+Acc.adm = () => !!(S && S.adm);
+Acc.token = () => (S && S.t) || '';
+Acc.navAdm = () => { const N = OS.NAV; if (!N) return; const i = N.findIndex(g => g[0] === 'Admin');
+  if (Acc.adm() && i < 0) { N.push(['Admin', [['admin', 'Administração', 'shield']]]); OS.request && OS.request(); } else if (!Acc.adm() && i >= 0) { N.splice(i, 1); OS.request && OS.request(); } };
+let ADM = null, admBusy = false, admErr = '';
+const admLoad = async () => { if (admBusy) return; admBusy = true; admErr = ''; try { ADM = Object.assign(await conta('admin'), { at: Date.now() }); } catch (e) { admErr = e.net ? 'Sem ligação à internet.' : e.message; } admBusy = false; OS.request(); };
+const ago = t => { if (!t) return '—'; const s = Math.max(0, (Date.now() - t) / 1000); if (s < 90) return 'agora'; if (s < 3600) return 'há ' + Math.round(s / 60) + ' min'; if (s < 86400) return 'há ' + Math.round(s / 3600) + ' h'; const d = Math.round(s / 86400); return d === 1 ? 'ontem' : d < 30 ? 'há ' + d + ' dias' : new Date(t).toLocaleDateString('pt-PT'); };
+const hmin = m => { m = Math.round(m || 0); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0'); };
+const lastDays = n => { const out = []; for (let i = n - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); out.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')); } return out; };
+const bars = (dias, n, h) => { const D = lastDays(n), mx = Math.max(30, ...D.map(d => dias[d] || 0)); return `<span class="adm-bars" style="--h:${h}px" role="img" aria-label="Minutos por dia, últimos ${n} dias">${D.map(d => `<i style="height:${Math.round((dias[d] || 0) / mx * 100)}%" title="${d}: ${hmin(dias[d] || 0)}"></i>`).join('')}</span>`; };
+// pedidos dos titulares (LGPD/RGPD) e riscos jurídicos: só na administração
+const TIPO = { confirmar: 'Confirmar se tratamos dados', acesso: 'Acesso aos dados', corrigir: 'Correção', eliminar: 'Anonimizar, bloquear ou eliminar', portabilidade: 'Portabilidade', partilha: 'Com quem partilhamos', revogar: 'Retirar consentimento', oposicao: 'Oposição', outro: 'Outro' };
+const prazo = at => { const d = Math.ceil(15 - (Date.now() - Date.parse(at)) / 864e5); return d > 0 ? `faltam ${d} ${d === 1 ? 'dia' : 'dias'} (LGPD: 15)` : 'prazo de 15 dias ultrapassado'; };
+const pedidosPn = () => { const P = (ADM && ADM.pedidos) || [], novos = P.filter(p => p.estado !== 'respondido').length;
+  return `<div class="pn" id="admPed"><div class="pn-h"><h3>Pedidos de privacidade (LGPD / RGPD)</h3><span class="mut" style="font-size:12px">${novos ? novos + ' por responder' : 'nenhum por responder'}</span></div>
+    ${P.length ? `<div class="adm-ped">${P.map(p => `<div class="adm-pd ${p.estado === 'respondido' ? 'ok' : ''}"><div class="row between" style="gap:8px;flex-wrap:wrap"><b>${esc(TIPO[p.tipo] || p.tipo)}</b><small class="mut">${esc(new Date(p.at).toLocaleString('pt-PT'))} · protocolo ${esc(p.id)}</small></div>
+      <small>${esc(p.nome || '')} · ${esc(p.email)}</small><p>${esc(p.msg || '(sem texto)')}</p>
+      <div class="row gap8" style="align-items:center;flex-wrap:wrap"><span class="bdg ${p.estado === 'respondido' ? 'pos' : 'warn'}">${p.estado === 'respondido' ? 'respondido' : prazo(p.at)}</span><button class="btn sm ${p.estado === 'respondido' ? 'ghost' : ''}" data-act="admPedido" data-id="${esc(p.id)}" data-e="${p.estado === 'respondido' ? 'novo' : 'respondido'}">${p.estado === 'respondido' ? 'Reabrir' : 'Marcar como respondido'}</button></div></div>`).join('')}</div>`
+    : '<p class="mut" style="margin:0">Ainda não há pedidos. Chegam aqui quando alguém usa “Fazer um pedido” em Definições › Privacidade e termos. Responde para o e-mail da pessoa e marca como respondido.</p>'}</div>`; };
+A.admPedido = async b => { try { await conta('pedidoFeito', { id: b.dataset.id, estado: b.dataset.e }); OS.UI.toast(b.dataset.e === 'respondido' ? 'Marcado como respondido' : 'Reaberto', 'pos'); ADM = null; admLoad(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
+const RISCOS = [
+  ['alto', 'Identificar o responsável e o contacto', 'A LGPD (art. 9.º) e o RGPD (art. 13.º) exigem o nome e um contacto de quem trata os dados. Os documentos já usam o formulário da app como canal. Falta: no Vercel, em Settings › Environment Variables, criar <b>NAUTILO_RESPONSAVEL</b> (o teu nome) e <b>NAUTILO_CONTACTO</b> (um e-mail para privacidade). Aparecem sozinhos nos documentos.'],
+  ['alto', 'Imagens de alimentos do Pinterest', 'Cerca de 400 fotos do catálogo de alimentos vêm do Pinterest e têm direitos de autor de terceiros. <b>Já não aparecem nas contas públicas</b> (só no teu perfil pessoal). Antes de divulgar o teu perfil ou fazer capturas públicas, troca-as por fotos tuas ou com licença livre.'],
+  ['médio', 'Dados sensíveis (saúde e religião)', 'Sono, treino, dieta, corpo, exames e a secção Fé são dados sensíveis (LGPD art. 11.º; RGPD art. 9.º). Já se pede um consentimento próprio e destacado, guardado na conta com a data. Não uses estes dados para mais nada além de os mostrar à própria pessoa.'],
+  ['médio', 'Servidores nos EUA (transferência internacional)', 'A base de dados está na Vercel, nos EUA. Está informado na Política. Aceita o acordo de tratamento de dados (DPA) da Vercel no painel da equipa, para teres as cláusulas contratuais-padrão por escrito.'],
+  ['médio', 'Marcas de terceiros', '“Jarvis” (modo Jarvis, sugestões) é marca da Marvel/Disney: troca por um nome teu antes de promover a app. Regista a marca “Náutilo” (INPI em Portugal e no Brasil) e confirma que não existe já uma igual na tua classe. Bancos e empresas aparecem só para identificar contas (uso informativo).'],
+  ['médio', 'IA, saúde e investimentos', 'As respostas da IA podem errar. Os Termos dizem que não é aconselhamento médico, financeiro nem recomendação de investimento (no Brasil, a recomendação de investimentos é atividade regulada pela CVM; em Portugal pela CMVM). Evita textos na app que pareçam recomendações (“compra X”). O Náutilo não deve fazer diagnósticos (não é dispositivo médico: Regulamento (UE) 2017/745 / ANVISA).'],
+  ['médio', 'Termos de fontes de dados', 'Yahoo Finance não autoriza uso automatizado ou comercial; TheMealDB e Pollinations têm regras próprias para uso público. Enquanto o Náutilo for gratuito o risco é baixo; se cobrares, passa para APIs com licença (ex.: Finnhub pago) e confirma os termos.'],
+  ['alto (se acontecer)', 'Fuga de dados', 'Os dados estão cifrados, mas se houver um incidente: avisa a ANPD em até 3 dias úteis (Resolução CD/ANPD n.º 15/2024), a CNPD em até 72 horas (RGPD art. 33.º) e as pessoas afetadas. Guarda um registo do que aconteceu.'],
+  ['baixo', 'Encarregado de dados (DPO) e registo de tratamentos', 'Como agente de pequeno porte, a ANPD dispensa o encarregado (Resolução CD/ANPD n.º 2/2022), mas é obrigatório haver um canal: o formulário cumpre. A tabela da Política de Privacidade serve de registo das atividades de tratamento (RGPD art. 30.º); guarda uma cópia de cada versão.'],
+  ['baixo', 'Menores', 'Idade mínima 16, confirmada por caixa. Se souberes de uma conta de menor de 16, apaga-a.'],
+  ['info', 'Se um dia cobrares', 'Vais precisar de atividade aberta (Finanças/NIF ou CNPJ), faturação, IVA/impostos, preço claro e o direito de arrependimento (14 dias na UE; 7 dias no Brasil, CDC art. 49.º), e de rever os Termos.'],
+  ['recomendação', 'Revisão por um advogado', 'Os documentos foram escritos para cumprir a LGPD e o RGPD e cobrem o que a app faz hoje, mas não substituem a revisão por um advogado em Portugal e no Brasil, sobretudo antes de crescer ou de cobrar.']];
+const riscosPn = () => `<div class="pn" id="admRisk"><div class="pn-h"><h3>Riscos jurídicos e o que fazer</h3><span class="mut" style="font-size:12px">só tu vês isto</span></div>
+  <div class="adm-risk">${RISCOS.map(([n, t, d]) => `<details><summary><span class="bdg ${/alto/.test(n) ? 'neg' : /médio/.test(n) ? 'warn' : ''}">${esc(n)}</span><b>${esc(t)}</b></summary><p>${d}</p></details>`).join('')}</div></div>`;
+OS.views.admin = () => { const UI = OS.UI, head = UI.head('Administração', 'Quem tem conta no Náutilo, quem entrou e quanto tempo usa. As senhas e os dados das pessoas nunca aparecem aqui.', `<button class="btn" data-act="admRefresh">${UI.ic('sync')}Atualizar</button>`, 'Admin');
+  if (!Acc.adm()) return head + '<div class="pn"><p class="mut" style="margin:0">Esta área é só para a conta de administração.</p></div>';
+  if (!ADM || Date.now() - ADM.at > 120e3) { if (!admBusy && !admErr) setTimeout(admLoad, 0); if (!ADM) return head + `<div class="pn"><p class="mut" style="margin:0">${admErr ? esc(admErr) + ' <button class="btn sm" data-act="admRefresh">Tentar outra vez</button>' : 'A carregar as contas…'}</p></div>`; }
+  const L = ADM.contas || [], t = today(), D7 = lastDays(7), act = days => L.filter(c => Math.max(c.ultUso || 0, c.ultEntrada || 0) > Date.now() - days * 864e5).length;
+  const minToday = L.reduce((n, c) => n + ((c.dias || {})[t] || 0), 0), min7 = L.reduce((n, c) => n + D7.reduce((m, d) => m + ((c.dias || {})[d] || 0), 0), 0);
+  return head + `<div class="adm">
+  <div class="adm-kpi"><div><b class="mono">${ADM.total}</b><span>contas</span></div><div><b class="mono">${ADM.perfis}</b><span>perfis</span></div><div><b class="mono">${act(1)}</b><span>ativas hoje</span></div><div><b class="mono">${act(7)}</b><span>ativas em 7 dias</span></div><div><b class="mono">${act(30)}</b><span>ativas em 30 dias</span></div><div><b class="mono">${hmin(minToday)}</b><span>de uso hoje (todos)</span></div><div><b class="mono">${act(7) ? hmin(min7 / 7 / act(7)) : '—'}</b><span>por dia, por conta ativa</span></div></div>
+  <div class="pn"><div class="pn-h"><h3>${UI.ic('users')}Contas</h3><div class="row gap8 adm-tools"><input type="search" id="admQ" class="field" placeholder="Procurar por nome ou e-mail" aria-label="Procurar contas"><button class="btn sm ghost" data-act="admCsv">Exportar CSV</button></div></div>
+    <div class="adm-t" role="table" aria-label="Contas"><div class="adm-r adm-hd" role="row"><span role="columnheader">Pessoa</span><span role="columnheader">Último acesso</span><span role="columnheader">Última entrada</span><span role="columnheader">Hoje</span><span role="columnheader">7 dias</span><span role="columnheader">Criada</span></div>
+    ${L.map((c, i) => { const d7 = D7.reduce((m, d) => m + ((c.dias || {})[d] || 0), 0), P = c.perfis || [];
+      return `<button class="adm-r" role="row" data-act="admOne" data-i="${i}" data-q="${esc((c.nome + ' ' + c.email + ' ' + P.join(' ')).toLowerCase())}"><span role="cell" class="adm-who"><b>${esc(c.nome || P[0] || '—')}${c.admin ? ' <small class="mu-tag">admin</small>' : ''}</b><small>${esc(c.email)}</small><small class="mut">${P.length} ${P.length === 1 ? 'perfil' : 'perfis'}${P.length ? ': ' + esc(P.join(', ')) : ''}</small></span>
+        <span role="cell"><em>Último acesso</em>${ago(c.ultUso || c.ultEntrada)}</span><span role="cell"><em>Última entrada</em>${ago(c.ultEntrada)}${c.entradas ? ` <small class="mut">(${c.entradas}×)</small>` : ''}</span><span role="cell" class="mono"><em>Hoje</em>${hmin((c.dias || {})[t] || 0)}</span><span role="cell"><em>7 dias</em>${bars(c.dias || {}, 7, 22)} <small class="mono">${hmin(d7)}</small></span><span role="cell"><em>Criada</em>${c.criado ? new Date(c.criado).toLocaleDateString('pt-PT') : '—'}</span></button>`; }).join('') || '<p class="mut" style="padding:12px">Ainda não há contas.</p>'}</div></div>
+  ${pedidosPn()}${riscosPn()}
+  <p class="mut adm-note">Atualizado ${ago(ADM.at)}. O tempo de uso conta os minutos com o Náutilo aberto e à vista (desbloqueado). Estes dados estão descritos na Política de Privacidade.</p></div>`; };
+A.admRefresh = () => { ADM = null; admErr = ''; admLoad(); OS.request(); };
+A.admOne = b => { const c = ADM && ADM.contas[+b.dataset.i]; if (!c) return; const D = lastDays(30), tot = D.reduce((m, d) => m + ((c.dias || {})[d] || 0), 0), on = D.filter(d => (c.dias || {})[d]).length;
+  OS.UI.modal(`<div style="padding:20px"><div class="row between" style="align-items:center"><h3 style="margin:0">${esc(c.nome || c.email)}</h3><button class="icon-btn" data-mclose aria-label="Fechar">${OS.UI.ic('x')}</button></div><p class="mut" style="margin:4px 0 14px">${esc(c.email)}</p>
+    <div class="dc-rows"><div><span>Perfis</span><b>${esc((c.perfis || []).join(', ') || '—')}</b></div><div><span>Conta criada</span><b>${c.criado ? new Date(c.criado).toLocaleString('pt-PT') : '—'}</b></div><div><span>Última entrada (login)</span><b>${c.ultEntrada ? new Date(c.ultEntrada).toLocaleString('pt-PT') : '—'}</b></div><div><span>Último acesso</span><b>${c.ultUso ? new Date(c.ultUso).toLocaleString('pt-PT') : '—'}</b></div><div><span>Entradas</span><b class="mono">${c.entradas || 0}</b></div><div><span>Termos aceites</span><b>${c.termos ? 'versão de ' + esc(c.termos) + (c.termosAt ? ' · ' + new Date(c.termosAt).toLocaleString('pt-PT') : '') : 'ainda não'}</b></div><div><span>Uso nos últimos 30 dias</span><b class="mono">${hmin(tot)} · ${on} ${on === 1 ? 'dia' : 'dias'}</b></div></div>
+    <h4 style="margin:16px 0 6px">Minutos por dia (30 dias)</h4>${bars(c.dias || {}, 30, 90)}<div class="adm-ax"><span>${D[0].slice(8)}/${D[0].slice(5, 7)}</span><span>hoje</span></div></div>`); };
+A.admCsv = () => { if (!ADM) return; const D = lastDays(30), q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const rows = [['Nome', 'E-mail', 'Perfis', 'Criada', 'Última entrada', 'Último acesso', 'Entradas'].concat(D)].concat(ADM.contas.map(c => [c.nome, c.email, (c.perfis || []).join(' / '), c.criado ? new Date(c.criado).toISOString() : '', c.ultEntrada ? new Date(c.ultEntrada).toISOString() : '', c.ultUso ? new Date(c.ultUso).toISOString() : '', c.entradas || 0].concat(D.map(d => (c.dias || {})[d] || 0))));
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(q).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' })); a.download = 'nautilo-contas-' + today() + '.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
+document.addEventListener('input', e => { if (e.target.id !== 'admQ') return; const q = e.target.value.trim().toLowerCase(); document.querySelectorAll('.adm-r[data-q]').forEach(r => { r.hidden = !!q && !r.dataset.q.includes(q); }); });
+OS.on('ready', () => Acc.navAdm());
 
 /* ---------- dentro da app ---------- */
 OS.on('ready', () => { const p = cur(); if (!p) return;
@@ -291,10 +420,16 @@ OS.on('ready', () => { const p = cur(); if (!p) return;
 // a bolinha do perfil na barra de cima (como na Netflix): toca para trocar de perfil ou ver a conta
 Acc.bubble = () => { const p = cur(); return p ? `<button class="ac-bub" data-act="accMenu" aria-label="Perfil ${esc(p.nome)}" title="${esc(p.nome)}">${avatar(p)}</button>` : ''; };
 A.accMenu = () => { const p = cur(); if (!p) return; OS.UI.modal(`<div class="ac-menu"><div class="ac-mh">${avatar(p, 1)}<div><b>${esc(p.nome)}</b><small class="mut">${esc(Acc.email())}</small></div></div>
-  <div class="list"><button class="li" data-act="accSwitch"><div class="li-t"><b>Trocar de perfil</b><small>${profiles().length} ${profiles().length === 1 ? 'perfil' : 'perfis'} nesta conta</small></div><span class="mut">›</span></button>
+  <div class="list"><button class="li" data-act="accEdit"><div class="li-t"><b>Editar perfil</b><small>Nome, cor e avatar: emoji, foto ou personagem do Dominus</small></div><span class="mut">›</span></button><button class="li" data-act="accSwitch"><div class="li-t"><b>Trocar de perfil</b><small>${profiles().length} ${profiles().length === 1 ? 'perfil' : 'perfis'} nesta conta</small></div><span class="mut">›</span></button>
   <a class="li" href="#definicoes.conta" data-mclose><div class="li-t"><b>Conta e perfis</b><small>Senha, código de recuperação, sincronização</small></div><span class="mut">›</span></a>
   <button class="li" data-act="accOut"><div class="li-t"><b>Sair da conta</b><small>Os dados ficam guardados na conta</small></div><span class="mut">›</span></button></div></div>`, 'ac-modal'); };
 A.accSwitch = () => { OS.UI.closeModal(); Acc.switchProfile(); };
+A.accEdit = () => { const p = cur(); if (!p) return; GAL = null; OS.UI.modal(`<form class="ac-menu ac-edit" data-form="accProf"><div class="row between" style="align-items:center"><h3 style="margin:0">Editar perfil</h3><button type="button" class="icon-btn" data-mclose aria-label="Fechar">${OS.UI.ic('x')}</button></div>
+  <label class="ac-f"><span>Nome</span><input name="nome" type="text" maxlength="24" required autocomplete="off" value="${esc(p.nome || '')}"></label>${avEditor(p)}<div class="ac-f"><span>Cor</span>${swatches(p.cor)}</div>
+  <div class="row gap8"><button class="btn pri">Guardar</button><button type="button" class="btn ghost" data-mclose>Cancelar</button></div></form>`, 'ac-modal'); };
+OS.forms.accProf = async f => { const nome = f.elements.nome.value.trim(); if (!nome) { OS.UI.toast('Escreve o nome do perfil', 'warn'); return; }
+  try { const j = await conta('perfil', { acao: 'editar', id: pid(), perfil: { nome, cor: formVal(f, 'cor'), av: formVal(f, 'av'), img: f.elements.img.value } }); takeConta(j); OS.UI.closeModal(); OS.UI.toast('Perfil guardado', 'pos'); OS.request(); }
+  catch (e) { OS.UI.toast(e.net ? 'Sem ligação à internet. Tenta outra vez.' : e.message, 'neg'); } };
 A.accOut = () => { OS.UI.closeModal(); logout(); };
 A.accSync = async () => { OS.UI.toast('A sincronizar…'); await Acc.flush().catch(() => { }); if (Acc.poll) await Acc.poll(); OS.UI.toast(SY.err ? 'Sem ligação: fica guardado neste aparelho' : 'Tudo sincronizado', SY.err ? 'warn' : 'pos'); OS.request(); };
 A.accAll = async () => { try { const j = await conta('sairtodos'); S.t = j.token; saveS(); OS.UI.toast('Saíste de todos os outros aparelhos', 'pos'); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
@@ -304,7 +439,7 @@ const AKK = () => 'nau:ak:' + pid();
 Acc.atalho = () => { const k = LS.get(AKK(), ''); return k ? { url: new URL('api/atalho', document.baseURI).href, key: k } : null; };
 const ensureAk = async nova => { if (!cur() || (!nova && LS.get(AKK(), ''))) return; const j = await conta('atalho', { id: pid(), nova: !!nova }); LS.set(AKK(), j.chave); };
 OS.on('ready', () => setTimeout(() => ensureAk().then(() => { const c = OS.one('inbox'); if (!(c.url && c.key) && OS.Inbox && OS.Inbox.pull) OS.Inbox.pull(false); }).catch(() => { }), 1500));
-const akLink = () => { const a = Acc.atalho(); return a ? a.url + '?k=' + encodeURIComponent(a.key) : ''; };
+const akLink = () => { const a = Acc.atalho(); return a ? a.url + '?k=' + encodeURIComponent(a.key) : ''; }; Acc.akLink = akLink;
 A.accAkCopy = async () => { const l = akLink(); if (!l) { await ensureAk().catch(() => { }); OS.request(); return; } try { await navigator.clipboard.writeText(l); OS.UI.toast('Link copiado: cola-o no atalho', 'pos'); } catch (e) { OS.UI.toast('Toca no link, seleciona e copia', 'warn'); } };
 A.accAkNew = async () => { if (!confirm('Criar um link novo? O atalho antigo deixa de funcionar até colares o novo.')) return; try { await ensureAk(true); OS.UI.toast('Link novo criado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 A.accAkTest = async () => { const a = Acc.atalho(); if (!a) return; try { const r = await fetch(a.url, { method: 'POST', body: new URLSearchParams({ k: a.key, v: '1', d: '__teste__' }) }); if (!r.ok) throw new Error(await r.text());
@@ -332,7 +467,7 @@ const settings = () => { const UI = OS.UI, p = cur() || {}, L = profiles(), ago 
     <form data-form="accName" class="row gap8" style="align-items:flex-end"><label class="grow">Nome da conta<input class="field" name="nome" maxlength="40" value="${esc((S && S.n) || '')}"></label><button class="btn">Guardar</button></form></div>
   <div class="pn"><div class="pn-h"><h3>${UI.ic('users')}Perfis</h3><span class="mut">${L.length} de 5</span></div>
     <div class="ac-plist">${L.map(x => `<div class="ac-pl">${avatar(x)}<b>${esc(x.nome)}</b>${x.id === p.id ? '<small class="mu-tag">a usar</small>' : ''}</div>`).join('')}</div>
-    <div class="row gap8" style="margin-top:12px"><button class="btn pri" data-act="accSwitch">Trocar ou gerir perfis</button></div></div>
+    <div class="row gap8" style="margin-top:12px"><button class="btn pri" data-act="accEdit">Editar este perfil</button><button class="btn" data-act="accSwitch">Trocar ou gerir perfis</button></div></div>
   <div class="pn"><div class="pn-h"><h3>${UI.ic('sync')}Sincronização</h3><span class="mut">${esc(SY.state)}</span></div>
     <p class="mut" style="margin:0 0 10px">Tudo o que registas neste perfil vai sozinho para a tua conta, cifrado, e aparece nos teus outros aparelhos em segundos.${ago != null ? ` Última vez: há ${ago < 60 ? ago + ' s' : Math.round(ago / 60) + ' min'}.` : ''}${pend.size ? ` ${pend.size} ${pend.size === 1 ? 'alteração por enviar' : 'alterações por enviar'}.` : ''}</p>
     <div class="row gap8"><button class="btn" data-act="accSync">Sincronizar agora</button></div></div>

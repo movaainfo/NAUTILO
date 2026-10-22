@@ -27,7 +27,8 @@ if (isOld) {
 }
 
 /* ---------- endereço novo: boas-vindas e importação ---------- */
-const fresh = () => !U.ls.get('os2sync', 0) && !OS.all('transactions').length && OS.all('tasks').length < 12 && !U.ls.get('os2mvDone', 0);
+// numa conta não há endereço antigo de onde trazer dados (a conta é que leva os dados)
+const fresh = () => !(OS.Acc && OS.Acc.on) && !U.ls.get('os2sync', 0) && !OS.all('transactions').length && OS.all('tasks').length < 12 && !U.ls.get('os2mvDone', 0);
 const welcome = () => UI.modal(`<div class="mv-p"><div class="pn-h"><h3>Bem-vindo ao novo endereço</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
     <p>Traz os teus dados do endereço antigo:</p>
     <div class="mv-o rec"><b>Tenho o ficheiro</b><small>O ficheiro .json que guardaste no endereço antigo.</small><label class="btn pri">${UI.ic('arrowUp')}Importar o ficheiro<input type="file" id="impData" accept="application/json,.json" hidden></label></div>

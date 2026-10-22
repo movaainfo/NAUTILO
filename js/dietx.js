@@ -69,7 +69,7 @@ Diet.picQuery = name => { let w = norm(name).replace(/[(),%/.0-9]/g, ' ').split(
 const DBN = new Set(DB.map(x => x.nn));
 OS.ONE_DEF.foodpics = OS.ONE_DEF.foodpics || { m: {} };
 Diet.img = (name, cat, cls = '', pic) => { if (!pic && FPN[norm(name)] && FPN[norm(name)] !== 'W') pic = FPN[norm(name)];
-  const p = pic ? { u: pic } : Diet.pic(name, cat); return p.u ? `<span class="fdi ${cls}${p.c && !pic ? ' cut' : ''}${pic && /openfoodfacts/.test(pic) ? ' brand' : ''}"><img src="${esc(p.u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()"></span>` : `<span class="fdi ${cls} noimg" aria-hidden="true"></span>`; };
+  let p = pic ? { u: pic } : Diet.pic(name, cat); if (p.u && OS.Acc && OS.Acc.pub && /pinimg\.com/.test(p.u)) p = { u: '' }; return p.u ? `<span class="fdi ${cls}${p.c && !pic ? ' cut' : ''}${pic && /openfoodfacts/.test(pic) ? ' brand' : ''}"><img src="${esc(p.u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()"></span>` : `<span class="fdi ${cls} noimg" aria-hidden="true"></span>`; };
 /* ================= procurar ================= */
 const userFoods = () => OS.all('foods').map(f => ({ id: 'u' + f.id, name: f.name, kcal: n(f.kcal), p: n(f.p), c: n(f.c), f: n(f.f), fib: n(f.fib), cat: 'Os meus', por: [f.portion || '1 porção', 0], per: 'portion', nn: norm(f.name), uid: f.id }));
 Diet.search = (q, lim = 40) => { const w = norm(q).split(/\s+/).filter(Boolean); if (!w.length) return [];
@@ -198,7 +198,7 @@ document.addEventListener('submit', e => { if (!e.target.matches('[data-fbq-form
 
 /* ================= foto com IA ================= */
 const PH = { items: null, img: '', busy: false, err: '' };
-const photoBody = () => { const key = OS.one('diet').aiKey;
+const photoBody = () => { const key = OS.AI.gkey();
   if (!key) return `<div class="fd-ai"><div class="fd-aic">${UI.ic('camera')}</div><h3>Reconhecer comida pela foto</h3><p>Tiras uma foto ao prato e a IA identifica os alimentos, estima as gramas, as calorias e as macros. Depois confirmas ou corriges antes de guardar.</p>${OS.AI.setup('')}</div>`;
   if (PH.busy) return `<div class="fd-ai">${PH.img ? `<img class="fd-ph" src="${PH.img}" alt="Foto da refeição">` : ''}<div class="fd-spin"></div><p class="mut">A identificar os alimentos…</p></div>`;
   if (PH.items) return `<div class="fd-ai">${PH.img ? `<img class="fd-ph" src="${PH.img}" alt="Foto da refeição">` : ''}${PH.note ? `<p class="mut">${esc(PH.note)}</p>` : ''}<div class="fd-phl">${PH.items.map((i, k) => `<div class="${i.off ? 'off' : ''}"><button class="fd-ck" data-fa="phtoggle" data-k="${k}" aria-label="Incluir">${UI.ic(i.off ? 'x' : 'check')}</button>${Diet.img(i.nome)}<span><b>${esc(i.nome)}</b><small class="mono">${U.nf(n(i.kcal))} kcal · P ${U.nf(n(i.proteina), 1)} · H ${U.nf(n(i.hidratos), 1)} · G ${U.nf(n(i.gordura), 1)}</small></span><label class="fd-g"><input type="text" inputmode="decimal" data-phg="${k}" value="${U.nf(n(i.gramas))}" aria-label="Gramas"><small>g</small></label></div>`).join('')}</div>
@@ -215,7 +215,7 @@ Diet.vision = async (dataUrl, key) => { let last = ''; await OS.AI.discover(); c
       const txt = (((j.candidates || [])[0] || {}).content || {}).parts ? j.candidates[0].content.parts.map(p => p.text || '').join('') : ''; const o = JSON.parse(txt.replace(/^```(json)?|```$/g, '').trim()); return { itens: (o.itens || o.items || []).filter(i => i && i.nome), nota: o.nota || '' }; }
     catch (e) { if (e.fatal) throw e; last = e.message; } }
   throw new Error('Não consegui analisar a foto (' + last + '). Verifica a internet e tenta de novo.'); };
-const photoRun = async () => { const key = OS.one('diet').aiKey; if (!key || !PH.img) return; PH.busy = true; PH.err = ''; fDraw();
+const photoRun = async () => { const key = OS.AI.gkey(); if (!key || !PH.img) return; PH.busy = true; PH.err = ''; fDraw();
   try { const r = await Diet.vision(PH.img, key); PH.items = r.itens.map(i => Object.assign({}, i, { nome: String(i.nome).trim() })); PH.note = r.nota; if (!PH.items.length) { PH.items = null; PH.err = 'Não encontrei comida nesta foto. Tenta outra, de cima e com boa luz.'; } }
   catch (e) { PH.err = e.message; PH.items = null; }
   PH.busy = false; if (FS) fDraw(); };

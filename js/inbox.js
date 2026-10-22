@@ -357,11 +357,16 @@ const getJSON = async (url, tries = 3) => { let last = null;
   for (let i = 0; i < tries; i++) { try { const r = await fetch(url, { cache: 'no-store', credentials: 'omit' }), t = await r.text(); try { return JSON.parse(t); } catch (e) { last = new Error('resposta do Google não é JSON'); } } catch (e) { last = e; }
     await new Promise(res => setTimeout(res, 800 * (i + 1))); }
   throw last || new Error('sem resposta'); };
-IB.pull = async (manual) => { const c = OS.Acc && OS.Acc.on && !(cfg().url && cfg().key) && OS.Acc.atalho ? (OS.Acc.atalho() || cfg()) : cfg(); if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
+// numa conta com o script pessoal, a caixa da conta também é lida (o sono do app Saúde chega sempre por ela)
+IB.pull = async (manual) => { const acc = OS.Acc && OS.Acc.on && OS.Acc.atalho ? OS.Acc.atalho() : null, own = !!(cfg().url && cfg().key), c = acc && !own ? acc : cfg();
+  if (!c.url || !c.key || busy) { if (manual) UI.toast('Configura primeiro o endereço do script', 'warn'); return; } busy = true;
+  try { await pull1(c, manual); if (acc && own) await pull1(acc, false).catch(() => { }); } finally { busy = false; } };
+const pull1 = async (c, manual) => {
   try { const j = await getJSON(c.url + (c.url.includes('?') ? '&' : '?') + 'op=pull&k=' + encodeURIComponent(c.key) + '&_=' + Date.now());
     if (!j.ok) { if (manual) UI.toast(j.msg || 'O script recusou o pedido', 'neg'); return; }
     const seen = new Set(U.ls.get(SEEN, [])), got = [];
-    (j.items || []).forEach(it => { if (seen.has(it.id) || it.d === '__teste__') { got.push(it.id); if (it.d === '__teste__') IB.testOk = true; return; } let v = U.num(it.v); if (!(v > 0)) { got.push(it.id); return; }
+    (j.items || []).forEach(it => { if (it.tipo === 'sono') { if (!seen.has(it.id) && it.s && OS.Sono) { const N = OS.Sono.ingest(it.s); if (N.length) UI.toast('Sono do app Saúde: ' + N.map(n => Math.floor(n.min / 60) + ' h ' + U.pad(n.min % 60)).join(', '), 'pos'); } seen.add(it.id); got.push(it.id); return; }
+      if (seen.has(it.id) || it.d === '__teste__') { got.push(it.id); if (it.d === '__teste__') IB.testOk = true; return; } let v = U.num(it.v); if (!(v > 0)) { got.push(it.id); return; }
       // atalho de uma só pergunta: "12,50 uber" chega em v e d; o valor sai do texto e fica só a descrição
       { const raw = String(it.d || ''), tok = raw.match(/(?:^|\s)([-+]?\d+(?:[.,]\d+)?)(?=\s*(?:€|eur|euros?)?\s*[,;:\-–]?(?:\s|$))/i), dz = x => String(x).replace(/\D/g, '').replace(/0+$/, '');
         if (tok && /[a-zà-ú]/i.test(raw) && dz(raw) === dz(it.v)) { const t = U.num(tok[1].replace(',', '.')); if (t > 0) v = t; } }
@@ -374,10 +379,10 @@ IB.pull = async (manual) => { const c = OS.Acc && OS.Acc.on && !(cfg().url && cf
       seen.add(it.id); got.push(it.id); c.n = (c.n || 0) + 1; UI.toast(`Gasto do atalho: ${U.eur(v)}${it.d ? ' · ' + it.d : ''}`, 'pos'); });
     U.ls.set(SEEN, [...seen].slice(-500));
     if (got.length) fetch(c.url + (c.url.includes('?') ? '&' : '?') + 'op=ack&k=' + encodeURIComponent(c.key) + '&ids=' + encodeURIComponent(got.join(','))).catch(() => { });
-    c.last = new Date().toISOString(); c.err = ''; OS.touch('inbox');
+    // a caixa do atalho da conta (objeto à parte) só mexe na app quando chegou alguma coisa: sem redesenhos à toa
+    c.last = new Date().toISOString(); c.err = ''; if (c === cfg() || got.length) OS.touch('inbox');
     if (manual) UI.toast(got.length ? `${got.length} gasto(s) importado(s)` : 'Ligação OK. Nada novo.', 'pos');
-  } catch (e) { c.err = (e && e.message) || 'erro'; OS.touch('inbox'); if (manual) UI.toast('O Google não respondeu agora (' + c.err + '). Tenta outra vez daqui a pouco.', 'neg'); }
-  finally { busy = false; } };
+  } catch (e) { c.err = (e && e.message) || 'erro'; if (c === cfg()) OS.touch('inbox'); if (manual) UI.toast('O Google não respondeu agora (' + c.err + '). Tenta outra vez daqui a pouco.', 'neg'); } };
 
 /* ---- painel nas Definições: assistente com verificação em cada passo ---- */
 const base = () => { const c = cfg(); return c.url ? c.url.trim() : ''; };
@@ -440,7 +445,9 @@ const syncPanel = () => { const c = cfg(), SY = window.OceanumSync || {}, on = !
     <div class="ib-s"><i>C</i><div><b>Ligar a sincronização</b><p>Faz isto <b>primeiro no aparelho com os dados principais</b> (o tablet). Os outros aparelhos ligam-se depois com o código.</p><button class="btn sm pri" data-act="syOn" ${v3 ? '' : 'disabled'}>Ligar sincronização neste aparelho</button></div></div>` : ''}
   </div>`}</div>`; };
 // numa conta a sincronização é a da conta (Definições › Conta e perfis): o painel do Google Drive fica só no modo pessoal
-const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (OS.Acc && OS.Acc.on ? '' : syncPanel()) + panel();
+// o atalho de gastos vive em Definições › Atalhos do iPhone (IB.panel)
+const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (OS.Acc && OS.Acc.on ? '' : syncPanel());
+IB.panel = () => panel();
 A.syVer = async () => { UI.toast('A verificar…'); await IB.check(); const c = cfg(); UI.toast((c.ver || 0) < 3 ? 'Ainda é a versão antiga. Confirma que escolheste "Nova versão" ao implantar.' : c.drive === 0 ? 'Falta autorizar o Google Drive (vê as instruções).' : 'Script atualizado ✓', (c.ver || 0) >= 3 && c.drive !== 0 ? 'pos' : 'warn'); OS.request(); };
 A.syOn = () => { try { localStorage.setItem('os2sync', '1'); localStorage.setItem('os2syncJoined', '0'); } catch (e) { } UI.toast('A ligar…'); setTimeout(() => location.reload(), 400); };
 A.syOff = () => UI.ask('Desligar a sincronização neste aparelho?', 'Os dados ficam neste aparelho, mas deixam de ser trocados com os outros.', 'Desligar', () => { try { localStorage.removeItem('os2sync'); } catch (e) { } location.reload(); });
@@ -482,14 +489,14 @@ IB.scriptTab = () => { const c = cfg(), v = +(c.ver || 0), on = !!(c.url && c.ke
   const has5 = !!(OS.Files && OS.Files.has5()), nx = on && v < 11 ? 3 : !has4 ? 4 : !has5 ? 5 : !has7 ? 7 : 0, done = !nx;
   const WHY = { 3: 'Traz o e-mail completo, a Agenda Google e as notícias.', 4: 'Traz o Outlook da faculdade e a IA sem limites na Siri.', 5: 'Serve para guardares PDFs e documentos da Universidade e dos Cursos no teu Google Drive.', 6: 'Põe tudo o que está no Calendário do Náutilo no teu Google Calendar e no Calendário do iPhone (o trabalho da escala importada também). Depois de a colares, liga-se sozinho.', 7: 'Põe tudo o que está no Calendário do Náutilo no teu Google Calendar e no Calendário do iPhone, com uma cor pastel para cada tipo: Trabalho azul, Folgas verde, Tarefas amarelo, Estudos lavanda, Compromissos rosa, Treino e rotina pêssego. Liga-se sozinho e o que já lá estava muda para a cor certa.' };
   // o app passou a chamar-se Náutilo: a Parte 3 versão 12 muda o nome do que está no Google (ficheiro, cópias, folha, pasta e calendários)
-  const ren = on && v >= 10 && v < 12 ? `<div class="pn sc-ren" id="nautilo"><div class="pn-h"><h3>Passar o teu Google para o nome Náutilo</h3><span class="bdg warn">versão 12</span></div>
+  const ren = on && v >= 10 && v < 12 ? `<div class="pn sc-ren" id="nautilo" data-open="1"><div class="pn-h"><h3>Passar o teu Google para o nome Náutilo</h3><span class="bdg warn">versão 12</span></div>
     <p class="mut" style="margin:0 0 8px">O app agora chama-se Náutilo. Copia outra vez as partes 1, 2 e 3 e cola-as por cima das que tens. Na primeira ligação, o script muda sozinho o nome do ficheiro de sincronização e das cópias, da folha dos gastos, da pasta dos ficheiros e dos calendários (no Google e no iPhone). Cada coisa é encontrada pelo seu código interno: nada se perde nem se duplica.</p>
     <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', 0, 2)}</div></li>
       <li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto → cola cada parte no seu ficheiro (<b>Código.gs</b>, <b>Parte2</b>, <b>Parte3</b>, a substituir o que lá está) → <b>Guardar</b>. Aproveita e muda o nome do projeto (em cima, à esquerda) para <b>Náutilo</b>.</li>
       <li><b>Implantar → Gerenciar implantações</b> → lápis (<b>Editar</b>) → Versão: <b>Nova versão</b> → <b>Implantar</b>. O endereço e a chave não mudam.</li>
       <li>Volta aqui e toca em <b>Verificar</b>: quando disser versão 12, está tudo com o nome novo.</li></ol>
     <small class="mut">As partes 4 a 7 podes colar outra vez quando quiseres (só mudam textos); o que elas criaram já fica renomeado pela Parte 3.</small></div>` : '';
-  return ren + `<div class="pn sc-p4" id="parte4"><div class="pn-h"><h3>${done ? '✓ O teu script tem todas as partes' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : nx === 5 ? !IB._p5d : nx >= 6 ? !IB._p6d : false) : ''}</div>
+  return ren + `<div class="pn sc-p4" id="parte4" ${done ? '' : 'data-open="1"'}><div class="pn-h"><h3>${done ? '✓ O teu script tem todas as partes' : `Parte ${nx} · copiar e colar (3 minutos)`}</h3>${on ? st(done, nx === 4 ? !I : nx === 5 ? !IB._p5d : nx >= 6 ? !IB._p6d : false) : ''}</div>
     ${!on ? `<p class="mut" style="margin:0 0 8px">Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Geral → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ''}
     ${done ? '' : `<p class="mut" style="margin:0 0 8px">A Parte ${nx} é um <b>ficheiro novo</b> no mesmo projeto: não apagas nem mudas nada das outras partes. ${WHY[nx] || ''}</p>
     <ol class="ai-steps"><li><div class="row gap8" style="flex-wrap:wrap">${partsBtns('btn pri', nx - 1, nx - 1)}</div></li>

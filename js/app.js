@@ -12,7 +12,8 @@ const NAV = [
   ['Corpo', [['corpo', 'Visão do corpo', 'heart'], ['treino', 'Treino', 'dumbbell'], ['dieta', 'Dieta', 'apple'], ['corrida', 'Corrida', 'run'], ['desporto', 'Desporto', 'target']]],
   ['Carreira', [['trabalho', 'Trabalho', 'briefcase'], ['carreira', 'Carreira e contactos', 'users'], ['capital', 'Capital Profissional', 'star'], ['oportunidades', 'Oportunidades', 'door']]],
   ['Direção', [['next', 'Plano de vida', 'compass'], ['decisoes', 'Centro de decisões', 'scale'], ['revisao', 'Revisões', 'rewind']]]];
-const TITLES = { dominus: ['Dominus', 'Jogo'], definicoes: ['Definições', 'Sistema'] };
+OS.NAV = NAV; // a conta de administração junta o separador Admin no fim
+const TITLES = { dominus: ['Dominus', 'Jogo'], definicoes: ['Definições', 'Sistema'], admin: ['Administração', 'Admin'] };
 NAV.forEach(([g, items]) => items.forEach(([k, l]) => TITLES[k] = [l, g]));
 TITLES.control = ['Painel', 'Visão geral']; TITLES.painel = ['Painel', 'Visão geral'];
 TITLES.mova = [OS.one ? 'Mova' : 'Mova', 'Empresa'];
@@ -21,7 +22,7 @@ const CORE = ['visao', 'eu', 'mundo', 'fe', 'jornal', 'gasto', 'hoje', 'tarefas'
 const DESC = { senhas: 'Cofre cifrado com a tua senha mestra: senhas, e-mails, contas, bancos, Wi-Fi e notas seguras. Só tu o abres.', mundo: 'A tua volta ao mundo: o mapa pinta-se com os países onde já foste, com a percentagem do mundo que conheces e o passaporte.', relatorios: 'Relatórios mensais, trimestrais e anuais, prontos para a declaração do teu país (IRS em Portugal, IRPF no Brasil).', spyke: 'O teu assistente de voz: resumo do dia, perguntas e comandos.', email: 'E-mails e LinkedIn resumidos: urgente, responder, spam.', foco: 'Resolver pendências por prioridade, sem fugir, com saída por Face ID.', desporto: 'Os teus desportos, práticas, estatísticas e treinos para melhorar.', floresta: 'Foca-te e faz crescer a tua floresta.', cursos: 'Os cursos que estás a fazer, com progresso.', certificacoes: 'Todas as tuas certificações.', leituras: 'Estante virtual: livros, resenhas e desafios.', eu: 'A tua história, família, amigos e quem és.', jornal: 'As notícias do mundo e de cada país, em tempo real.', fe: 'Versículo do dia, Bíblia, devocional e oração.', visao: 'Tudo num só lugar: dinheiro, agenda, alertas, próxima ação, trabalho, corpo e estudos.', gasto: 'Registar uma compra em segundos.', hoje: 'O teu dia numa página.',  next: 'Para onde vais, quando e o que fazer a seguir: estrela-guia, roteiro e próximos passos numa só página.', calendario: 'Aulas, turnos, compromissos e Google Calendar.', tarefas: 'Tudo o que tens para fazer.', habitos: 'Inegociáveis, rotina e sequências.', projetos: 'Projetos com fases e progresso.', metas: 'Metas grandes e o caminho até elas.', financas: 'Contas, gastos, orçamento e dívidas.', investimentos: 'Carteira, movimentos e cotações.', compras: 'Pensar antes de comprar.', simuladores: 'Empréstimos, compras, metas e juros.', universidade: 'Disciplinas, avaliações, revisões.', aprendizagem: 'Competências a dominar, etapa a etapa.', conhecimento: 'Notas e conhecimento guardado.', corpo: 'Treino, dieta e corrida ligados.', treino: 'Rotinas, treino em curso, exercícios com imagens.', dieta: 'Refeições, calorias, proteína e água.', dieta: 'Refeições, calorias, proteína e água.', corrida: 'Corridas, plano e ritmo.', trabalho: 'Turnos e horas de trabalho.', carreira: 'Rede de contactos e experiências.', capital: 'O teu valor profissional a crescer.', oportunidades: 'Vagas, candidaturas e oportunidades.', mova: 'A tua empresa: vendas, clientes, custos.', northstar: 'A direção que guia tudo.', roadmap: 'O plano no tempo.', longterm: 'Visão a 1, 5 e 10 anos.', decisoes: 'Decidir bem, com critérios.', revisao: 'Revisões semanais e mensais.', evolucao: 'Tudo o que te aproxima dos objetivos: evolução por área e longo prazo.' };
 const unlocked = () => new Set(CORE.concat(Object.keys((OS.ui.nav) || {})));
 const unlock = k => { if (!k || CORE.includes(k) || !DESC[k]) return; const n = Object.assign({}, OS.ui.nav || {}); if (!n[k]) { n[k] = 1; OS.ui.nav = n; try { OS.setUI('nav', n); } catch (e) { } } };
-const setH = (el, h) => { if (el && el._h !== h) { el.innerHTML = h; el._h = h; } };
+const setH = (el, h) => { if (OS.aiN) h = OS.aiN(h); if (el && el._h !== h) { el.innerHTML = h; el._h = h; } };
 function renderSide(cur) {
   setH(U.$('#side'), `<a class="brand" href="#visao"><span class="brand-mark oc">${OS.Lock.logo(20, '#EAF6FF')}</span><span><b>Náutilo</b></span></a>
   <a class="side-set ${cur === 'definicoes' ? 'on' : ''}" href="#definicoes">${UI.ic('settings')}<span>Definições</span></a>
@@ -60,7 +61,7 @@ document.addEventListener('click', e => { if (!e.target.closest('.tn-g')) docume
 /* ---------- revelação progressiva: poucas secções de cada vez ----------
    Os botões "Mostrar mais"/"Ver mais" mostram logo o que estava escondido: o render não redesenha uma página igual,
    por isso não basta guardar a escolha. */
-const SKIP = ['dominus', 'definicoes', 'explorar', 'mundo', 'senhas', 'oportunidades'];
+const SKIP = ['dominus', 'definicoes', 'explorar', 'mundo', 'senhas', 'oportunidades', 'admin'];
 function progressive(cur, raw) {
   if (SKIP.includes(cur)) return; const view = U.$('#view'); let root = view; while (root.children.length === 1 && root.firstElementChild.children.length > 1) root = root.firstElementChild;
   const kids = [...root.children].filter(el => !el.matches('script,style')), key = 'more_page_' + raw, open = OS.ui[key];
@@ -91,7 +92,8 @@ function render() {
   if (a && a !== document.body && U.$('#view').contains(a)) { for (const at of FOCUS_ATTRS) { const v = a.getAttribute(at); if (v) { fsel = `[${at}="${CSS.escape(v)}"]`; break; } } try { caret = a.selectionStart; } catch (e) { } }
   try { renderSide(cur); renderTop(cur); renderTab(cur); } catch (e) { console.error(e); }
   C.reset(); let html;
-  try { html = cur === 'definicoes' && OS.settingsView ? OS.settingsView(r.sub) : V[cur](r.sub); } catch (e) { console.error(e); html = `<div class="pn"><b>Não foi possível mostrar esta página.</b><p class="mut">${esc(e.message)}</p></div>`; }
+  try { html = cur === 'definicoes' && OS.settingsView ? OS.Fold.html(OS.settingsView(r.sub), r.sub) : V[cur](r.sub); } catch (e) { console.error(e); html = `<div class="pn"><b>Não foi possível mostrar esta página.</b><p class="mut">${esc(e.message)}</p></div>`; }
+  if (OS.aiN) html = OS.aiN(String(html || ''));
   if (!html || !String(html).trim()) html = `<div class="pn"><b>Esta página ainda está vazia.</b><p class="mut"><a href="#hoje">Voltar ao Hoje</a></p></div>`;
   // se nada mudou na página, não a substitui (evita piscar, perder o toque e redesenhar gráficos à toa)
   const sig = r.raw + '|' + String(html).replace(/ id="ch\d+"/g, ''), view = U.$('#view');
@@ -187,15 +189,58 @@ document.addEventListener('submit', e => {
 OS.SETT = [['', 'Geral'], ['email', 'E-mail'], ['ligacoes', 'Ligações'], ['atalhos', 'Atalhos do iPhone'], ['spyke', 'Spyke (assistente)'], ['impostos', 'Impostos'], ['script', 'Script Google']];
 OS.settingsView = sub => { const s = String(sub || ''), k = ['script', 'email', 'ligacoes', 'atalhos', 'impostos'].includes(s) ? s : /^spyke(\.|$)/.test(s) ? 'spyke' : '';
   const sp = k === 'spyke' ? `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>` : '';
-  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Náutilo: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Náutilo: a tua agenda no Google Calendar e no iPhone, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, relógio da corrida e bloquear apps no bloco de foco.' : k === 'impostos' ? 'A tua situação fiscal, para os Relatórios saírem no formato certo da declaração de IRS (e do IRPF no Brasil).' : 'O teu perfil alimenta cálculos em todo o sistema.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
-  if (k === 'spyke') return head + String(V.spyke ? V.spyke(s.slice(6)) : '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
+  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Náutilo: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Náutilo: a tua agenda no Google Calendar e no iPhone, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, sono do app Saúde, relógio da corrida e bloquear apps no bloco de foco.' : k === 'impostos' ? 'A tua situação fiscal, para os Relatórios saírem no formato certo da declaração de IRS (e do IRPF no Brasil).' : 'Tudo o que configuras no Náutilo, arrumado por temas. Toca num bloco para o abrir.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
+  if (k === 'spyke') return head + (OS.Spyke && OS.Spyke.namePanel ? OS.Spyke.namePanel() : '') + String(V.spyke ? V.spyke(s.slice(6)) : '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
   if (k === 'script') return head + (OS.Inbox && OS.Inbox.scriptTab ? OS.Inbox.scriptTab() : '');
   const sec = (t, h) => h ? `<h4 class="set-h">${t}</h4>${h}` : '';
   if (k === 'ligacoes') return head + `<div class="set-page">${sec('Agenda', (OS.CalPush ? OS.CalPush.panel() : '') + (OS.gcalPanel ? OS.gcalPanel() : ''))}${sec('Investimentos', (OS.InvX && OS.InvX.quotesSettings ? OS.InvX.quotesSettings() : '') + (OS.InvX && OS.InvX.alertSettings ? OS.InvX.alertSettings() : ''))}${sec('Notícias, e-mail e IA', `<div class="pn"><div class="list"><a class="li" href="#definicoes.script"><div class="li-t"><b>Notícias (Jornal)</b><small>Chegam pelo teu script Google: vê o estado em Script Google.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.email"><div class="li-t"><b>E-mail e faculdade</b><small>Gmail, Outlook da faculdade e outras contas.</small></div><span class="mut">›</span></a><a class="li" href="#definicoes.spyke"><div class="li-t"><b>IA (Spyke)</b><small>Uma só ligação para tudo o que usa IA.</small></div><span class="mut">›</span></a></div></div>`)}</div>`;
-  if (k === 'atalhos') return head + `<div class="set-page">${OS.quickSettings ? OS.quickSettings() : ''}${OS.RunLink && OS.RunLink.panel ? `<div class="pn" id="runSet"><div class="pn-h"><h3>Relógio → Corrida</h3></div>${OS.RunLink.panel()}</div>` : ''}${OS.FocusBlock && OS.FocusBlock.settings ? OS.FocusBlock.settings() : ''}</div>`;
+  if (k === 'atalhos') return head + `<div class="set-page">${OS.quickSettings ? OS.quickSettings() : ''}${OS.Sono && OS.Sono.panel ? OS.Sono.panel(OS.Acc && OS.Acc.on && OS.Acc.akLink && OS.Acc.akLink() ? OS.Acc.akLink() + '&tipo=sono' : '') : ''}${OS.RunLink && OS.RunLink.panel ? `<div class="pn" id="runSet"><div class="pn-h"><h3>Relógio → Corrida</h3></div>${OS.RunLink.panel()}</div>` : ''}${OS.FocusBlock && OS.FocusBlock.settings ? OS.FocusBlock.settings() : ''}</div>`;
   if (k === 'impostos') return head + `<div class="set-page">${OS.Reports && OS.Reports.settings ? OS.Reports.settings() : ''}</div>`;
   if (k === 'email') return head + `<div class="ml-page set-mail">${OS.Mail && OS.Mail.settings ? OS.Mail.settings() : ''}</div>`;
   return String(V.definicoes(s)).replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, head); };
+/* ---------- Definições arrumadas: cada bloco abre e fecha pela seta; os que abriste ficam abertos neste aparelho ---------- */
+OS.Fold = (() => {
+  const KEY = 'os2fold', st = () => U.ls.get(KEY, {}), norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  const hdOf = pn => [...pn.children].find(c => c.classList.contains('pn-h') && c.querySelector('h3'));
+  const titleOf = pn => { const h = hdOf(pn); return h ? h.querySelector('h3').textContent.trim() : ''; };
+  const keyOf = (tab, pn) => tab + ':' + (pn.id || norm(titleOf(pn)).slice(0, 40));
+  const tabOf = sub => String(sub || '').split('.')[0] || 'geral';
+  const CHEV = '<svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  // Geral: os blocos por temas (chave = id do bloco ou o título)
+  const GROUPS = [['Tu', 'Os teus dados e metas: entram nos cálculos de todo o Náutilo.', ['pfMe', 'pfUni', 'pfWork', 'pfGoals', 'contextos']],
+    ['Segurança e conta', 'Código de bloqueio, Face ID e a tua conta.', ['seguranca', 'codigo neste aparelho', 'accMig']],
+    ['Aparelhos e dados', 'Sincronizar aparelhos, cópias de segurança e mudar de endereço.', ['syncPn', 'dataPn', 'mudanca de endereco']],
+    ['Aplicação', 'Desempenho e atualizações.', ['desempenho', 'verPn']]];
+  const html = (h, sub) => { const tab = tabOf(sub), t = document.createElement('template'); t.innerHTML = h; const S = st(), all = U.ls.get('os2foldAll', false), F = t.content;
+    // blocos com o título solto (sem .pn-h): o título passa a ser o cabeçalho que abre e fecha
+    [...F.querySelectorAll('.pn')].forEach(pn => { const f = pn.firstElementChild; if (f && f.tagName === 'H3' && !(pn.parentElement && pn.parentElement.closest('.pn'))) { const h = document.createElement('div'); h.className = 'pn-h'; pn.insertBefore(h, f); h.appendChild(f); } });
+    const top = [...F.querySelectorAll('.pn')].filter(pn => !(pn.parentElement && pn.parentElement.closest('.pn')) && hdOf(pn) && !pn.classList.contains('nofold'));
+    if (!top.length) return h;
+    top.forEach(pn => { const k = keyOf(tab, pn), open = all || S[k] === 1 || (S[k] == null && (pn.dataset.open === '1' || top.length === 1)), hd = hdOf(pn);
+      pn.classList.add('fold'); pn.classList.toggle('shut', !open); pn.dataset.fold = k;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'pn-fold'; b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', (open ? 'Fechar ' : 'Abrir ') + titleOf(pn)); b.innerHTML = CHEV; hd.appendChild(b); });
+    if (tab === 'geral') { const mark = document.createComment('grupos'), used = new Set(); top[0].parentNode.insertBefore(mark, top[0]); const mk = (n, d, L) => { const g = document.createElement('section'); g.className = 'set-grp'; g.innerHTML = `<div class="set-gh"><h2>${esc(n)}</h2><p>${esc(d)}</p></div>`; L.forEach(x => { used.add(x); g.appendChild(x); }); return g; };
+      const by = id => top.find(pn => !used.has(pn) && (pn.id === id || norm(titleOf(pn)) === id));
+      const secs = GROUPS.map(([n, d, ids]) => [n, d, ids.map(by).filter(Boolean)]).filter(x => x[2].length).map(([n, d, L]) => mk(n, d, L));
+      const rest = top.filter(pn => !used.has(pn)); if (rest.length) secs.push(mk('Mais', 'Outras opções.', rest));
+      const box = document.createElement('div'); box.className = 'set-groups'; secs.forEach(x => box.appendChild(x)); mark.parentNode.insertBefore(box, mark); mark.remove(); }
+    // abrir ou fechar tudo de uma vez
+    const tabs = F.querySelector('.tabs'), bar = document.createElement('div'); bar.className = 'fold-bar';
+    bar.innerHTML = `<button type="button" class="btn sm ghost" data-fold-all="1">Abrir tudo</button><button type="button" class="btn sm ghost" data-fold-all="0">Fechar tudo</button>`;
+    if (tabs && tabs.parentNode) tabs.parentNode.insertBefore(bar, tabs.nextSibling); else F.insertBefore(bar, F.firstChild);
+    return t.innerHTML; };
+  const setPn = (pn, open) => { pn.classList.toggle('shut', !open); const b = pn.querySelector(':scope > .pn-h > .pn-fold'); if (b) { b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', (open ? 'Fechar ' : 'Abrir ') + titleOf(pn)); } };
+  const save = (k, open) => { const S = st(); S[k] = open ? 1 : 0; U.ls.set(KEY, S); };
+  document.addEventListener('click', e => { const fa = e.target.closest('[data-fold-all]');
+    if (fa) { const open = fa.dataset.foldAll === '1'; document.querySelectorAll('#view .pn.fold').forEach(pn => { setPn(pn, open); save(pn.dataset.fold, open); }); return; }
+    const hd = e.target.closest('.pn.fold > .pn-h'); if (!hd) return;
+    if (!e.target.closest('.pn-fold') && e.target.closest('a,button,input,select,textarea,label,summary')) return;
+    const pn = hd.parentElement, open = pn.classList.contains('shut'); setPn(pn, open); save(pn.dataset.fold, open); });
+  // ir direto a um bloco (abre-o): OS.Fold.go('atalhos', 'slSet')
+  const go = (tab, id) => { save((tab || 'geral') + ':' + id, true); OS.go('definicoes' + (tab && tab !== 'geral' ? '.' + tab : ''));
+    setTimeout(() => { const el = document.getElementById(id); if (el) { if (el.classList.contains('shut')) setPn(el, true); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 260); };
+  A.setGo = (b, e) => { e && e.preventDefault(); UI.closeModal && !document.getElementById('modal').hidden && UI.closeModal(); go(b.dataset.tab, b.dataset.id); };
+  return { html, go, key: keyOf }; })();
 /* ---------- com um painel aberto, só o painel rola (no iPhone o overflow:hidden não chega) ---------- */
 (() => { let locked = false, y = 0, h0 = '';
   const want = () => document.body.classList.contains('nav-open') || document.body.classList.contains('noscroll') || !U.$('#modal').hidden || !!document.querySelector('.ceremony');

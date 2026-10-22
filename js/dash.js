@@ -53,6 +53,7 @@ V.visao = () => {
     ${card('Tarefas', `<div class="dc-kp"><b class="mono">${OS.Tasks.open().length}</b><span>abertas</span><b class="mono">${doneP}</b><span>feitas no período</span></div>${tasks.map(x => `<div class="dc-li" data-edit="tasks:${x.id}"><input type="checkbox" class="cbx round" data-act="taskToggle" data-id="${x.id}" aria-label="Concluir ${esc(x.title)}"><b>${esc(x.title)}</b></div>`).join('') || '<p class="dc-empty">Nada para hoje.</p>'}`, { cls: 'span4', act: more('tarefas') })}
     ${card('Corpo', `<div class="dc-tiles"><a href="#treino"><b class="mono">${wk}</b><span>treinos</span></a><a href="#corrida"><b class="mono">${U.nf(km, 1)}</b><span>km</span></a><a href="#dieta"><b class="mono">${U.nf(diet.kcal, 0)}</b><span>kcal hoje</span></a><a href="#dieta"><b class="mono">${U.nf(diet.p, 0)}<small>/${U.num(dg.p) || '—'}</small></b><span>proteína</span></a></div>`, { cls: 'hero h-reef span4', act: more('treino', 'Treino') })}
     ${work}
+    ${OS.Sono ? safe(() => OS.Sono.card(card), '') : ''}
     ${card('Hábitos de hoje', `<div class="dc-big">${Math.round(habit * 100)}%</div><div class="dc-bar"><i style="width:${Math.round(habit * 100)}%"></i></div><div class="dc-sub">inegociáveis cumpridos</div>`, { cls: 'span4', act: more('habitos') })}
     ${card('Dominus', `<div class="dc-big">Nível ${lvl}</div><div class="dc-sub">${dom.born ? esc(rank) : 'Cria o teu herói'}</div>`, { cls: 'hero h-deep span4', act: more('dominus', 'Jogar') })}
     ${cards.length ? card('Gastos por cartão', cards.map(c => `<div class="dc-li"><b>${esc(c.l)}</b><span class="mono">${U.eur(c.v)}</span></div>`).join(''), { cls: 'span4' }) : ''}
@@ -80,10 +81,9 @@ V.gasto = sub => { const pre = U.num(String(sub || '').replace(',', '.')) || '',
 </div>`; };
 // Definições → Atalhos do iPhone: abrir sempre no Gasto rápido e registar sem abrir a app (o Gasto rápido só regista)
 OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
-  return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3></div>
+  return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3><span class="mut" style="font-size:12px">${start ? 'abre no Gasto rápido' : ''}</span></div>
     <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Náutilo sempre no Gasto rápido neste aparelho</label>
-    <div class="list" style="margin-top:10px"><div class="li"><div class="li-t"><b>iPhone: registar sem abrir a app</b><small>Um atalho no Centro de Controlo pede o valor e a descrição e grava direto. Os gastos entram sozinhos.</small></div><div class="li-r"><a class="btn sm pri" href="#definicoes" data-act="ibGo">${UI.ic('bolt')}Configurar o atalho</a></div></div>
-    <div class="li"><div class="li-t"><b>Android</b><small>No Chrome: menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</small></div></div></div></div>${OS.Acc && OS.Acc.on && OS.Acc.atalhoPanel && !(OS.one('inbox').url && OS.one('inbox').key) ? OS.Acc.atalhoPanel() : ''}`; };
+    <p class="mut" style="margin:10px 0 0;font-size:13px"><b>Android:</b> no Chrome, menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</p></div>${OS.Inbox && OS.Inbox.panel ? OS.Inbox.panel() : ''}`; };
 OS.forms = OS.forms || {};
 OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 0)) { UI.toast('Escreve o valor', 'warn'); return; }
   const cat = (f.querySelector('input[name=cat]:checked') || {}).value || '', account = (f.querySelector('input[name=acc]:checked') || {}).value || '';
@@ -93,7 +93,7 @@ OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 
   OS.ui.qg = { cat, acc: account }; U.ls.set('os2ui', OS.ui);
   UI.toast(`Registado: ${U.eur(amount)}${cat ? ' · ' + cat : ''}`, 'pos'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } };
 A.qgCopy = () => { const url = (() => { try { return window.top.location.href.split('#')[0]; } catch (e) { return ''; } })() || document.referrer || 'https://claude.ai/artifact/AUtUtqFR4x46BWPVcR3kLZ'; const ok = () => UI.toast('Link copiado', 'pos'); try { navigator.clipboard.writeText(url).then(ok, () => UI.toast(url)); } catch (e) { UI.toast(url); } };
-A.ibGo = (b, e) => { e && e.preventDefault(); OS.go('definicoes'); setTimeout(() => { const el = document.getElementById('inboxPn'); el && el.scrollIntoView({ behavior: 'smooth' }); }, 250); };
+A.ibGo = (b, e) => { e && e.preventDefault(); OS.Fold.go('atalhos', 'inboxPn'); };
 A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Náutilo vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
 A.dashPer = b => OS.setUI('dashPer', b.dataset.p);
 A.dashYM = b => { const cur = OS.ui.dashYM || U.ym(U.today()), n = U.addMonths(cur, +b.dataset.d); OS.setUI('dashYM', n > U.ym(U.today()) ? U.ym(U.today()) : n); };

@@ -15,11 +15,11 @@ let OFFLINE = false, GSFAIL = 0, SLOWIDX = 0, FAILP = '';
 // os mesmos cabeçalhos de segurança do Vercel (CSP incluída), para os testes apanharem o que ela bloquearia; o Apps Script simulado está em http://127.0.0.1
 const SECH = (() => { try { const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')), all = v.headers.find(h => h.source === '/(.*)'), o = {}; all.headers.forEach(h => { o[h.key] = h.key === 'Content-Security-Policy' ? h.value.replace("connect-src 'self'", `connect-src 'self' http://127.0.0.1:${PORT}`) : h.value; }); delete o['Strict-Transport-Security']; return o; } catch (e) { return {}; } })();
 // servidor das contas para os testes: pasta temporária em vez do Vercel Blob (apagada no fim)
-const ACCDIR = fs.mkdtempSync(path.join(require('os').tmpdir(), 'nautilo-contas-')); process.env.NAUTILO_STORE_DIR = ACCDIR; process.env.NAUTILO_CACHE_MS = '0'; process.env.NAUTILO_RSS_BASE = 'http://localhost:' + PORT + '/rssmock'; delete process.env.BLOB_READ_WRITE_TOKEN;
+const ACCDIR = fs.mkdtempSync(path.join(require('os').tmpdir(), 'nautilo-contas-')); process.env.NAUTILO_STORE_DIR = ACCDIR; process.env.NAUTILO_ADMIN = 'ana@exemplo.pt'; process.env.NAUTILO_IA_LIVRE = 'http://localhost:' + PORT + '/iamock'; delete process.env.GEMINI_API_KEY; process.env.NAUTILO_CACHE_MS = '0'; process.env.NAUTILO_RSS_BASE = 'http://localhost:' + PORT + '/rssmock'; delete process.env.BLOB_READ_WRITE_TOKEN;
 process.on('exit', () => { try { fs.rmSync(ACCDIR, { recursive: true, force: true }); } catch (e) { } });
 const ACCFN = {}; const ACCAPI = n => { if (!(n in ACCFN)) { try { ACCFN[n] = require(path.join(ROOT, 'api', n + '.js')); } catch (e) { ACCFN[n] = null; } } return ACCFN[n]; };
 // servidor estático + caixa de entrada simulada (Apps Script)
-const INBOX = [], STORE = {};
+const INBOX = [], STORE = {}, IAMOCK = [], INFL = new Map(); if (process.env.DEBUGAPI) setInterval(() => { const L = [...INFL.values()].map(f => f()).filter(x => +x.split(' ').pop().replace('ms', '') > 5000); if (L.length) console.log('    [api pendurada]', L.join(' | ')); }, 5000).unref();
 const srv = http.createServer((req, res) => {
   const u = url.parse(req.url, true);
   if (u.pathname === '/gs') { // simula o Apps Script
@@ -37,12 +37,17 @@ const srv = http.createServer((req, res) => {
       const v = Number(String(q.v || '').replace(/[^0-9,.-]/g, '').replace(',', '.')); if (!(v > 0)) return out({ ok: false, msg: 'Valor inválido' });
       INBOX.push({ id: crypto.randomUUID(), t: new Date().toISOString(), v, d: q.d || '', c: q.c || '' }); out('✓ registado', 1); });
     return; }
+  if (u.pathname === '/iamock') { let body = ''; req.on('data', c => body += c); req.on('end', () => { let j = {}; try { j = JSON.parse(body); } catch (e) { } IAMOCK.push(j); const json = j.response_format && j.response_format.type === 'json_object';
+      res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: json ? '{"ok":true,"resposta":"feito"}' : 'Olá! Aqui é a tua IA.' } }] })); }); return; }
   if (OFFLINE) { req.socket.destroy(); return; }
   // contas: as funções do servidor a sério (api/conta.js e api/dados.js), com uma pasta temporária no lugar do Vercel Blob
   if (u.pathname.startsWith('/rssmock/')) { const q = u.query.q || '', n = (k) => `<item><title>${k} - Jornal Teste</title><link>https://exemplo.pt/${encodeURIComponent(k)}</link><pubDate>${new Date().toUTCString()}</pubDate><source url="https://exemplo.pt">Jornal Teste</source><description></description></item>`;
     res.writeHead(200, { 'Content-Type': 'application/rss+xml' }); return res.end(`<?xml version="1.0"?><rss><channel>${[1, 2, 3].map(i => n((q ? 'Pesquisa ' : 'Notícia da conta ') + i)).join('')}</channel></rss>`); }
-  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias)$/);
-  if (am) { const fn = ACCAPI(am[1]); if (!fn) { res.writeHead(404); return res.end(); } req.query = u.query; return fn(req, res); }
+  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias|ia)$/);
+  if (am) { const fn = ACCAPI(am[1]); if (!fn) { res.writeHead(404); return res.end(); } req.query = u.query;
+    if (process.env.DEBUGAPI) { const t0 = Date.now(), id = Math.random().toString(36).slice(2, 7); let op = ''; const oe = req.emit; req.emit = function (ev, ch) { if (ev === 'data' && !op) op = String(ch).slice(0, 40); return oe.apply(this, arguments); };
+      INFL.set(id, () => am[1] + ' ' + op + ' ' + (Date.now() - t0) + 'ms'); res.on('finish', () => { INFL.delete(id); if (Date.now() - t0 > 2500) console.log('    [api lenta]', am[1], op, Date.now() - t0, 'ms'); }); }
+    return fn(req, res); }
   let p = decodeURIComponent(u.pathname);
   if (!p.startsWith('/Oceanum/')) { res.writeHead(404); return res.end(); }
   p = p.slice('/Oceanum/'.length) || 'index.html';
@@ -62,12 +67,20 @@ const R = []; let cur = '';
 const ok = (name, pass, info = '') => { R.push({ p: cur, name, pass, info }); console.log(`${pass ? '  ✓' : '  ✗'} [${cur}] ${name}${info ? ' — ' + info : ''}`); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+// ACCMODE=1: corre a bateria inteira com o app dentro de uma conta (perfil pessoal migrado), cada página com a sua conta nova
+const ACCMODE = !!process.env.ACCMODE;
+const TERMOS_V = (fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'legal.js'), 'utf8').match(/V: '(\d{4}-\d{2}-\d{2})'/) || [])[1];
+const mkAcc = async () => { const ip = '10.' + [1, 2, 3].map(() => crypto.randomBytes(1)[0]).join('.'), call = (body, tok) => fetch(BASE + 'api/conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json', origin: 'http://localhost:' + PORT, 'x-forwarded-for': ip }, tok ? { authorization: 'Bearer ' + tok } : {}), body: JSON.stringify(body) }).then(r => r.json());
+  const email = 'm' + crypto.randomBytes(6).toString('hex') + '@teste.pt', r = await call({ op: 'registar', email, senha: 'segredo123', termos: TERMOS_V, saude: true, idade: true }), q = await call({ op: 'perfil', acao: 'criar', perfil: { nome: 'Ryan', lk: HASH, ps: true } }, r.token);
+  return { 'nau:s': JSON.stringify({ t: r.token, e: email, n: '', perfis: q.conta.perfis }), 'nau:p': JSON.stringify(q.perfil.id), 'nau:pd': JSON.stringify(q.perfil.id), 'nau:owner': JSON.stringify(email) }; };
 async function newPage(b, prof, init = {}) {
+  if (ACCMODE) init = Object.assign(await mkAcc(), init);
   const ctx = await b.newContext(prof.o); const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push('JS: ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/fonts\.g|net::ERR|Failed to load resource|ERR_INTERNET|ERR_CONNECTION/.test(m.text())) errs.push('consola: ' + m.text().slice(0, 160)); });
   p.on('dialog', d => d.dismiss());
   await p.addInitScript(([HASH, init]) => {
+    try { if (localStorage.getItem('os2foldAll') == null && !sessionStorage.getItem('__nofa')) localStorage.setItem('os2foldAll', 'true'); } catch (e) { }
     if (!localStorage.getItem('__seeded')) { localStorage.setItem('os2:one~security', JSON.stringify({ data: { hash: HASH } })); Object.entries(init).forEach(([k, v]) => localStorage.setItem(k, v)); localStorage.setItem('__seeded', '1'); }
     window.__cred = 0; try { Object.defineProperty(navigator, 'credentials', { value: { get: () => { window.__cred++; return new Promise(() => { }); }, create: () => new Promise(() => { }) } }); } catch (e) { }
     window.PublicKeyCredential = window.PublicKeyCredential || { isUserVerifyingPlatformAuthenticatorAvailable: async () => true };
@@ -75,7 +88,8 @@ async function newPage(b, prof, init = {}) {
   if (prof.slow) { const cdp = await ctx.newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: prof.slow }); }
   return { ctx, p, errs };
 }
-const unlock = async p => { await p.waitForFunction(() => document.getElementById('lkCode') || (document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30), null, { timeout: 8000 }); if (!(await p.$('#lkCode')) || !(await p.isVisible('#lkCode'))) return; await p.fill('#lkCode', CODE); await p.click('.lk-go'); await p.waitForFunction(() => document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30, null, { timeout: 8000 }); };
+const ACCSEEN = { acc: 0, all: 0 };
+const unlock = async p => { if (ACCMODE) { try { await p.waitForFunction(() => window.OS && OS.Acc, null, { timeout: 8000 }); const a = await p.evaluate(() => OS.Acc.on && !OS.Acc.pub); ACCSEEN.all++; if (a) ACCSEEN.acc++; } catch (e) { } } await p.waitForFunction(() => document.getElementById('lkCode') || (document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30), null, { timeout: 8000 }); if (!(await p.$('#lkCode')) || !(await p.isVisible('#lkCode'))) return; await p.fill('#lkCode', CODE); await p.click('.lk-go'); await p.waitForFunction(() => document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30, null, { timeout: 8000 }); };
 const E = (p, f, a) => p.evaluate(f, a);
 
 async function profileTests(b, prof) {
@@ -110,7 +124,7 @@ async function profileTests(b, prof) {
   ok('nada sai para o lado', !ovf.length, ovf.join(', '));
   ok('páginas rápidas' + (prof.slow ? ' (processador 6× mais lento)' : ''), !slow.length, slow.length ? slow.join(', ') : 'máx ' + Math.round(maxT) + ' ms');
   // D · carregar nos botões
-  const SKIP = 'wipe|lockNow|[Dd]el|remove|[Rr]eset|[Aa]bort|navOpen|cmdOpen|focusStart|focusEnd|exportData|bioRegister|bioForget|cloud|qgStart|dStart|d3LegOff|d3LookReset|liteSet|ibSave|ibRound|ibCopy|gcal';
+  const SKIP = 'wipe|lockNow|[Dd]el|remove|[Rr]eset|[Aa]bort|navOpen|cmdOpen|focusStart|focusEnd|exportData|bioRegister|bioForget|cloud|qgStart|dStart|d3LegOff|d3LookReset|liteSet|ibSave|ibRound|ibCopy|gcal|acc[A-Z]';
   let clicks = 0; const cErr0 = errs.length;
   for (const r of (QUICK ? routes.slice(0, 12) : routes)) { await E(p, r => location.hash = r, r); await sleep(120);
     const n = await E(p, SK => [...document.querySelectorAll('#view [data-act]')].filter(x => !new RegExp(SK).test(x.dataset.act) && x.offsetParent).length, SKIP);
@@ -158,7 +172,7 @@ async function sharedTests(b) {
     await E(p, j => OS.importAll(JSON.parse(j)), exp); await sleep(800); ok('exportar e importar devolve tudo', (await E(p, () => OS.all('transactions').length)) === n0, n0 + ' movimentos');
     // M · atalho de gastos (Apps Script simulado, envio por formulário como o iPhone)
     await E(p, base => { const c = OS.one('inbox'); c.url = base; c.key = 'KEY_T'; OS.touch('inbox'); }, `http://127.0.0.1:${PORT}/gs`);
-    await E(p, () => location.hash = 'definicoes'); await sleep(400);
+    await E(p, () => location.hash = 'definicoes.atalhos'); await sleep(400);
     await p.evaluate(() => document.querySelector('[data-act=ibSave]').click()); await sleep(800);
     ok('atalho: verificação da ligação', /Ligado/.test(await E(p, () => document.querySelector('.ib-st').innerText)));
     await new Promise(res => { const rq = http.request({ host: 'localhost', port: PORT, path: '/gs?k=KEY_T', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, r => { r.resume(); r.on('end', res); }); rq.end('v=8%2C50&d=Uber+para+a+faculdade'); });
@@ -1028,7 +1042,7 @@ async function newFeatureTests(b) {
       return { two: run(5, [[.01, 120], [.6, 1], [.08, 20], [.55, 1], [.05, 40]]), one: run(5, [[.01, 120], [.6, 1], [.02, 80]]), voice: run(5, [[.01, 120], [.5, 1], [.4, 30], [.5, 1], [.4, 30]]), far: run(5, [[.01, 120], [.5, 1], [.02, 120], [.5, 1], [.02, 10]]), soft9: run(9, [[.005, 120], [.12, 1], [.01, 15], [.12, 1], [.01, 20]]), soft1: run(1, [[.005, 120], [.12, 1], [.01, 15], [.12, 1], [.01, 20]]) }; });
     ok('palmas: duas palmas chamam o Spyke', det.two === 1, JSON.stringify(det)); ok('palmas: uma palma sozinha não chama', det.one === 0); ok('palmas: voz ou música contínua não chamam', det.voice === 0); ok('palmas: palmas muito afastadas não contam', det.far === 0);
     ok('palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)', det.soft9 === 1 && det.soft1 === 0);
-    await E(p, () => { OS.Spyke.close(); location.hash = 'spyke'; }); await sleep(400);
+    await E(p, () => { OS.Spyke.close(); localStorage.setItem('os2foldAll', 'true'); location.hash = 'spyke'; }); await sleep(400);
     ok('Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone', await E(p, () => /segundo plano/.test(document.getElementById('view').innerText) && /Safari → Microfone → Permitir/.test(document.getElementById('view').innerText)));
     ok('sem erros de JavaScript (Spyke a ouvir)', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
   // Floresta: o 3D recupera sozinho
@@ -1176,7 +1190,7 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Faculdade: sem nada configurado, não há passos de configuração (só o botão para Definições → E-mail)', await E(p, () => !document.querySelector('#view .ol-f, #view [data-act=olAuth], #view [data-form=olDom], #view .ol-set') && !!document.querySelector('#view a[href="#definicoes.email"]')));
   ok('E-mail: o separador "Ligar contas" saiu da página E-mail', await E(p, () => ![...document.querySelectorAll('#view .tabs a')].some(a => /Ligar contas/.test(a.textContent))));
   await E(p, () => location.hash = 'email.contas'); await sleep(900);
-  ok('E-mail: o endereço antigo "Ligar contas" abre Definições → E-mail', await E(p, () => location.hash === '#definicoes.email' && /Gmail principal/.test(document.getElementById('view').innerText) && !!document.getElementById('uniSet') && [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()).join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google'));
+  ok('E-mail: o endereço antigo "Ligar contas" abre Definições → E-mail', await E(p, () => location.hash === '#definicoes.email' && /Gmail principal/.test(document.getElementById('view').innerText) && !!document.getElementById('uniSet') && [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()).join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google|Privacidade e termos'));
   ok('Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar', await E(p, () => /usercallback/.test(document.getElementById('view').innerText) && /Registos de aplicações/.test(document.getElementById('view').innerText)));
   await p.fill('#view .ol-f [name=id]', '11111111-2222-3333-4444-555555555555'); await p.fill('#view .ol-f [name=ten]', '22222222-3333-4444-5555-666666666666'); await p.fill('#view .ol-f [name=sec]', 'segredo-de-teste-123'); await p.click('#view .ol-f button'); await sleep(800);
   ok('Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)', posts.some(x => x.op === 'olcfg' && x.sec === 'segredo-de-teste-123' && x.id.length === 36));
@@ -1210,7 +1224,7 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   ok('Definições: o Spyke saiu do menu principal', !(await E(p, () => [...document.querySelectorAll('#side a, .tn-dd a')].some(a => a.getAttribute('href') === '#spyke'))));
   await E(p, () => location.hash = 'spyke'); await sleep(700);
   const sp = await E(p, () => ({ h: location.hash, tabs: [...document.querySelectorAll('#view .tabs a')].map(a => a.textContent.trim()), st: !!document.getElementById('spyState'), h1: (document.querySelector('#view h1') || {}).textContent, side: !!document.querySelector('#side .side-set.on') }));
-  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google' && sp.side, JSON.stringify(sp));
+  ok('Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)', sp.h === '#definicoes.spyke' && sp.st && sp.h1 === 'Definições' && sp.tabs.join('|') === 'Geral|E-mail|Ligações|Atalhos do iPhone|Spyke (assistente)|Impostos|Script Google|Privacidade e termos' && sp.side, JSON.stringify(sp));
   ok('Definições → Spyke: a Parte 4 já não aparece no Spyke (só em Definições → Script Google)', await E(p, () => !/Parte 4/.test(document.getElementById('spyState').innerText) && !document.querySelector('#spyState [data-act=ibCopy]')));
   await E(p, () => location.hash = 'definicoes.script'); await sleep(700);
   const sc = await E(p, () => ({ t: document.getElementById('view').innerText, b: [...document.querySelectorAll('#view [data-act=ibCopy]')].filter(x => !x.closest('#nautilo')).map(x => x.dataset.t) }));
@@ -1223,7 +1237,7 @@ async function novosTests(b) { cur = 'Novos'; console.log('\n=== Painel, Próxim
   await E(p, () => location.hash = 'definicoes.spyke'); await sleep(500);
   ok('Definições → Spyke: mesmo sem a Parte 4, o Spyke não fala dela (está só em Script Google)', await E(p, () => !/Parte 4/.test(document.getElementById('spyState').innerText)));
   await E(p, () => location.hash = 'definicoes'); await sleep(600);
-  ok('Definições → Geral: mantém perfil, segurança, sincronização e atalho', await E(p, () => !!document.getElementById('syncPn') && !!document.getElementById('inboxPn') && !document.getElementById('spyState') && /Perfil/.test(document.getElementById('view').innerText) && document.querySelectorAll('#view .tabs').length === 1 && document.querySelectorAll('#view h1').length === 1));
+  ok('Definições → Geral: perfil, segurança e sincronização (o atalho de gastos está em Atalhos do iPhone)', await E(p, () => !!document.getElementById('syncPn') && !document.getElementById('inboxPn') && !document.getElementById('spyState') && /Sobre ti/.test(document.getElementById('view').innerText) && document.querySelectorAll('#view .tabs').length === 1 && document.querySelectorAll('#view h1').length === 1));
   // "Ver mais": o botão mostra logo o que estava escondido (a página não é redesenhada se não mudou)
   await E(p, () => { OS.views.zzteste = () => OS.UI.head('Teste', '') + '<div class="pn"><div class="list">' + Array.from({ length: 7 }, (_, i) => '<div class="li"><div class="li-t"><b>Dia ' + (i + 1) + '</b></div></div>').join('') + '</div></div>'; location.hash = 'zzteste'; }); await sleep(600);
   const vm0 = await E(p, () => { const b = document.querySelector('#view .list .pg-more'); return b ? b.textContent + '|' + document.querySelectorAll('#view .list .pg-hide').length : ''; });
@@ -2013,17 +2027,20 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   const errs = [], ctxs = [];
   const fresh = async (prof, init) => { const ctx = await b.newContext(prof.o); ctxs.push(ctx); const p = await ctx.newPage();
     p.on('pageerror', e => errs.push('JS: ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/fonts\.g|net::ERR|Failed to load resource|ERR_INTERNET|ERR_CONNECTION|status of 40[134]/.test(m.text())) errs.push('consola: ' + m.text().slice(0, 160)); }); p.on('dialog', d => d.accept());
-    await p.addInitScript(() => { window.__accPoll = 1200; }); if (init) await p.addInitScript(init); await p.goto(BASE); return p; };
+    await p.addInitScript(() => { window.__accPoll = 1200; window.__noAsk = 1; { const of = window.fetch.bind(window); window.__pend = new Map(); let n = 0; window.fetch = (u, o) => { const id = ++n, s = String(u && u.url || u); if (/api\//.test(s)) window.__pend.set(id, s.replace(/^.*api\//, '') + ' ' + String((o && o.body) || '').slice(0, 30) + ' @' + Date.now()); const r = of(u, o); r.finally(() => window.__pend.delete(id)).catch(() => { }); return r; }; } try { if (!localStorage.getItem('__fa')) { localStorage.setItem('os2foldAll', 'true'); localStorage.setItem('__fa', '1'); } } catch (e) { } }); if (init) await p.addInitScript(init); await p.goto(BASE); return p; };
   const gateUp = p => p.waitForSelector('#acc .ac-in form, #acc .ac-who, #acc .ac-code', { timeout: 15000 });
   const lockUp = p => p.waitForSelector('#lkCode', { state: 'visible', timeout: 15000 });
   const app = p => p.waitForFunction(() => !document.getElementById('acc') && document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30, null, { timeout: 15000 });
   const code = async (p, c) => { await lockUp(p); await p.fill('#lkCode', c); await p.click('.lk-go'); await app(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); }); };
   const files = () => { const out = []; const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) f.isDirectory() ? walk(path.join(d, f.name)) : out.push(path.join(d, f.name)); }; try { walk(ACCDIR); } catch (e) { } return out; };
   // aparelho A (iPhone): aparelho novo → criar conta
-  const A = await fresh(PROFILES[0]); await gateUp(A);
+  const A = await fresh(PROFILES[0], () => { window.__useTick = 300; }); await gateUp(A);
   const g0 = await E(A, () => ({ gate: !!document.querySelector('#acc .ac-card[data-acf=criar]'), lock: !!(document.getElementById('lkCode') && document.getElementById('lkCode').offsetParent), mode: OS.Acc && OS.Acc.on }));
   ok('Aparelho novo: abre o ecrã da conta (criar conta ou entrar) e não o código pessoal', g0.gate && !g0.lock && g0.mode, JSON.stringify(g0));
-  await A.fill('#acc input[name=nome]', 'Ana Teste'); await A.fill('#acc input[name=email]', 'ana@exemplo.pt'); await A.fill('#acc input[name=senha]', 'segredo123'); await A.click('#acc button[type=submit]');
+  await A.fill('#acc input[name=nome]', 'Ana Teste'); await A.fill('#acc input[name=email]', 'ana@exemplo.pt'); await A.fill('#acc input[name=senha]', 'segredo123'); await A.click('#acc button[type=submit]'); await sleep(500);
+  const nt = await E(A, () => ({ gate: !!document.querySelector('#acc form[data-acf=criar]'), msg: ((document.querySelector('#acc .ac-msg') || {}).textContent || '') + ' ' + ((document.querySelector('#acc input[name=t_termos]') || {}).validationMessage || '') }));
+  ok('Criar conta sem aceitar os termos: não cria (as três caixas são obrigatórias)', nt.gate && !files().some(f => /[\\/]a[\\/]/.test(f)), JSON.stringify(nt));
+  for (const n of ['t_termos', 't_saude', 't_idade']) await A.check('#acc input[name=' + n + ']'); await A.click('#acc button[type=submit]');
   await A.waitForSelector('#acc .ac-code', { timeout: 15000 }); const rec = await E(A, () => document.querySelector('#acc .ac-code').textContent.trim());
   ok('Criar conta: mostra o código de recuperação (só uma vez)', /^[A-Z0-9]{4}(-[A-Z0-9]{4}){3}$/.test(rec), rec);
   await A.click('#acc [data-ac=guardei]'); await A.waitForSelector('#acc form[data-acf=novo]');
@@ -2047,7 +2064,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   ok('O que registas vai para a conta, cifrado no servidor (sem texto legível)', fl && fz.some(f => /[\\/]d[\\/]/.test(f) && /tasks/.test(f)) && blob.length > 30 && !blob.includes('Tarefa da Ana'), fz.length + ' ficheiros · flush ' + fl + ' · ' + JSON.stringify(pd) + ' · ' + fz.filter(f => /[\\/]d[\\/]/.test(f)).map(f => path.basename(f)).join(','));
   // aparelho B (computador): entrar com a mesma conta
   const B = await fresh(PROFILES[4]); await gateUp(B); await B.click('#acc [data-ac=m][data-v=entrar]');
-  await B.fill('#acc input[name=email]', 'ana@exemplo.pt'); await B.fill('#acc input[name=senha]', 'errada000'); await B.click('#acc button[type=submit]'); await sleep(700);
+  await B.fill('#acc input[name=email]', 'ana@exemplo.pt'); await B.fill('#acc input[name=senha]', 'errada000'); await B.click('#acc button[type=submit]'); await B.waitForFunction(() => /E-mail ou senha errados/.test((document.querySelector('#acc .ac-msg') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => { });
   ok('Senha errada: mensagem clara', await E(B, () => /E-mail ou senha errados/.test((document.querySelector('#acc .ac-msg') || {}).textContent || '')));
   await B.fill('#acc input[name=senha]', 'segredo123'); await B.click('#acc button[type=submit]'); await B.waitForSelector('#acc .ac-p[data-ac=escolher]'); await B.click('#acc .ac-p[data-ac=escolher]'); await code(B, 'abc123');
   ok('Noutro aparelho (computador): entra com a mesma conta e vê os mesmos dados', await E(B, () => OS.all('tasks').some(t => t.title === 'Tarefa da Ana') && OS.all('transactions').some(t => t.desc === 'Almoço') && OS.one('profile').short === 'Ana'));
@@ -2057,13 +2074,50 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   // segundo perfil no computador: dados separados
   await E(B, () => OS.Acc.switchProfile()); await B.waitForSelector('#acc .ac-p.add'); await B.click('#acc .ac-p.add');
   await B.fill('#acc input[name=nome]', 'Bruno'); await B.fill('#acc input[name=c1]', 'bruno99'); await B.fill('#acc input[name=c2]', 'bruno99'); await B.click('#acc button[type=submit]');
-  await B.waitForFunction(() => document.querySelectorAll('#acc .ac-p[data-ac=escolher]').length === 2, null, { timeout: 15000 }).catch(async e => { console.log('    [estado]', await E(B, () => ({ g: (document.getElementById('acc') || {}).innerText, s: localStorage.getItem('nau:s') && JSON.parse(localStorage.getItem('nau:s')).perfis.length }))); throw e; });
+  await B.waitForFunction(() => document.querySelectorAll('#acc .ac-p[data-ac=escolher]').length === 2, null, { timeout: 15000 }).catch(async e => { console.log('    [estado]', await E(B, () => ({ now: Date.now(), pend: [...window.__pend.values()], nome: (document.querySelector('#acc input[name=nome]') || {}).value, c1: (document.querySelector('#acc input[name=c1]') || {}).value, dis: (document.querySelector('#acc button[type=submit]') || {}).disabled, g: ((document.getElementById('acc') || {}).innerText || '').slice(0, 60), s: localStorage.getItem('nau:s') && JSON.parse(localStorage.getItem('nau:s')).perfis.length }))); throw e; });
   await Promise.all([B.waitForNavigation({ timeout: 15000 }).catch(() => { }), B.click('#acc .ac-p[data-ac=escolher]:nth-child(2)')]); await code(B, 'bruno99');
   const b2 = await E(B, () => ({ t: OS.all('tasks').map(t => t.title), short: OS.one('profile').short, p: OS.Acc.profile().nome }));
   ok('Segundo perfil na mesma conta: dados separados (não vê as tarefas da Ana)', b2.p === 'Bruno' && b2.short === 'Bruno' && !b2.t.includes('Tarefa da Ana'), JSON.stringify(b2));
   // definições da conta
-  await E(B, () => location.hash = 'definicoes.conta'); await sleep(500);
-  ok('Definições › Conta e perfis: e-mail, perfis, sincronização, senha, sair e apagar a conta', await E(B, () => { const t = document.querySelector('#view').innerText; return /ana@exemplo\.pt/.test(t) && /Bruno/.test(t) && /Sincroniza/i.test(t) && /Mudar a senha/.test(t) && /Apagar a conta/.test(t); }));
+  await E(B, () => location.hash = 'definicoes.conta'); await sleep(500); const shut0 = await E(B, () => document.querySelectorAll('#view .pn.fold.shut').length); await B.click('[data-fold-all="1"]'); await sleep(200);
+  ok('Definições › Conta e perfis: blocos fechados com seta; abertos mostram e-mail, perfis, sincronização, senha, sair e apagar a conta', shut0 >= 5 && await E(B, () => { const t = document.querySelector('#view').innerText; return /ana@exemplo\.pt/.test(t) && /Bruno/.test(t) && /Sincroniza/i.test(t) && /Mudar a senha/.test(t) && /Apagar a conta/.test(t); }));
+  // editar o perfil: foto ou personagem do Dominus
+  await E(B, () => { const b = document.querySelector('[data-act=accEdit]'); b && b.click(); }); await B.waitForSelector('form[data-form=accProf]');
+  await B.click('form[data-form=accProf] [data-acx=dom]'); await B.waitForSelector('.ac-domg [data-acx=pick]');
+  const gl = await E(B, () => ({ n: document.querySelectorAll('.ac-domg [data-acx=pick]').length, ok: [...document.querySelectorAll('.ac-domg img')].every(i => i.complete && i.naturalWidth === 128) }));
+  await B.click('.ac-domg [data-acx=pick]:nth-child(3)'); await sleep(200);
+  try { await B.screenshot({ path: path.join(process.env.SHOTS || require('os').tmpdir(), 'conta-avatar-editar.png') }); } catch (e) { }
+  await B.click('form[data-form=accProf] button.pri'); await sleep(1200);
+  const av1 = await E(B, () => ({ img: (OS.Acc.profile().img || '').slice(0, 22), bub: !!document.querySelector('.ac-bub .ac-av.im img'), modal: !document.getElementById('modal').hidden }));
+  ok('Editar perfil: escolher um personagem do Dominus (heróis e monstros em pixel art) passa a ser a bolinha do perfil', gl.n >= 16 && gl.ok && av1.img === 'data:image/png;base64,' && av1.bub && !av1.modal, JSON.stringify(Object.assign(gl, av1)));
+  // foto: um PNG 400×300 vira um quadrado 160×160 em JPEG
+  await E(B, () => document.querySelector('[data-act=accEdit]') ? document.querySelector('[data-act=accEdit]').click() : OS.act.accEdit()); await B.waitForSelector('form[data-form=accProf]');
+  const png = await E(B, () => { const c = document.createElement('canvas'); c.width = 400; c.height = 300; const x = c.getContext('2d'); x.fillStyle = '#C0392B'; x.fillRect(0, 0, 400, 300); x.fillStyle = '#F1C40F'; x.fillRect(150, 100, 100, 100); return c.toDataURL('image/png').split(',')[1]; });
+  await B.setInputFiles('form[data-form=accProf] [data-acx=foto]', { name: 'eu.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') }); await sleep(600);
+  const ph = await E(B, () => { const v = document.querySelector('form[data-form=accProf] input[name=img]').value; return { jpg: v.startsWith('data:image/jpeg'), len: v.length, prev: !!document.querySelector('.ac-avprev .ac-av.im img') }; });
+  await B.click('form[data-form=accProf] button.pri'); await sleep(1200);
+  const ph2 = await E(B, () => new Promise(r => { const s = OS.Acc.profile().img || '', i = new Image(); i.onload = () => r({ w: i.naturalWidth, h: i.naturalHeight, jpg: s.startsWith('data:image/jpeg') }); i.onerror = () => r({ err: 1 }); i.src = s; }));
+  ok('Editar perfil: uma foto tua fica cortada em quadrado (160 px, leve) e guardada no perfil, em todos os aparelhos', ph.jpg && ph.len < 60000 && ph.prev && ph2.w === 160 && ph2.h === 160 && ph2.jpg, JSON.stringify([ph, ph2]));
+  await E(B, () => OS.Acc.switchProfile()); await B.waitForSelector('#acc .ac-p[data-ac=escolher]');
+  ok('Ecrã "Quem está a usar": o perfil aparece com a foto', await E(B, () => [...document.querySelectorAll('#acc .ac-p[data-ac=escolher]')].some(b => /Bruno/.test(b.textContent) && b.querySelector('.ac-av.im img'))));
+  await B.click('#acc [data-ac=gerir]'); await B.click('#acc .ac-p[data-ac=editar]:nth-child(2)'); await B.waitForSelector('#acc form[data-acf=editar] [data-acx=tirar]:not([hidden])');
+  await B.click('#acc form[data-acf=editar] [data-acx=tirar]'); await B.click('#acc .ac-avs label:nth-child(4)'); await B.click('#acc form[data-acf=editar] button[type=submit]'); await B.waitForSelector('#acc .ac-p[data-ac=editar]'); await B.click('#acc [data-ac=gerir]'); await B.waitForSelector('#acc .ac-p[data-ac=escolher]');
+  ok('Gerir perfis › Editar: tirar a foto volta ao emoji', await E(B, () => { const p = OS.Acc.profiles ? OS.Acc.profiles().find(x => x.nome === 'Bruno') : null; return [...document.querySelectorAll('#acc .ac-p[data-ac=escolher]')].some(b => /Bruno/.test(b.textContent) && !b.querySelector('img') && b.querySelector('.ac-av').textContent === '🧭') && (!p || !p.img); }));
+  await Promise.all([B.waitForNavigation({ timeout: 15000 }).catch(() => { }), B.click('#acc .ac-p[data-ac=escolher]:nth-child(2)')]); await code(B, 'bruno99');
+  // separador de administração: só na conta de administração (NAUTILO_ADMIN), sem senhas
+  await sleep(2600); await E(A, () => OS.request()); await sleep(300);
+  const ad0 = await E(A, () => ({ adm: OS.Acc.adm(), nav: [...document.querySelectorAll('.tn-g .tn-b')].map(b => b.textContent.trim()).pop(), side: !!document.querySelector('#side a[href="#admin"], .tn-dd a[href="#admin"]') }));
+  ok('Conta de administração: aparece o separador "Admin" no fim do menu', ad0.adm && ad0.nav === 'Admin' && ad0.side, JSON.stringify(ad0));
+  await E(A, () => location.hash = 'admin'); await A.waitForSelector('.adm-r[data-q]', { timeout: 10000 }).catch(() => { }); try { await A.screenshot({ path: path.join(process.env.SHOTS || require('os').tmpdir(), 'conta-admin.png'), fullPage: true }); } catch (e) { }
+  const ad1 = await E(A, () => { const v = document.getElementById('view').innerText, r = [...document.querySelectorAll('.adm-r[data-q]')].map(x => x.dataset.q); return { r, contas: /contas/.test(v), ana: r.some(q => /ana@exemplo\.pt/.test(q) && /bruno/.test(q)), hoje: /Hoje/.test(v), kpi: document.querySelectorAll('.adm-kpi > div').length, senha: /segredo123|novasenha1|\$scrypt|hash/i.test(document.getElementById('view').innerHTML) }; });
+  ok('Administração: lista as contas (e-mail, nome, perfis), último acesso, última entrada e minutos por dia, sem senhas', ad1.ana && ad1.hoje && ad1.kpi >= 6 && !ad1.senha, JSON.stringify(ad1));
+  const raw = await E(A, async () => { const S = JSON.parse(localStorage.getItem('nau:s')); const r = await fetch('api/conta', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'admin' }) }); return r.text(); });
+  ok('A resposta do servidor para a administração não traz senhas, códigos nem chaves', /ana@exemplo\.pt/.test(raw) && !/"(pw|senha|hash|rec|lk|ak|salt|tv)"\s*:/.test(raw) && !/scrypt/.test(raw), raw.slice(0, 160));
+  const um = await E(A, () => { const S = JSON.parse(localStorage.getItem('nau:s')); return fetch('api/conta', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'admin' }) }).then(r => r.json()).then(j => { const c = j.contas.find(x => x.email === 'ana@exemplo.pt'); return { ult: c.ultUso, ent: c.entradas, dias: c.dias }; }); });
+  ok('Tempo de uso: os minutos com a app aberta contam por dia e o último acesso fica registado', um.ult > Date.now() - 120e3 && Object.values(um.dias || {}).reduce((a, b) => a + b, 0) >= 1 && um.ent >= 1, JSON.stringify(um));
+  await E(A, () => { const b = document.querySelector('.adm-r[data-q]'); b && b.click(); }); await sleep(300);
+  ok('Tocar numa conta mostra o detalhe: perfis, criada, última entrada, último acesso e o gráfico dos 30 dias', await E(A, () => { const m = document.getElementById('modal'); return !m.hidden && /Última entrada/.test(m.innerText) && /Minutos por dia/.test(m.innerText) && m.querySelectorAll('.adm-bars i').length === 30; }));
+  await E(A, () => OS.UI.closeModal());
   // o modo pessoal não muda
   { const { ctx, p, errs: e2 } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p);
     ok('Modo pessoal (aparelho que já tinha o Náutilo): igual a antes, sem ecrã de conta nem bolinha', await E(p, () => !OS.Acc.on && !document.getElementById('acc') && !document.querySelector('.ac-bub') && OS.one('profile').short === 'Ryan'));
@@ -2073,7 +2127,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   ok('Sair da conta limpa este aparelho e volta ao ecrã de entrar', await E(A, () => !Object.keys(localStorage).some(k => k.startsWith('os2:')) && !!document.querySelector('#acc form[data-acf=entrar]') && document.querySelector('#acc input[name=email]').value === 'ana@exemplo.pt'));
   // recuperar a senha com o código
   await A.click('#acc [data-ac=m][data-v=recuperar]'); await A.fill('#acc input[name=email]', 'ana@exemplo.pt'); await A.fill('#acc input[name=codigo]', rec.toLowerCase()); await A.fill('#acc input[name=nova]', 'novasenha1'); await A.click('#acc button[type=submit]');
-  await A.waitForSelector('#acc .ac-code', { timeout: 15000 });
+  await A.waitForSelector('#acc .ac-code', { timeout: 45000 }).catch(async e => { console.log('    [recuperar]', await E(A, () => (document.querySelector('#acc .ac-msg') || {}).textContent || (document.getElementById('acc') || {}).innerText)); throw e; });
   ok('Esqueci a senha: o código de recuperação muda a senha e dá um código novo', await E(A, r => document.querySelector('#acc .ac-code').textContent.trim() !== r, rec));
   await sleep(300); await E(B, () => OS.Acc.poll && OS.Acc.poll()); await sleep(800);
   ok('Com a senha mudada, os outros aparelhos pedem para entrar outra vez', await E(B, () => !!document.querySelector('#acc form[data-acf=entrar]')));
@@ -2088,13 +2142,42 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   ok('Atalho de gastos do iPhone numa conta sem script: o link do perfil regista e o gasto entra nas finanças desse perfil', /registado no Náutilo/.test(sr) && bad === 403 && await E(C, () => OS.all('transactions').some(t => t.amount === 12.4 && /café/i.test(t.desc))), sr + ' / ' + bad);
   await E(C, () => location.hash = 'definicoes.atalhos'); await sleep(500);
   ok('Definições › Atalhos do iPhone mostra o link do perfil (sem pedir o script Google)', await E(C, () => { const t = document.querySelector('#view').innerText; return /api\/atalho\?k=/.test(t) && !/script\.google\.com\/create/.test(t); }));
+  { const lk = await E(C, () => ((document.getElementById('slSet') || {}).innerText || '').match(/https?:\S+tipo=sono/));
+    const smp = await E(C, () => { const U = OS.U, t = U.today(), y = U.addDays(t, -1), z = (d, h) => { const [Y, M, D] = d.split('-').map(Number), [hh, mm] = h.split(':').map(Number); return new Date(Y, M - 1, D, hh, mm).toISOString(); }; return ['Core|' + z(y, '23:40') + '|' + z(t, '03:00'), 'Deep|' + z(t, '03:00') + '|' + z(t, '04:00'), 'REM|' + z(t, '04:00') + '|' + z(t, '07:10')].join('\n'); });
+    // o Formulário dos Atalhos pode chegar como multipart
+    const bd = '----nau' + Date.now(), mp = [['k', ak.key], ['tipo', 'sono'], ['s', smp]].map(([k, v]) => `--${bd}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`).join('') + `--${bd}--\r\n`;
+    const r1 = await fetch('http://localhost:' + PORT + '/Oceanum/api/atalho', { method: 'POST', headers: { 'content-type': 'multipart/form-data; boundary=' + bd }, body: mp }).then(r => r.text());
+    await E(C, () => OS.Inbox.pull(false)); await sleep(600);
+    const sl = await E(C, () => OS.Sono.list().map(r => ({ d: r.date, m: r.min, src: r.src })));
+    ok('Sono numa conta: o atalho do app Saúde envia para o link do perfil (tipo=sono) e a noite entra no Painel', !!lk && /Sono enviado/.test(r1) && sl.length === 1 && sl[0].m === 450 && sl[0].src === 'saude', JSON.stringify({ lk: !!lk, r1, sl })); }
   await E(C, () => location.hash = 'jornal'); await C.waitForFunction(() => /Notícia da conta 1/.test(document.querySelector('#view').innerText), null, { timeout: 12000 }).catch(() => { });
   ok('Jornal numa conta sem script: as notícias vêm do servidor do Náutilo', await E(C, () => /Notícia da conta 1/.test(document.querySelector('#view').innerText)));
+  // IA para todos sem configurar + cada pessoa dá nome à sua IA
+  { const D = await fresh(PROFILES[1], () => { window.__noAsk = 0; }); await gateUp(D); await D.click('#acc [data-ac=m][data-v=entrar]'); await D.fill('#acc input[name=email]', 'ana@exemplo.pt'); await D.fill('#acc input[name=senha]', 'novasenha1'); await D.click('#acc button[type=submit]');
+    await D.waitForSelector('#acc .ac-p[data-ac=escolher]'); await D.click('#acc .ac-p[data-ac=escolher]'); await code(D, 'abc123');
+    await D.waitForSelector('#modal form[data-form=aiNameSave]', { timeout: 9000 }).catch(() => { });
+    const q0 = await E(D, () => ({ ask: !!document.querySelector('#modal form[data-form=aiNameSave]'), key: OS.AI.key(), own: OS.AI.own() }));
+    ok('Conta nova: pergunta o nome da IA uma vez, e a IA já está ligada sem chave nenhuma', q0.ask && q0.key === 'nautilo-servidor' && !q0.own, JSON.stringify(q0));
+    if (q0.ask) { await D.fill('#modal input[name=nome]', 'Luna'); await D.check('#modal input[name=art][value=a]'); await D.click('#modal button.pri'); await sleep(400); }
+    const q1 = await E(D, () => ({ n: OS.aiName(), f: OS.aiFem(), w1: OS.Spyke._isWake('Luna, como está o meu dia?'), w2: OS.Spyke._isWake('spike, bom dia'), t: OS.aiN('Cérebro do Spyke · fala com o Spyke') }));
+    ok('Nome da IA: "Luna" (é ela) — chama-se por voz pelo nome e o texto fica no feminino', q1.n === 'Luna' && q1.f && q1.w1 && !q1.w2 && q1.t === 'Cérebro da Luna · fala com a Luna', JSON.stringify(q1));
+    await E(D, () => location.hash = 'definicoes.spyke'); await sleep(600);
+    ok('Definições: o separador e os blocos usam o nome da IA (sem "Spyke")', await E(D, () => { const v = document.getElementById('view').innerText; return /Luna \(assistente\)/.test(v) && /Cérebro da Luna/.test(v) && !/Spyke/.test(v); }));
+    IAMOCK.length = 0; const r1 = await E(D, async () => { try { return await OS.AI.text('Diz olá ao Spyke'); } catch (e) { return 'ERRO ' + e.message; } });
+    const sent = JSON.stringify(IAMOCK.slice(-1)[0] || {});
+    ok('IA sem configurar (servidor do Náutilo → IA grátis): responde, e o pedido leva o nome dela', /Olá/.test(r1) && /Luna/.test(sent) && !/Spyke/.test(sent), r1 + ' · ' + sent.slice(0, 140));
+    const r2 = await E(D, async () => { try { return JSON.stringify(await OS.AI.json([{ text: 'Responde com JSON {"ok":true}' }])); } catch (e) { return 'ERRO ' + e.message; } });
+    ok('IA sem configurar: pedidos em JSON (decisões, resumos, tutor) também funcionam', /"ok":true/.test(r2), r2);
+    const r3 = await E(D, async () => { try { await OS.AI.json([{ text: 'Lê esta foto' }, { inline_data: { mime_type: 'image/png', data: 'iVBORw0KGgo=' } }]); return 'sem erro'; } catch (e) { return e.message; } });
+    ok('Fotos sem a chave Google: mensagem clara a explicar como ligar (sem ficar a carregar)', /Google/.test(r3) && /Definições/.test(r3), r3);
+    const r4 = await fetch('http://localhost:' + PORT + '/Oceanum/api/ia?p=v1beta/models/gemini-x:generateContent', { method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://localhost:' + PORT }, body: '{}' }).then(r => r.status);
+    ok('A IA do servidor só responde a quem tem sessão numa conta', r4 === 401, String(r4));
+  }
   // o Náutilo pessoal (do Ryan) guardado numa conta: tudo igual, o mesmo código, os marcos e textos dele
   { const { ctx, p, errs: e3 } = await newPage(b, PROFILES[0]); ctxs.push(ctx); p.removeAllListeners('dialog'); p.on('dialog', d => d.accept()); await p.goto(BASE); await unlock(p);
     await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.add('tasks', { title: 'Tarefa antiga do Ryan', status: 'Inbox' }); OS.add('goals', { title: 'Meta antiga do Ryan', status: 'Ativa', steps: [] }); location.hash = 'definicoes'; }); await sleep(700);
     ok('Modo pessoal: Definições tem "Conta Náutilo" para guardar o Náutilo numa conta', await E(p, () => !!document.querySelector('#accMig [data-act=accMigNew]')));
-    await p.fill('#accMigE', 'ryan@exemplo.pt'); await p.fill('#accMigP', 'senhaDoRyan1');
+    await p.fill('#accMigE', 'ryan@exemplo.pt'); await p.fill('#accMigP', 'senhaDoRyan1'); for (const n of ['t_termos', 't_saude', 't_idade']) await p.check('#accMig input[name=' + n + ']');
     await Promise.all([p.waitForNavigation({ timeout: 20000 }).catch(() => { }), p.click('#accMig [data-act=accMigNew]')]);
     await unlock(p); await app(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); });
     const m1 = await E(p, () => ({ on: OS.Acc.on, pub: OS.Acc.pub, ps: !!(OS.Acc.profile() || {}).ps, t: OS.all('tasks').some(t => t.title === 'Tarefa antiga do Ryan'), g: OS.all('goals').some(g => g.title === 'Meta antiga do Ryan'), short: OS.one('profile').short, leg: OS.Dom.LEG.int.length, who: OS.whoCtx('o Ryan (brasileiro)'), bub: !!document.querySelector('.ac-bub') }));
@@ -2103,6 +2186,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     ok('Guardar na conta: este aparelho passa a usar a conta com o mesmo código e os mesmos dados; o perfil continua o do Ryan (marcos e textos dele)', m1.on && !m1.pub && m1.ps && m1.t && m1.g && m1.short === 'Ryan' && m1.leg === 100 && m1.who === 'o Ryan (brasileiro)' && m1.bub, JSON.stringify(m1));
     const R = await fresh(PROFILES[4]); await gateUp(R); await R.click('#acc [data-ac=m][data-v=entrar]'); await R.fill('#acc input[name=email]', 'ryan@exemplo.pt'); await R.fill('#acc input[name=senha]', 'senhaDoRyan1'); await R.click('#acc button[type=submit]');
     await R.waitForSelector('#acc .ac-p[data-ac=escolher]'); await Promise.all([R.waitForNavigation({ timeout: 20000 }).catch(() => { }), R.click('#acc .ac-p[data-ac=escolher]')]); await code(R, CODE);
+    ok('Conta sem administração: sem o separador "Admin" e o servidor recusa a lista de contas', await E(R, async () => { const S = JSON.parse(localStorage.getItem('nau:s')), r = await fetch('api/conta', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'admin' }) }); return !OS.Acc.adm() && !document.querySelector('a[href="#admin"]') && r.status === 403; }));
     ok('Noutro aparelho: entra na conta do Ryan e aparece tudo o que estava no Náutilo pessoal', await E(R, () => OS.all('tasks').some(t => t.title === 'Tarefa antiga do Ryan') && OS.all('goals').some(g => g.title === 'Meta antiga do Ryan') && !OS.Acc.pub && OS.Dom.LEG.int.length === 100));
     errs.push(...e3); }
   // outro aparelho ainda no modo pessoal: Definições oferece entrar na conta (o aviso chega pelo Google Drive)
@@ -2113,8 +2197,103 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     const j1 = await E(p, () => ({ em: document.querySelector('#acc input[name=email]').value, keys: Object.keys(localStorage).filter(k => k.startsWith('os2:')), meta: localStorage.getItem('os2:one~meta'), tasks: OS.all('tasks').length }));
     ok('Outro aparelho no modo pessoal: "Entrar na conta neste aparelho" leva ao ecrã de entrar, com o e-mail (os dados pessoais deste aparelho saem)', has && j1.em === 'ryan@exemplo.pt' && !/ryan@exemplo/.test(j1.meta || '') && !j1.keys.some(k => /^os2:tasks~/.test(k)), JSON.stringify(Object.assign({ has }, j1)));
   }
+  // termos: documentos, aceitação única nas contas antigas, pedidos LGPD e a administração
+  { const api = (body, tok) => fetch('http://localhost:' + PORT + '/Oceanum/api/conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json', origin: 'http://localhost:' + PORT, 'x-forwarded-for': '10.9.9.9' }, tok ? { authorization: 'Bearer ' + tok } : {}), body: JSON.stringify(body) }).then(async r => Object.assign({ _st: r.status }, await r.json()));
+    const sem = await api({ op: 'registar', email: 'sem@exemplo.pt', senha: 'segredo123' });
+    ok('O servidor recusa criar conta sem a aceitação dos termos', sem._st === 400 && /Termos/.test(sem.msg || ''), JSON.stringify(sem).slice(0, 160));
+    const old = await api({ op: 'registar', email: 'lia@exemplo.pt', senha: 'segredo123', nome: 'Lia', termos: '2020-01-01', saude: true, idade: true }); await api({ op: 'perfil', acao: 'criar', perfil: { nome: 'Lia', lk: HASH } }, old.token);
+    const L = await fresh(PROFILES[0]); await gateUp(L);
+    await L.click('#acc .ac-foot [data-lgl=privacidade]'); await sleep(300);
+    const dv = await E(L, () => { const b = document.getElementById('lgl'); return { open: !!b && !b.hidden, t: (b.querySelector('#lglT') || {}).textContent, lgpd: /LGPD/.test(b.innerText) && /RGPD/.test(b.innerText) && /ANPD/.test(b.innerText) && /CNPD/.test(b.innerText), tabs: b.querySelectorAll('.lgl-n button').length }; });
+    await L.click('#lgl .lgl-n [data-lgl=termos]'); await sleep(200); const dv2 = await E(L, () => /não substituem aconselhamento profissional/.test(document.getElementById('lgl').innerText));
+    await L.keyboard.press('Escape'); await sleep(200);
+    ok('Ecrã de entrar: Termos, Privacidade, Cookies e Acessibilidade abrem por cima (LGPD e RGPD, ANPD e CNPD) e fecham com Esc', dv.open && dv.t === 'Política de Privacidade' && dv.lgpd && dv.tabs === 6 && dv2 && await E(L, () => document.getElementById('lgl').hidden), JSON.stringify(dv));
+    await L.click('#acc [data-ac=m][data-v=entrar]'); await L.fill('#acc input[name=email]', 'lia@exemplo.pt'); await L.fill('#acc input[name=senha]', 'segredo123'); await L.click('#acc button[type=submit]');
+    await L.waitForSelector('#acc form[data-acf=termos], #acc .ac-p', { timeout: 12000 }).catch(() => { });
+    const tg = await E(L, () => ({ termos: !!document.querySelector('#acc form[data-acf=termos]'), boxes: document.querySelectorAll('#acc form[data-acf=termos] input[type=checkbox]').length }));
+    ok('Conta que ainda não aceitou esta versão: ao entrar, pede para aceitar os termos uma vez', tg.termos && tg.boxes === 3, JSON.stringify(tg));
+    await L.click('#acc form[data-acf=termos] button[type=submit]'); await sleep(400); const still = await E(L, () => !!document.querySelector('#acc form[data-acf=termos]'));
+    for (const n of ['t_termos', 't_saude', 't_idade']) await L.check('#acc input[name=' + n + ']'); await L.click('#acc form[data-acf=termos] button[type=submit]');
+    await L.waitForSelector('#acc .ac-p[data-ac=escolher]', { timeout: 12000 }).catch(() => { });
+    const eu = await api({ op: 'eu' }, await E(L, () => JSON.parse(localStorage.getItem('nau:s')).t));
+    ok('Aceitar fica guardado na conta (versão e data) e segue para os perfis', still && eu.conta && eu.conta.termos === TERMOS_V && !!eu.conta.termosAt && await E(L, () => !!document.querySelector('#acc .ac-p[data-ac=escolher]')), JSON.stringify({ still, t: eu.conta && eu.conta.termos }));
+    await L.click('#acc .ac-p[data-ac=escolher]'); await code(L, CODE);
+    await sleep(500); ok('Depois de aceitar não volta a pedir (nem ao recarregar)', await E(L, () => !document.querySelector('#acc')) && (await L.reload(), await sleep(1500), await E(L, () => !document.querySelector('#acc form[data-acf=termos]'))));
+    await unlock(L).catch(() => { }); await E(L, () => location.hash = 'definicoes.legal'); await sleep(600);
+    const st = await E(L, () => ({ tab: /Privacidade e termos/.test(document.querySelector('#view .tabs').innerText), docs: document.querySelectorAll('#lgDocs [data-lgl]').length, ac: /Aceitaste os Termos/.test((document.getElementById('lgAceite') || {}).innerText || '') }));
+    ok('Definições › Privacidade e termos: os 6 documentos, o que aceitaste e quando', st.tab && st.docs === 6, JSON.stringify(st));
+    await E(L, () => { document.querySelector('[data-fold-all="1"]').click(); }); await sleep(200);
+    await L.selectOption('form[data-form=lgPedido] select[name=tipo]', 'acesso'); await L.fill('form[data-form=lgPedido] textarea[name=msg]', 'Quero saber que dados meus guardam.'); await L.click('form[data-form=lgPedido] button.pri'); await sleep(900);
+    const prot = await E(L, () => { const m = document.getElementById('modal'); return !m.hidden && (m.querySelector('.ac-code') || {}).textContent || ''; });
+    ok('Fazer um pedido LGPD/RGPD: recebe um número de protocolo', /^\d{14}-[a-f0-9]{6}$/.test(prot), prot);
+    const adm = await api({ op: 'admin' }, await E(A, () => JSON.parse(localStorage.getItem('nau:s')).t)); const pd = (adm.pedidos || []).find(x => x.id === prot);
+    ok('Administração: o pedido aparece (tipo, e-mail, texto) para responder em 15 dias', !!pd && pd.email === 'lia@exemplo.pt' && pd.tipo === 'acesso' && pd.estado === 'novo', JSON.stringify(pd || {}).slice(0, 160));
+    await E(C, () => { location.hash = 'visao'; }); await sleep(300); await E(C, () => { OS.act.admRefresh(); location.hash = 'admin'; }); await C.waitForSelector('#admPed [data-act=admPedido]', { timeout: 8000 }).catch(() => { });
+    try { await C.screenshot({ path: path.join(process.env.SHOTS || require('os').tmpdir(), 'conta-admin-pedidos.png'), fullPage: true }); } catch (e) { }
+    await E(C, () => { const b = document.querySelector('#admPed [data-act=admPedido]'); b && b.click(); }); await sleep(1200);
+    const adm2 = await api({ op: 'admin' }, await E(C, () => JSON.parse(localStorage.getItem('nau:s')).t));
+    ok('Administração: marcar o pedido como respondido; riscos jurídicos só para o administrador', ((adm2.pedidos || []).find(x => x.id === prot) || {}).estado === 'respondido' && await E(C, () => document.querySelectorAll('#admRisk details').length >= 10) && !(await E(L, () => !!document.getElementById('admRisk'))), '');
+    const pin = await E(L, () => { const h = OS.Diet && OS.Diet.img ? OS.Diet.img('Arroz branco tipo 1 (agulha)', 'Cereais') : ''; return { pub: OS.Acc.pub, pin: /pinimg/.test(h) }; });
+    ok('Contas públicas não mostram as fotos de alimentos do Pinterest (direitos de autor)', pin.pub && !pin.pin, JSON.stringify(pin));
+  }
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | '));
   for (const c of ctxs) await c.close(); }
+async function sonoTests(b) { cur = 'Sono'; console.log('\n=== Sono: app Saúde no Painel ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.all('sleep').splice(0); location.hash = 'visao'; }); await sleep(600);
+  ok('Painel: cartão do Sono vazio convida a ligar o app Saúde ou registar à mão', await E(p, () => { const c = [...document.querySelectorAll('.dash .dc')].find(d => /^Sono/.test(d.querySelector('h3').textContent)); return !!c && /Ligar ao app Saúde/.test(c.innerText) && !!c.querySelector('[data-act=slAdd]'); }));
+  // as amostras como o atalho do iPhone as envia (ISO 8601, nomes em português e em inglês)
+  const smp = await E(p, () => { const U = OS.U, t = U.today(), y = U.addDays(t, -1), z = (d, h) => { const [Y, M, D] = d.split('-').map(Number), [hh, mm] = h.split(':').map(Number); return new Date(Y, M - 1, D, hh, mm).toISOString(); };
+    return [['Na cama', z(y, '23:05'), z(t, '07:20')], ['Essencial', z(y, '23:20'), z(t, '01:00')], ['Profundo', z(t, '01:00'), z(t, '02:10')], ['REM', z(t, '02:10'), z(t, '03:00')], ['Acordado', z(t, '03:00'), z(t, '03:12')], ['Core', z(t, '03:12'), z(t, '05:40')], ['Deep', z(t, '05:40'), z(t, '06:10')], ['REM', z(t, '06:10'), z(t, '07:05')],
+      ['Essencial', z(y, '00:30'), z(y, '06:30')], ['Profundo', z(U.addDays(t, -2), '23:59'), z(y, '00:30')]].map(r => r.join('|')).join('\n'); });
+  await E(p, s => location.hash = 'sono-add?s=' + encodeURIComponent(s), smp); await sleep(1500);
+  const n1 = await E(p, () => { const L = OS.Sono.list(); return { n: L.length, d: L.map(r => r.date), a: L[0] && { min: L[0].min, deep: L[0].profundo, rem: L[0].rem, leve: L[0].leve, aw: L[0].acordado, bed: L[0].bedT, wake: L[0].wakeT }, hash: location.hash }; });
+  ok('Atalho → #sono-add: junta as amostras por noite (2 noites), sem contar duas vezes, com as fases', n1.n === 2 && n1.a && n1.a.min === 453 && n1.a.deep === 100 && n1.a.rem === 105 && n1.a.leve === 248 && n1.a.aw === 12 && n1.a.bed === '23:20' && n1.a.wake === '07:05' && n1.hash === '#visao', JSON.stringify(n1));
+  await E(p, () => OS.request()); await sleep(500);
+  const c1 = await E(p, () => { const c = [...document.querySelectorAll('.dash .dc')].find(d => /^Sono/.test(d.querySelector('h3').textContent)); return c ? { t: c.innerText, bar: c.querySelectorAll('.sl-bar i').length, days: c.querySelectorAll('.sl-d').length, ok: c.querySelectorAll('.sl-d.ok').length, span: c.className } : null; });
+  ok('Painel: o Sono mostra as horas, adormeci → acordei, fases (profundo, REM, leve, acordado) e a semana', c1 && /7 h 33/.test(c1.t) && /23:20 → 07:05/.test(c1.t) && /Profundo/.test(c1.t) && /REM/.test(c1.t) && c1.bar === 4 && c1.days === 7 && /span8/.test(c1.span), JSON.stringify(c1));
+  ok('Média dos 7 dias e dívida de sono', /Média dos 7 dias/.test(c1.t) && /Dívida de sono/.test(c1.t));
+  await E(p, () => { const s = document.querySelector('[data-act=slMore]'); s && s.click(); }); await sleep(400);
+  ok('"Ver as noites": lista as noites com a origem (Saúde) e uma dica', await E(p, () => { const m = document.getElementById('modal'); return !m.hidden && m.querySelectorAll('.sl-row').length === 2 && /Saúde/.test(m.innerText) && /O teu sono/.test(m.innerText); }));
+  await E(p, () => OS.UI.closeModal());
+  // a mesma noite outra vez não duplica
+  await E(p, s => OS.Sono.ingest(s), smp); ok('Enviar a mesma noite outra vez não duplica', await E(p, () => OS.all('sleep').length === 2));
+  // registo à mão: as horas dão a duração
+  await E(p, () => { OS.all('sleep').splice(0); OS.UI.openForm('sleep'); }); await sleep(300);
+  await E(p, () => { const f = document.getElementById('osform'), set = (n, v) => { const i = f.querySelector(`[name=${n}]`); i.value = v; i.dispatchEvent(new Event('input', { bubbles: true })); }; set('bedT', '23:30'); set('wakeT', '06:45'); f.requestSubmit ? f.requestSubmit() : f.querySelector('[type=submit]').click(); }); await sleep(500);
+  ok('Registar uma noite à mão: 23:30 → 06:45 = 7 h 15', await E(p, () => { const r = OS.all('sleep')[0]; return !!r && r.min === 435 && r.src === 'manual'; }), await E(p, () => JSON.stringify(OS.all('sleep'))));
+  await E(p, () => location.hash = 'definicoes.atalhos'); await sleep(500);
+  ok('Definições › Atalhos do iPhone: passos do atalho do sono (Encontrar amostras de saúde → Análise do sono)', await E(p, () => { const t = (document.getElementById('slSet') || {}).innerText || ''; return /Análise do sono/.test(t) && /Despertar/.test(t) && /#sono-add\?s=/.test(t); }));
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+async function foldTests(b) { cur = 'Definições'; console.log('\n=== Definições arrumadas: blocos com seta ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); sessionStorage.setItem('__nofa', '1'); localStorage.removeItem('os2foldAll'); localStorage.removeItem('os2fold'); location.hash = 'definicoes'; }); await sleep(700);
+  const g = await E(p, () => ({ groups: [...document.querySelectorAll('#view .set-gh h2')].map(h => h.textContent), shut: document.querySelectorAll('#view .pn.fold.shut').length, open: document.querySelectorAll('#view .pn.fold:not(.shut)').length, vis: !!document.getElementById('pf_name').offsetParent, h: document.documentElement.scrollHeight, inbox: !!document.getElementById('inboxPn'), arq: /Arquitetura/.test(document.getElementById('view').innerText) }));
+  ok('Geral arrumado por temas (Tu, Segurança e conta, Aparelhos e dados, Aplicação), com todos os blocos fechados', g.groups.join('|') === 'Tu|Segurança e conta|Aparelhos e dados|Aplicação' && g.shut >= 10 && g.open === 0 && !g.vis && !g.inbox && !g.arq, JSON.stringify(g));
+  ok('A página Geral fica curta no iPhone (antes tinha quase 7000 px)', g.h < 2400, g.h + ' px');
+  await p.click('#pfUni > .pn-h h3'); await sleep(250);
+  const o1 = await E(p, () => ({ open: !document.getElementById('pfUni').classList.contains('shut'), vis: !!document.getElementById('pf_uni').offsetParent, aria: document.querySelector('#pfUni .pn-fold').getAttribute('aria-expanded') }));
+  ok('Tocar no bloco (Estudos) abre-o, com a seta para baixo', o1.open && o1.vis && o1.aria === 'true', JSON.stringify(o1));
+  await p.fill('#pf_course', 'Gestão'); await p.press('#pf_course', 'Tab'); await sleep(500);
+  ok('Escrever dentro de um bloco aberto grava e o bloco continua aberto', await E(p, () => OS.one('profile').course === 'Gestão' && !document.getElementById('pfUni').classList.contains('shut')));
+  await p.reload(); await unlock(p); await E(p, () => location.hash = 'definicoes'); await sleep(600);
+  ok('O bloco aberto continua aberto depois de recarregar (lembrado neste aparelho)', await E(p, () => !document.getElementById('pfUni').classList.contains('shut') && document.getElementById('pfMe').classList.contains('shut')));
+  await p.click('#pfUni .pn-fold'); await sleep(250);
+  ok('A seta fecha o bloco', await E(p, () => document.getElementById('pfUni').classList.contains('shut') && !document.getElementById('pf_uni').offsetParent));
+  await p.click('[data-fold-all="1"]'); await sleep(250); const all1 = await E(p, () => document.querySelectorAll('#view .pn.fold.shut').length);
+  await p.click('[data-fold-all="0"]'); await sleep(250); const all0 = await E(p, () => document.querySelectorAll('#view .pn.fold:not(.shut)').length);
+  ok('"Abrir tudo" e "Fechar tudo"', all1 === 0 && all0 === 0, all1 + ' / ' + all0);
+  // todos os separadores: cada bloco tem a sua seta (nada solto)
+  const loose = {}; for (const tb of ['', 'email', 'ligacoes', 'atalhos', 'spyke', 'impostos', 'script']) { await E(p, h => location.hash = 'definicoes' + (h ? '.' + h : ''), tb); await sleep(500);
+    loose[tb || 'geral'] = await E(p, () => [...document.querySelectorAll('#view .pn')].filter(x => !(x.parentElement && x.parentElement.closest('.pn')) && !x.classList.contains('fold')).map(x => (x.id || x.className) + ':' + x.innerText.slice(0, 30).replace(/\n/g, ' '))); }
+  ok('Em todos os separadores das Definições os blocos abrem e fecham pela seta (nada solto)', Object.entries(loose).every(([k, v]) => v.length <= (k === 'ligacoes' ? 1 : k === 'email' ? 1 : 0)), JSON.stringify(loose));
+  await E(p, () => location.hash = 'definicoes.atalhos'); await sleep(500);
+  ok('Atalhos do iPhone: os passos do Bloco de foco ficam dentro do bloco "Bloquear apps" e o atalho de gastos está aqui', await E(p, () => { const f = document.getElementById('fbSet'); return !!f && f.querySelectorAll('.fb-guide .pn').length >= 3 && !!document.getElementById('inboxPn'); }));
+  // ir direto a um bloco: o cartão do Sono no Painel abre Atalhos › Sono do app Saúde já aberto
+  await E(p, () => { OS.all('sleep').splice(0); location.hash = 'visao'; }); await sleep(700);
+  await E(p, () => { const c = [...document.querySelectorAll('.dash .dc')].find(d => /^Sono/.test(d.querySelector('h3').textContent)); c.querySelector('[data-act=setGo]').click(); }); await sleep(900);
+  ok('"Ligar ao app Saúde" (Painel) leva a Atalhos do iPhone com o bloco do sono já aberto', await E(p, () => location.hash === '#definicoes.atalhos' && !document.getElementById('slSet').classList.contains('shut') && !!document.querySelector('#slSet .ib-w').offsetParent));
+  await E(p, () => { localStorage.removeItem('os2fold'); location.hash = 'gasto'; }); await sleep(400); await E(p, () => OS.act.ibGo()); await sleep(900);
+  ok('Configurar o atalho de gastos abre Atalhos do iPhone já no bloco do atalho', await E(p, () => location.hash === '#definicoes.atalhos' && !document.getElementById('inboxPn').classList.contains('shut')));
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
 async function domTests(b) { cur = 'Dominus'; console.log('\n=== Dominus: o herói, missões, chefe, marcos, visual e aventuras ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await ctx.route(/script\.google\.com|generativelanguage/, rt => rt.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"items":[],"docs":{}}' }));
   await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.setOne('spyke', { eng: 'device' }); });
@@ -2372,10 +2551,11 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
-  catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); try { for (const c of b.contexts()) for (const pg of c.pages()) { const d = await pg.evaluate(() => ({ u: location.hash, now: Date.now(), pend: window.__pend ? [...window.__pend.values()] : null, acc: ((document.getElementById('acc') || {}).innerText || '').slice(0, 80).replace(/\n/g, ' '), msg: (document.querySelector('#acc .ac-msg') || {}).textContent || '' })).catch(() => null); if (d && d.pend) console.log('    [pagina]', JSON.stringify(d)); } } catch (e2) { } }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);
+  if (ACCMODE) console.log(`modo conta: ${ACCSEEN.acc} de ${ACCSEEN.all} páginas abertas estavam dentro de uma conta (perfil pessoal)`);
   console.log(`\n────────\n${R.length - f.length}/${R.length} testes passaram em ${Math.round((Date.now() - t0) / 1000)} s`);
   if (f.length) { console.log('FALHAS:'); f.forEach(x => console.log(`  ✗ [${x.p}] ${x.name} — ${x.info}`)); }
   fs.writeFileSync(path.resolve(__dirname, 'last-report.json'), JSON.stringify(R, null, 1));

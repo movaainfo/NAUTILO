@@ -1,8 +1,6 @@
-Contas Náutilo: qualquer pessoa pode criar a sua conta com e-mail e senha. Os dados ficam na conta, cifrados, e aparecem iguais no telemóvel e no computador.
-Perfis como na Netflix: até 5 perfis em cada conta, cada um com nome, avatar, cor, código de bloqueio e os seus próprios dados. A bolinha do perfil fica na barra de cima: toca para trocar de perfil ou ver a conta.
-O ecrã de bloqueio é o mesmo de sempre, com o código de cada perfil e "Trocar de perfil". Esqueceste o código? Mudas com a senha da conta.
-Definições › Conta e perfis: mudar a senha, código de recuperação novo, sincronizar agora, sair dos outros aparelhos e apagar a conta. Esqueceste a senha? Usa o código de recuperação que recebes ao criar a conta.
-O teu Náutilo pessoal: em Definições › Geral › Conta Náutilo tocas em "Criar conta e guardar" e tudo o que tens (dados, metas, jogo, definições, ligações) vai para a tua conta, com o mesmo código. Os outros aparelhos mostram "Entrar na conta".
-Contas novas começam limpas, com o nome de quem as criou: sem nada do perfil do Ryan. As funcionalidades são as mesmas para todos: o atalho de gastos do iPhone funciona com um link do perfil (sem script Google) e o Jornal busca as notícias pelo servidor do Náutilo.
-Mundo › Ilhas: a lista abre no grupo de Portugal (a página fica mais rápida); "Todas" mostra as 191.
-Ao guardar o teu Náutilo numa conta nova, o código de recuperação da senha aparece logo a seguir (guarda-o).
+Definições arrumadas: cada bloco abre e fecha pela seta, e a página Geral está por temas (Tu, Segurança e conta, Aparelhos e dados, Aplicação). Há "Abrir tudo" e "Fechar tudo", e o que abres fica aberto neste aparelho.
+O perfil em Definições está dividido em Sobre ti, Estudos, Trabalho e Metas. O atalho de gastos do iPhone passou para Definições › Atalhos do iPhone.
+Sono no Painel: as noites do app Saúde do iPhone (com um atalho que corre sozinho ao acordar) aparecem com as horas, adormeci → acordei, as fases (profundo, REM, leve), a semana, a média e a dívida de sono. Também podes registar uma noite à mão.
+Editar perfil: escolhe uma foto tua ou um personagem do Dominus (heróis e monstros em pixel art) para a bolinha do perfil.
+IA para todos: nas contas a IA já vem ligada, sem chave nem configuração. Cada pessoa dá um nome à sua IA e chama-a por voz por esse nome.
+Termos de Serviço, Política de Privacidade (LGPD e RGPD), cookies, os teus direitos (com pedido e número de protocolo), acessibilidade e créditos, em Definições › Privacidade e termos. Aceitas uma vez, ao criar a conta ou na primeira entrada.
