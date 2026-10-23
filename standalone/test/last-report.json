@@ -1,523 +1,397 @@
 [
  {
-  "p": "Áreas",
-  "name": "finanças: saldo da conta = abertura + receitas − despesas − transferências (1279,50 €)",
+  "p": "IA",
+  "name": "IA: descobre sozinha os modelos que o Google tem hoje (sem voz, imagem nem embeddings)",
   "pass": true,
-  "info": "{\"a\":1279.5,\"c\":100,\"inc\":500,\"exp\":1119.5,\"up\":true}"
+  "info": "gemini-3.5-flash, gemini-3.5-flash-lite, gemini-2.0-flash-lite, gemma-3-27b-it"
  },
  {
-  "p": "Áreas",
-  "name": "finanças: transferência entra na conta de destino (100 €)",
+  "p": "IA",
+  "name": "IA: cota de um modelo esgotada → passa logo ao seguinte, sem esperar",
   "pass": true,
-  "info": ""
+  "info": "google · gemini-3.5-flash > gemini-3.5-flash-lite"
  },
  {
-  "p": "Áreas",
-  "name": "finanças: mês soma receitas e despesas (despesa futura ainda não conta no saldo)",
+  "p": "IA",
+  "name": "IA: modelo desligado pelo Google (como o gemini-2.0) fica de lado e usa outro",
   "pass": true,
-  "info": ""
+  "info": "google · gemini-3.5-flash-lite > gemini-2.0-flash-lite > gemma-3-27b-it"
  },
  {
-  "p": "Áreas",
-  "name": "finanças: despesa agendada aparece nos próximos pagamentos",
+  "p": "IA",
+  "name": "IA: com toda a cota do Google esgotada responde a IA grátis de reserva (sem esperar)",
   "pass": true,
-  "info": ""
+  "info": "reserva"
  },
  {
-  "p": "Áreas",
-  "name": "finanças: compra em 3 parcelas cria 3 movimentos de 100 € em meses seguidos",
+  "p": "IA",
+  "name": "IA: texto (resumos) também passa à reserva",
   "pass": true,
-  "info": "[[100,1,3,\"2026-10\"],[100,2,3,\"2026-11\"],[100,3,3,\"2026-12\"]]"
+  "info": "Primeiro parágrafo do resumo da reserva.\n\nSegundo parágrafo "
  },
  {
-  "p": "Áreas",
-  "name": "finanças: recorrente aparece antes de pagar e desaparece depois de pago",
+  "p": "IA",
+  "name": "IA: o Spyke continua a pensar e a agir com a reserva (criou a tarefa)",
   "pass": true,
-  "info": "{\"before\":true,\"paid\":true,\"after\":false}"
+  "info": "Criei a tarefa, chefe. | Tarefa: Tarefa criada pela reserva"
  },
  {
-  "p": "Áreas",
-  "name": "finanças: pagar 200 € de uma dívida de 1000 € deixa 800 € (património igual)",
+  "p": "IA",
+  "name": "IA: notícia bloqueada e Google sem cota → o Spyke faz o resumo com o que os jornais publicaram (não mostra erro em inglês)",
   "pass": true,
-  "info": "{\"bal\":800,\"nwDelta\":0}"
+  "info": "Estadão · agora Notícia bloqueada RESUMO FEITO PELO SPYKE COM O QUE 2 JORNAIS PUBLICARAM Primeiro parágrafo do resumo da reserva. Segundo parágrafo do resumo. Fontes consultadas: Estadão · O Globo Spy"
  },
  {
-  "p": "Áreas",
-  "name": "finanças: orçamento soma o gasto da categoria no mês",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Áreas",
-  "name": "tarefas: \"Rever balanço @Universidade !1 amanhã\" → título, prioridade 1, amanhã, área",
-  "pass": true,
-  "info": "[\"Rever balanço\",\"1\",true,\"Universidade\",\"Próxima\"]"
- },
- {
-  "p": "Áreas",
-  "name": "tarefas: concluir tarefa diária marca a data e cria a de amanhã",
-  "pass": true,
-  "info": "{\"done\":true,\"next\":true}"
- },
- {
-  "p": "Áreas",
-  "name": "tarefas: prazo passado conta como atrasada",
+  "p": "IA",
+  "name": "IA: se desligares a reserva, nada vai para fora do Google",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "próxima ação: prioridade 1 com prazo hoje vem antes da prioridade 4",
+  "p": "IA",
+  "name": "sem erros de JavaScript (IA)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "hábitos: 3 dias seguidos = sequência de 3",
+  "p": "Contas",
+  "name": "Aparelho novo: abre o ecrã da conta (criar conta ou entrar) e não o código pessoal",
   "pass": true,
-  "info": "{\"streak\":3,\"wkend\":false,\"auto\":true,\"past\":true}"
+  "info": "{\"gate\":true,\"lock\":false,\"mode\":true}"
  },
  {
-  "p": "Áreas",
-  "name": "hábitos: \"dias úteis\" não conta ao sábado",
+  "p": "Contas",
+  "name": "Criar conta sem aceitar os termos: não cria (as três caixas são obrigatórias)",
   "pass": true,
-  "info": ""
+  "info": "{\"gate\":true,\"msg\":\" Please check this box if you want to proceed.\"}"
  },
  {
-  "p": "Áreas",
-  "name": "hábitos: automático (registar um gasto) marca-se sozinho",
+  "p": "Contas",
+  "name": "Criar conta: mostra o código de recuperação (só uma vez)",
   "pass": true,
-  "info": ""
+  "info": "2ARY-JAC7-2Y2Z-PYMK"
  },
  {
-  "p": "Áreas",
-  "name": "hábitos: não deixa marcar dias passados",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Áreas",
-  "name": "metas: manual 5 de 10 = 50%",
-  "pass": true,
-  "info": "[0.5,0.5,0.25,\"Atrás do ritmo\"]"
- },
- {
-  "p": "Áreas",
-  "name": "metas: 2 de 4 passos = 50%",
+  "p": "Contas",
+  "name": "Depois pede o primeiro perfil, já com o nome",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "metas: meta ligada a uma conta segue o saldo (100 de 400 = 25%)",
+  "p": "Contas",
+  "name": "Códigos diferentes: avisa e não cria",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "metas: atrás do ritmo é detetado",
+  "p": "Contas",
+  "name": "Perfis como na Netflix: \"Quem está a usar\", a bolinha do perfil e \"Adicionar perfil\"",
+  "pass": true,
+  "info": "{\"n\":1,\"name\":\"Ana\",\"av\":\"🌊\",\"add\":true,\"title\":\"Quem está a usar o Náutilo?\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Escolher o perfil abre o mesmo ecrã de bloqueio, com o nome do perfil e \"Trocar de perfil\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "universidade: média ponderada 40%×12 + 60%×16 = 14,4",
-  "pass": true,
-  "info": "{\"avg\":14.4,\"due1\":true,\"r1\":true,\"next\":true}"
- },
- {
-  "p": "Áreas",
-  "name": "universidade: revisão de ontem está para hoje e a seguinte é a 7 dias",
+  "p": "Contas",
+  "name": "O código pessoal (do Ryan) não abre um perfil de uma conta",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "calendário: evento semanal repete-se daqui a 7 dias",
+  "p": "Contas",
+  "name": "Perfil novo começa limpo: nada do Ryan (sem disciplinas, candidaturas, contactos, metas), com o nome do perfil",
   "pass": true,
-  "info": "{\"ev0\":true,\"ev7\":true,\"shift\":true,\"exam\":true}"
+  "info": "{\"subj\":0,\"apps\":0,\"contacts\":0,\"goals\":0,\"short\":\"Ana\",\"uni\":\"\",\"hab\":6,\"acc\":2,\"bub\":true,\"mova\":\"O meu negócio\"}"
  },
  {
-  "p": "Áreas",
-  "name": "calendário: turnos e avaliações aparecem",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Áreas",
-  "name": "decisões: filtro Alpha (24 h, 3 dias, passado)",
-  "pass": true,
-  "info": "[\"Responde às 5 perguntas\",\"Esperar 24 h\",\"Filtro passado\",\"Esperar 3 dias\",\"Filtro passado\"]"
- },
- {
-  "p": "Áreas",
-  "name": "segurança: mudar o código pede o atual e 6+ caracteres",
-  "pass": true,
-  "info": "[\"O código atual não está certo.\",\"O novo código precisa de pelo menos 6 caracteres.\",null,null,\"Código incorreto.\",null]"
- },
- {
-  "p": "Áreas",
-  "name": "segurança: depois de mudar, o novo código entra e o antigo não",
+  "p": "Contas",
+  "name": "A bolinha do perfil aparece na barra de cima",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "segurança: o código nunca fica guardado em texto",
+  "p": "Contas",
+  "name": "O que registas vai para a conta, cifrado no servidor (sem texto legível)",
+  "pass": true,
+  "info": "16 ficheiros · flush true · {\"st\":\"sincronizada\",\"err\":\"\"} · accounts~0,exercises~0,habits~0,one~fin,one~fit,one~meta,one~profile,one~security,one~spyke,one~tax,snapshots~0,tasks~0,transactions~0"
+ },
+ {
+  "p": "Contas",
+  "name": "Senha errada: mensagem clara",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "segurança: 5 códigos errados bloqueiam 30 s (mesmo com o certo)",
-  "pass": true,
-  "info": "[\"Código errado 5 vezes. Espera 30 s.\",\"Muitas tentativas. Espera 30 s.\"]"
- },
- {
-  "p": "Áreas",
-  "name": "clima: frase com cidade, graus, sensação e chuva",
-  "pass": true,
-  "info": "Em Aveiro estão 18 graus, sensação de 14, chuva fraca. Máxima de 21 e mínima de 13, 70% de probabilidade de chuva: leva guarda-chuva."
- },
- {
-  "p": "Áreas",
-  "name": "clima: amanhã e ícone sem emojis",
+  "p": "Contas",
+  "name": "Noutro aparelho (computador): entra com a mesma conta e vê os mesmos dados",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "mudança: recuperar recusa endereço errado e aceita o do script (tira as aspas da chave)",
-  "pass": true,
-  "info": "{\"bad\":null,\"ok\":true,\"done\":1}"
- },
- {
-  "p": "Áreas",
-  "name": "todas as 172 páginas: cada botão tem função",
+  "p": "Contas",
+  "name": "Sincroniza nos dois sentidos em segundos (computador → telemóvel)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "todas as páginas: cada formulário tem função",
+  "p": "Contas",
+  "name": "Segundo perfil na mesma conta: dados separados (não vê as tarefas da Ana)",
+  "pass": true,
+  "info": "{\"t\":[],\"short\":\"Bruno\",\"p\":\"Bruno\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Definições › Conta e perfis: blocos fechados com seta; abertos mostram e-mail, perfis, sincronização, senha, sair e apagar a conta",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "todas as páginas: \"editar\" aponta para dados que existem",
+  "p": "Contas",
+  "name": "Editar perfil: escolher um personagem do Dominus (heróis e monstros em pixel art) passa a ser a bolinha do perfil",
+  "pass": true,
+  "info": "{\"n\":24,\"ok\":true,\"img\":\"data:image/png;base64,\",\"bub\":true,\"modal\":false}"
+ },
+ {
+  "p": "Contas",
+  "name": "Editar perfil: uma foto tua fica cortada em quadrado (160 px, leve) e guardada no perfil, em todos os aparelhos",
+  "pass": true,
+  "info": "[{\"jpg\":true,\"len\":1991,\"prev\":true},{\"w\":160,\"h\":160,\"jpg\":true}]"
+ },
+ {
+  "p": "Contas",
+  "name": "Ecrã \"Quem está a usar\": o perfil aparece com a foto",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "todas as páginas: sem \"undefined\", \"NaN\" ou \"[object Object]\" no ecrã",
+  "p": "Contas",
+  "name": "Gerir perfis › Editar: tirar a foto volta ao emoji",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "IA unificada: nenhuma página tem o cartão antigo \"Ligar a IA\"",
+  "p": "Contas",
+  "name": "Conta de administração: aparece o separador \"Admin\" no fim do menu",
+  "pass": true,
+  "info": "{\"adm\":true,\"nav\":\"Admin\",\"side\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Administração: lista as contas (e-mail, nome, perfis), último acesso, última entrada e minutos por dia, sem senhas",
+  "pass": true,
+  "info": "{\"r\":[\"ana teste ana@exemplo.pt ana bruno\"],\"contas\":true,\"ana\":true,\"hoje\":true,\"kpi\":7,\"senha\":false}"
+ },
+ {
+  "p": "Contas",
+  "name": "A resposta do servidor para a administração não traz senhas, códigos nem chaves",
+  "pass": true,
+  "info": "{\"ok\":true,\"contas\":[{\"email\":\"ana@exemplo.pt\",\"nome\":\"Ana Teste\",\"criado\":\"2026-10-23T16:53:29.645Z\",\"perfis\":[\"Ana\",\"Bruno\"],\"ultEntrada\":1792774413575,\"entra"
+ },
+ {
+  "p": "Contas",
+  "name": "Tempo de uso: os minutos com a app aberta contam por dia e o último acesso fica registado",
+  "pass": true,
+  "info": "{\"ult\":1792774426581,\"ent\":1,\"dias\":{\"2026-10-23\":50}}"
+ },
+ {
+  "p": "Contas",
+  "name": "Tocar numa conta mostra o detalhe: perfis, criada, última entrada, último acesso e o gráfico dos 30 dias",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "IA unificada: o cartão do Spyke aparece onde a IA faz falta",
-  "pass": true,
-  "info": "investimentos.ia, universidade.flashcards, universidade.simulados, universidade.questoes, trabalho.foto"
- },
- {
-  "p": "Áreas",
-  "name": "IA unificada: a página do Spyke tem o cérebro (IA) com os passos",
+  "p": "Contas",
+  "name": "Modo pessoal (aparelho que já tinha o Náutilo): igual a antes, sem ecrã de conta nem bolinha",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "IA unificada: ligar uma vez liga a app inteira",
+  "p": "Contas",
+  "name": "Sair da conta limpa este aparelho e volta ao ecrã de entrar",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Áreas",
-  "name": "sem erros de JavaScript (áreas)",
+  "p": "Contas",
+  "name": "Esqueci a senha: o código de recuperação muda a senha e dá um código novo",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Painel: Visão Geral e Painel são uma só página \"Painel\" (o endereço antigo leva lá)",
-  "pass": true,
-  "info": "[\"\\n  \\n  \\n  \",\"Náutilo\",\"Definições\",\"Painel\",\"Hoje\",\"Jornal\"]"
- },
- {
-  "p": "Novos",
-  "name": "Painel: tem tudo (estado das áreas, centro de controlo, cartões, dinheiro em 6 meses, universidade) sem cartões repetidos",
-  "pass": true,
-  "info": "{\"hash\":\"#visao\",\"nav\":[\"\\n  \\n  \\n  \",\"Náutilo\",\"Definições\",\"Painel\",\"Hoje\",\"Jornal\",\"E-mail e LinkedIn\",\"Calendário\",\"Tarefas\",\"Hábitos e rotina\",\"Bloco de foco\",\"Projetos\",\"Metas\",\"Quem sou eu\",\"Mundo\",\"Senhas\",\"Fé & Devoção\",\"Gasto rápido\",\"Finanças\",\"Investimentos\",\"Relatórios\",\"Compras\",\"Simuladores\",\"Universidade\",\"Floresta (foco)\",\"Cursos\",\"Certificações\",\"Leituras\",\"Trilhas e competências\",\"Base de conhecimento\",\"Visão do corpo\",\"Treino\",\"Dieta\",\"Corrida\",\"Desporto\",\"Trabalho\",\"Carreira e contactos\",\"Capital Profissional\",\"Oportunidades\",\"Plano de vida\",\"Centro de decisões\",\"Revisões\"],\"ctrl\":true,\"life\":true,\"grid\":true,\"money\":true,\"uni\":true,\"agendaDup\":false}"
- },
- {
-  "p": "Novos",
-  "name": "nomes: nenhum separador em inglês no menu",
+  "p": "Contas",
+  "name": "Com a senha mudada, os outros aparelhos pedem para entrar outra vez",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Plano de vida: uma só entrada na Direção (sem Estrela-guia e Roteiro à parte), com as áreas da vida e os passos do pequeno ao grande",
+  "p": "Contas",
+  "name": "Atalho de gastos do iPhone numa conta sem script: o link do perfil regista e o gasto entra nas finanças desse perfil",
   "pass": true,
-  "info": "DireçãoPlano de vidaCentro de decisõesRevisões"
+  "info": "✓ 12,4 € registado no Náutilo / 403"
  },
  {
-  "p": "Novos",
-  "name": "Próximos passos: o Spyke faz o plano com novos passos ligados às metas",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Plano de vida: o endereço antigo da Estrela-guia abre o separador Estrela-guia",
+  "p": "Contas",
+  "name": "Definições › Atalhos do iPhone mostra o link do perfil (sem pedir o script Google)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Plano de vida: o endereço antigo do Roteiro abre o separador Roteiro (com a linha do tempo)",
+  "p": "Contas",
+  "name": "Sono numa conta: o atalho do app Saúde envia para o link do perfil (tipo=sono) e a noite entra no Painel",
+  "pass": true,
+  "info": "{\"lk\":true,\"r1\":\"✓ Sono enviado para o Náutilo\",\"sl\":[{\"d\":\"2026-10-23\",\"m\":450,\"src\":\"saude\"}]}"
+ },
+ {
+  "p": "Contas",
+  "name": "Jornal numa conta sem script: as notícias vêm do servidor do Náutilo",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Próximos passos: a aba \"Agora\" mantém a próxima ação de sempre",
+  "p": "Contas",
+  "name": "Conta nova: pergunta o nome da IA uma vez, e a IA já está ligada sem chave nenhuma",
+  "pass": true,
+  "info": "{\"ask\":true,\"key\":\"nautilo-servidor\",\"own\":\"\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Nome da IA: \"Luna\" (é ela) — chama-se por voz pelo nome e o texto fica no feminino",
+  "pass": true,
+  "info": "{\"n\":\"Luna\",\"f\":true,\"w1\":true,\"w2\":false,\"t\":\"Cérebro da Luna · fala com a Luna\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Definições: o separador e os blocos usam o nome da IA (sem \"Spyke\")",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Faculdade: sem nada configurado, não há passos de configuração (só o botão para Definições → E-mail)",
+  "p": "Contas",
+  "name": "IA sem configurar (servidor do Náutilo → IA grátis): responde, e o pedido leva o nome dela",
+  "pass": true,
+  "info": "Olá! Aqui é a tua IA. · {\"model\":\"openai\",\"messages\":[{\"role\":\"user\",\"content\":\"Diz olá à Luna\"}],\"temperature\":0.4,\"private\":true,\"referrer\":\"nautilo\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "IA sem configurar: pedidos em JSON (decisões, resumos, tutor) também funcionam",
+  "pass": true,
+  "info": "{\"ok\":true,\"resposta\":\"feito\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Fotos sem a chave Google: mensagem clara a explicar como ligar (sem ficar a carregar)",
+  "pass": true,
+  "info": "A IA não respondeu (Ler fotos, PDFs e voz precisa da IA do Google. Liga a tua chave grátis em Definições › Spyke › Cérebro.). Verifica a internet e tenta de novo."
+ },
+ {
+  "p": "Contas",
+  "name": "A IA do servidor só responde a quem tem sessão numa conta",
+  "pass": true,
+  "info": "401"
+ },
+ {
+  "p": "Contas",
+  "name": "Modo pessoal: Definições tem \"Conta Náutilo\" para guardar o Náutilo numa conta",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "E-mail: o separador \"Ligar contas\" saiu da página E-mail",
+  "p": "Contas",
+  "name": "Ao guardar numa conta nova, o código de recuperação da senha aparece uma vez",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "E-mail: o endereço antigo \"Ligar contas\" abre Definições → E-mail",
+  "p": "Contas",
+  "name": "Guardar na conta: este aparelho passa a usar a conta com o mesmo código e os mesmos dados; o perfil continua o do Ryan (marcos e textos dele)",
+  "pass": true,
+  "info": "{\"on\":true,\"pub\":false,\"ps\":true,\"t\":true,\"g\":true,\"short\":\"Ryan\",\"leg\":100,\"who\":\"o Ryan (brasileiro)\",\"bub\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Conta sem administração: sem o separador \"Admin\" e o servidor recusa a lista de contas",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Outlook: mostra o passo a passo com o endereço de redirecionamento para copiar",
+  "p": "Contas",
+  "name": "Noutro aparelho: entra na conta do Ryan e aparece tudo o que estava no Náutilo pessoal",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Outlook: os dados da aplicação vão por POST (o segredo não fica no endereço)",
+  "p": "Contas",
+  "name": "Outro aparelho no modo pessoal: \"Entrar na conta neste aparelho\" leva ao ecrã de entrar, com o e-mail (os dados pessoais deste aparelho saem)",
+  "pass": true,
+  "info": "{\"has\":true,\"em\":\"ryan@exemplo.pt\",\"keys\":[],\"meta\":null,\"tasks\":0}"
+ },
+ {
+  "p": "Contas",
+  "name": "O servidor recusa criar conta sem a aceitação dos termos",
+  "pass": true,
+  "info": "{\"_st\":400,\"ok\":false,\"msg\":\"Para usar o Náutilo tens de aceitar os Termos de Serviço e a Política de Privacidade e confirmar as outras duas caixas.\",\"code\":\"te"
+ },
+ {
+  "p": "Contas",
+  "name": "Ecrã de entrar: Termos, Privacidade, Cookies e Acessibilidade abrem por cima (LGPD e RGPD, ANPD e CNPD) e fecham com Esc",
+  "pass": true,
+  "info": "{\"open\":true,\"t\":\"Política de Privacidade\",\"lgpd\":true,\"tabs\":6}"
+ },
+ {
+  "p": "Contas",
+  "name": "Conta que ainda não aceitou esta versão: ao entrar, pede para aceitar os termos uma vez",
+  "pass": true,
+  "info": "{\"termos\":true,\"boxes\":3}"
+ },
+ {
+  "p": "Contas",
+  "name": "Aceitar fica guardado na conta (versão e data) e segue para os perfis",
+  "pass": true,
+  "info": "{\"still\":true,\"t\":\"2026-10-22\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Depois de aceitar não volta a pedir (nem ao recarregar)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Outlook: \"Entrar com a conta da faculdade\" abre o login da Microsoft",
+  "p": "Contas",
+  "name": "Definições › Privacidade e termos: os 6 documentos, o que aceitaste e quando",
+  "pass": true,
+  "info": "{\"tab\":true,\"docs\":6,\"ac\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Fazer um pedido LGPD/RGPD: recebe um número de protocolo",
+  "pass": true,
+  "info": "20261023165414-613fb2"
+ },
+ {
+  "p": "Contas",
+  "name": "Administração: o pedido aparece (tipo, e-mail, texto) para responder em 15 dias",
+  "pass": true,
+  "info": "{\"id\":\"20261023165414-613fb2\",\"uid\":\"a120b34f3aedc5765679fd59\",\"email\":\"lia@exemplo.pt\",\"nome\":\"Lia\",\"tipo\":\"acesso\",\"msg\":\"Quero saber que dados meus guardam.\""
+ },
+ {
+  "p": "Contas",
+  "name": "Administração: marcar o pedido como respondido; o que falta configurar (chave Google, Gmail) só para o administrador",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novos",
-  "name": "Definições → E-mail: mostra \"Outlook ligado\" com o botão Desligar",
+  "p": "Contas",
+  "name": "Contas públicas mostram as mesmas fotos dos alimentos",
   "pass": true,
-  "info": ""
+  "info": "{\"pub\":true,\"pin\":true}"
  },
  {
-  "p": "Novos",
-  "name": "Faculdade: ligada, só e-mails e matérias (nenhum passo de configuração)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: ligado, lê os e-mails da faculdade",
-  "pass": true,
-  "info": "[\"Todas · 4\",\"Contabilidade · 2\",\"Marketing · 1\",\"Geral · 1\"]"
- },
- {
-  "p": "Novos",
-  "name": "Outlook: separa por matéria (código da cadeira, professor, IA e Geral)",
-  "pass": true,
-  "info": "{\"o1\":\"Contabilidade\",\"o2\":\"Contabilidade\",\"o3\":\"Marketing\",\"o4\":\"Geral\"}"
- },
- {
-  "p": "Novos",
-  "name": "Outlook: filtrar por matéria",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: mudar a matéria à mão também ensina o remetente",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: abre o e-mail inteiro dentro da app",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Outlook: responder vai pelo Outlook da faculdade",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → E-mail: guarda o domínio e mostra que o reencaminhamento funciona",
-  "pass": true,
-  "info": "E-mail da faculdade\nOutlook ligado\n\nOs e-mails aparecem em E-mail → Faculdade, separados por matéria.\n\nOutlook ligado diretamente\nryan@ua.pt\nDesligar\nPelo Gmail (reencaminhamento)\n✓ A funcionar: 1 e-mail de @ua.pt no Gmail.\nGuardar\nComo reencaminhar o Outlook para o Gmail"
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: uma sigla curta (EST) só conta como palavra inteira, não dentro de \"prestação\"",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: a linha do e-mail mostra o remetente e o assunto com a largura toda",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Faculdade: o e-mail reencaminhado pelo Gmail aparece na matéria certa",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições: o Spyke saiu do menu principal",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições: #spyke abre Definições → Spyke (links antigos e Siri continuam a funcionar)",
-  "pass": true,
-  "info": "{\"h\":\"#definicoes.spyke\",\"tabs\":[\"Geral\",\"E-mail\",\"Ligações\",\"Atalhos do iPhone\",\"Spyke (assistente)\",\"Impostos\",\"Script Google\",\"Privacidade e termos\"],\"st\":true,\"h1\":\"Definições\",\"side\":true}"
- },
- {
-  "p": "Novos",
-  "name": "Definições → Spyke: a Parte 4 já não aparece no Spyke (só em Definições → Script Google)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Script Google: as 7 partes com botão de copiar e a parte que falta (5) em destaque",
-  "pass": true,
-  "info": "[\"p5\",\"p1\",\"p2\",\"p3\",\"p4\",\"p5\",\"p6\",\"p7\"]"
- },
- {
-  "p": "Novos",
-  "name": "Definições → Script Google: \"Copiar parte 4\" copia a Parte 4 (Outlook), sem mexer nas outras",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Script Google: sem a Parte 4 diz \"falta\" e mostra os passos",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Spyke: mesmo sem a Parte 4, o Spyke não fala dela (está só em Script Google)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Geral: perfil, segurança e sincronização (o atalho de gastos está em Atalhos do iPhone)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "\"Ver mais\": tocar mostra os itens escondidos na hora",
-  "pass": true,
-  "info": "Ver mais 2|2"
- },
- {
-  "p": "Novos",
-  "name": "Hábitos (iPhone): nomes e etiquetas cabem na coluna, o dia de hoje está à vista e a página não sai para o lado",
-  "pass": true,
-  "info": "{\"over\":0,\"rows\":2,\"today\":true,\"page\":true}"
- },
- {
-  "p": "Novos",
-  "name": "Finanças: botões para juntar conta por banco (BTG, Santander, Revolut, Caixa Geral, Wise)",
-  "pass": true,
-  "info": "Caixa Geral de Depósitos, Millennium BCP, Santander, Novo Banco, BPI, ActivoBank, Crédito Agrícola, Montepio"
- },
- {
-  "p": "Novos",
-  "name": "Finanças: tocar no banco abre a nova conta já com o banco",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Finanças: a conta fica \"Revolut · Conta à ordem\"",
-  "pass": true,
-  "info": "{\"lab\":\"Revolut · Conta à ordem\",\"id\":\"0sqcrligjqs\"}"
- },
- {
-  "p": "Novos",
-  "name": "Finanças: ao registar um gasto, a conta mostra o banco",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Gasto rápido: \"Pago com\" mostra o banco de cada conta",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições: nenhuma página fora das Definições tem passos de configuração (39 páginas)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Atalhos do iPhone: bloquear apps, gasto rápido e relógio (o endereço antigo do Bloco de foco leva lá)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Ligações: agenda Google, cotações (com a chave Finnhub e o câmbio) e alertas de preço",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "Definições → Geral: sem o painel antigo \"Integrações\"",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novos",
-  "name": "sem erros de JavaScript (novos)",
+  "p": "Contas",
+  "name": "sem erros de JavaScript",
   "pass": true,
   "info": ""
  }

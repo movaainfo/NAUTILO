@@ -43,6 +43,8 @@ module.exports = N.handler(async (req, res) => {
   if (req.method !== 'POST') return gErr(res, 405, 'Só POST.');
   const b = await N.body(req);
   if (k) { const r = await fetch(G + p + '?key=' + encodeURIComponent(k), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) });
+    // modelo sobrecarregado no Google (503): a app trata como limite e passa ao modelo seguinte durante 1 minuto
+    if (r.status === 503) return gErr(res, 429, 'Modelo sobrecarregado no Google agora (temporário).');
     res.statusCode = r.status; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); return res.end(await r.text()); }
   if (hasMedia(b)) return gErr(res, 400, 'Ler fotos, PDFs e voz precisa da IA do Google. Liga a tua chave grátis em Definições › Spyke › Cérebro.');
   if (/countTokens$/.test(p)) return N.send(res, 200, { totalTokens: JSON.stringify(b).length / 4 | 0 });

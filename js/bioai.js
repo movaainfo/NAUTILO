@@ -76,12 +76,12 @@ AI.discover = async force => { const k = AI.key(); if (!k) return MODELS; const 
   if (!force && c && c.k === k.slice(-6) && Date.now() - c.at < 12 * 36e5 && Array.isArray(c.m) && c.m.length) return (MODELS = c.m);
   try { let names = [], tok = '';
     for (let i = 0; i < 5; i++) { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=200${tok ? '&pageToken=' + encodeURIComponent(tok) : ''}&key=${encodeURIComponent(k)}`); const j = await r.json().catch(() => ({})); if (!r.ok) break;
-      (j.models || []).forEach(m => { const n = String(m.name || '').replace(/^models\//, ''); if ((m.supportedGenerationMethods || []).includes('generateContent') && /^(gemini|gemma)/.test(n) && !/(tts|image|embed|aqa|live|audio|robotics|computer|veo|imagen|native|banana|nano|learnlm|vision)/i.test(n)) names.push(n); });
+      (j.models || []).forEach(m => { const n = String(m.name || '').replace(/^models\//, ''); if ((m.supportedGenerationMethods || []).includes('generateContent') && /^(gemini|gemma)/.test(n) && !/(tts|image|embed|aqa|live|audio|robotics|computer|veo|imagen|native|banana|nano|learnlm|vision|transcribe|customtools)/i.test(n)) names.push(n); });
       tok = j.nextPageToken; if (!tok) break; }
     if (names.length) { MODELS = [...new Set(names)].sort((x, y) => rank(x) - rank(y)).slice(0, 16); U.ls.set(MK, { k: k.slice(-6), at: Date.now(), m: MODELS }); } } catch (e) { }
   return MODELS; };
 AI.blocked = m => { const q = U.ls.get(QK, {}) || {}, x = q[m]; return !!x && (x.dead ? x.dead > Date.now() : x.d ? x.d === ptDay() : x.until > Date.now()); };
-AI.markLimit = (m, msg) => { const q = U.ls.get(QK, {}) || {}; q[m] = /per ?day|perday|daily|diári/i.test(msg || '') ? { d: ptDay() } : { until: Date.now() + 65000 }; U.ls.set(QK, q); };
+AI.markLimit = (m, msg) => { const q = U.ls.get(QK, {}) || {}; q[m] = /per ?day|perday|daily|diári|billing/i.test(msg || '') ? { d: ptDay() } : { until: Date.now() + 65000 }; U.ls.set(QK, q); };
 // modelo desligado pelo Google ("no longer available", "not found"): fica de lado 7 dias e a lista é pedida outra vez
 AI.markDead = m => { const q = U.ls.get(QK, {}) || {}; q[m] = { dead: Date.now() + 7 * 864e5 }; U.ls.set(QK, q); U.ls.del(MK); };
 AI.isDead = (status, msg) => status === 404 || (status === 400 && /no longer available|is not found|not supported for generateContent|deprecated|has been shut ?down/i.test(msg || ''));
