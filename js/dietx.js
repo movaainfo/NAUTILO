@@ -69,7 +69,7 @@ Diet.picQuery = name => { let w = norm(name).replace(/[(),%/.0-9]/g, ' ').split(
 const DBN = new Set(DB.map(x => x.nn));
 OS.ONE_DEF.foodpics = OS.ONE_DEF.foodpics || { m: {} };
 Diet.img = (name, cat, cls = '', pic) => { if (!pic && FPN[norm(name)] && FPN[norm(name)] !== 'W') pic = FPN[norm(name)];
-  let p = pic ? { u: pic } : Diet.pic(name, cat); if (p.u && OS.Acc && OS.Acc.pub && /pinimg\.com/.test(p.u)) p = { u: '' }; return p.u ? `<span class="fdi ${cls}${p.c && !pic ? ' cut' : ''}${pic && /openfoodfacts/.test(pic) ? ' brand' : ''}"><img src="${esc(p.u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()"></span>` : `<span class="fdi ${cls} noimg" aria-hidden="true"></span>`; };
+  const p = pic ? { u: pic } : Diet.pic(name, cat); return p.u ? `<span class="fdi ${cls}${p.c && !pic ? ' cut' : ''}${pic && /openfoodfacts/.test(pic) ? ' brand' : ''}"><img src="${esc(p.u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()"></span>` : `<span class="fdi ${cls} noimg" aria-hidden="true"></span>`; };
 /* ================= procurar ================= */
 const userFoods = () => OS.all('foods').map(f => ({ id: 'u' + f.id, name: f.name, kcal: n(f.kcal), p: n(f.p), c: n(f.c), f: n(f.f), fib: n(f.fib), cat: 'Os meus', por: [f.portion || '1 porção', 0], per: 'portion', nn: norm(f.name), uid: f.id }));
 Diet.search = (q, lim = 40) => { const w = norm(q).split(/\s+/).filter(Boolean); if (!w.length) return [];

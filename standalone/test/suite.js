@@ -2232,9 +2232,9 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     try { await C.screenshot({ path: path.join(process.env.SHOTS || require('os').tmpdir(), 'conta-admin-pedidos.png'), fullPage: true }); } catch (e) { }
     await E(C, () => { const b = document.querySelector('#admPed [data-act=admPedido]'); b && b.click(); }); await sleep(1200);
     const adm2 = await api({ op: 'admin' }, await E(C, () => JSON.parse(localStorage.getItem('nau:s')).t));
-    ok('Administração: marcar o pedido como respondido; riscos jurídicos só para o administrador', ((adm2.pedidos || []).find(x => x.id === prot) || {}).estado === 'respondido' && await E(C, () => document.querySelectorAll('#admRisk details').length >= 10) && !(await E(L, () => !!document.getElementById('admRisk'))), '');
+    ok('Administração: marcar o pedido como respondido; o que falta configurar (chave Google, Gmail) só para o administrador', ((adm2.pedidos || []).find(x => x.id === prot) || {}).estado === 'respondido' && await E(C, () => document.querySelectorAll('#admPend details').length === 2 && /GEMINI_API_KEY/.test(document.getElementById('admPend').innerText)) && !(await E(L, () => !!document.getElementById('admPend'))), '');
     const pin = await E(L, () => { const h = OS.Diet && OS.Diet.img ? OS.Diet.img('Arroz branco tipo 1 (agulha)', 'Cereais') : ''; return { pub: OS.Acc.pub, pin: /pinimg/.test(h) }; });
-    ok('Contas públicas não mostram as fotos de alimentos do Pinterest (direitos de autor)', pin.pub && !pin.pin, JSON.stringify(pin));
+    ok('Contas públicas mostram as mesmas fotos dos alimentos', pin.pub && pin.pin, JSON.stringify(pin));
   }
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | '));
   for (const c of ctxs) await c.close(); }

@@ -77,7 +77,7 @@ ${sec('Conteúdos e dados de terceiros', `<table class="lg-t"><tbody>
 <tr><td>Bíblia</td><td>Tradução de João Ferreira de Almeida, edição de 1911 — domínio público</td></tr>
 <tr><td>Mapa do mundo</td><td>Natural Earth 1:110m — domínio público; dados dos países: mledoze/countries (ODbL)</td></tr>
 <tr><td>Imagens de produtos alimentares</td><td>Open Food Facts — imagens CC BY-SA 3.0, dados ODbL, © colaboradores do Open Food Facts</td></tr>
-<tr><td>Imagens de alimentos e ingredientes</td><td>Wikimedia Commons / Wikipédia (cada imagem com a licença e o autor indicados na página dela, em geral CC BY-SA ou domínio público) e TheMealDB (conforme os termos do TheMealDB)</td></tr>
+<tr><td>Imagens de alimentos e ingredientes</td><td>Páginas públicas na internet (os direitos pertencem aos respetivos autores; retiramos qualquer imagem a pedido), Wikimedia Commons / Wikipédia (cada imagem com a licença e o autor indicados na página dela, em geral CC BY-SA ou domínio público) e TheMealDB (conforme os termos do TheMealDB)</td></tr>
 <tr><td>Notícias</td><td>Títulos e ligações do Google Notícias; os artigos pertencem aos respetivos jornais</td></tr>
 <tr><td>Meteorologia</td><td>Open-Meteo (CC BY 4.0)</td></tr>
 <tr><td>Cotações e câmbio</td><td>Yahoo Finance, Finnhub, CoinGecko, Banco Central Europeu, Banco Central do Brasil, Frankfurter e outras fontes públicas; dados para informação, com possível atraso</td></tr>

@@ -368,7 +368,7 @@ S.memAdd = memAdd;
 // junta o que cada passo diria e fala tudo de uma vez no fim
 { const say0 = S.say; S.say = (t, o) => say0(OS.aiN(t), o); }
 /* ---------- o nome da tua IA ---------- */
-const NAMES = ['Spyke', 'Atlas', 'Nova', 'Luna', 'Orion', 'Aurora', 'Max', 'Íris'];
+const NAMES = ['Spyke', 'Jarvis', 'Atlas', 'Nova', 'Luna', 'Aurora', 'Max', 'Íris'];
 S.namePanel = () => { const c = cfg(), n = c.nome || '';
   return `<div class="pn" id="aiName"><div class="pn-h"><h3>Nome da tua IA</h3><span class="mut" style="font-size:12px">${esc(OS.aiName())}</span></div>
     <p class="mut" style="margin:0 0 10px;font-size:13px">É assim que a chamas por voz ("${esc(OS.aiName())}, como está o meu dia?") e como ela aparece em toda a app.</p>
