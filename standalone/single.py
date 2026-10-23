@@ -15,6 +15,8 @@ if os.path.isdir(f'{src}/vendor'): shutil.copytree(f'{src}/vendor', f'{out}/vend
 # funções do Vercel (cotações de reserva)
 if os.path.isdir('standalone/api'): shutil.copytree('standalone/api', f'{out}/api')
 shutil.copy('standalone/vercel.json', f'{out}/vercel.json')
+# páginas públicas dos documentos legais (/privacidade, /termos…)
+import subprocess; subprocess.run(['node', 'standalone/legalpages.js', out], check=True)
 files = ['manifest.webmanifest'] + sorted(x for x in os.listdir(out) if x.endswith('.png')) + (['vendor/fonts/' + x for x in sorted(os.listdir(f'{out}/vendor/fonts'))] if os.path.isdir(f'{out}/vendor/fonts') else [])
 ver = hashlib.sha1(html.encode()).hexdigest()[:10]
 sw = open('standalone/sw.js').read().replace('__VERSION__', ver).replace('__FILES__', '[' + ','.join(f'"{x}"' for x in files) + ']')

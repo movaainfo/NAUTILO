@@ -16,6 +16,7 @@ self.addEventListener('fetch', e => {
   if (IMGHOST.test(u.hostname) && /\.(jpe?g|png|webp)$/i.test(u.pathname)) { e.respondWith(caches.open(IMG).then(c => c.match(e.request).then(hit => hit || fetch(e.request).then(r => { if (r.ok || r.type === 'opaque') c.put(e.request, r.clone()); return r; })))); return; }
   if (u.hostname === 'cdnjs.cloudflare.com' && /three\.js/.test(u.pathname)) { e.respondWith(caches.open(IMG).then(c => c.match(e.request).then(hit => hit || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })))); return; }
   if (u.origin !== location.origin) return;
+  if (/^\/(termos|privacidade|cookies|direitos|acessibilidade|creditos)(\.html)?$/.test(u.pathname)) return; // documentos legais públicos: páginas à parte, sempre da rede
   // a app: primeiro a internet (abre sempre a versão mais recente; o servidor só manda tudo outra vez quando há versão nova),
   // a cópia guardada só quando não há rede ou a rede demora mais de 4 s
   if (e.request.mode === 'navigate' || /\/(index\.html)?$/.test(u.pathname)) { e.respondWith(fresh(e)); return; }
