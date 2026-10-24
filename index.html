@@ -2619,6 +2619,10 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 10px 26px rgba(3
 .sl-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;max-height:52vh;overflow:auto}
 .sl-row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border-radius:12px;background:var(--pn2);cursor:pointer}
 .sl-row>div{display:flex;flex-direction:column}.sl-row .sl-bar,.sl-row .sl-leg{grid-column:1/-1}.sl-row .sl-bar{margin:6px 0 2px;height:8px}.sl-row .pos{color:var(--pos,#5EEAD4)}
+/* conta Google (Gmail e agenda) nas contas sem script */
+.gg-card .btn.pri{display:inline-flex}
+.gg-steps{margin:12px 0 0;padding-left:20px;font-size:13px;color:var(--tx2,#A9B6C6)}.gg-steps li{margin:0 0 4px}
+.gg-card .ib-st{background:rgba(242,196,141,.10);color:var(--tx,#E6EDF5);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
 </style>
 <style>
@@ -3331,7 +3335,7 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.36", "date": "23/10/2026", "notes": ["Definições arrumadas: cada bloco abre e fecha pela seta, e a página Geral está por temas (Tu, Segurança e conta, Aparelhos e dados, Aplicação). Há \"Abrir tudo\" e \"Fechar tudo\", e o que abres fica aberto neste aparelho.", "O perfil em Definições está dividido em Sobre ti, Estudos, Trabalho e Metas. O atalho de gastos do iPhone passou para Definições › Atalhos do iPhone.", "Sono no Painel: as noites do app Saúde do iPhone (com um atalho que corre sozinho ao acordar) aparecem com as horas, adormeci → acordei, as fases (profundo, REM, leve), a semana, a média e a dívida de sono. Também podes registar uma noite à mão.", "Editar perfil: escolhe uma foto tua ou um personagem do Dominus (heróis e monstros em pixel art) para a bolinha do perfil.", "IA para todos: nas contas a IA já vem ligada, sem chave nem configuração. Cada pessoa dá um nome à sua IA e chama-a por voz por esse nome.", "Termos de Serviço, Política de Privacidade (LGPD e RGPD), cookies, os teus direitos (com pedido e número de protocolo), acessibilidade e créditos, em Definições › Privacidade e termos. Aceitas uma vez, ao criar a conta ou na primeira entrada."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.37", "date": "24/10/2026", "notes": ["Gmail e agenda Google para todas as contas: em Definições › E-mail toca em «Ligar a minha conta Google», autoriza uma vez e o Náutilo passa a ler os teus e-mails (separados e resumidos pela IA) e os eventos da tua agenda, em todos os teus aparelhos.", "Só leitura: o Náutilo nunca envia, apaga nem muda nada no teu Google. Para responder, escreve (ou pede à IA) e toca em «Copiar e abrir no Gmail».", "Quem já usa o script Google continua exatamente como antes.", "A Política de Privacidade inclui agora os dados da conta Google (só leitura, Utilização Limitada)."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -5133,11 +5137,12 @@ OS.on('ready', () => setTimeout(() => sendUse(0), 4000));
 /* ---------- separador de administração (só na conta de quem está em NAUTILO_ADMIN no servidor) ---------- */
 Acc.adm = () => !!(S && S.adm);
 Acc.token = () => (S && S.t) || '';
+Acc.pid = () => pid();
 Acc.navAdm = () => { const N = OS.NAV; if (!N) return; const i = N.findIndex(g => g[0] === 'Admin');
   if (Acc.adm() && i < 0) { N.push(['Admin', [['admin', 'Administração', 'shield']]]); OS.request && OS.request(); } else if (!Acc.adm() && i >= 0) { N.splice(i, 1); OS.request && OS.request(); } };
 let ADM = null, admBusy = false, admErr = '';
 const admLoad = async () => { if (admBusy) return; admBusy = true; admErr = '';
-  fetch(new URL('api/ia?p=estado', document.baseURI).href).then(r => r.json()).then(j => { U.ls.set('os2iaSrv', { g: !!j.google, at: Date.now() }); }).catch(() => { }); try { ADM = Object.assign(await conta('admin'), { at: Date.now() }); } catch (e) { admErr = e.net ? 'Sem ligação à internet.' : e.message; } admBusy = false; OS.request(); };
+  fetch(new URL('api/ia?p=estado', document.baseURI).href).then(r => r.json()).then(j => { U.ls.set('os2iaSrv', { g: !!j.google, at: Date.now() }); }).catch(() => { }); fetch(new URL('api/google?p=estado', document.baseURI).href).then(r => r.json()).then(j => { if (j && j.ok) U.ls.set('os2gSrv', { pronto: !!j.pronto, chave: j.chave || '', erro: j.erro || '', at: Date.now() }); OS.request(); }).catch(() => { }); try { ADM = Object.assign(await conta('admin'), { at: Date.now() }); } catch (e) { admErr = e.net ? 'Sem ligação à internet.' : e.message; } admBusy = false; OS.request(); };
 const ago = t => { if (!t) return '—'; const s = Math.max(0, (Date.now() - t) / 1000); if (s < 90) return 'agora'; if (s < 3600) return 'há ' + Math.round(s / 60) + ' min'; if (s < 86400) return 'há ' + Math.round(s / 3600) + ' h'; const d = Math.round(s / 86400); return d === 1 ? 'ontem' : d < 30 ? 'há ' + d + ' dias' : new Date(t).toLocaleDateString('pt-PT'); };
 const hmin = m => { m = Math.round(m || 0); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0'); };
 const lastDays = n => { const out = []; for (let i = n - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); out.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')); } return out; };
@@ -5153,9 +5158,9 @@ const pedidosPn = () => { const P = (ADM && ADM.pedidos) || [], novos = P.filter
     : '<p class="mut" style="margin:0">Ainda não há pedidos. Chegam aqui quando alguém usa “Fazer um pedido” em Definições › Privacidade e termos. Responde para o e-mail da pessoa e marca como respondido.</p>'}</div>`; };
 A.admPedido = async b => { try { await conta('pedidoFeito', { id: b.dataset.id, estado: b.dataset.e }); OS.UI.toast(b.dataset.e === 'respondido' ? 'Marcado como respondido' : 'Reaberto', 'pos'); ADM = null; admLoad(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 // o que falta ao administrador configurar (some sozinho quando estiver feito)
-const pendPn = () => { const g = !!(OS.AI && OS.AI.srvGoogle && OS.AI.srvGoogle());
+const pendPn = () => { const g = !!(OS.AI && OS.AI.srvGoogle && OS.AI.srvGoogle()), gs = U.ls.get('os2gSrv', null);
   const L = [[!g, 'Chave Google da IA para todos (GEMINI_API_KEY)', 'Para a IA das contas ler fotos (comida, exames, escala) e PDFs. 1) aistudio.google.com/apikey → Create API key. 2) Vercel → projeto nautilo → Settings → Environment Variables → nome <b>GEMINI_API_KEY</b>, valor a chave, Production. 3) Deployments → Redeploy. Este aviso some sozinho quando a chave estiver ativa.'],
-    [true, 'Ler e-mails do Gmail para todos (Google OAuth)', 'Para cada pessoa ligar o Gmail só com “inserir o e-mail e confirmar”, sem script: 1) console.cloud.google.com → novo projeto “Náutilo”. 2) APIs e serviços → ativar Gmail API e Google Calendar API. 3) Ecrã de consentimento OAuth → Externo, nome Náutilo, o teu e-mail, âmbitos gmail.readonly e calendar.readonly. 4) Credenciais → ID de cliente OAuth → Aplicação Web → origem https://nautilo-app.vercel.app. 5) Pedir a verificação do Google (sem ela só 100 utilizadores de teste). Quando tiveres o ID de cliente, diz-me e eu ligo o resto na app.']];
+    [!(gs && gs.pronto && gs.chave === 'ok'), 'Gmail e agenda para todos (Google)', !gs ? 'A verificar a ligação ao Google…' : gs.chave === 'errada' ? 'O Google não aceita a chave secreta que está no Vercel. Google Cloud → Google Auth Platform → Clientes → Náutilo web → Adicionar chave secreta; depois Vercel → nautilo → Settings → Environment Variables → <b>GOOGLE_CLIENT_SECRET</b> → Edit, cola a nova → Save → Redeploy.' : gs.chave === 'redirecionamento' ? 'Falta o URI de redirecionamento no cliente do Google: Clientes → Náutilo web → URIs de redirecionamento autorizados → <b>https://nautilo-app.vercel.app/api/google</b> → Salvar.' : !gs.pronto || gs.chave === 'falta' ? 'Falta a chave secreta do cliente OAuth no servidor: Google Cloud → Google Auth Platform → Clientes → Náutilo web → Adicionar chave secreta. Depois Vercel → projeto nautilo → Settings → Environment Variables → nome <b>GOOGLE_CLIENT_SECRET</b>, Production → Save → Redeploy.' : 'O Google não respondeu à verificação (' + esc(gs.erro || '?') + '). Toca em Atualizar daqui a pouco.']];
   const P = L.filter(x => x[0]);
   return `<div class="pn" id="admPend"><div class="pn-h"><h3>Por fazer</h3><span class="mut" style="font-size:12px">${P.length ? P.length + ' pendente' + (P.length > 1 ? 's' : '') : 'tudo feito'}</span></div>
   <div class="adm-risk">${P.map(([, t, d]) => `<details open><summary><span class="bdg warn">pendente</span><b>${esc(t)}</b></summary><p>${d}</p></details>`).join('') || '<p class="mut" style="margin:0">Nada pendente.</p>'}</div></div>`; };
@@ -5302,13 +5307,14 @@ ${sec('2. Que dados tratamos', `<table class="lg-t"><thead><tr><th>Dados</th><th
 <tr><td><b>Utilização</b>: data de criação, data e número de entradas, último acesso, minutos de utilização por dia (últimos 90 dias)</td><td data-l="Para quê">Administração, segurança, prevenção de abusos e melhorar a app</td><td data-l="Base legal">Legítimo interesse (LGPD art. 7.º IX; RGPD art. 6.º/1 f)</td></tr>
 <tr><td><b>Técnicos</b>: endereço IP e tipo de aparelho, tratados de forma transitória pelo alojamento</td><td data-l="Para quê">Entregar a app, limitar tentativas, segurança</td><td data-l="Base legal">Legítimo interesse</td></tr>
 <tr><td><b>Pedidos à IA</b>: o texto (e, se usares, a foto) que envias à assistente</td><td data-l="Para quê">Gerar a resposta</td><td data-l="Base legal">Execução do contrato e consentimento ao usares a função</td></tr>
+<tr><td><b>Conta Google</b>, só se a ligares: o teu endereço Gmail, a autorização do Google (guardada cifrada) e, quando a app os pede, os e-mails recentes (remetente, assunto, início do texto; o e-mail inteiro quando o abres) e os eventos da tua agenda</td><td data-l="Para quê">Mostrar, separar e resumir os teus e-mails e pôr os teus eventos no Calendário do Náutilo</td><td data-l="Base legal">O teu consentimento, dado no Google ao ligares (LGPD art. 7.º I; RGPD art. 6.º/1 a), que retiras ao desligar</td></tr>
 <tr><td><b>Atalhos do iPhone</b>: gastos e noites de sono enviados pelo atalho</td><td data-l="Para quê">Guardar na tua conta até a app os buscar</td><td data-l="Base legal">Execução do contrato / consentimento (saúde)</td></tr>
 <tr><td><b>Pedidos de direitos</b>: o que nos escreves no formulário</td><td data-l="Para quê">Responder e provar que respondemos</td><td data-l="Base legal">Cumprimento de obrigação legal</td></tr></tbody></table>
 <p>Não fazemos perfis para publicidade, não vendemos dados e não tomamos decisões automáticas com efeitos jurídicos sobre ti.</p>`)}
 ${sec('3. Onde ficam e como os protegemos', ul(['Os dados da conta ficam no serviço Vercel Blob (Vercel Inc., servidores nos Estados Unidos, região de Washington, D.C.), <b>cifrados com AES-256-GCM</b> com uma chave própria de cada conta.', 'Também ficam guardados no teu aparelho (armazenamento local do navegador) para a app funcionar sem internet.', 'Ligações sempre por HTTPS; senhas e códigos guardados só como resumos criptográficos; sessões com prazo e que terminam em todos os aparelhos ao mudares a senha; limites de tentativas.', 'O cofre de Senhas é cifrado no teu aparelho com a tua senha mestra antes de sair dele.']))}
-${sec('4. Com quem partilhamos', `<p>Só com fornecedores que nos ajudam a prestar o serviço (operadores / subcontratantes), na medida necessária:</p>${ul(['<b>Vercel Inc.</b> (EUA): alojamento da app, funções do servidor e base de dados cifrada.', '<b>Pollinations</b>: IA de texto gratuita (recebe o texto do pedido, sem o teu e-mail).', '<b>Google</b> (Gemini), apenas se a IA do Google estiver ativa: texto e fotos que envias à assistente. O Jornal usa o Google Notícias através do nosso servidor, sem dados teus.', 'Serviços que <b>tu</b> ligas por tua iniciativa (o teu script Google para e-mail e calendário, Microsoft/Outlook, ElevenLabs, Azure, Anthropic, Finnhub): os dados vão diretamente do teu aparelho para esses serviços, com as tuas chaves.', 'Fontes públicas de cotações, câmbio, meteorologia e imagens de alimentos recebem apenas o pedido (por exemplo, o símbolo de uma ação ou o nome da cidade) e o teu endereço IP.'])}<p>Podemos ainda divulgar dados se a lei ou uma autoridade competente o exigir.</p>`)}
+${sec('4. Com quem partilhamos', `<p>Só com fornecedores que nos ajudam a prestar o serviço (operadores / subcontratantes), na medida necessária:</p>${ul(['<b>Vercel Inc.</b> (EUA): alojamento da app, funções do servidor e base de dados cifrada.', '<b>Pollinations</b>: IA de texto gratuita (recebe o texto do pedido, sem o teu e-mail).', '<b>Google</b> (Gemini), apenas se a IA do Google estiver ativa: texto e fotos que envias à assistente. O Jornal usa o Google Notícias através do nosso servidor, sem dados teus.', '<b>Google</b> (Gmail e Google Calendar), só se ligares a tua conta Google: acesso <b>só de leitura</b> (gmail.readonly e calendar.readonly). Os e-mails e eventos passam pelo nosso servidor a caminho da tua app <b>sem lá ficarem guardados</b>; para separar e resumir os e-mails, o remetente, o assunto e o início do texto vão para a IA. Desligas quando quiseres em Definições → E-mail, e também em myaccount.google.com → Segurança.', 'Serviços que <b>tu</b> ligas por tua iniciativa (o teu script Google para e-mail e calendário, Microsoft/Outlook, ElevenLabs, Azure, Anthropic, Finnhub): os dados vão diretamente do teu aparelho para esses serviços, com as tuas chaves.', 'Fontes públicas de cotações, câmbio, meteorologia e imagens de alimentos recebem apenas o pedido (por exemplo, o símbolo de uma ação ou o nome da cidade) e o teu endereço IP.'])}<p>O uso e a transferência, para qualquer outra app, de informações recebidas das APIs do Google seguem a <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Política de Dados do Utilizador dos Serviços de API do Google</a>, incluindo os requisitos de Utilização Limitada: o Náutilo usa os dados do teu Gmail e da tua agenda só para te mostrar estas funções, não os vende, não os usa para publicidade nem para treinar modelos de IA.</p><p>Podemos ainda divulgar dados se a lei ou uma autoridade competente o exigir.</p>`)}
 ${sec('5. Transferência internacional', `<p>Como o alojamento é nos Estados Unidos, os teus dados são transferidos para fora do Brasil e da União Europeia. A transferência apoia-se nas garantias contratuais do fornecedor (cláusulas contratuais-padrão e, quando aplicável, o Quadro de Privacidade de Dados UE-EUA), nos termos do art. 33.º da LGPD e dos arts. 45.º–46.º do RGPD.</p>`)}
-${sec('6. Quanto tempo guardamos', ul(['Os dados da conta e o que registas: enquanto tiveres conta. Ao apagares a conta (ou um perfil), apagamos esses dados do servidor de imediato; o que estiver guardado no teu aparelho apaga-se ao saíres da conta.', 'Minutos de utilização: os últimos 90 dias.', 'Pedidos de direitos e a prova de aceitação dos termos: até 5 anos, para provar o cumprimento da lei.', 'Caixa dos atalhos do iPhone: até a app buscar os registos.']))}
+${sec('6. Quanto tempo guardamos', ul(['Os dados da conta e o que registas: enquanto tiveres conta. Ao apagares a conta (ou um perfil), apagamos esses dados do servidor de imediato; o que estiver guardado no teu aparelho apaga-se ao saíres da conta.', 'Minutos de utilização: os últimos 90 dias.', 'Pedidos de direitos e a prova de aceitação dos termos: até 5 anos, para provar o cumprimento da lei.', 'Caixa dos atalhos do iPhone: até a app buscar os registos.', 'Autorização da conta Google: até a desligares ou apagares o perfil. Os e-mails e eventos não ficam no servidor; ficam só no teu aparelho, para a app abrir depressa.']))}
 ${sec('7. Os teus direitos', `<p>Podes, a qualquer momento: confirmar se tratamos dados teus; aceder a eles; corrigi-los; pedir a anonimização, o bloqueio ou a eliminação; a portabilidade (descarregar em ficheiro); saber com quem partilhamos; retirar o consentimento; opor-te a tratamentos baseados no legítimo interesse; e reclamar. Muitos destes direitos exercem-se diretamente na app; para os outros, usa o formulário. Respondemos em até <b>15 dias</b> (LGPD) e, no máximo, <b>1 mês</b> (RGPD). Ver <a href="#" data-lgl="direitos">Os teus direitos</a>.</p><p>Podes também reclamar à autoridade de proteção de dados: no Brasil, a <b>ANPD</b> (www.gov.br/anpd); em Portugal, a <b>CNPD</b> (www.cnpd.pt).</p>`)}
 ${sec('8. Menores', `<p>O Náutilo não se destina a menores de 16 anos. Se souberes que um menor de 16 anos criou uma conta, contacta-nos para a apagarmos.</p>`)}
 ${sec('9. Incidentes de segurança', `<p>Se houver um incidente que possa trazer risco ou dano relevante, informamos as pessoas afetadas e a autoridade competente (ANPD e/ou CNPD) nos prazos legais.</p>`)}
@@ -5875,22 +5881,23 @@ A.calSrc = b => { const o = Object.assign({}, OS.ui.calOff || {}); o[b.dataset.v
 A.calDay = (b, e) => { if (e.target.closest('[data-edit]')) return; OS.ui.calDate = b.dataset.d; OS.ui.calView = 'dia'; OS.go('calendario.dia'); };
 A.calSlot = (b, e) => { if (e.target.closest('[data-edit]')) return; const r = b.getBoundingClientRect(); const h = Math.floor((e.clientY - r.top) / 44) + 6; UI.openForm('events', null, { date: b.dataset.d, start: U.pad(h) + ':00', end: U.pad(h + 1) + ':00' }); };
 
-/* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; dentro do claude.ai também pelo conector */
+/* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; nas contas sem script pela conta Google ligada (google.js, só leitura); dentro do claude.ai também pelo conector */
 let gcalUnsub = null, gcalTimer = 0, gcalBusy = false;
 const gscr = () => { const c = OS.one('inbox'); return c && c.url && c.key && +(c.ver || 0) >= 11 ? c : null; };
 // os calendários "Náutilo" e "Náutilo · …" são a cópia que a app põe no Google: não se leem de volta (senão aparecia tudo duas vezes)
 const gmap = L => L.filter(x => !/^(Oceanum|Náutilo)( · .+)?$/.test(String(x.cal || ''))).map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
 try { const sv = U.ls.get('os2gcal', null); if (sv && OS.one('integ').gcal) Cal.gcal = sv.ev || []; } catch (e) { }
-const gcalScript = async quiet => { const c = gscr(); if (!c || gcalBusy) return; gcalBusy = true;
+const gapi = () => !gscr() && !!(OS.Goog && OS.Goog.cal());
+const gcalScript = async quiet => { const c = gscr(), viaG = !c && gapi(); if ((!c && !viaG) || gcalBusy) return; gcalBusy = true;
   const from = U.addDays(U.today(), -14), to = U.addDays(U.today(), 90);
-  try { const j = await OS.Inbox.getJSON(c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=cl&a=' + from + '&b=' + to + '&_=' + Date.now(), 2);
+  try { const j = viaG ? await OS.Goog.call('cl', { a: from, b: to }) : await OS.Inbox.getJSON(c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=cl&a=' + from + '&b=' + to + '&_=' + Date.now(), 2);
     if (!j || !j.ok) throw new Error((j && j.msg) || 'o script não respondeu');
     Cal.gcal = gmap(j.ev || []); U.ls.set('os2gcal', { at: Date.now(), ev: Cal.gcal });
     OS.gcalState = `${Cal.gcal.length} eventos entre ${U.fmtDS(from)} e ${U.fmtDS(to)} · atualizado às ${U.hm(new Date())}`; }
-  catch (e) { OS.gcalState = /Calendar|autoriz|permiss/i.test(e.message || '') ? 'Falta autorizar a Agenda no script: no Apps Script escolhe a função "autorizar" → ▶ Executar → Permitir, e faz Nova versão na implementação.' : 'Não consegui ler a agenda agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.'; if (!quiet) UI.toast(OS.gcalState, 'warn'); }
+  catch (e) { OS.gcalState = viaG ? 'Não consegui ler a agenda Google agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.' : /Calendar|autoriz|permiss/i.test(e.message || '') ? 'Falta autorizar a Agenda no script: no Apps Script escolhe a função "autorizar" → ▶ Executar → Permitir, e faz Nova versão na implementação.' : 'Não consegui ler a agenda agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.'; if (!quiet) UI.toast(OS.gcalState, 'warn'); }
   gcalBusy = false; OS.request(); };
 OS.gcalStart = async () => {
-  if (gscr()) { gcalScript(true); if (!gcalTimer) gcalTimer = setInterval(() => { if (!document.hidden && OS.one('integ').gcal) gcalScript(true); }, 15 * 60 * 1000); return; }
+  if (gscr() || gapi()) { gcalScript(true); if (!gcalTimer) gcalTimer = setInterval(() => { if (!document.hidden && OS.one('integ').gcal) gcalScript(true); }, 15 * 60 * 1000); return; }
   if (gcalUnsub) return; let mcp = null;
   try { mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { }
   if (!mcp) { OS.gcalState = OS.one('inbox').url ? 'Para ver a tua agenda Google aqui, atualiza o script Google (Definições → Script Google → Parte 3).' : 'Para ver a tua agenda Google aqui, liga o script Google (Definições → Sincronizar aparelhos).'; OS.request(); return; }
@@ -5909,15 +5916,17 @@ OS.gcalStart = async () => {
   }, { refetchInterval: 15 * 60 * 1000 });
 };
 // criar um evento na agenda Google (o Spyke usa isto quando pedes "põe na minha agenda Google")
-OS.gcalAdd = async ev => { const c = gscr(); if (!c) return { ok: false, msg: 'o script Google ainda não tem a Parte 3' };
+OS.gcalAdd = async ev => { const c = gscr(); if (!c) return { ok: false, msg: gapi() ? 'a ligação à agenda Google é só de leitura' : 'o script Google ainda não tem a Parte 3' };
   const u = c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=ce&t=' + encodeURIComponent(ev.title || '') + '&d=' + encodeURIComponent(ev.date || '') + (ev.start ? '&h=' + ev.start : '') + (ev.end ? '&f=' + ev.end : '') + (ev.loc ? '&l=' + encodeURIComponent(ev.loc) : '');
   try { const j = await OS.Inbox.getJSON(u, 2); if (j && j.ok) setTimeout(() => gcalScript(true), 1500); return j || { ok: false }; } catch (e) { return { ok: false, msg: e.message }; } };
 // Definições → Ligações: a agenda Google (pelo script) liga-se e desliga-se aqui; o Calendário só mostra os eventos
 OS.gcalPanel = () => { const integ = OS.one('integ');
-  return `<div class="pn" id="gcalSet"><div class="pn-h"><h3>${UI.ic('link')}Agenda Google (Calendário)</h3><span class="mut" style="font-size:12px">${integ.gcal ? 'ligada' : 'desligada'}</span></div><p class="mut" style="margin:0 0 10px;font-size:13px">${integ.gcal ? esc(OS.gcalState || 'A carregar os teus eventos…') : 'Mostra no Calendário, em Hoje e no Painel os eventos da tua agenda Google (todas as agendas), pelo teu script Google.'}</p>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div>`; };
+  // conta sem script e sem a agenda Google autorizada: o cartão de ligar a conta Google (o mesmo do E-mail)
+  if (!gscr() && OS.Goog && OS.Goog.on() && !OS.Goog.cal()) return OS.Goog.card();
+  return `<div class="pn" id="gcalSet"><div class="pn-h"><h3>${UI.ic('link')}Agenda Google (Calendário)</h3><span class="mut" style="font-size:12px">${integ.gcal ? 'ligada' : 'desligada'}</span></div><p class="mut" style="margin:0 0 10px;font-size:13px">${integ.gcal ? esc(OS.gcalState || 'A carregar os teus eventos…') : 'Mostra no Calendário, em Hoje e no Painel os eventos da tua agenda Google (todas as agendas), ' + (gapi() ? 'pela tua conta Google ligada.' : 'pelo teu script Google.')}</p>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div>`; };
 A.gcalOn = () => { OS.setOne('integ', { gcal: true }); OS.gcalStart(); };
 A.gcalOff = () => { OS.setOne('integ', { gcal: false }); if (gcalUnsub) { gcalUnsub(); gcalUnsub = null; } clearInterval(gcalTimer); gcalTimer = 0; Cal.gcal = []; OS.gcalState = ''; U.ls.del ? U.ls.del('os2gcal') : U.ls.set('os2gcal', null); };
-A.gcalRefresh = async () => { if (gscr()) return gcalScript(false); try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
+A.gcalRefresh = async () => { if (gscr() || gapi()) return gcalScript(false); try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
 OS.on('ready', () => { if (OS.one('integ').gcal) OS.gcalStart(); });
 
 /* ================= TAREFAS ================= */
@@ -11980,6 +11989,86 @@ OS.FocusBlock = { settings: fbSettings, preset: th => { DR = { th, sel: {}, mins
 
 </script>
 <script>
+/* NÁUTILO — conta Google (Gmail e agenda) para todas as contas, sem script.
+   A pessoa toca em "Ligar a minha conta Google", autoriza uma vez no Google e a autorização fica guardada no servidor, no perfil dela
+   (api/google), por isso funciona em todos os aparelhos. Só leitura: nunca envia, apaga nem muda nada no Google.
+   Quem já tem o script Google ligado (a conta do Ryan) continua pelo script: aqui não muda nada. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act, esc = U.esc;
+const Acc = () => OS.Acc || {};
+const on = () => !!(Acc().on && Acc().token && Acc().token() && Acc().pid && Acc().pid());
+const script = () => { const c = OS.one('inbox') || {}; return !!(c.url && c.key); };
+// estado guardado neste aparelho por perfil, para a página abrir logo certa: { pronto, ligado, email, gmail, agenda, at }
+let stK = '', st = null;
+const cur = () => { const k = 'os2goog:' + (Acc().pid ? Acc().pid() : ''); if (k !== stK) { stK = k; st = U.ls.get(k, null); } return st || {}; };
+const set = o => { cur(); st = Object.assign({}, st || {}, o); U.ls.set(stK, st); };
+
+const call = async (op, body = {}) => { let r;
+  try { r = await fetch('api/google', { method: 'POST', cache: 'no-store', credentials: 'omit', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + Acc().token() }, body: JSON.stringify(Object.assign({ op, p: Acc().pid() }, body)) }); }
+  catch (e) { throw new Error('Sem ligação à internet.'); }
+  let j = null; try { j = await r.json(); } catch (e) { }
+  if (j && j.ok) return j;
+  const e = new Error((j && j.msg) || (r.status === 404 ? 'O servidor do Náutilo não respondeu.' : 'Erro ' + r.status)); e.code = j && j.code; e.status = r.status;
+  if (e.code === 'desligado') { set({ ligado: false, gmail: false, agenda: false, email: '' }); OS.request(); }
+  throw e; };
+
+/* ---------- estado e regresso do Google ---------- */
+let waitAt = 0, busyE = null, triedAt = 0;
+const waiting = () => !!waitAt && Date.now() - waitAt < 15 * 60e3 && !cur().ligado;
+const linked = was => { const s = cur(); waitAt = 0; if (was) UI.toast('Conta Google ligada' + (s.email ? ': ' + s.email : ''), 'pos');
+  if (s.agenda && !script()) { OS.setOne('integ', { gcal: true }); if (OS.gcalStart) OS.gcalStart(); }
+  if (s.gmail && OS.Mail && OS.Mail.refresh) setTimeout(() => OS.Mail.refresh(), 300);
+  OS.emit && OS.emit('google'); };
+const refresh = () => { if (!on()) return Promise.resolve(cur()); if (busyE) return busyE;
+  triedAt = Date.now(); busyE = (async () => { try { const was = !!cur().ligado, j = await call('estado'), wt = waiting(); set({ pronto: !!j.pronto, ligado: !!j.ligado, email: j.email || '', gmail: !!j.gmail, agenda: !!j.agenda, at: Date.now() }); if (!was && j.ligado) linked(wt); } catch (e) { } busyE = null; OS.request(); return cur(); })();
+  return busyE; };
+// o endereço do Google (com o state do servidor) é preparado antes, para o botão ser um link a sério (abre logo, sem bloqueio de janelas)
+let link = { url: '', at: 0, busy: false, err: '' };
+const fresh = () => !!link.url && Date.now() - link.at < 10 * 60e3;
+const prep = async () => { if (link.busy || !on()) return; link.busy = true; link.err = '';
+  try { const j = await call('inicio'); link = { url: j.url, at: Date.now(), busy: false, err: '' }; } catch (e) { link.busy = false; link.err = e.message; link.errAt = Date.now(); }
+  OS.request(); };
+// ao tocar no link: fica à espera; quando a pessoa volta a esta janela, confirma sozinho
+document.addEventListener('click', e => { if (!e.target.closest('[data-gggo]')) return; waitAt = Date.now(); link.at = 0; setTimeout(() => OS.request(), 60); }, true);
+const poll = () => { if (waiting() && !document.hidden) refresh(); };
+document.addEventListener('visibilitychange', poll); window.addEventListener('focus', poll);
+setInterval(() => { if (waiting() && Date.now() - waitAt < 3 * 60e3) poll(); }, 4000);
+
+/* ---------- o cartão (Definições → E-mail, página E-mail e agenda) ---------- */
+const card = () => { if (!on() || script()) return ''; const s = cur();
+  // sem resposta do servidor: tenta outra vez no máximo de 30 em 30 s (nunca a cada desenho da página)
+  if (!s.at) { if (Date.now() - triedAt > 30e3) refresh(); return `<div class="pn gg-card"><p class="mut" style="margin:0">${triedAt && !busyE ? 'Sem resposta do servidor do Náutilo. Confirma a internet.' : 'A ver se a tua conta Google está ligada…'}</p></div>`; }
+  if (!s.pronto) return `<div class="pn gg-card"><div class="pn-h"><h3>${UI.ic('mail')}Gmail e agenda Google</h3></div><p class="mut" style="margin:0">A ligação ao Google ainda não está ativa neste Náutilo. Volta a ver daqui a pouco.</p></div>`;
+  if (s.ligado) { const miss = [!s.gmail && 'o Gmail', !s.agenda && 'a agenda'].filter(Boolean);
+    return `<div class="pn gg-card gg-on"><div class="pn-h"><h3>${UI.ic('mail')}Conta Google</h3><span class="pos">✓ ligada</span></div>
+    <p style="margin:0 0 6px"><b>${esc(s.email || 'A tua conta Google')}</b></p><p class="mut" style="margin:0 0 10px;font-size:13px">${s.gmail ? 'Gmail ✓' : 'Gmail ✗'} · ${s.agenda ? 'Agenda ✓' : 'Agenda ✗'} · só leitura: o Náutilo nunca envia, apaga nem muda nada no Google.</p>
+    ${miss.length ? `<div class="note" style="margin-bottom:10px">Na autorização ficou por marcar ${miss.join(' e ')}. Toca em Desligar e liga outra vez, com as caixas marcadas.</div>` : ''}
+    <div class="row gap8"><button class="btn sm ghost" data-act="ggOff">Desligar</button></div></div>`; }
+  if (!fresh() && !link.busy && (!link.err || Date.now() - link.errAt > 30e3)) prep();
+  return `<div class="pn gg-card"><div class="pn-h"><h3>${UI.ic('mail')}Ligar o Gmail e a agenda</h3></div>
+    <p style="margin:0 0 10px">Autorizas uma vez no Google e o Náutilo passa a ler os teus e-mails (para os separar e resumir com a IA) e os eventos da tua agenda, em todos os teus aparelhos. Só leitura: nunca envia, apaga nem muda nada.</p>
+    ${fresh() ? `<a class="btn pri" href="${esc(link.url)}" target="_blank" rel="noopener" data-gggo="1">Ligar a minha conta Google</a>` : `<button class="btn pri" disabled>${link.err ? 'Sem resposta do servidor' : 'A preparar…'}</button>${link.err ? ` <button class="btn sm ghost" data-act="ggRetry">Tentar outra vez</button>` : ''}`}
+    <ol class="gg-steps"><li>Escolhe a tua conta Google.</li><li>Se aparecer o aviso de app não verificada, toca em <b>Avançado</b> e depois em <b>Aceder a Náutilo</b>.</li><li>Marca as caixas do <b>Gmail</b> e da <b>agenda</b> e toca em <b>Continuar</b>.</li><li>Volta ao Náutilo: fica ligado sozinho.</li></ol>
+    ${waiting() ? `<div class="ib-st">À espera da autorização no Google… <button class="btn xs ghost" data-act="ggCheck">Já autorizei</button></div>` : ''}</div>`; };
+A.ggRetry = () => prep();
+A.ggCheck = async () => { const s = await refresh(); if (!s.ligado) UI.toast('Ainda não chegou a autorização. Acaba os passos no Google e volta aqui.', 'warn'); };
+A.ggOff = () => UI.ask('Desligar a conta Google?', 'O Náutilo deixa de ler o teu Gmail e a tua agenda, e a autorização é apagada também no Google.', 'Desligar', async () => {
+  try { await call('sair'); } catch (e) { return UI.toast(e.message, 'neg'); }
+  set({ ligado: false, email: '', gmail: false, agenda: false }); if (OS.Mail && OS.Mail._clear) OS.Mail._clear(); if (A.gcalOff) A.gcalOff();
+  UI.toast('Conta Google desligada', 'pos'); OS.request(); });
+
+const s1 = () => cur();
+OS.Goog = { on, card, refresh, call, st: s1,
+  // usar o Google em vez do script: só nas contas sem script e com a caixa respetiva autorizada
+  mail: () => on() && !script() && !!s1().ligado && !!s1().gmail,
+  cal: () => on() && !script() && !!s1().ligado && !!s1().agenda,
+  email: () => s1().email || '' };
+OS.on('ready', () => { if (on() && !script()) refresh(); });
+})();
+
+</script>
+<script>
 /* NÁUTILO — E-mail & LinkedIn.
    Os e-mails vêm do Gmail através do teu script Google (o mesmo do atalho de gastos; versão 9+). Nada passa por servidores do Náutilo.
    A IA (a tua chave Gemini) separa: urgente, responder, atenção, informativo, promoções e spam, e escreve o resumo.
@@ -12000,13 +12089,16 @@ let busy = '', err = '';
 const CATS = [['urgente', '', 'Urgente'], ['responder', '', 'Responder'], ['atencao', '', 'Ler com atenção'], ['info', '', 'Informativo'], ['promo', '', 'Promoções'], ['spam', '', 'Spam / suspeito']];
 const catL = c => (CATS.find(x => x[0] === c) || CATS[3]);
 const IB = () => OS.Inbox || {};
-const ready = () => { const c = OS.one('inbox'); return !!(c.url && c.key); };
-const ver = () => +(OS.one('inbox').ver || 0);
+// o Gmail chega pelo script Google (a conta do Ryan e quem o tiver) ou, nas contas sem script, pela conta Google ligada (google.js, só leitura)
+const scr = () => { const c = OS.one('inbox'); return !!(c.url && c.key); };
+const viaG = () => !!(OS.Goog && OS.Goog.mail());
+const ready = () => scr() || viaG();
+const ver = () => viaG() ? 11 : +(OS.one('inbox').ver || 0);
 const sources = () => { const c = OS.one('inbox'), out = []; if (c.url) out.push(c.url.trim()); (cfg().accts || []).forEach(a => a && a.url && out.push(a.url.trim())); return out; };
 const qs = (u, extra) => u + (u.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(OS.one('inbox').key) + extra;
 const nameOf = f => { const m = String(f || '').match(/^\s*"?([^"<]+?)"?\s*</); return (m ? m[1] : String(f || '').replace(/<.*>/, '')).trim() || f; };
 const addrOf = f => { const m = String(f || '').match(/<([^>]+)>/); return (m ? m[1] : f || '').trim().toLowerCase(); };
-const gmailLink = it => 'https://mail.google.com/mail/u/' + (+it.src || 0) + '/#all/' + encodeURIComponent(String(it.id || ''));
+const gmailLink = it => viaG() ? 'https://mail.google.com/mail/?authuser=' + encodeURIComponent(OS.Goog.email()) + '#all/' + encodeURIComponent(String(it.id || '')) : 'https://mail.google.com/mail/u/' + (+it.src || 0) + '/#all/' + encodeURIComponent(String(it.id || ''));
 
 /* ---------- classificação sem IA (reserva) ---------- */
 const guess = it => { const t = (it.s + ' ' + it.sn).toLowerCase(), f = (it.f || '').toLowerCase(), robot = /no-?reply|notifica|notification|newsletter|mailer|news@|info@|marketing|bounce/.test(f);
@@ -12019,7 +12111,8 @@ const guess = it => { const t = (it.s + ' ' + it.sn).toLowerCase(), f = (it.f ||
 const info = it => M.ai[it.id] || guess(it);
 
 /* ---------- buscar ---------- */
-const fetchQ = async (q, n) => { const all = []; const S = sources();
+const fetchQ = async (q, n) => { if (viaG()) { const j = await OS.Goog.call('gm', { q, n }); return U.sortBy((j.gm || []).map(x => Object.assign(x, { src: 0, sn: String(x.sn || '') })), x => x.d).reverse(); }
+  const all = []; const S = sources();
   await Promise.all(S.map(async (u, si) => { const j = await IB().getJSON(qs(u, '&op=gm&n=' + n + '&q=' + encodeURIComponent(q) + '&_=' + Date.now()), 2);
     if (!j || !j.ok) throw new Error(j && j.msg === 'Chave errada' ? 'Chave errada no script — cola o código outra vez.' : 'O script não devolveu os e-mails.');
     if (!Array.isArray(j.gm)) throw new Error('O script ainda não tem a parte do e-mail. Atualiza-o (passo abaixo).');
@@ -12038,7 +12131,7 @@ E-mails novos: ${JSON.stringify(todo.map(x => ({ id: x.id, de: x.f, assunto: x.s
 Outros já vistos (só para o resumo): ${JSON.stringify(items.filter(x => M.ai[x.id]).slice(0, 25).map(x => ({ assunto: x.s, c: M.ai[x.id].c })))}` }], .15);
   (o.itens || []).forEach(r => { if (r && r.id && CATS.some(c => c[0] === r.c)) { M.ai[r.id] = { c: r.c, why: String(r.porque || '').slice(0, 120), a: String(r.acao || '').slice(0, 80), due: /^\d{4}-\d\d-\d\d$/.test(r.prazo || '') ? r.prazo : '' }; addEvent(items.find(x => x.id === r.id), r.evento); } });
   if (o.resumo) M.sum = String(o.resumo).slice(0, 600); };
-const refresh = async (manual) => { if (busy || !ready()) { if (manual && !ready()) UI.toast('Liga primeiro o script Google (aba Ligar contas)', 'warn'); return; }
+const refresh = async (manual) => { if (busy || !ready()) { if (manual && !ready()) UI.toast(OS.Goog && OS.Goog.on() ? 'Liga primeiro a tua conta Google (Definições → E-mail)' : 'Liga primeiro o script Google (aba Ligar contas)', 'warn'); return; }
   busy = 'mail'; err = ''; if (manual) OS.request();
   try { const c = cfg(); M.items = await fetchQ(c.q, c.n); M.at = Date.now(); if (aiOn()) { try { await classify(M.items); } catch (e) { err = 'IA: ' + (e.message || 'sem resposta') + ' (usei a classificação simples)'; } } save(); OS.emit && OS.emit('mail'); }
   catch (e) { err = e.message || 'Não consegui ir buscar os e-mails.'; }
@@ -12057,7 +12150,7 @@ const liGuess = items => { const r = { resumo: '', mensagens: [], convites: [], 
     else if (/visualiz|viewed|apareceu em|appeared in/i.test(s)) { const m = s.match(/(\d+)/); r.visualizacoes = (r.visualizacoes || 0) + (m ? +m[1] : 1); }
     else r.publicacoes.push({ texto: s, id: x.id }); });
   return r; };
-const act = async (it, a) => { try { const u = sources()[it.src || 0]; const j = await IB().getJSON(qs(u, '&op=ga&a=' + a + '&ids=' + encodeURIComponent(it.id) + '&_=' + Date.now()), 2); return j && j.ok && j.n > 0; } catch (e) { return false; } };
+const act = async (it, a) => { if (viaG()) return false; try { const u = sources()[it.src || 0]; const j = await IB().getJSON(qs(u, '&op=ga&a=' + a + '&ids=' + encodeURIComponent(it.id) + '&_=' + Date.now()), 2); return j && j.ok && j.n > 0; } catch (e) { return false; } };
 
 /* ---------- API para as outras áreas (Spyke, Control Room, Next Action, Bloco de foco) ---------- */
 const open = () => M.items.filter(x => !M.done[x.id]);
@@ -12070,9 +12163,12 @@ const Mail = OS.Mail = {
     return `Nos e-mails: ${c.urg ? c.urg + (c.urg === 1 ? ' urgente' : ' urgentes') : ''}${c.urg && c.resp ? ' e ' : ''}${c.resp ? c.resp + ' à espera de resposta' : ''}. ${top.map(x => nameOf(x.f) + ' sobre ' + x.s.replace(/^(re|res|fw|fwd|enc):\s*/i, '')).join('; ')}.`; },
   ctx: () => Mail.items().filter(x => ['urgente', 'responder', 'atencao'].includes(x.c)).slice(0, 8).map(x => `${catL(x.c)[2]}: ${nameOf(x.f)} — ${x.s}`).join('\n'),
   _set: v => { M = Object.assign(M, v); save(); },
+  _clear: () => { M.items = []; M.at = 0; M.sum = ''; M.ai = {}; M.li = { at: 0, items: [], sum: null }; save(); },
   // Spyke: "responde à Ana que envio amanhã" → rascunho no Gmail
   replyByName: async (who, instr) => { const n = String(who || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''), L = Mail.items(); const it = L.find(x => nameOf(x.f).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(n)) || L.find(x => addrOf(x.f).includes(n)); if (!it) return { ok: false, msg: `Não encontrei um e-mail recente de ${who}.` };
-    if (!OS.AI || !OS.AI.key()) return { ok: false, msg: 'Preciso da IA ligada para escrever a resposta.' }; const body = await compose(it, instr); await saveDraft(it, body); M.done[it.id] = Date.now(); save(); return { ok: true, to: nameOf(it.f), body }; }
+    if (!OS.AI || !OS.AI.key()) return { ok: false, msg: 'Preciso da IA ligada para escrever a resposta.' }; const body = await compose(it, instr);
+    if (viaG()) return { ok: false, msg: 'Escrevi a resposta, mas a tua ligação ao Gmail é só de leitura. Abre o e-mail de ' + nameOf(it.f) + ' no Gmail e envia isto: ' + body };
+    await saveDraft(it, body); M.done[it.id] = Date.now(); save(); return { ok: true, to: nameOf(it.f), body }; }
 };
 // Control Room: e-mails urgentes
 const I = OS.Intel;
@@ -12086,9 +12182,9 @@ const TB = [['', 'Resumo'], ['caixa', 'Caixa'], ['faculdade', 'Faculdade'], ['li
 V.email = sub => { const k = TB.some(t => t[0] === (sub || '')) ? (sub || '') : '';
   const when = M.at ? 'atualizado ' + U.rel(U.iso(new Date(M.at))) + ' às ' + new Date(M.at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não atualizado';
   return UI.head('E-mail e LinkedIn', 'O que precisa da tua atenção, separado do lixo.', `<button class="btn sm" data-act="mlRefresh" ${busy ? 'disabled' : ''}>${UI.ic('sync')}${busy ? 'A atualizar…' : 'Atualizar'}</button>`) + UI.tabs('email', TB, k) + `<div class="ml-page">${err ? `<div class="ib-st bad" style="margin-bottom:10px">${esc(err)}</div>` : ''}${!ready() || ver() < 9 ? setupCard() : ''}${P[k](when)}</div>`; };
-const setupCard = () => `<div class="pn ml-setup">${UI.empty(ready() ? 'O teu script Google ainda não tem a parte do e-mail.' : 'O Gmail ainda não está ligado neste aparelho.', `<a class="btn sm pri" href="#definicoes.email">${UI.ic('settings')}Configurar em Definições</a>`)}</div>`;
+const setupCard = () => !scr() && OS.Goog && OS.Goog.on() ? OS.Goog.card() : `<div class="pn ml-setup">${UI.empty(ready() ? 'O teu script Google ainda não tem a parte do e-mail.' : 'O Gmail ainda não está ligado neste aparelho.', `<a class="btn sm pri" href="#definicoes.email">${UI.ic('settings')}Configurar em Definições</a>`)}</div>`;
 const row = (x, o = {}) => { const [c, ic, l] = catL(x.c); return `<div class="ml-it ${x.u ? 'unread' : ''} c-${c}"><div class="ml-ic" title="${l}"></div><div class="ml-t click" data-act="mlRead" data-id="${esc(x.id)}" role="button" tabindex="0"><div class="ml-h"><b>${esc(nameOf(x.f))}</b><small>${U.fmtDS(x.d.slice(0, 10))} ${x.d.slice(11, 16) ? new Date(x.d).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : ''}</small></div><div class="ml-s">${esc(x.s || '(sem assunto)')}</div><small class="ml-w">${esc([x.why, x.a ? '→ ' + x.a : '', x.due ? 'prazo ' + U.fmtDS(x.due) : ''].filter(Boolean).join(' · ') || x.sn.slice(0, 110))}</small>
-  <div class="ml-a"><button class="btn xs" data-act="mlRead" data-id="${esc(x.id)}">${UI.ic('mail')}Ler</button>${c === 'urgente' || c === 'responder' || c === 'atencao' ? `<button class="btn xs pri" data-act="mlReply" data-id="${esc(x.id)}">Responder</button><button class="btn xs ghost" data-act="mlTask" data-id="${esc(x.id)}">${UI.ic('plus')}Tarefa</button><button class="btn xs ghost" data-act="mlDone" data-id="${esc(x.id)}">${UI.ic('check')}Feito</button>` : ''}<button class="btn xs ghost" data-act="mlDo" data-a="arquivar" data-id="${esc(x.id)}">Arquivar</button>${c === 'spam' || c === 'promo' ? `<button class="btn xs ghost" data-act="mlDo" data-a="spam" data-id="${esc(x.id)}">Spam</button>` : ''}${o.move === false ? '' : `<select class="ml-mv" data-mlmv="${esc(x.id)}" aria-label="Mudar categoria">${CATS.map(k => `<option value="${k[0]}"${k[0] === c ? ' selected' : ''}>${k[2]}</option>`).join('')}</select>`}</div></div></div>`; };
+  <div class="ml-a"><button class="btn xs" data-act="mlRead" data-id="${esc(x.id)}">${UI.ic('mail')}Ler</button>${c === 'urgente' || c === 'responder' || c === 'atencao' ? `<button class="btn xs pri" data-act="mlReply" data-id="${esc(x.id)}">Responder</button><button class="btn xs ghost" data-act="mlTask" data-id="${esc(x.id)}">${UI.ic('plus')}Tarefa</button><button class="btn xs ghost" data-act="mlDone" data-id="${esc(x.id)}">${UI.ic('check')}Feito</button>` : ''}${viaG() ? '' : `<button class="btn xs ghost" data-act="mlDo" data-a="arquivar" data-id="${esc(x.id)}">Arquivar</button>${c === 'spam' || c === 'promo' ? `<button class="btn xs ghost" data-act="mlDo" data-a="spam" data-id="${esc(x.id)}">Spam</button>` : ''}`}${o.move === false ? '' : `<select class="ml-mv" data-mlmv="${esc(x.id)}" aria-label="Mudar categoria">${CATS.map(k => `<option value="${k[0]}"${k[0] === c ? ' selected' : ''}>${k[2]}</option>`).join('')}</select>`}</div></div></div>`; };
 /* ---------- ler o e-mail inteiro dentro da app (script versão 11) ---------- */
 const RD = {}; // id → { busy, err, t:[mensagens], s }
 const linkify = t => esc(t).replace(/\bhttps?:\/\/[^\s<>"']+/g, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.length > 60 ? u.slice(0, 57) + '…' : u}</a>`);
@@ -12100,12 +12196,12 @@ const readerHTML = (it, r) => `<div class="ml-rd"><div class="pn-h"><h3>${esc((r
   ${!r || r.busy ? `<div class="sai-busy"><div class="fd-spin"></div><span>A abrir o e-mail…</span></div>` : r.err ? `<div class="note">${esc(r.err)}</div><p class="ml-rb">${linkify(it.sn || '')}</p>` : r.t.map((m, i) => `<div class="ml-msg ${i === r.t.length - 1 ? 'last' : ''}"><div class="ml-mh"><b>${esc(nameOf(m.f))}</b><small>${esc(addrOf(m.f))} · ${new Date(m.d).toLocaleString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</small>${m.to ? `<small>para ${esc(m.to)}</small>` : ''}</div>
     ${r.fmt === i && m.h ? frame(m.h) : `<div class="ml-rb">${linkify(m.b || '(mensagem sem texto)')}</div>`}
     <div class="row gap6" style="margin-top:6px;flex-wrap:wrap">${m.h ? `<button class="btn xs ghost" data-act="mlFmt" data-id="${esc(it.id)}" data-i="${i}">${r.fmt === i ? 'Ver só o texto' : 'Ver formatado'}</button>` : ''}${(m.at || []).map(a => `<span class="bdg">${UI.ic('note')} ${esc(a)}</span>`).join('')}</div></div>`).join('')}
-  <div class="row gap8" style="margin-top:12px;flex-wrap:wrap">${isLi(it) ? '' : `<button class="btn sm pri" data-act="mlReply" data-id="${esc(it.id)}">Responder</button>`}<button class="btn sm ghost" data-act="mlTask" data-id="${esc(it.id)}">${UI.ic('plus')}Tarefa</button><button class="btn sm ghost" data-act="mlDo" data-a="arquivar" data-id="${esc(it.id)}">Arquivar</button><span class="grow"></span>${isLi(it) ? '<a class="btn sm ghost" href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>' : `<a class="btn sm ghost" href="${esc(gmailLink(it))}" target="_blank" rel="noopener">Gmail</a>`}</div></div>`;
+  <div class="row gap8" style="margin-top:12px;flex-wrap:wrap">${isLi(it) ? '' : `<button class="btn sm pri" data-act="mlReply" data-id="${esc(it.id)}">Responder</button>`}<button class="btn sm ghost" data-act="mlTask" data-id="${esc(it.id)}">${UI.ic('plus')}Tarefa</button>${viaG() ? '' : `<button class="btn sm ghost" data-act="mlDo" data-a="arquivar" data-id="${esc(it.id)}">Arquivar</button>`}<span class="grow"></span>${isLi(it) ? '<a class="btn sm ghost" href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>' : `<a class="btn sm ghost" href="${esc(gmailLink(it))}" target="_blank" rel="noopener">Gmail</a>`}</div></div>`;
 const drawReader = it => { const m = document.querySelector('#modal .ml-rd'); if (m) m.outerHTML = readerHTML(it, RD[it.id]); else UI.modal(readerHTML(it, RD[it.id]), 'tall'); document.querySelectorAll('#modal [data-mclose]').forEach(b => b.onclick = UI.closeModal); };
 A.mlRead = async b => { const it = Mail.items().find(x => x.id === b.dataset.id) || M.li.items.find(x => x.id === b.dataset.id); if (!it) return;
   if (ver() < 11) { RD[it.id] = { err: 'Para ler o e-mail inteiro aqui dentro, atualiza o script do Google (Spyke → Estado do Spyke → passo a passo). Por agora mostro o início:', t: [] }; return drawReader(it); }
   if (!RD[it.id] || RD[it.id].err) { RD[it.id] = { busy: true }; drawReader(it);
-    try { const u = sources()[it.src || 0], j = await IB().getJSON(qs(u, '&op=gx&id=' + encodeURIComponent(it.id) + '&_=' + Date.now()), 2); if (!j || !j.ok) throw new Error((j && j.msg) || 'o script não respondeu'); RD[it.id] = { s: j.s, t: j.t || [], fmt: -1 }; if (it.u) { it.u = false; save(); } }
+    try { let j; if (viaG()) j = await OS.Goog.call('gx', { id: it.id }); else { const u = sources()[it.src || 0]; j = await IB().getJSON(qs(u, '&op=gx&id=' + encodeURIComponent(it.id) + '&_=' + Date.now()), 2); } if (!j || !j.ok) throw new Error((j && j.msg) || 'o script não respondeu'); RD[it.id] = { s: j.s, t: j.t || [], fmt: -1 }; if (it.u) { it.u = false; save(); } }
     catch (e) { RD[it.id] = { err: 'Não consegui abrir o e-mail: ' + (e.message || 'erro') + '.', t: [] }; } }
   drawReader(it); };
 A.mlFmt = b => { const r = RD[b.dataset.id], it = Mail.items().find(x => x.id === b.dataset.id); if (!r || !it) return; r.fmt = r.fmt === +b.dataset.i ? -1 : +b.dataset.i; drawReader(it); };
@@ -12120,7 +12216,7 @@ P[''] = when => { const L = Mail.items(), c = Mail.counts(), by = k => L.filter(
   <div class="pn ml-sum"><div class="pn-h"><h3>${aiOn() ? 'Resumo' : 'Resumo'}</h3><small class="mut">${esc(when)}</small></div><p>${esc(M.sum || (aiOn() ? 'Toca em Atualizar para a IA ler os e-mails.' : 'Liga o Spyke (IA) em Definições → Spyke para teres o resumo escrito e a separação inteligente. Agora uso regras simples.'))}</p>${(OS.Spyke && OS.Spyke.say) ? `<button class="btn xs ghost" data-act="mlSay">${UI.ic('mic')}Spyke, lê-me isto</button>` : ''}</div>
   ${['urgente', 'responder', 'atencao'].map(k => by(k).length ? `<div class="pn"><div class="pn-h"><h3>${catL(k)[2]} · ${by(k).length}</h3></div><div class="ml-list">${by(k).map(x => row(x)).join('')}</div></div>` : '').join('')}
   ${by('urgente').length + by('responder').length + by('atencao').length ? '' : `<div class="pn">${UI.empty('Nada urgente nem à espera de resposta.')}</div>`}
-  ${(by('promo').length + by('spam').length) ? `<div class="pn"><div class="pn-h"><h3>Lixo e promoções · ${by('promo').length + by('spam').length}</h3><div class="row gap6">${by('promo').length ? `<button class="btn xs ghost" data-act="mlBulk" data-c="promo" data-a="arquivar">Arquivar promoções</button>` : ''}${by('spam').length ? `<button class="btn xs ghost" data-act="mlBulk" data-c="spam" data-a="spam">Mandar suspeitos para spam</button>` : ''}</div></div>${UI.toggle('Ver lista', `<div class="ml-list">${by('spam').concat(by('promo')).map(x => row(x)).join('')}</div>`, 'mlJunk')}</div>` : ''}`; };
+  ${(by('promo').length + by('spam').length) ? `<div class="pn"><div class="pn-h"><h3>Lixo e promoções · ${by('promo').length + by('spam').length}</h3><div class="row gap6">${viaG() ? '' : by('promo').length ? `<button class="btn xs ghost" data-act="mlBulk" data-c="promo" data-a="arquivar">Arquivar promoções</button>` : ''}${!viaG() && by('spam').length ? `<button class="btn xs ghost" data-act="mlBulk" data-c="spam" data-a="spam">Mandar suspeitos para spam</button>` : ''}</div></div>${UI.toggle('Ver lista', `<div class="ml-list">${by('spam').concat(by('promo')).map(x => row(x)).join('')}</div>`, 'mlJunk')}</div>` : ''}`; };
 P.caixa = () => { const L = Mail.items(), f = OS.ui.mlF || '', V2 = f ? L.filter(x => x.c === f) : L;
   return `<div class="ml-f"><button class="chip ${!f ? 'on' : ''}" data-ui="mlF" data-v="">Tudo · ${L.length}</button>${CATS.map(([k, ic, l]) => `<button class="chip ${f === k ? 'on' : ''}" data-ui="mlF" data-v="${k}">${l} · ${L.filter(x => x.c === k).length}</button>`).join('')}</div>
   <div class="pn"><div class="ml-list">${V2.map(x => row(x)).join('') || UI.empty(M.at ? 'Nada aqui.' : 'Toca em Atualizar.')}</div></div>${Object.keys(M.done).length ? `<p class="mut" style="font-size:12.5px">${Object.keys(M.done).length} marcado(s) como feito neste aparelho · <button class="btn xs ghost" data-act="mlUndo">mostrar outra vez</button></p>` : ''}`; };
@@ -12137,6 +12233,10 @@ P.linkedin = () => { const li = M.li, s = li.sum;
   ${(s.vagas || []).length ? `<div class="pn"><div class="pn-h"><h3>Vagas</h3></div><div class="list">${s.vagas.map(m => `<div class="li"><div${rt(m.id)}><b>${esc(m.titulo || '')}</b><small>${esc([m.empresa, m.local].filter(Boolean).join(' · '))}</small></div><div class="li-r"><button class="btn xs ghost" data-act="mlOpp" data-t="${esc(m.titulo || '')}" data-e="${esc(m.empresa || '')}" data-id="${esc(m.id || '')}">${UI.ic('plus')}Oportunidades</button>${lk(m.id)}</div></div>`).join('')}</div></div>` : ''}
   ${(s.publicacoes || []).length ? UI.toggle('Outras notificações · ' + s.publicacoes.length, `<div class="list">${s.publicacoes.map(m => `<div class="li"><div${rt(m.id)}><small>${esc(m.texto || '')}</small></div><div class="li-r">${lk(m.id)}</div></div>`).join('')}</div>`, 'mlLiO') : ''}`; };
 P.contas = (when, extra = '') => { const c = cfg(), ib = OS.one('inbox');
+  // contas sem script: a conta Google (só leitura); o script continua possível, em "Avançado"
+  if (!scr() && OS.Goog && OS.Goog.on()) return `${OS.Goog.card()}${extra}
+  <div class="pn fb-guide"><h3>O que ler</h3><div class="ws-form"><label>Pesquisa do Gmail<input class="field" data-bind="mail.q" value="${esc(c.q)}"></label><label>Quantos e-mails (máx. 50)<input class="field" type="number" min="5" max="50" data-bind="mail.n" value="${c.n}"></label><label>LinkedIn<input class="field" data-bind="mail.liq" value="${esc(c.liq)}"></label></div><small class="mut">Exemplos: <code>in:inbox newer_than:3d</code> · <code>is:unread newer_than:7d</code> · <code>in:inbox -category:promotions newer_than:2d</code></small>
+    <p class="mut" style="font-size:12.5px;margin:10px 0 0">Privacidade: o Náutilo lê o remetente, o assunto e o início dos e-mails recentes, e o e-mail inteiro quando o abres. Isso passa pelo servidor do Náutilo sem lá ficar guardado e, para ser separado e resumido, pela IA. Outlook pessoal ou iCloud: reencaminha-os para o teu Gmail e aparecem aqui.</p></div>`;
   return `<div class="pn fb-guide"><h3>1 · Gmail principal ${ready() && ver() >= 10 ? '<span class="pos">✓ ligado</span>' : ready() && ver() >= 9 ? '<span class="mut">ligado · atualiza para poderes responder</span>' : ''}</h3>
     ${!ready() ? `<p>Primeiro liga o script Google em <a class="acc" href="#definicoes">Definições → Atalho de gastos</a> (passos 1 e 2). Depois volta aqui.</p>` : ver() >= 10 ? '<p class="mut">O teu script já lê o Gmail e guarda respostas como rascunho.</p>' : ''}
     ${ready() && ver() < 10 ? `<ol><li>Toca em <b>Copiar código novo</b> (versão 10: lê o Gmail e guarda respostas como rascunho).</li><li>Abre <a class="acc" href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> → o teu projeto do Náutilo → apaga tudo → cola → <b>Guardar</b>.</li><li>Na lista de funções ao lado de ▶ escolhe <b>autorizarGmail</b> → <b>▶ Executar</b> → <b>Rever permissões</b> → a tua conta → Avançadas → Aceder → <b>Permitir</b> (agora pede também o Gmail).</li><li><b>Implementar → Gerir implementações → ✏️ → Versão: Nova versão → Implementar</b>. O endereço fica igual.</li><li>Volta aqui e toca em <b>Verificar</b>.</li></ol>
@@ -12172,12 +12272,15 @@ const replyModal = () => { if (!RP) return; const it = RP.it; UI.modal(`<div cla
   <div class="ml-rq">${esc(it.sn.slice(0, 260))}${it.sn.length > 260 ? '…' : ''}</div>
   <div class="ml-rai"><input class="field" id="mlRi" placeholder="O que queres dizer? ex.: aceito, envio amanhã até às 18h" value="${esc(RP.instr || '')}"><button class="btn sm" data-act="mlRai" ${OS.AI && OS.AI.key() ? '' : 'disabled'}>${RP.busy ? 'A escrever…' : 'Escrever com IA'}</button></div>
   <textarea id="mlRb" class="field" rows="7" placeholder="A tua resposta…">${esc(RP.body || '')}</textarea>
-  <div class="row gap8" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm" data-act="mlRdict">${UI.ic('mic')}Ditar</button><span class="grow"></span><button class="btn pri" data-act="mlRsave">Guardar rascunho no Gmail</button></div>
-  ${RP.msg ? `<div class="ib-st ${RP.ok ? 'ok' : 'bad'}" style="margin-top:8px">${esc(RP.msg)}</div>` : ''}<small class="mut" style="display:block;margin-top:8px">Fica nos Rascunhos do Gmail: revês e envias de lá. O Náutilo nunca envia e-mails sozinho.</small></div>`, 'tall'); };
+  <div class="row gap8" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm" data-act="mlRdict">${UI.ic('mic')}Ditar</button><span class="grow"></span>${viaG() ? `<a class="btn pri" href="${esc(gmailLink(it))}" target="_blank" rel="noopener" data-mlrcopy="1">Copiar e abrir no Gmail</a>` : `<button class="btn pri" data-act="mlRsave">Guardar rascunho no Gmail</button>`}</div>
+  ${RP.msg ? `<div class="ib-st ${RP.ok ? 'ok' : 'bad'}" style="margin-top:8px">${esc(RP.msg)}</div>` : ''}<small class="mut" style="display:block;margin-top:8px">${viaG() ? 'A resposta é copiada e o e-mail abre no Gmail: tocas em Responder e colas. O Náutilo só lê o teu Gmail.' : 'Fica nos Rascunhos do Gmail: revês e envias de lá. O Náutilo nunca envia e-mails sozinho.'}</small></div>`, 'tall'); };
 const keepRP = () => { const b = document.getElementById('mlRb'), i = document.getElementById('mlRi'); if (RP) { if (b) RP.body = b.value; if (i) RP.instr = i.value; } };
 A.mlReply = b => { const it = byId(b.dataset.id); if (!it) return; RP = { it, body: '', instr: '' }; replyModal(); };
 A.mlRai = async () => { keepRP(); if (!RP || RP.busy) return; RP.busy = true; replyModal(); try { RP.body = await compose(RP.it, RP.instr); RP.msg = ''; } catch (e) { RP.msg = 'IA: ' + (e.message || 'erro'); RP.ok = false; } RP.busy = false; replyModal(); };
 A.mlRdict = () => { keepRP(); const SRc = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SRc) return UI.toast('Este navegador não deixa ditar', 'warn'); const r = new SRc(); r.lang = (OS.one('spyke').accent === 'PT') ? 'pt-PT' : 'pt-BR'; r.interimResults = false; r.onresult = e => { const t = [...e.results].map(x => x[0].transcript).join(' '); RP.body = (RP.body ? RP.body.trim() + ' ' : '') + t; replyModal(); }; r.onerror = () => UI.toast('Não consegui ouvir', 'warn'); UI.toast('A ouvir… fala a tua resposta'); try { r.start(); } catch (e) { } };
+// modo Google (só leitura): o link abre o Gmail e, no mesmo toque, a resposta vai para a área de transferência
+document.addEventListener('click', e => { const a = e.target.closest('[data-mlrcopy]'); if (!a) return; keepRP(); if (!RP || !RP.body.trim()) { e.preventDefault(); return UI.toast('Escreve a resposta primeiro', 'warn'); }
+  const t = RP.body.trim(); try { navigator.clipboard.writeText(t).catch(() => { }); } catch (er) { } M.done[RP.it.id] = Date.now(); save(); UI.toast('Resposta copiada. No Gmail, toca em Responder e cola.', 'pos'); setTimeout(() => { UI.closeModal(); OS.request(); }, 300); }, true);
 A.mlRsave = async () => { keepRP(); if (!RP || !RP.body.trim()) return UI.toast('Escreve a resposta primeiro', 'warn'); try { await saveDraft(RP.it, RP.body.trim()); RP.msg = 'Rascunho guardado no Gmail. Abre o Gmail → Rascunhos para enviar.'; RP.ok = true; M.done[RP.it.id] = Date.now(); save(); } catch (e) { RP.msg = e.message; RP.ok = false; } replyModal(); OS.request(); };
 
 /* ---------- ações ---------- */
@@ -13062,8 +13165,8 @@ const statePanel = () => { const c = ib(), v = +(c.ver || 0), hasScr = !!(c.url 
     ${row(SR || silent() ? (ear ? true : null) : false, 'Microfone', !SR && !silent() ? 'este navegador não reconhece voz' : ear ? 'a ouvir agora' + (ear === OS.Ear ? ' (silencioso · ' + OS.Ear.engine() + ')' : '') : earStopped ? 'desligado por ti: toca no microfone ou diz "volta a ouvir"' : cfg().always ? 'parado: toca no microfone para começar' : '"Ouvir sempre" está desligado')}
     ${row(hasScr ? (v >= SCRV ? true : false) : false, 'Script Google', !hasScr ? 'não está ligado neste aparelho: Definições → Sincronizar aparelhos → Recuperar os meus dados' : v >= SCRV ? 'versão ' + v + ': notícias, e-mail, Siri e sincronização' : 'versão ' + (v || 'antiga') + ': falta atualizar para a versão ' + SCRV + ' (passo a passo abaixo)')}
     ${row(hasScr && v >= SCRV ? (OS.News && OS.News.old ? false : true) : false, 'Notícias', hasScr && v >= SCRV ? 'prontas no Jornal e no resumo do dia' : 'precisam do script Google atualizado')}
-    ${row(hasScr && v >= SCRV ? (OS.one('integ').gcal ? true : null) : false, 'Agenda Google', hasScr && v >= SCRV ? (OS.one('integ').gcal ? 'ligada: os teus eventos aparecem no Calendário' : 'pronta: liga-a no Calendário') : 'precisa do script Google atualizado')}
-    ${row(hasScr && v >= SCRV ? (mail.at ? true : null) : false, 'E-mail', hasScr && v >= SCRV ? (mail.at ? 'ligado' : 'falta ligar o Gmail: página E-mail → Atualizar') : 'precisa do script Google atualizado')}
+    ${OS.Goog && OS.Goog.cal() ? row(true, 'Agenda Google', 'ligada pela tua conta Google: os teus eventos aparecem no Calendário') : row(hasScr && v >= SCRV ? (OS.one('integ').gcal ? true : null) : false, 'Agenda Google', hasScr && v >= SCRV ? (OS.one('integ').gcal ? 'ligada: os teus eventos aparecem no Calendário' : 'pronta: liga-a no Calendário') : OS.Goog && OS.Goog.on() ? 'liga a tua conta Google em Definições → E-mail' : 'precisa do script Google atualizado')}
+    ${OS.Goog && OS.Goog.mail() ? row(mail.at ? true : null, 'E-mail', mail.at ? 'ligado pela tua conta Google (só leitura)' : 'conta Google ligada: página E-mail → Atualizar') : row(hasScr && v >= SCRV ? (mail.at ? true : null) : false, 'E-mail', hasScr && v >= SCRV ? (mail.at ? 'ligado' : 'falta ligar o Gmail: página E-mail → Atualizar') : OS.Goog && OS.Goog.on() ? 'liga a tua conta Google em Definições → E-mail' : 'precisa do script Google atualizado')}
     </div>
     ${oldScr ? `<div class="spy-upd"><b>O script Google está desatualizado (versão ${v || 'antiga'})</b><p class="mut" style="margin:4px 0 0">Atualiza-o em <a class="acc" href="#definicoes.script">Definições → Script Google</a>: lá estão todas as partes, com o passo a passo. Depois volta aqui e toca em <b>Verificar tudo</b>.</p></div>` : ''}</div>`; };
 A.spyCheckAll = async () => { if (chkBusy) return; chkBusy = true; OS.request();
@@ -13877,7 +13980,8 @@ OS.on('upd:decisions', d => { if (!d || !d.opp || d.status !== 'Decidida' || !d.
 const card = g => `<div class="ops-c"><div class="ops-h"><span class="bdg ${g.src === 'LinkedIn' ? 'acc' : ''}">${esc(g.src)}</span><span class="eyebrow">${esc(g.kind || '')}</span>${g.deadline ? UI.badge('prazo ' + U.fmtDS(g.deadline), U.diff(g.deadline, U.today()) <= 7 ? 'neg' : 'warn') : ''}</div>
   <b>${esc(g.name)}</b>${g.inst || g.loc ? `<small class="mut">${esc([g.inst, g.loc].filter(Boolean).join(' · '))}</small>` : ''}${g.why ? `<small class="tx2">${esc(g.why)}</small>` : ''}
   <div class="ops-a"><button class="btn sm pri" data-act="opsTake" data-id="${esc(g.id)}">${UI.ic('plus')}Adicionar</button><button class="btn sm" data-act="opsLater" data-id="${esc(g.id)}">Depois</button><button class="btn sm ghost" data-act="opsNo" data-id="${esc(g.id)}">Não me interessa</button><a class="btn sm ghost" href="${esc(g.mail)}" target="_blank" rel="noopener">Ver e-mail</a></div></div>`;
-const panel = () => { const ok = (() => { const c = OS.one('inbox'); return !!(c.url && c.key); })(), P = ok ? pending() : { now: [], later: [] }, li = OS.Mail && OS.Mail.li ? OS.Mail.li() : {}, at = Math.max((OS.Mail && OS.Mail.counts ? OS.Mail.counts().at : 0) || 0, (li && li.at) || 0);
+const mailOk = () => { const c = OS.one('inbox'); return !!(c.url && c.key) || !!(OS.Goog && OS.Goog.mail()); };
+const panel = () => { const ok = mailOk(), P = ok ? pending() : { now: [], later: [] }, li = OS.Mail && OS.Mail.li ? OS.Mail.li() : {}, at = Math.max((OS.Mail && OS.Mail.counts ? OS.Mail.counts().at : 0) || 0, (li && li.at) || 0);
   if (ok && P.now.length && aiOn()) setTimeout(() => aiScan(), 800);
   return `<section class="pn ops"><div class="pn-h"><h3>${UI.ic('mail')} Encontradas no teu e-mail e no LinkedIn</h3><button class="btn sm" data-act="opsScan" ${ok ? '' : 'disabled'}>${UI.ic('sync')}${busy ? 'A ler…' : 'Procurar agora'}</button></div>
     ${!ok ? `<p class="mut" style="margin:0">Liga o teu Gmail em <a class="acc" href="#definicoes.email">Definições → E-mail</a>. O LinkedIn entra pelas notificações que ele te manda para o Gmail (vagas, alertas de emprego, eventos). Depois disto as oportunidades aparecem aqui sozinhas e tu decides cada uma.</p>`
@@ -13890,7 +13994,7 @@ OS.on('mail', () => { if (aiOn()) setTimeout(() => aiScan(), 1500); });
 
 // Centro de controlo: há oportunidades à espera de decisão
 const I = OS.Intel;
-if (I && I.alerts) { const _a = I.alerts; I.alerts = () => { const out = _a(); try { const c = OS.one('inbox'); if (c.url && c.key) { const n = pending().now.length; if (n) out.push({ lvl: 'attention', area: 'Oportunidades', title: `${n} oportunidade${n > 1 ? 's' : ''} encontrada${n > 1 ? 's' : ''} no e-mail e no LinkedIn`, detail: 'Decide: adicionar, ver depois ou recusar', href: '#oportunidades' }); } } catch (e) { } return out; }; }
+if (I && I.alerts) { const _a = I.alerts; I.alerts = () => { const out = _a(); try { if (mailOk()) { const n = pending().now.length; if (n) out.push({ lvl: 'attention', area: 'Oportunidades', title: `${n} oportunidade${n > 1 ? 's' : ''} encontrada${n > 1 ? 's' : ''} no e-mail e no LinkedIn`, detail: 'Decide: adicionar, ver depois ou recusar', href: '#oportunidades' }); } } catch (e) { } return out; }; }
 OS.OppScan = { all, pending, guess, deadline, aiScan };
 })();
 

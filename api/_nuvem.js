@@ -136,4 +136,4 @@ const handler = (fn, o = {}) => async (req, res) => {
 const atalhoTag = async body => crypto.createHmac('sha256', await master()).update('atalho:' + body).digest().subarray(0, 18);
 const atalhoKey = async (eid, pid, n) => { const body = b64u(JSON.stringify({ a: eid, p: pid, n })); return body + '.' + b64u(await atalhoTag(body)); };
 
-module.exports = { atalhoTag, atalhoKey, unb64u, b64u, store, master, userKey, accKey, seal, open, emailId, normEmail, hashPw, checkPw, newCode, normCode, signToken, readToken, limit, body, send, handler, err, sleep, crypto };
+module.exports = { allowed, atalhoTag, atalhoKey, unb64u, b64u, store, master, userKey, accKey, seal, open, emailId, normEmail, hashPw, checkPw, newCode, normCode, signToken, readToken, limit, body, send, handler, err, sleep, crypto };
