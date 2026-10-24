@@ -253,3 +253,32 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(242,196,141,.22),0 8px 22px rgba(0
 .lk-brand .sp-name{font-size:24px}
 .ac-brand>span{font-size:26px}
 .brand-mark.oc{background:#0B0B0C}
+/* Vamos conhecer-te (questionário de boas-vindas) */
+#onb{position:fixed;inset:0;z-index:120;background:#070D16;display:flex;justify-content:center;overflow:hidden}
+#onb[hidden]{display:none}
+body.onb-open{overflow:hidden}
+.onb-in{width:100%;max-width:640px;display:flex;flex-direction:column;height:100%;padding:calc(14px + env(safe-area-inset-top,0px)) 20px 0}
+.onb-top{display:flex;align-items:center;gap:12px;min-height:44px}
+.onb-brand{display:inline-flex;align-items:center;gap:9px;margin-right:auto}.onb-brand .pr-word{font-size:22px}
+.onb-n{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
+.onb-bar{height:3px;border-radius:3px;background:rgba(170,195,225,.12);margin:10px 0 0;overflow:hidden}.onb-bar i{display:block;height:100%;background:var(--farol,#F2C48D);transition:width .25s ease}
+.onb-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 2px 24px}
+.onb-body h1{margin:0 0 6px;font:500 32px/1.12 'Bodoni Moda',Didot,Georgia,serif;color:#F3EEE6;text-wrap:balance}
+.onb-s{margin:0 0 20px;color:var(--tx2);font-size:15px;line-height:1.5;max-width:52ch}
+.onb-f{display:flex;flex-direction:column;gap:8px;margin:0 0 18px}.onb-f>span{font-size:13.5px;color:var(--tx2)}
+.onb-2,.onb-3{display:grid;gap:12px;grid-template-columns:1fr 1fr}.onb-3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:420px){.onb-2{grid-template-columns:1fr}.onb-3{grid-template-columns:1fr 1fr}}
+.onb-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip.onb-c{min-height:40px;padding:8px 14px;font-size:14px;display:inline-flex;align-items:center;gap:7px}
+.chip.onb-c .ic{width:16px;height:16px;opacity:.75}
+.chip.onb-c.on{background:rgba(242,196,141,.16);border-color:rgba(242,196,141,.6);color:#F7E6CF}
+.chip.onb-c[disabled]{opacity:.7}
+.onb-g{border:1px solid var(--line);border-radius:14px;padding:12px 12px 14px;margin:0 0 12px;background:rgba(255,255,255,.015)}
+.onb-gh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}.onb-gh b{font-size:15px;color:var(--tx)}
+.onb-m{margin:0 0 8px}
+.onb-body h1+.onb-sum{margin-top:18px}.onb-sum{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
+.onb-sum li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.45}.onb-sum .ic{color:var(--pos,#3FCF8E);flex:none;margin-top:3px}
+.onb-err{display:block;margin-top:8px;color:var(--warn,#F2B544)}
+.onb-foot{display:flex;align-items:center;gap:10px;padding:12px 0 calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:#070D16}
+.onb-foot .btn{min-height:46px;padding:0 22px}
+.exp-t.off{opacity:.62}.exp-t .btn.xs{margin-top:6px;align-self:flex-start}

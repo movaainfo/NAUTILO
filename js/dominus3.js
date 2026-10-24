@@ -320,6 +320,10 @@ const legx = () => { const s = S(); if (!s.legx || typeof s.legx !== 'object') s
 const legList = p => { const x = legx(), off = new Set(x.off[p] || []), out = (LEG[p] || []).filter(t => !off.has(t));
   (x.add[p] || []).forEach(a => { const j = a.at === '^' ? 0 : a.at && out.includes(a.at) ? out.indexOf(a.at) + 1 : out.length; out.splice(j, 0, a.t); }); return out; };
 D.legList = legList;
+// marcos feitos para a pessoa (questionário de boas-vindas e IA): entram no topo do pilar, pela ordem dada, sem repetir
+D.legAddMine = (p, list, after) => { if (!LEG[p]) return 0; const x = legx(), have = new Set(legList(p).map(t => t.toLowerCase())); let at = after ? ((x.add[p] || []).filter(a => a.mine).slice(-1)[0] || {}).t || '^' : '^', n = 0;
+  (list || []).map(t => String(t || '').trim().slice(0, 160)).filter(t => t && !have.has(t.toLowerCase())).forEach(t => { x.add[p] = (x.add[p] || []).concat({ t, at, mine: 1 }); at = t; have.add(t.toLowerCase()); n++; }); if (n) save(); return n; };
+D.legOffWhere = (p, re) => { if (!LEG[p]) return 0; const x = legx(), off = new Set(x.off[p] || []); let n = 0; (LEG[p] || []).forEach(t => { if (re.test(t) && !off.has(t)) { off.add(t); n++; } }); if (n) { x.off[p] = [...off]; save(); } return n; };
 const legDone = p => (S().legacy[p] || []).filter(m => m && m.t);
 const isDone = (p, t) => legDone(p).some(m => m.t === t);
 D.legacyCount = () => D.PK.reduce((a, p) => a + legDone(p).length, 0);

@@ -21,9 +21,11 @@ OS.S.attend = { label: 'Presença na aula', title: r => ((OS.get('subjects', r.s
 /* ---------- feriados ---------- */
 const easter = y => { const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, mm = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * mm + 114) / 31), da = (h + l - 7 * mm + 114) % 31 + 1; return y + '-' + U.pad(mo) + '-' + U.pad(da); };
 const HOL = {};
-Att.holiday = d => { const y = +d.slice(0, 4); if (!HOL[y]) { const e = easter(y), o = { [y + '-01-01']: 'Ano Novo', [U.addDays(e, -47)]: 'Carnaval', [U.addDays(e, -2)]: 'Sexta-feira Santa', [e]: 'Páscoa', [y + '-04-25']: '25 de Abril', [y + '-05-01']: 'Dia do Trabalhador', [U.addDays(e, 60)]: 'Corpo de Deus', [y + '-06-10']: 'Dia de Portugal', [y + '-08-15']: 'Assunção', [y + '-10-05']: 'Implantação da República', [y + '-11-01']: 'Todos os Santos', [y + '-12-01']: 'Restauração da Independência', [y + '-12-08']: 'Imaculada Conceição', [y + '-12-25']: 'Natal' };
-    const p = OS.one('profile'); if (/aveiro/i.test([p.city, p.uni].join(' '))) o[y + '-05-12'] = 'Feriado de Aveiro'; HOL[y] = o; }
-  return HOL[y][d] || ''; };
+// feriados nacionais do país do perfil (Portugal por omissão; Brasil com os seus)
+const BRH = (y, e) => ({ [y + '-01-01']: 'Ano Novo', [U.addDays(e, -48)]: 'Carnaval', [U.addDays(e, -47)]: 'Carnaval', [U.addDays(e, -2)]: 'Sexta-feira Santa', [y + '-04-21']: 'Tiradentes', [y + '-05-01']: 'Dia do Trabalho', [U.addDays(e, 60)]: 'Corpus Christi', [y + '-09-07']: 'Independência', [y + '-10-12']: 'Nossa Senhora Aparecida', [y + '-11-02']: 'Finados', [y + '-11-15']: 'Proclamação da República', [y + '-11-20']: 'Consciência Negra', [y + '-12-25']: 'Natal' });
+Att.holiday = d => { const y = +d.slice(0, 4), cc = OS.one('profile').country || 'PT', ky = cc + y; if (!HOL[ky] && cc === 'BR') HOL[ky] = BRH(y, easter(y)); if (!HOL[ky]) { const e = easter(y), o = { [y + '-01-01']: 'Ano Novo', [U.addDays(e, -47)]: 'Carnaval', [U.addDays(e, -2)]: 'Sexta-feira Santa', [e]: 'Páscoa', [y + '-04-25']: '25 de Abril', [y + '-05-01']: 'Dia do Trabalhador', [U.addDays(e, 60)]: 'Corpo de Deus', [y + '-06-10']: 'Dia de Portugal', [y + '-08-15']: 'Assunção', [y + '-10-05']: 'Implantação da República', [y + '-11-01']: 'Todos os Santos', [y + '-12-01']: 'Restauração da Independência', [y + '-12-08']: 'Imaculada Conceição', [y + '-12-25']: 'Natal' };
+    const p = OS.one('profile'); if (/aveiro/i.test([p.city, p.uni].join(' '))) o[y + '-05-12'] = 'Feriado de Aveiro'; HOL[ky] = o; }
+  return HOL[ky][d] || ''; };
 OS.on('one:profile', () => { Object.keys(HOL).forEach(k => delete HOL[k]); });
 
 /* ---------- o que diz a tua semana ---------- */

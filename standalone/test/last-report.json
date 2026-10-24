@@ -1,133 +1,397 @@
 [
  {
-  "p": "Segurança",
-  "name": "segurança: código malicioso gravado em todos os campos de 81 tipos de registo",
+  "p": "Novidades",
+  "name": "Face ID: ao abrir a app o Face ID começa sozinho e entra",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: nenhuma página executa código malicioso guardado nos dados (152 páginas)",
+  "p": "Novidades",
+  "name": "Face ID: não pergunta \"Ativar o Face ID?\" outra vez",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: os formulários de edição mostram o código como texto",
+  "p": "Novidades",
+  "name": "Face ID: se cancelares fica o botão e uma mensagem calma (sem repetir sozinho)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "segurança: e-mail (texto e formatado), notícia aberta, conversa com o Spyke e endereços com código não executam nada",
-  "pass": true,
-  "info": "{\"em\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"nw\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"sp\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0},\"hs\":{\"x\":0,\"img\":0,\"svg\":0,\"scr\":0,\"js\":0}}"
- },
- {
-  "p": "Segurança",
-  "name": "segurança: sem o código/Face ID não aparece nenhum dado (mesmo abrindo o endereço de uma página)",
+  "p": "Novidades",
+  "name": "Face ID: não fica a pedir em ciclo",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Segurança",
-  "name": "sem erros de JavaScript (segurança)",
+  "p": "Novidades",
+  "name": "Face ID: tocar no botão entra",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up Computador",
-  "name": "Check-up: dados de teste em todas as áreas da app (237 registos)",
-  "pass": true,
-  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
- },
- {
-  "p": "Check-up Computador",
-  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (150 visitadas)",
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Face ID)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up Computador",
-  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
-  "pass": true,
-  "info": " · repetidas: next, floresta.loja"
- },
- {
-  "p": "Check-up Computador",
-  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "p": "Novidades",
+  "name": "Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up Computador",
-  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "p": "Novidades",
+  "name": "Spyke: sem dizer o nome dele não responde (só \"Spyke, …\")",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up Computador",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (158)",
+  "p": "Novidades",
+  "name": "Spyke: com o nome responde logo",
+  "pass": true,
+  "info": "São 12:55."
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: conversa seguida (depois de responder volta a ouvir sozinho)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up Computador",
-  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
+  "p": "Novidades",
+  "name": "Spyke: \"Spike, bom dia\" dá o resumo do dia (escrito \"Spike\", como o iPhone ouve)",
+  "pass": true,
+  "info": "Boa tarde, Ryan. Hoje é sábado, 24 de outubro. A agenda está livre de compromiss"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"Bom dia, Spike\" (nome no fim) também dá o resumo",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up Computador",
-  "name": "Check-up: sem erros de JavaScript em toda a app",
+  "p": "Novidades",
+  "name": "Spyke: só \"Spike\" não fala nada (som e fica à espera do pedido)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: dados de teste em todas as áreas da app (237 registos)",
+  "p": "Novidades",
+  "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
   "pass": true,
-  "info": "{\"err\":[],\"skip\":[\"reports\",\"files\"]}"
+  "info": "São 12:55."
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: todas as páginas e abas abrem sem erros nem valores partidos (145 visitadas)",
+  "p": "Novidades",
+  "name": "Spyke: com uma pausa depois do nome (\"Spike… que dia é hoje\") faz o pedido",
   "pass": true,
-  "info": ""
+  "info": "Hoje é sábado, 24 de outubro."
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: nenhuma página recarrega a app sozinha (cada página que falhe é tentada outra vez)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Check-up iPhone",
-  "name": "Check-up: nenhuma página trava (cada uma desenha em menos de 1,5 s, com dados em todas as áreas)",
+  "p": "Novidades",
+  "name": "Spyke: depois de responder, sem o nome volta a ignorar",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: tudo cabe no ecrã (nenhuma página desliza para o lado nem tem partes cortadas)",
+  "p": "Novidades",
+  "name": "Spyke: fora da conversa ignora o que não é para ele",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: todos os formulários (criar e editar) abrem sem erros (159)",
+  "p": "Novidades",
+  "name": "Spyke: \"Spyke, …\" funciona sempre",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: cabeçalho, menu, Spyke, Jarvis, procurar, registar e ecrã de bloqueio cabem no ecrã",
+  "p": "Novidades",
+  "name": "Spyke: frase sem \"fim\" é apanhada pela pausa (iPhone)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Check-up iPhone",
-  "name": "Check-up: sem erros de JavaScript em toda a app",
+  "p": "Novidades",
+  "name": "Spyke: o eco da própria voz não conta como pedido",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: o iPhone fecha o microfone e ele reabre sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: \"para de ouvir\" desliga e não reabre",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: tocar no microfone volta a ouvir",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: enquanto fala o microfone descansa (não ouve a própria voz nem corta o som)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: acabou de falar e volta a ouvir sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: com \"Interromper por voz\" ligado, dizer \"Spyke\" enquanto fala interrompe e ouve",
+  "pass": true,
+  "info": "Sim?"
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: duas palmas chamam o Spyke",
+  "pass": true,
+  "info": "{\"two\":1,\"one\":0,\"voice\":0,\"far\":0,\"soft9\":1,\"soft1\":0}"
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: uma palma sozinha não chama",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: voz ou música contínua não chamam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: palmas muito afastadas não contam",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Spyke a ouvir)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: quando o iPhone apaga o 3D, ele refaz-se sozinho",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: se o 3D falhar mostra \"A abrir o 3D…\" (não fica preso no erro)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "floresta: tenta outra vez sozinha e volta a mostrar a árvore 3D",
+  "pass": true,
+  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Floresta)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: o Spyke analisa (prós, contras, riscos, perguntas, para onde apontam os dados)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: \"Preencher a matriz\" estima só o que está vazio",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: perguntas ao Spyke ficam guardadas na decisão",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "decisões: próximo passo vira tarefa",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: mostra os segundos enquanto espera",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: sem resposta desiste, explica e oferece \"Tentar outra vez\" (sem ficar em ciclo)",
+  "pass": true,
+  "info": "Visão geral\nJORNAL\n\nAs notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do di"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (decisões e jornal)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: mostra o que falta (script, notícias, e-mail) e leva a Definições → Script Google (sem partes para copiar no Spyke)",
+  "pass": true,
+  "info": "{\"bad\":4,\"guide\":true,\"noCopy\":true}"
+ },
+ {
+  "p": "Novidades",
+  "name": "estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)",
+  "pass": true,
+  "info": "{\"ok\":[\"Cérebro (IA)\",\"Script Google\",\"Notícias\"],\"guide\":false}"
+ },
+ {
+  "p": "Novidades",
+  "name": "script atualizado: o Jornal mostra as notícias",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (estado do Spyke)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "script v10: Definições → Script Google pede a Parte 3, num ficheiro novo (sem apagar as partes 1 e 2)",
+  "pass": true,
+  "info": "[\"p3\"]"
+ },
+ {
+  "p": "Novidades",
+  "name": "script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (Parte 3)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
+  "pass": true,
+  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 24/10, 12:56\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail: nada abre fora da app",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "e-mail formatado: num quadro isolado, sem scripts (o código malicioso de um e-mail não corre)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: nenhum botão leva ao Gmail",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: \"Abrir\" abre o e-mail dentro da app (sem Responder nem Gmail)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "LinkedIn: tocar na própria notificação também abre o leitor",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: a notícia abre dentro da app com o texto completo do jornal",
+  "pass": true,
+  "info": "Jornal de Notícias · agora Notícia aberta pelo jornal TEXTO DE JORNAL DE NOTÍCIAS Primeiro parágrafo da notícia completa, com os factos principais do que aconteceu hoje em Aveiro e no resto do país. Segundo parágrafo com as declarações dos envolvidos e o contexto do que levou a esta situação inesper"
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: texto do jornal entra só como texto (sem código a correr)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "jornal: jornal que bloqueia → o Spyke escreve a notícia completa com as fontes, dentro da app",
+  "pass": true,
+  "info": "Público · há 1 min Notícia de jornal fechado NOTÍCIA COMPLETA ESCRITA PELO SPYKE A PARTIR DE PESQUISA NA INTERNET O Spyke escreveu o primeiro parágrafo. Segundo parágrafo escrito. Terceiro parágrafo escrito. Fontes consultadas: publico.pt · rtp.pt Spyke, lê-me Se mesmo assim quiseres, abrir no site "
+ },
+ {
+  "p": "Novidades",
+  "name": "agenda Google pelo script: os eventos aparecem no Calendário",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "agenda Google: o Spyke consegue marcar eventos na agenda Google",
+  "pass": true,
+  "info": "{\"k\":\"k\",\"op\":\"ce\",\"t\":\"Dentista\",\"d\":\"2026-10-29\",\"h\":\"10:00\"}"
+ },
+ {
+  "p": "Novidades",
+  "name": "sem erros de JavaScript (leitores)",
+  "pass": true,
+  "info": ""
+ },
+ {
+  "p": "Novidades",
+  "name": "nome da app: Prumo no ecrã principal, no título e no manifesto",
   "pass": true,
   "info": ""
  }

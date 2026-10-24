@@ -383,7 +383,7 @@ OS.forms.aiNameSave = f => { const v = String(f.elements.nome.value || '').trim(
   OS.setOne('spyke', { nome: v === 'Spyke' ? '' : v, art, nomeAt: U.today() }); S.setWakeName(); UI.closeModal(); UI.toast('A tua IA chama-se ' + v, 'pos'); OS.request(); };
 // numa conta nova: perguntar o nome uma vez (depois de aceitar os termos)
 const asked = () => { try { return !!sessionStorage.getItem('os2aiNameAsk'); } catch (e) { return false; } };
-const askName = () => { if (!(OS.Acc && OS.Acc.pub) || window.__noAsk || cfg().nomeAt || asked() || document.getElementById('modal') && !document.getElementById('modal').hidden || (OS.Legal && OS.Legal.pending && OS.Legal.pending())) return false;
+const askName = () => { if (!(OS.Acc && OS.Acc.pub) || window.__noAsk || cfg().nomeAt || asked() || (OS.Onb && (OS.Onb.isOpen() || (!OS.one('onb').done && !window.__noOnb))) || document.getElementById('modal') && !document.getElementById('modal').hidden || (OS.Legal && OS.Legal.pending && OS.Legal.pending())) return false;
   try { sessionStorage.setItem('os2aiNameAsk', '1'); } catch (e) { }
   UI.modal(`<form style="padding:20px" class="col gap10" data-form="aiNameSave"><h3 style="margin:0">Dá um nome à tua IA</h3>
     <p class="mut" style="margin:0">A tua assistente pessoal conversa contigo, organiza o dia, resume e-mails e notícias e ajuda-te a decidir. Já está ligada: só falta o nome. Chamas por ela pelo nome.</p>

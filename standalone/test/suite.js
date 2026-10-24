@@ -64,7 +64,8 @@ const srv = http.createServer((req, res) => {
       INBOX.push({ id: crypto.randomUUID(), t: new Date().toISOString(), v, d: q.d || '', c: q.c || '' }); out('✓ registado', 1); });
     return; }
   if (u.pathname === '/iamock') { let body = ''; req.on('data', c => body += c); req.on('end', () => { let j = {}; try { j = JSON.parse(body); } catch (e) { } IAMOCK.push(j); const json = j.response_format && j.response_format.type === 'json_object';
-      res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: json ? '{"ok":true,"resposta":"feito"}' : 'Olá! Aqui é a tua IA.' } }] })); }); return; }
+      const tx = JSON.stringify(j.messages || ''), out = json && /disciplinas/.test(tx) ? '{"disciplinas":["Cálculo I","Contabilidade Geral","Microeconomia","Introdução ao Direito","Matemática Financeira"]}' : json && /mestre de jogo/.test(tx) ? '{"int":["Ler 6 livros de gestão este ano"],"for":["Juntar 1500 até ao verão"],"cor":["Fazer 10 elevações seguidas"],"inf":["Jantar com a família todos os domingos"],"esp":["Escrever 3 gratidões por dia durante 30 dias"]}' : json ? '{"ok":true,"resposta":"feito"}' : 'Olá! Aqui é a tua IA.';
+      res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: out } }] })); }); return; }
   // Google simulado (OAuth, Gmail e Calendar) para api/google
   if (u.pathname.startsWith('/gmock/')) { let body = ''; req.on('data', c => body += c); req.on('end', () => GM.handle(req, res, u, body)); return; }
   if (OFFLINE) { req.socket.destroy(); return; }
@@ -110,6 +111,7 @@ async function newPage(b, prof, init = {}) {
   await p.addInitScript(([HASH, init]) => {
     try { if (localStorage.getItem('os2foldAll') == null && !sessionStorage.getItem('__nofa')) localStorage.setItem('os2foldAll', 'true'); } catch (e) { }
     if (!localStorage.getItem('__seeded')) { localStorage.setItem('os2:one~security', JSON.stringify({ data: { hash: HASH } })); Object.entries(init).forEach(([k, v]) => localStorage.setItem(k, v)); localStorage.setItem('__seeded', '1'); }
+    if (!sessionStorage.getItem('__onb')) window.__noOnb = 1;
     window.__cred = 0; try { Object.defineProperty(navigator, 'credentials', { value: { get: () => { window.__cred++; return new Promise(() => { }); }, create: () => new Promise(() => { }) } }); } catch (e) { }
     window.PublicKeyCredential = window.PublicKeyCredential || { isUserVerifyingPlatformAuthenticatorAvailable: async () => true };
   }, [HASH, init]);
@@ -1174,7 +1176,7 @@ async function newFeatureTests(b) {
     const er2 = errs.filter(e => !/sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (leitores)', !er2.length, er2.slice(0, 3).join(' | ')); await ctx.close(); }
   // nome da app
   { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), m = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
-    ok('nome da app: PRUMO no ecrã principal, no título e no manifesto', m.name === 'PRUMO' && m.short_name === 'PRUMO' && /<title>PRUMO<\/title>/.test(html) && /apple-mobile-web-app-title" content="PRUMO"/.test(html)); }
+    ok('nome da app: Prumo no ecrã principal, no título e no manifesto', m.name === 'Prumo' && m.short_name === 'Prumo' && /<title>Prumo<\/title>/.test(html) && /apple-mobile-web-app-title" content="Prumo"/.test(html)); }
 }
 
 /* ================= PAINEL ÚNICO, PRÓXIMOS PASSOS, NOMES EM PORTUGUÊS E OUTLOOK DA FACULDADE ================= */
@@ -2055,7 +2057,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   const errs = [], ctxs = [];
   const fresh = async (prof, init) => { const ctx = await b.newContext(prof.o); ctxs.push(ctx); const p = await ctx.newPage();
     p.on('pageerror', e => errs.push('JS: ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/fonts\.g|net::ERR|Failed to load resource|ERR_INTERNET|ERR_CONNECTION|status of 40[134]/.test(m.text())) errs.push('consola: ' + m.text().slice(0, 160)); }); p.on('dialog', d => d.accept());
-    await p.addInitScript(() => { window.__accPoll = 1200; window.__noAsk = 1; { const of = window.fetch.bind(window); window.__pend = new Map(); let n = 0; window.fetch = (u, o) => { const id = ++n, s = String(u && u.url || u); if (/api\//.test(s)) window.__pend.set(id, s.replace(/^.*api\//, '') + ' ' + String((o && o.body) || '').slice(0, 30) + ' @' + Date.now()); const r = of(u, o); r.finally(() => window.__pend.delete(id)).catch(() => { }); return r; }; } try { if (!localStorage.getItem('__fa')) { localStorage.setItem('os2foldAll', 'true'); localStorage.setItem('__fa', '1'); } } catch (e) { } }); if (init) await p.addInitScript(init); await p.goto(BASE); return p; };
+    await p.addInitScript(() => { window.__accPoll = 1200; window.__noAsk = 1; window.__noOnb = 1; { const of = window.fetch.bind(window); window.__pend = new Map(); let n = 0; window.fetch = (u, o) => { const id = ++n, s = String(u && u.url || u); if (/api\//.test(s)) window.__pend.set(id, s.replace(/^.*api\//, '') + ' ' + String((o && o.body) || '').slice(0, 30) + ' @' + Date.now()); const r = of(u, o); r.finally(() => window.__pend.delete(id)).catch(() => { }); return r; }; } try { if (!localStorage.getItem('__fa')) { localStorage.setItem('os2foldAll', 'true'); localStorage.setItem('__fa', '1'); } } catch (e) { } }); if (init) await p.addInitScript(init); await p.goto(BASE); return p; };
   const gateUp = p => p.waitForSelector('#acc .ac-in form, #acc .ac-who, #acc .ac-code', { timeout: 15000 });
   const lockUp = p => p.waitForSelector('#lkCode', { state: 'visible', timeout: 15000 });
   const app = p => p.waitForFunction(() => !document.getElementById('acc') && document.querySelector('#view') && document.querySelector('#view').innerText.trim().length > 30, null, { timeout: 15000 });
@@ -2350,6 +2352,75 @@ async function googleTests(b) { cur = 'Google'; console.log('\n=== Gmail e agend
   ok('Modo pessoal (sem conta): sem cartão do Google', await E(k3.p, () => !document.querySelector('.gg-card') && !OS.Goog.on()));
   await k3.ctx.close();
   ok('sem erros de JavaScript', !errs.concat(k2.errs, k3.errs).length, errs.concat(k2.errs, k3.errs).slice(0, 3).join(' | ')); }
+async function onbTests(b) { cur = 'Boas-vindas'; console.log('\n=== Vamos conhecer-te: o Prumo feito para cada pessoa ===');
+  const prof = PROFILES[0], ip = () => '10.' + [1, 2, 3].map(() => crypto.randomBytes(1)[0]).join('.');
+  // conta de uma pessoa qualquer (perfil sem "ps": não é o Náutilo do Ryan passado para a conta)
+  const mkPub = async (nome = 'Beatriz') => { const x = ip(), call = (body, tok) => fetch(BASE + 'api/conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json', origin: 'http://localhost:' + PORT, 'x-forwarded-for': x }, tok ? { authorization: 'Bearer ' + tok } : {}), body: JSON.stringify(body) }).then(r => r.json());
+    const email = 'o' + crypto.randomBytes(6).toString('hex') + '@teste.pt', r = await call({ op: 'registar', email, senha: 'segredo123', termos: TERMOS_V, saude: true, idade: true }), q = await call({ op: 'perfil', acao: 'criar', perfil: { nome, lk: HASH } }, r.token);
+    return { 'nau:s': JSON.stringify({ t: r.token, e: email, n: '', perfis: q.conta.perfis }), 'nau:p': JSON.stringify(q.perfil.id), 'nau:pd': JSON.stringify(q.perfil.id), 'nau:owner': JSON.stringify(email) }; };
+  const open = async init => { const k = await newPage(b, prof, init); await k.p.addInitScript(() => { sessionStorage.setItem('__onb', '1'); delete window.__noOnb; window.__noAsk = 1; }); await k.p.goto(BASE); await unlock(k.p); return k; };
+  const C = (p, sel) => p.click('#onb ' + sel), F = (p, sel, v) => p.fill('#onb ' + sel, v), next = async p => { await C(p, '[data-onb=seguinte]'); await sleep(150); };
+  // 1) a primeira vez: abre sozinho e monta tudo com as respostas
+  const A = await open(await mkPub()); const p = A.p;
+  await p.waitForSelector('#onb:not([hidden]) .onb-body', { timeout: 12000 }).catch(() => { });
+  ok('Primeira vez numa conta: abre "Vamos fazer o Prumo à tua medida" (com Saltar)', await E(p, () => /à tua medida/.test((document.querySelector('#onb h1') || {}).textContent || '') && !!document.querySelector('#onb [data-onb=saltar]')));
+  await F(p, '[data-ok=short]', 'Bia'); await p.selectOption('#onb [data-ok=country]', 'BR'); await F(p, '[data-ok=city]', 'Belo Horizonte'); await C(p, '[data-oc=ia][data-v=Luna]'); await next(p);
+  ok('Abas: todas escolhidas de início, o Painel não se pode tirar', await E(p, () => document.querySelectorAll('#onb [data-oa].on').length === document.querySelectorAll('#onb [data-oa]').length && document.querySelector('#onb [data-oa=visao]').disabled));
+  await C(p, '[data-oa=fe]'); await C(p, '[data-oag=Carreira]'); await next(p);
+  await C(p, '[data-oc=est][data-v=uni]'); await F(p, '[data-ok=inst]', 'UFMG'); await F(p, '[data-ok=curso]', 'Administração'); await C(p, '[data-oc=ano][data-v="1"]'); await C(p, '[data-act=onbSug]');
+  await p.waitForFunction(() => /Cálculo I/.test((document.querySelector('#onb [data-ok=subs]') || {}).value || ''), null, { timeout: 10000 }).catch(() => { });
+  ok('Estudos: "Sugerir as disciplinas com IA" preenche as disciplinas do curso', await E(p, () => (document.querySelector('#onb [data-ok=subs]').value.match(/\n/g) || []).length >= 4));
+  await next(p); ok('Sem a área Carreira, salta a pergunta do trabalho', await E(p, () => /O teu corpo/.test(document.querySelector('#onb h1').textContent)));
+  await C(p, '[data-oc=obj][data-v=cut]'); await C(p, '[data-oc=dias][data-v="3"]'); await C(p, '[data-oc=onde][data-v=gym]'); await C(p, '[data-om=desp][data-v=corrida]'); await C(p, '[data-om=desp][data-v=voleibol]');
+  await F(p, '[data-ok=peso]', '68'); await F(p, '[data-ok=altura]', '165'); await F(p, '[data-ok=idade]', '21'); await C(p, '[data-oc=sexo][data-v=F]'); await next(p);
+  await C(p, '[data-om=dinh][data-v=reserva]'); await next(p);
+  await F(p, '[data-ok=acordar]', '07:00'); for (const h of ['acordar', 'treino', 'estudo', 'agua']) await C(p, `[data-om=hab][data-v=${h}]`);
+  ok('Rotina: sem a Fé, não sugere o hábito de oração', await E(p, () => !document.querySelector('#onb [data-om=hab][data-v=fe]')));
+  await F(p, '[data-om3="0"]', 'Passar a todas as cadeiras do 1.º ano'); await F(p, '[data-om3="1"]', 'Juntar 3000 reais de reserva'); await next(p);
+  ok('Fim: resume o que vai criar', await E(p, () => document.querySelectorAll('#onb .onb-sum li').length >= 6));
+  await C(p, '[data-onb=criar]'); await p.waitForSelector('#onb [data-onb=fechar]', { timeout: 12000 }).catch(() => { }); await sleep(1500);
+  const R = await E(p, () => ({ pr: OS.one('profile'), sp: OS.one('spyke'), subs: OS.all('subjects').length, split: OS.one('fit').split, rout: OS.all('routines').map(r => [r.name, r.items.length, r.items[0].sets.length, r.items[0].sets[0].reps]), sports: OS.all('sports').map(s => s.key).sort().join(','), diet: OS.one('diet'),
+    hab: OS.all('habits').filter(h => h.active !== false).map(h => h.name).sort(), goals: OS.all('goals').length, hide: OS.one('areas').hide, cur: [...new Set(OS.all('accounts').map(a => a.currency))].join(','),
+    leg: { int: OS.Dom.legList('int').slice(0, 3), for: OS.Dom.legList('for').slice(0, 3), cor: OS.Dom.legList('cor').slice(0, 3), esp: OS.Dom.legList('esp') }, hol: OS.Att.holiday('2026-11-20'), hol2: OS.Att.holiday('2026-04-25'), onb: OS.one('onb').done }));
+  ok('Perfil: nome, país (Brasil), cidade, curso e horário', R.pr.short === 'Bia' && R.pr.country === 'BR' && R.pr.city === 'Belo Horizonte' && R.pr.uni === 'UFMG' && R.pr.course === 'Administração' && R.pr.wakeTime === '07:00', JSON.stringify(R.pr).slice(0, 200));
+  ok('País: feriados do Brasil (Consciência Negra, sem o 25 de Abril), moeda BRL e voz brasileira', R.hol === 'Consciência Negra' && R.hol2 === '' && R.cur === 'BRL' && R.sp.accent === 'BR', [R.hol, R.hol2, R.cur, R.sp.accent].join('|'));
+  ok('IA chamada "Luna" (no feminino)', R.sp.nome === 'Luna' && R.sp.art === 'a');
+  ok('Universidade: as disciplinas do curso dela', R.subs >= 4, String(R.subs));
+  ok('Treino: 3 dias (seg, qua, sex), corrida ao sábado, rotinas com os exercícios e 3×12 para perder gordura', R.split[1] === 'Corpo inteiro A' && R.split[3] === 'Corpo inteiro B' && R.split[5] === 'Corpo inteiro C' && R.split[6] === 'Corrida' && R.rout.length === 3 && R.rout.every(x => x[1] >= 4 && x[2] === 3 && x[3] === 12), JSON.stringify(R.rout));
+  ok('Desportos: corrida e voleibol', R.sports === 'corrida,voleibol', R.sports);
+  ok('Dieta: meta de calorias e proteína para ela (a perder gordura)', R.diet.goal === 'cut' && R.diet.kcal > 1300 && R.diet.kcal < 2400 && R.diet.p > 80, JSON.stringify({ k: R.diet.kcal, p: R.diet.p }));
+  ok('Hábitos: os escolhidos ativos (sem duplicar os que a conta já tinha), os outros desligados', R.hab.join('|') === ['2 blocos de foco (100 min)', 'Acordar à hora, sem snooze', 'Beber 2 litros de água', 'Treino ou corrida'].join('|'), R.hab.join('|'));
+  ok('Metas: as 2 que escreveu', R.goals === 2);
+  ok('Marcos do Dominus feitos para ela (curso, reserva, peso) e sem os de oração', R.leg.int.some(t => /Administração/.test(t)) && R.leg.for.some(t => /3000 reais|fundo de emergência/.test(t)) && R.leg.cor.some(t => /68 para 63/.test(t)) && !R.leg.esp.some(t => /Oração/.test(t)), JSON.stringify(R.leg).slice(0, 300));
+  await C(p, '[data-onb=fechar]'); await sleep(600);
+  const nav = await E(p, () => [...document.querySelectorAll('#side a[href^="#"]')].map(a => a.getAttribute('href')));
+  ok('Menu: sem Fé nem Carreira (escondidas), com o resto', !nav.includes('#fe') && !nav.includes('#carreira') && !nav.includes('#trabalho') && nav.includes('#universidade') && nav.includes('#treino'));
+  // abas outra vez: Definições › Geral e Explorar
+  await E(p, () => { location.hash = 'definicoes'; }); await sleep(500); await E(p, () => document.querySelector('#onbSet [data-act=onbAreas]').click()); await sleep(200);
+  ok('Definições › Geral: "O teu Prumo" abre só as abas do menu', await E(p, () => /O que queres no teu Prumo/.test(document.querySelector('#onb h1').textContent) && !!document.querySelector('#onb [data-onb=guardarAreas]')));
+  await C(p, '[data-oa=fe]'); await C(p, '[data-onb=guardarAreas]'); await sleep(400);
+  ok('Pôr a Fé de volta no menu', await E(p, () => !!document.querySelector('#side a[href="#fe"]') && !OS.one('areas').hide.includes('fe')));
+  await E(p, () => { location.hash = 'explorar'; }); await sleep(500); await E(p, () => { const b = document.querySelector('[data-act=areaOn][data-k=trabalho]'); b && b.click(); }); await sleep(400);
+  ok('Explorar: "Pôr no menu" devolve uma aba escondida', await E(p, () => !!document.querySelector('#side a[href="#trabalho"]')));
+  // responder outra vez não duplica
+  const n0 = await E(p, () => [OS.all('subjects').length, OS.all('routines').length, OS.all('goals').length, OS.all('habits').length].join(','));
+  await E(p, () => OS.Onb.apply(OS.one('onb').ans)); await sleep(500);
+  const n1 = await E(p, () => [OS.all('subjects').length, OS.all('routines').length, OS.all('goals').length, OS.all('habits').length].join(','));
+  ok('Responder outra vez não duplica disciplinas, rotinas, metas nem hábitos', n1 === n0, n0 + ' → ' + n1);
+  // depois de recarregar não volta a aparecer
+  await p.reload(); await unlock(p); await sleep(1500);
+  ok('Depois de respondido, não volta a abrir sozinho', await E(p, () => !document.querySelector('#onb:not([hidden]) .onb-body')));
+  await A.ctx.close();
+  // 2) saltar
+  const B = await open(await mkPub('Carlos')); await B.p.waitForSelector('#onb:not([hidden]) .onb-body', { timeout: 12000 }).catch(() => { }); await B.p.click('#onb [data-onb=saltar]'); await sleep(400);
+  const sk = await E(B.p, () => ({ d: OS.one('onb').done, open: !!document.querySelector('#onb:not([hidden]) .onb-body'), hide: (OS.one('areas').hide || []).length }));
+  ok('Saltar: fecha, guarda que saltou e não muda nada', sk.d === 'skip' && !sk.open && sk.hide === 0, JSON.stringify(sk));
+  await B.ctx.close();
+  // 3) o perfil do Ryan (perfil pessoal "ps") nunca vê o questionário
+  const Cc = await open(await mkAcc()); await sleep(2500);
+  ok('Perfil do Ryan (ps): sem questionário', await E(Cc.p, () => !document.querySelector('#onb:not([hidden]) .onb-body') && !(OS.Acc && OS.Acc.pub)));
+  await Cc.ctx.close();
+  ok('sem erros de JavaScript', !A.errs.concat(B.errs, Cc.errs).length, A.errs.concat(B.errs, Cc.errs).slice(0, 3).join(' | ')); }
 async function sonoTests(b) { cur = 'Sono'; console.log('\n=== Sono: app Saúde no Painel ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.all('sleep').splice(0); location.hash = 'visao'; }); await sleep(600);
   ok('Painel: cartão do Sono vazio convida a ligar o app Saúde ou registar à mão', await E(p, () => { const c = [...document.querySelectorAll('.dash .dc')].find(d => /^Sono/.test(d.querySelector('h3').textContent)); return !!c && /Ligar ao app Saúde/.test(c.innerText) && !!c.querySelector('[data-act=slAdd]'); }));
@@ -2663,7 +2734,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('google')) await googleTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('google')) await googleTests(b); if (run('boasvindas')) await onbTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); try { for (const c of b.contexts()) for (const pg of c.pages()) { const d = await pg.evaluate(() => ({ u: location.hash, now: Date.now(), pend: window.__pend ? [...window.__pend.values()] : null, acc: ((document.getElementById('acc') || {}).innerText || '').slice(0, 80).replace(/\n/g, ' '), msg: (document.querySelector('#acc .ac-msg') || {}).textContent || '' })).catch(() => null); if (d && d.pend) console.log('    [pagina]', JSON.stringify(d)); } } catch (e2) { } }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

@@ -686,12 +686,14 @@ const EXERCISES = [['Supino reto com barra', 'Peito', ['Tríceps', 'Ombros'], 'B
   ['Afundos (lunges)', 'Quadríceps', ['Glúteos'], 'Halteres'], ['Peso morto romeno', 'Isquiotibiais', ['Glúteos', 'Lombar'], 'Barra'], ['Flexão de pernas', 'Isquiotibiais', [], 'Máquina'], ['Hip thrust', 'Glúteos', ['Isquiotibiais'], 'Barra'], ['Gémeos em pé', 'Gémeos', [], 'Máquina'],
   ['Desenvolvimento militar', 'Ombros', ['Tríceps'], 'Barra'], ['Desenvolvimento com halteres', 'Ombros', ['Tríceps'], 'Halteres'], ['Elevações laterais', 'Ombros', [], 'Halteres'], ['Face pull', 'Ombros', ['Trapézio'], 'Cabo'], ['Prancha', 'Abdómen', ['Oblíquos', 'Lombar'], 'Peso corporal'],
   ['Abdominal na roda', 'Abdómen', ['Oblíquos'], 'Outro'], ['Elevação de pernas suspenso', 'Abdómen', ['Antebraços'], 'Peso corporal'], ['Russian twist', 'Oblíquos', ['Abdómen'], 'Peso corporal'], ['Hiperextensão lombar', 'Lombar', ['Glúteos'], 'Máquina'], ['Farmer walk', 'Antebraços', ['Trapézio', 'Abdómen'], 'Halteres']];
+// o mínimo de uma conta nova: as duas contas de dinheiro e a biblioteca de exercícios (o questionário inicial também o garante)
+OS.seedBase = () => {
+  if (!OS.all('accounts').length) { OS.add('accounts', { name: 'Conta principal', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); OS.add('accounts', { name: 'Fundo de emergência', type: 'Reserva', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); }
+  if (!OS.all('exercises').length) EXERCISES.forEach(([name, muscle, secondary, equip]) => OS.add('exercises', { name, muscle, secondary, equip }, { silent: true })); };
 OS.on('seed', () => {
   const meta = OS.one('meta'); if (meta.seeded) return;
   // conta nova (versão pública): só o essencial, sem nada do Ryan
-  if (OS.Acc && OS.Acc.pub) { OS.touch('profile'); OS.touch('fin'); OS.touch('fit');
-    if (!OS.all('accounts').length) { OS.add('accounts', { name: 'Conta principal', type: 'Conta à ordem', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); OS.add('accounts', { name: 'Fundo de emergência', type: 'Reserva', currency: 'EUR', opening: 0, openDate: U.today() }, { silent: true }); }
-    if (!OS.all('exercises').length) EXERCISES.forEach(([name, muscle, secondary, equip]) => OS.add('exercises', { name, muscle, secondary, equip }, { silent: true }));
+  if (OS.Acc && OS.Acc.pub) { OS.touch('profile'); OS.touch('fin'); OS.touch('fit'); OS.seedBase();
     if (!OS.all('habits').length) [['Acordar à hora, sem snooze', 'Manhã', 1], ['2 blocos de foco (100 min)', 'Dia', 1, 'study100'], ['Treino ou corrida', 'Dia', 1, 'workout'], ['20 páginas de leitura', 'Noite', 1], ['Registar gastos do dia', 'Noite', 0, 'cash'], ['Telemóvel fora do quarto', 'Noite', 0]].forEach(([name, group, core, auto]) => OS.add('habits', { name, group, core: !!core, freq: name.startsWith('Treino') ? 'Dias úteis' : 'Diário', active: true, log: {}, auto: auto || '', area: 'Pessoal' }, { silent: true }));
     meta.seeded = true; OS.touch('meta'); return; }
   const p = OS.one('profile'); OS.touch('profile'); OS.touch('fin'); OS.touch('fit'); OS.touch('mova');

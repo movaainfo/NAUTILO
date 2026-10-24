@@ -1,4 +1,4 @@
-O app chama-se agora Prumo, com a logo nova: os anéis com a linha de prumo e o ponto vermelho ao centro. O nome usa a letra Bodoni Moda.
-Endereço novo: prumo-vida.vercel.app. O antigo continua a funcionar; numa conta basta entrar no novo com o teu e-mail e senha.
-Ícones novos no ecrã principal (para os ver no iPhone, adiciona outra vez ao ecrã principal a partir do endereço novo).
-Editar o perfil (foto ou personagem) já não dá o erro «a conta está a ser alterada noutro aparelho».
+Contas novas: na primeira vez, o Prumo faz-te umas perguntas rápidas (estudos, trabalho, corpo, dinheiro, rotina) e monta tudo à tua medida: disciplinas do teu curso, treino da semana, metas de calorias, hábitos, metas e marcos do Dominus. Podes saltar.
+Escolhes as abas que queres no menu. As outras ficam em Definições › Geral › O teu Prumo e em Explorar, para pores de volta quando quiseres.
+País da conta: feriados, moeda e voz da IA do Brasil ou de Portugal.
+Podes responder outra vez quando quiseres, em Definições › Geral, sem duplicar nada.

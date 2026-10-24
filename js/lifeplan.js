@@ -99,7 +99,7 @@ const ctx = () => { const { out } = build(), n = OS.one('northstar'), p = OS.one
   return JSON.stringify({ hoje: U.today(), estrela: { identidade: n.identity, ano1: n.h1y, anos3: n.h3y, anos5: n.h5y, visao: n.hlong, valores: n.values },
     metas: OS.all('goals').filter(g => g.status === 'Ativa').slice(0, 25).map(g => { const i = safe(() => Goal.info(g), {}); return { titulo: g.title, area: byGoal(g), horizonte: g.horizon, prazo: g.due, progresso: Math.round((i.p || 0) * 100) + '%', etapas_por_fazer: (g.steps || []).filter(s => !s.done).map(s => s.t).slice(0, 6), porque: g.why }; }),
     passos_atuais: Object.fromEntries(Object.entries(out).map(([k, L]) => [k, L.filter(s => !s.ai).slice(0, 10).map(s => ({ nivel: s.lv, passo: s.t }))])),
-    perfil: { curso: p.course || p.uni, trabalho: p.employer, cidade: 'Aveiro' } }).slice(0, 12000); };
+    perfil: { curso: p.course || p.uni, trabalho: p.employer, cidade: p.city || (OS.Acc && OS.Acc.pub ? '' : 'Aveiro') } }).slice(0, 12000); };
 A.lpAI = async () => { if (busy) return; busy = true; OS.request();
   try { const o = await OS.AI.json([{ text: `És o Spyke, o mentor pessoal ${OS.whoCtx('do Ryan (brasileiro, vive em Aveiro, estuda, trabalha e investe)', 'de')}. Com base nos dados reais abaixo, cria o plano de próximos passos da vida dele para alcançar as metas e a estrela-guia.
 Regras: para cada área (estudos, dinheiro, corpo, carreira, pessoal) dá 3 a 6 passos NOVOS (não repitas os "passos_atuais"), do mais pequeno ao maior, concretos e acionáveis, em português de Portugal. Nível: 1 = hoje (pequeno), 2 = esta semana, 3 = este mês, 4 = este ano, 5 = longo prazo. Se uma área não tiver metas, sugere passos para começar.

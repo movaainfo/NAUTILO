@@ -91,7 +91,7 @@ const first = n => String(n || '').trim().split(/\s+/)[0] || '';
 Object.assign(Acc, { sess: () => S, profiles, profile: cur, email: () => (S && S.e) || '', lk: () => (cur() || {}).lk || '', pub: !(cur() && cur().ps) });
 
 // numa conta nova nada do Ryan: o perfil começa com o nome de quem o criou (o resto preenche em Definições)
-if (Acc.pub) { Object.assign(OS.ONE_DEF.profile, { name: '', short: '', city: '', uni: '', course: '', year: '', semester: '', semStart: '', semEnd: '' }); if (OS.ONE_DEF.mova) OS.ONE_DEF.mova.name = 'O meu negócio'; }
+if (Acc.pub) { try { delete OS.ONE_DEF.fin.cats.Receita.Mova; } catch (e) { } Object.assign(OS.ONE_DEF.profile, { name: '', short: '', city: '', uni: '', course: '', year: '', semester: '', semStart: '', semEnd: '' }); if (OS.ONE_DEF.mova) OS.ONE_DEF.mova.name = 'O meu negócio'; }
 
 /* ---------- dados locais de cada perfil ---------- */
 // guarda: a sessão e as escolhas do aparelho; o resto (dados do perfil, preferências do perfil) sai ao trocar de perfil ou de conta
