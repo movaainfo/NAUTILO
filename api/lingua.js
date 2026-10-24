@@ -18,7 +18,8 @@ const strings = async req => { if (SRC && Date.now() - SRC_AT < 10 * 60e3) retur
   if (local) j = JSON.parse(require('fs').readFileSync(local, 'utf8'));
   else { const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim(); if (!/^[a-z0-9.-]+(:\d+)?$/i.test(host)) throw N.err('host', 'Endereço inválido.', 400);
     const r = await fetch('https://' + host + '/i18n/strings.json', { cache: 'no-store' }); if (!r.ok) throw N.err('strings', 'Sem a lista de textos do app.', 503); j = await r.json(); }
-  SRC = { v: j.v, all: (j.s || []).concat(j.p || []) };   // já vêm por ordem de importância SRC_AT = Date.now(); return SRC; };
+  // os textos já vêm por ordem de importância (o que se vê mais primeiro)
+  SRC = { v: j.v, all: (j.s || []).concat(j.p || []) }; SRC_AT = Date.now(); return SRC; };
 const KEY = l => 'i18n/' + l + '.json';
 const load = async l => { const g = await N.store().get(KEY(l)); if (!g) return { d: { m: {}, f: {} }, etag: null }; let d; try { d = JSON.parse(g.buf.toString()); } catch (e) { d = { m: {}, f: {} }; } d.m = d.m || {}; d.f = d.f || {}; return { d, etag: g.etag }; };
 
