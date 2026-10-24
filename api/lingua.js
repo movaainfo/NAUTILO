@@ -8,8 +8,9 @@ const G = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const FREE = () => process.env.NAUTILO_IA_LIVRE || 'https://text.pollinations.ai/openai';
 const gkey = () => String(process.env.GEMINI_API_KEY || '').trim();
 const LANG = /^(pt-BR|zh-TW|[a-z]{2})$/;
-const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
-const BATCH_N = 240, BATCH_C = 9000;
+// os modelos que esta chave tem (do melhor para o mais leve); os que falham passam ao seguinte
+const MODELS = (process.env.NAUTILO_LINGUA_MODELS || 'gemini-3.5-flash,gemini-3.1-flash-lite,gemini-3-flash-preview,gemini-3.5-flash-lite,gemini-flash-latest,gemini-flash-lite-latest').split(',');
+const BATCH_N = 160, BATCH_C = 6000;
 
 // a lista dos textos do app (do próprio site), guardada em memória
 let SRC = null, SRC_AT = 0;
@@ -38,8 +39,8 @@ ${l === 'pt-BR' ? '7. Rewrite in Brazilian Portuguese: você, celular, tela, sal
 const ask = async (l, items) => { const input = {}; items.forEach((s, i) => { input[i] = s; });
   const user = JSON.stringify(input), k = gkey();
   if (k) { let last = null; const t0 = Date.now();
-    for (const m of MODELS) { if (Date.now() - t0 > 14e3) break; const body = { systemInstruction: { parts: [{ text: RULES(l) }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: Object.assign({ temperature: .2, responseMimeType: 'application/json', maxOutputTokens: 16000 }, /2\.5|latest/.test(m) ? { thinkingConfig: { thinkingBudget: 0 } } : {}) };
-      const ac = new AbortController(), to = setTimeout(() => ac.abort(), 42e3); let r, j;
+    for (const m of MODELS) { const left = 52e3 - (Date.now() - t0); if (left < 8e3) break; const body = { systemInstruction: { parts: [{ text: RULES(l) }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: Object.assign({ temperature: .2, responseMimeType: 'application/json', maxOutputTokens: 16000 }, /^gemini-3/.test(m) ? { thinkingConfig: { thinkingLevel: 'low' } } : /2\.5/.test(m) ? { thinkingConfig: { thinkingBudget: 0 } } : {}) };
+      const ac = new AbortController(), to = setTimeout(() => ac.abort(), Math.min(40e3, left)); let r, j;
       try { r = await fetch(G + m + ':generateContent?key=' + encodeURIComponent(k), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ac.signal }); j = await r.json().catch(() => ({})); }
       catch (e) { last = 'tempo'; continue; } finally { clearTimeout(to); }
       if (!r.ok) { last = (j.error && j.error.message) || r.status; continue; }
