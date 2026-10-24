@@ -26,8 +26,12 @@ const cleanProfile = (p, old) => { const o = Object.assign({}, old || {});
 
 // ler e gravar a conta (cifrada); grava só se ninguém a mudou entretanto (etag), e volta a tentar
 const readAcc = async eid => { const g = await N.store().get('a/' + eid); if (!g) return null; return { rec: N.open(await N.accKey(), g.buf), etag: g.etag }; };
+// para gravar: a etiqueta oficial (head, pela API) tem de ser a do conteúdo lido; se a leitura veio atrasada, lê outra vez
+const readFresh = async eid => { const s = N.store(); for (let i = 0; i < 4; i++) { const a = await readAcc(eid); if (!a) return null; const h = await s.head('a/' + eid).catch(() => null);
+    const nt = x => String(x || '').replace(/^W\//, '').replace(/"/g, ''); if (!h || !h.etag) return a; if (nt(h.etag) === nt(a.etag)) return { rec: a.rec, etag: h.etag }; await N.sleep(150 * (i + 1)); }
+  return readAcc(eid); };
 const writeAcc = (eid, rec, etag) => N.accKey().then(k => N.store().put('a/' + eid, N.seal(k, rec), etag ? { ifMatch: etag } : { overwrite: false }));
-const change = async (eid, fn) => { for (let i = 0; i < 4; i++) { const a = await readAcc(eid); if (!a) throw N.err('sem_conta', 'Conta não encontrada.', 404);
+const change = async (eid, fn) => { for (let i = 0; i < 5; i++) { const a = await (i ? readFresh(eid) : readAcc(eid)); if (!a) throw N.err('sem_conta', 'Conta não encontrada.', 404);
     const out = await fn(a.rec); if (out === false) return a.rec;
     try { await writeAcc(eid, a.rec, a.etag); return a.rec; } catch (e) { if (e.code !== 'conflict') throw e; await N.sleep(80 + Math.random() * 200); } }
   throw N.err('ocupado', 'A conta está a ser alterada noutro aparelho. Tenta outra vez.', 409); };
