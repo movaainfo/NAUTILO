@@ -3457,40 +3457,95 @@ html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
 <style>
-/* PRUMO — movimento (js/vivo.js). Curto, leve (opacidade e deslocações) e por cima do modo leve: também nos tablets Android. */
-@keyframes vvUp{from{opacity:0;translate:0 16px}to{opacity:1;translate:0 0}}
+/* PRUMO — movimento (js/vivo.js). Só opacidade e deslocações (leve no iPhone), por cima do modo leve, e sempre a terminar (nada fica a mexer para sempre).
+   vv = animações ligadas · vv-full = completas · vv-rm = o aparelho pede menos movimento e a pessoa não escolheu: só aparecer devagar */
+@keyframes vvUp{from{opacity:0;translate:0 26px}to{opacity:1;translate:0 0}}
 @keyframes vvFade{from{opacity:0}to{opacity:1}}
-@keyframes vvScale{from{opacity:0;scale:.94}to{opacity:1;scale:1}}
+@keyframes vvScale{from{opacity:0;scale:.9;translate:0 14px}to{opacity:1;scale:1;translate:0 0}}
+@keyframes vvSide{from{opacity:0;translate:-22px 0}to{opacity:1;translate:0 0}}
 @keyframes vvBar{from{scale:0 1}to{scale:1 1}}
-@keyframes vvPop{0%{scale:1}35%{scale:.93}70%{scale:1.05}100%{scale:1}}
-@keyframes vvToast{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
-@keyframes vvModal{from{opacity:0;translate:0 18px;scale:.97}to{opacity:1;translate:0 0;scale:1}}
-/* entrada da página: os blocos de cima em cascata */
-html.vv #view.pg-in>*{animation:vvUp .5s cubic-bezier(.2,.8,.2,1) both!important}
-html.vv #view.pg-in>:nth-child(2){animation-delay:.05s!important}html.vv #view.pg-in>:nth-child(3){animation-delay:.1s!important}html.vv #view.pg-in>:nth-child(4){animation-delay:.15s!important}
-html.vv #view.pg-in>:nth-child(5){animation-delay:.2s!important}html.vv #view.pg-in>:nth-child(6){animation-delay:.24s!important}html.vv #view.pg-in>:nth-child(n+7){animation-delay:.28s!important}
-/* completas: também os cartões dentro das grelhas, os KPIs e as barras */
-html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid)>*{animation:vvScale .45s cubic-bezier(.2,.8,.2,1) both!important}
-html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(2){animation-delay:.06s!important}html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(3){animation-delay:.12s!important}
-html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(4){animation-delay:.18s!important}html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(5){animation-delay:.22s!important}
-html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(6){animation-delay:.26s!important}html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(n+7){animation-delay:.3s!important}
-html.vv-full #view.pg-in :is(.pbar,.dc-bar,.dbar) i{transform-origin:left center;animation:vvBar .9s .2s cubic-bezier(.2,.8,.2,1) both!important}
-html.vv-full #view.pg-in .li{animation:vvFade .4s ease-out both!important}
-/* toque: afunda um pouco; o que mudou dá um salto */
-html.vv :is(button,.btn,.chip,.li.click,a.click,[data-act],[data-edit],[data-go]){transition:scale .14s ease,background-color .2s,border-color .2s,color .2s!important}
-html.vv .vv-press:not(:disabled){scale:.96}
-html.vv .vv-pop{animation:vvPop .48s cubic-bezier(.2,.8,.2,1)!important}
-/* avisos e janelas */
-html.vv .toast:not([hidden]){animation:vvToast .34s cubic-bezier(.2,.8,.2,1)!important}
-html.vv .vv-modal{animation:vvModal .3s cubic-bezier(.2,.8,.2,1)!important}
-html.vv #modal:not([hidden]) .drw-bg{animation:vvFade .25s ease-out!important}
-/* menu: o separador ativo acende devagar */
-html.vv #side a,html.vv .tn-links a{transition:background-color .25s,color .25s!important}
-@media (prefers-reduced-motion:reduce){html.vv *{animation:none!important;transition:none!important}}
+@keyframes vvGrowY{from{scale:1 0}to{scale:1 1}}
+@keyframes vvDraw{from{stroke-dasharray:3000;stroke-dashoffset:3000}to{stroke-dasharray:3000;stroke-dashoffset:0}}
+@keyframes vvDash{from{stroke-dasharray:0 2000}}
+@keyframes vvPopIn{0%{opacity:0;scale:.3}70%{opacity:1;scale:1.12}100%{opacity:1;scale:1}}
+@keyframes vvPop{0%{scale:1}30%{scale:.9}65%{scale:1.1}100%{scale:1}}
+@keyframes vvToast{0%{opacity:0;translate:0 26px;scale:.94}70%{opacity:1;translate:0 -3px;scale:1.01}100%{opacity:1;translate:0 0;scale:1}}
+@keyframes vvModal{0%{opacity:0;translate:0 40px;scale:.95}70%{opacity:1;translate:0 -4px;scale:1.005}100%{opacity:1;translate:0 0;scale:1}}
+@keyframes vvWipe{from{clip-path:inset(0 100% 0 0);opacity:.2}to{clip-path:inset(0 0 0 0);opacity:1}}
+@keyframes vvLine{from{scale:0 1}to{scale:1 1}}
+@keyframes vvSpin{0%{rotate:0deg;scale:1}50%{scale:1.12}100%{rotate:360deg;scale:1}}
+@keyframes vvRip{from{opacity:.35;scale:0}to{opacity:0;scale:1}}
+@keyframes vvFly{0%{opacity:1;translate:0 0;scale:1}100%{opacity:0;translate:var(--x) var(--y);scale:.3}}
+@keyframes vvRing{0%{opacity:.7;scale:.4}100%{opacity:0;scale:1.6}}
+@keyframes vvGlow{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent,#5CC8E6) 55%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+:root{--vv-e:cubic-bezier(.16,.84,.24,1)}
+
+/* ---------- entrada da página ---------- */
+html.vv #view.pg-in>*{animation:vvUp .62s var(--vv-e) both!important}
+html.vv #view.pg-in>:nth-child(2){animation-delay:.07s!important}html.vv #view.pg-in>:nth-child(3){animation-delay:.14s!important}html.vv #view.pg-in>:nth-child(4){animation-delay:.2s!important}
+html.vv #view.pg-in>:nth-child(5){animation-delay:.26s!important}html.vv #view.pg-in>:nth-child(6){animation-delay:.31s!important}html.vv #view.pg-in>:nth-child(n+7){animation-delay:.36s!important}
+/* o título da página desenha-se da esquerda para a direita; a linha da aba ativa cresce */
+html.vv-full #view.pg-in .phead h1{animation:vvWipe .8s .08s var(--vv-e) both!important}
+html.vv-full #view.pg-in .phead .eyebrow{animation:vvSide .55s var(--vv-e) both!important}
+html.vv-full #view.pg-in .phead p{animation:vvFade .7s .25s ease-out both!important}
+html.vv-full #view .tabs a.on{position:relative}
+html.vv-full #view.pg-in .tabs a.on::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent,#5CC8E6);transform-origin:center;animation:vvLine .5s .2s var(--vv-e) both!important}
+/* completas: os cartões das grelhas em cascata, KPIs e listas */
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>*{animation:vvScale .55s var(--vv-e) both!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>:nth-child(2){animation-delay:.07s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>:nth-child(3){animation-delay:.14s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>:nth-child(4){animation-delay:.2s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>:nth-child(5){animation-delay:.25s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>:nth-child(6){animation-delay:.3s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid,.fe-plans,.fe-moods)>:nth-child(n+7){animation-delay:.34s!important}
+html.vv-full #view.pg-in :is(.list,.li-wrap)>.li{animation:vvSide .5s var(--vv-e) both!important}
+html.vv-full #view.pg-in :is(.list,.li-wrap)>.li:nth-child(2){animation-delay:.04s!important}html.vv-full #view.pg-in :is(.list,.li-wrap)>.li:nth-child(3){animation-delay:.08s!important}
+html.vv-full #view.pg-in :is(.list,.li-wrap)>.li:nth-child(4){animation-delay:.12s!important}html.vv-full #view.pg-in :is(.list,.li-wrap)>.li:nth-child(5){animation-delay:.16s!important}
+html.vv-full #view.pg-in :is(.list,.li-wrap)>.li:nth-child(6){animation-delay:.2s!important}html.vv-full #view.pg-in :is(.list,.li-wrap)>.li:nth-child(n+7){animation-delay:.24s!important}
+html.vv-full #view.pg-in .chip{animation:vvPopIn .45s var(--vv-e) both!important}
+/* barras de progresso enchem; gráficos crescem e as linhas desenham-se; roscas dão a volta */
+html.vv-full #view.pg-in :is(.pbar,.dc-bar,.dbar) i{transform-origin:left center;animation:vvBar 1.1s .25s var(--vv-e) both!important}
+html.vv-full #view.pg-in .chart svg rect{transform-box:fill-box;transform-origin:50% 100%;animation:vvGrowY .8s .15s var(--vv-e) backwards!important}
+html.vv-full #view.pg-in .chart svg rect:nth-of-type(2n){animation-delay:.22s!important}html.vv-full #view.pg-in .chart svg rect:nth-of-type(3n){animation-delay:.29s!important}html.vv-full #view.pg-in .chart svg rect:nth-of-type(5n){animation-delay:.36s!important}
+html.vv-full #view.pg-in :is(.chart,.spark) path[fill="none"]{animation:vvDraw 1.4s .15s ease-out backwards!important}
+html.vv-full #view.pg-in .chart svg path:not([fill="none"]){animation:vvFade 1s .5s ease-out backwards!important}
+html.vv-full #view.pg-in .chart svg circle{animation:vvPopIn .5s 1s var(--vv-e) backwards!important;transform-box:fill-box;transform-origin:center}
+html.vv-full #view.pg-in .donut circle:not(:first-of-type){animation:vvDash 1.2s .15s var(--vv-e) backwards!important}
+html.vv-full #view.pg-in .chart svg polygon:not(.gl){transform-box:fill-box;transform-origin:center;animation:vvPopIn .9s .2s var(--vv-e) backwards!important}
+html.vv-full #view.pg-in .heat i{animation:vvPopIn .5s var(--vv-e) backwards!important}
+html.vv-full #view.pg-in .heat i:nth-child(3n){animation-delay:.05s!important}html.vv-full #view.pg-in .heat i:nth-child(3n+1){animation-delay:.1s!important}
+/* ---------- ao rolar: o que estava em baixo aparece quando chega ao ecrã ---------- */
+html.vv .vv-rv{opacity:0!important;translate:0 34px!important;scale:.97!important}
+html.vv .vv-rv.vv-rv-in{opacity:1!important;translate:0 0!important;scale:1!important;transition:opacity .7s var(--vv-e),translate .8s var(--vv-e),scale .8s var(--vv-e)!important}
+/* ---------- toque ---------- */
+html.vv :is(button,.btn,.chip,.li.click,a.click,[data-act],[data-edit],[data-go]){transition:scale .16s ease,translate .2s ease,background-color .25s,border-color .25s,color .25s!important}
+html.vv .vv-press:not(:disabled){scale:.94}
+html.vv .vv-pop{animation:vvPop .55s var(--vv-e)!important}
+html.vv .vv-glow{animation:vvGlow .8s ease-out!important}
+html.vv .vv-ripc{position:relative;overflow:hidden}
+html.vv .vv-rip{position:absolute;border-radius:50%;pointer-events:none;background:currentColor;width:var(--d);height:var(--d);left:var(--l);top:var(--t);animation:vvRip .6s ease-out forwards!important}
+/* concluir uma tarefa, marcar um hábito: uma pequena explosão */
+.vv-burst{position:fixed;z-index:99998;pointer-events:none;width:0;height:0}
+html.vv .vv-burst i{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--c);animation:vvFly .9s cubic-bezier(.1,.7,.3,1) forwards!important}
+html.vv .vv-burst b{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:2px solid var(--c0);animation:vvRing .6s ease-out forwards!important}
+/* passar o rato por cima (computador): os cartões levantam-se um pouco */
+@media (hover:hover){html.vv-full :is(.li.click,.pn.click,.dc[data-go],.kpi[data-go],.fe-plan,.btn):hover{translate:0 -2px}}
+/* ---------- menu, logo, avisos e janelas ---------- */
+html.vv .vv-spin svg{animation:vvSpin 1s var(--vv-e)!important}
+html.vv-full #side.vv-navin :is(a,.side-g,.side-h){animation:vvSide .45s var(--vv-e) both!important}
+html.vv-full #side.vv-navin a:nth-of-type(2n){animation-delay:.03s!important}html.vv-full #side.vv-navin a:nth-of-type(3n){animation-delay:.06s!important}html.vv-full #side.vv-navin a:nth-of-type(4n){animation-delay:.09s!important}
+html.vv .toast:not([hidden]){animation:vvToast .5s var(--vv-e)!important}
+html.vv .vv-modal{animation:vvModal .45s var(--vv-e)!important}
+html.vv #modal:not([hidden]) .drw-bg{animation:vvFade .3s ease-out!important}
+html.vv #side a,html.vv .tn-links a{transition:background-color .3s,color .3s,translate .2s!important}
+/* o aparelho pede menos movimento (e a pessoa não escolheu): tudo só aparece devagar, sem deslocações */
+html.vv-rm #view.pg-in *,html.vv-rm .toast,html.vv-rm .vv-modal{animation-name:vvFade!important}
+html.vv-rm .vv-rv{translate:none!important;scale:none!important}
+html.vv-rm .vv-press:not(:disabled){scale:1}
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.43", "date": "24/10/2026", "notes": ["O Prumo fala a tua língua: escolhe o país e a língua no questionário inicial ou em Definições › Tu › País, língua e moeda. Português do Brasil, inglês, espanhol, francês, italiano e alemão já vêm prontos; outras línguas são preparadas pela IA na primeira vez que as escolhes.", "Tudo se adapta ao teu país: moeda, feriados, formato das datas e dos números, escala das notas da escola ou da faculdade, notícias, índices da bolsa, relatórios e unidades do tempo. A IA e a voz respondem na tua língua.", "Escolhe a voz da tua IA: 30 vozes (masculinas e femininas) para ouvir e escolher em Definições › Spyke, e logo no questionário inicial. Sem configurar nada.", "Fundos animados no ecrã de entrada: ondas, chuva, estrelas a piscar, aurora, luzes da cidade, nuvens e os anéis do Prumo a rodar devagar. Duas cenas novas: Ondas e Chuva. Podes desligar o movimento no botão Fundo.", "O app ficou mais vivo: as páginas entram com movimento, os números contam até ao valor, as barras enchem e os botões respondem ao toque. Em Definições › Aplicação › Animações escolhes completas, suaves ou desligadas."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.44", "date": "24/10/2026", "notes": ["Muito mais movimento dentro do app: as páginas entram em cascata, os títulos desenham-se, os números contam, os gráficos crescem e as linhas desenham-se, os cartões aparecem ao rolar, os botões espalham uma onda ao toque e há uma pequena explosão quando concluis uma tarefa ou marcas um hábito.", "Em Definições › Aplicação › Animações, \"Completas\" mostra tudo mesmo que o iPhone tenha \"Reduzir movimento\" ligado (antes ficava tudo parado)."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -20460,69 +20515,106 @@ OS.forms.codeChange = async (f) => { const err = await L.setCode(f.elements.cur.
 </script>
 <script>
 /* PRUMO — movimento: o app mais vivo, sem pesar.
-   - ao abrir uma página, os blocos entram em cascata e as barras enchem;
+   - ao abrir uma página, os blocos entram em cascata, o título desenha-se, as barras enchem, os gráficos crescem e as linhas desenham-se;
    - os números grandes (saldos, médias, totais) contam até ao valor;
-   - ao tocar num botão ele afunda um pouco, e o que mudou dá um pequeno salto quando a página se redesenha;
-   - avisos e janelas entram a deslizar.
-   Só animações curtas (nada que fique a mexer para sempre dentro do app) e só com opacidade e deslocações, para o iPhone e os tablets.
-   Definições › Aplicação › Animações: completas, suaves (só as entradas) ou desligadas. Respeita "reduzir movimento" do aparelho. */
+   - ao rolar, o que estava em baixo aparece quando chega ao ecrã;
+   - ao tocar num botão ele afunda e espalha uma onda; concluir uma tarefa ou marcar um hábito dá uma pequena explosão;
+   - o logo dá uma volta ao mudar de página, o menu entra em cascata, avisos e janelas entram a deslizar.
+   Só animações curtas (nada fica a mexer para sempre dentro do app) e só com opacidade e deslocações, para o iPhone e os tablets.
+   Definições › Aplicação › Animações: completas, suaves ou desligadas. A escolha da pessoa manda; sem escolha, se o aparelho pede
+   menos movimento, as coisas só aparecem devagar (sem deslocações). */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, A = OS.act;
 const K = 'os2anim';
 const reduce = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+const chosen = () => { const v = U.ls.get(K, null); return v === 'off' || v === 'soft' || v === 'full' ? v : null; };
 // (nos testes automáticos fica desligado, salvo se o teste o ligar, para os números não estarem a meio da contagem)
-const mode = () => { const v = U.ls.get(K, null); if (v === 'off' || v === 'soft' || v === 'full') return v; return reduce() || navigator.webdriver ? 'off' : 'full'; };
-const apply = () => { const R = document.documentElement, m = mode(); R.classList.toggle('vv', m !== 'off'); R.classList.toggle('vv-full', m === 'full'); if (m === 'off') { const v = document.getElementById('view'); if (v) v.classList.remove('pg-in'); } };
+const mode = () => chosen() || (navigator.webdriver ? 'off' : reduce() ? 'soft' : 'full');
+const apply = () => { const R = document.documentElement, m = mode(); R.classList.toggle('vv', m !== 'off'); R.classList.toggle('vv-full', m === 'full'); R.classList.toggle('vv-rm', m !== 'off' && !chosen() && reduce());
+  if (m === 'off') { const v = document.getElementById('view'); if (v) v.classList.remove('pg-in'); } };
 apply();
+try { matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', apply); } catch (e) { }
 const V = OS.Vivo = { mode, set: v => { U.ls.set(K, v); apply(); OS.request && OS.request(); } };
+const full = () => mode() === 'full';
+const rm = () => document.documentElement.classList.contains('vv-rm');
 
 /* ---------- entrada de página ---------- */
 const view = () => document.getElementById('view');
 let lastR = null, tIn = 0;
 const enter = () => { const v = view(); if (!v) return; if (mode() === 'off') { v.classList.remove('pg-in'); return; }
   v.classList.remove('pg-in'); void v.offsetWidth; v.classList.add('pg-in');
-  clearTimeout(tIn); tIn = setTimeout(() => v.classList.remove('pg-in'), 1300);
-  if (mode() === 'full') requestAnimationFrame(() => countUp(v)); };
+  clearTimeout(tIn); tIn = setTimeout(() => v.classList.remove('pg-in'), 1700);
+  if (full()) { requestAnimationFrame(() => { countUp(v); reveal(v); }); if (!rm()) spin(); } };
 
 /* ---------- números a contar ---------- */
 const dec = () => { try { return (1.5).toLocaleString(OS.loc ? OS.loc() : 'pt-PT').charAt(1); } catch (e) { return ','; } };
 const ease = t => 1 - Math.pow(1 - t, 3);
 const countUp = root => { const D = dec(), loc = OS.loc ? OS.loc() : 'pt-PT'; let n = 0;
-  root.querySelectorAll('.kpi-v, .big-num, .dc-big, .fin-big, .vv-n').forEach(el => {
-    if (n >= 18 || el.children.length > 1 || el.closest('[data-novv]')) return;
+  root.querySelectorAll('.kpi-v, .big-num, .dc-big, .fin-big, .vv-n, .fe-streak b, .co-own b, .dn-v').forEach(el => {
+    if (n >= 24 || el.children.length > 1 || el.closest('[data-novv]')) return;
     const txt = el.firstChild && el.firstChild.nodeType === 3 && el.childNodes.length === 1 ? el.firstChild : null; if (!txt) return;
-    const t = txt.data, m = t.match(/[−-]?\d[\d   .,']*\d|[−-]?\d/); if (!m) return;
+    const t = txt.data, m = t.match(/[−-]?\d[\d   .,']*\d|[−-]?\d/); if (!m) return;
     const raw = m[0], neg = /^[−-]/.test(raw), body = raw.replace(/^[−-]/, ''), li = body.lastIndexOf(D), hasDec = li >= 0 && /^\d{1,2}$/.test(body.slice(li + 1));
     const digits = body.replace(/[^\d]/g, ''), d = hasDec ? body.length - li - 1 : 0, v = (neg ? -1 : 1) * (+digits) / Math.pow(10, d);
-    if (!isFinite(v) || Math.abs(v) < 3 || digits.length > 12 || /\d{4}-\d{2}|:\d{2}|\d\/\d/.test(t)) return;   // datas e horas não
-    if (!hasDec && v >= 1900 && v <= 2100 && !/[\u00a0\u202f .,']/.test(body)) return;   // anos (2026) também não
-    const grouped = /[   .,']/.test(hasDec ? body.slice(0, li) : body), pre = t.slice(0, m.index), post = t.slice(m.index + raw.length);
+    if (!isFinite(v) || Math.abs(v) < 2 || digits.length > 12 || /\d{4}-\d{2}|:\d{2}|\d\/\d/.test(t)) return;   // datas e horas não
+    if (!hasDec && v >= 1900 && v <= 2100 && !/[   .,']/.test(body)) return;   // anos (2026) também não
+    const grouped = /[   .,']/.test(hasDec ? body.slice(0, li) : body), pre = t.slice(0, m.index), post = t.slice(m.index + raw.length);
     const fmt = x => { let s = Math.abs(x).toLocaleString(loc, { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: grouped }); return (x < 0 || neg ? (raw[0] === '−' ? '−' : '-') : '') + s; };
-    n++; const t0 = performance.now(), dur = 650 + Math.min(500, Math.log10(Math.abs(v) + 1) * 120);
-    const step = now => { if (!txt.isConnected || (txt._vv && txt._vv !== t0)) return; const k = Math.min(1, (now - t0) / dur);
+    n++; const t0 = performance.now() + n * 40, dur = 900 + Math.min(700, Math.log10(Math.abs(v) + 1) * 160);
+    const step = now => { if (!txt.isConnected || (txt._vv && txt._vv !== t0)) return; const k = Math.max(0, Math.min(1, (now - t0) / dur));
       if (k >= 1) { txt.data = t; return; } txt.data = pre + fmt(v * ease(k)) + post; requestAnimationFrame(step); };
     txt._vv = t0; txt.data = pre + fmt(0) + post; requestAnimationFrame(step); }); };
 
-/* ---------- toque e o que acabou de mudar ---------- */
+/* ---------- ao rolar: o que está em baixo aparece quando chega ao ecrã ---------- */
+let IO = null;
+const reveal = root => { if (!('IntersectionObserver' in window)) return;
+  if (!IO) IO = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const el = e.target; IO.unobserve(el); el.classList.add('vv-rv-in'); setTimeout(() => el.classList.remove('vv-rv', 'vv-rv-in'), 900); }), { rootMargin: '0px 0px -6% 0px', threshold: .08 });
+  const H = innerHeight; let n = 0;
+  root.querySelectorAll(':scope > *, :scope :is(.g,.dash,.dc-grid,.fe-plans) > *, :scope .pn').forEach(el => {
+    if (n > 80 || el.classList.contains('vv-rv') || el.closest('.vv-rv')) return; const r = el.getBoundingClientRect();
+    if (r.top > H * .96 && r.height > 0) { el.classList.add('vv-rv'); IO.observe(el); n++; } }); };
+
+/* ---------- o logo dá uma volta ---------- */
+const spin = () => document.querySelectorAll('.tn-brand, #side .brand-mark').forEach(el => { el.classList.remove('vv-spin'); void el.offsetWidth; el.classList.add('vv-spin'); setTimeout(() => el.classList.remove('vv-spin'), 1100); });
+
+/* ---------- toque: afunda, espalha uma onda; o que mudou dá um salto; concluir dá uma pequena explosão ---------- */
 let hit = null;
 const keyOf = b => { for (const a of ['data-act', 'data-edit', 'data-go', 'data-oc', 'data-om', 'data-oa']) if (b.hasAttribute(a)) { let s = `[${a}="${CSS.escape(b.getAttribute(a))}"]`;
-    for (const x of ['data-id', 'data-v', 'data-k', 'data-d', 'data-i', 'data-h']) if (b.hasAttribute(x)) s += `[${x}="${CSS.escape(b.getAttribute(x))}"]`; return s; } return null; };
-document.addEventListener('pointerdown', e => { if (mode() === 'off') return; const b = e.target.closest && e.target.closest('button,.btn,.chip,[data-act],[data-edit],[data-go],a.click,.li.click'); if (!b) return; b.classList.add('vv-press'); setTimeout(() => b.classList.remove('vv-press'), 220); }, { passive: true, capture: true });
-document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-act],[data-edit],[data-go],[data-oc],[data-om],[data-oa]'); if (!b) return; const k = keyOf(b); if (k) hit = { k, at: Date.now() }; }, true);
-const popAfter = root => { if (!hit || Date.now() - hit.at > 1000 || mode() === 'off') return; const el = root.querySelector(hit.k); hit = null; if (!el) return; el.classList.add('vv-pop'); setTimeout(() => el.classList.remove('vv-pop'), 520); };
+    for (const x of ['data-id', 'data-v', 'data-k', 'data-d', 'data-i', 'data-h', 'data-m', 'data-r']) if (b.hasAttribute(x)) s += `[${x}="${CSS.escape(b.getAttribute(x))}"]`; return s; } return null; };
+const isOn = el => !!el && (/\b(on|done|ok|checked|is-done|pos)\b/.test(el.className || '') || el.getAttribute('aria-pressed') === 'true' || el.getAttribute('aria-checked') === 'true' || /✓|✔/.test(el.textContent || ''));
+document.addEventListener('pointerdown', e => { if (mode() === 'off') return; const b = e.target.closest && e.target.closest('button,.btn,.chip,[data-act],[data-edit],[data-go],a.click,.li.click'); if (!b) return;
+  b.classList.add('vv-press'); setTimeout(() => b.classList.remove('vv-press'), 240);
+  if (full() && !rm() && b.matches('.btn,.chip,button.pri') && !b.disabled) { const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height) * 2.2, s = document.createElement('span');
+    s.className = 'vv-rip'; s.style.cssText = `--d:${d}px;--l:${e.clientX - r.left - d / 2}px;--t:${e.clientY - r.top - d / 2}px`; b.classList.add('vv-ripc'); b.appendChild(s);
+    setTimeout(() => { s.remove(); if (!b.querySelector('.vv-rip')) b.classList.remove('vv-ripc'); }, 650); } }, { passive: true, capture: true });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-act],[data-edit],[data-go],[data-oc],[data-om],[data-oa]'); if (!b) return; const k = keyOf(b);
+  if (k) hit = { k, at: Date.now(), was: isOn(b), x: e.clientX, y: e.clientY };
+  // caixas de marcar (tarefas, hábitos…): a explosão sai logo, sem esperar pelo ecrã novo
+  const cb = e.target.closest('input[type=checkbox]'); if (cb && cb.checked && full() && !rm()) burst(e.clientX, e.clientY); }, true);
+const COLS = ['#5CC8E6', '#3FCF8E', '#F2B544', '#9A8CF5', '#F28CB1', '#E9E3D8'];
+const burst = (x, y) => { const w = document.createElement('div'); w.className = 'vv-burst'; w.setAttribute('aria-hidden', 'true'); w.style.left = x + 'px'; w.style.top = y + 'px'; w.style.setProperty('--c0', COLS[0]);
+  let h = '<b></b>'; for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2 + Math.random() * .4, r = 44 + Math.random() * 34; h += `<i style="--c:${COLS[i % COLS.length]};--x:${(Math.cos(a) * r).toFixed(1)}px;--y:${(Math.sin(a) * r).toFixed(1)}px;animation-delay:${(Math.random() * .06).toFixed(2)}s"></i>`; }
+  w.innerHTML = h; document.body.appendChild(w); setTimeout(() => w.remove(), 900);
+  try { navigator.vibrate && navigator.vibrate(12); } catch (e) { } };
+const popAfter = root => { if (!hit || Date.now() - hit.at > 1200 || mode() === 'off') return; const h = hit; hit = null; const el = root.querySelector(h.k) || document.querySelector(h.k); if (!el) return;
+  el.classList.add('vv-pop'); setTimeout(() => el.classList.remove('vv-pop'), 600);
+  if (full() && !rm() && !h.was && isOn(el)) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); el.classList.add('vv-glow'); setTimeout(() => el.classList.remove('vv-glow'), 850); } };
+OS.Vivo.burst = burst;
 
 /* ---------- vigiar o ecrã ---------- */
 const start = () => { const v = view(); if (!v) return setTimeout(start, 300);
   new MutationObserver(() => { const r = location.hash.split('?')[0]; if (r !== lastR) { lastR = r; enter(); } else popAfter(v); }).observe(v, { childList: true });
-  const m = document.getElementById('modal'); if (m) new MutationObserver(() => { if (!m.hidden && mode() !== 'off') { const d = m.querySelector('.modal'); if (d && !d._vv) { d._vv = 1; d.classList.add('vv-modal'); } } }).observe(m, { childList: true, attributes: true, attributeFilter: ['hidden'] }); };
+  const m = document.getElementById('modal'); if (m) new MutationObserver(() => { if (!m.hidden && mode() !== 'off') { const d = m.querySelector('.modal'); if (d && !d._vv) { d._vv = 1; d.classList.add('vv-modal'); } } if (!m.hidden) popAfter(m); }).observe(m, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  // o menu lateral entra em cascata
+  new MutationObserver(() => { const s = document.getElementById('side'); if (!s || !full() || rm()) return; if (document.body.classList.contains('nav-open') && !s._open) { s._open = 1; s.classList.remove('vv-navin'); void s.offsetWidth; s.classList.add('vv-navin'); setTimeout(() => s.classList.remove('vv-navin'), 900); } else if (!document.body.classList.contains('nav-open')) s._open = 0; }).observe(document.body, { attributes: true, attributeFilter: ['class'] }); };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 OS.on && OS.on('unlock', () => { lastR = null; });
 
 /* ---------- Definições › Aplicação ---------- */
 A.vivoSet = b => { V.set(b.dataset.v); UI.toast(b.dataset.v === 'off' ? 'Animações desligadas' : 'Animações ' + (b.dataset.v === 'full' ? 'completas' : 'suaves'), 'pos'); };
 OS.on && OS.on('ready', () => { const o = OS.views.definicoes; if (!o || o._vv) return; OS.views.definicoes = sub => o(sub) + (String(sub || '') === '' ? `<div class="pn" id="animSet"><div class="pn-h"><h3>${UI.ic('sun')}Animações</h3><span class="mut" style="font-size:12px">${{ full: 'completas', soft: 'suaves', off: 'desligadas' }[mode()]}</span></div>
-  <p class="mut" style="margin:0 0 10px">Páginas que entram com movimento, números que contam até ao valor, barras que enchem e botões que respondem ao toque. Leves: não gastam bateria.${reduce() ? ' O teu aparelho pede menos movimento, por isso começam desligadas.' : ''}</p>
+  <p class="mut" style="margin:0 0 10px">Páginas que entram em cascata, títulos que se desenham, números que contam até ao valor, barras que enchem, gráficos que crescem, cartões que aparecem ao rolar e uma pequena explosão quando concluis uma tarefa ou marcas um hábito. Leves: não gastam bateria.${reduce() && !chosen() ? ' O teu aparelho pede menos movimento, por isso as coisas só aparecem devagar; escolhe "Completas" para ver tudo.' : ''}</p>
   <div class="seg" role="group">${[['full', 'Completas'], ['soft', 'Suaves'], ['off', 'Desligadas']].map(([v, l]) => `<button class="${mode() === v ? 'on' : ''}" data-act="vivoSet" data-v="${v}">${l}</button>`).join('')}</div></div>` : ''); OS.views.definicoes._vv = 1; });
 })();
 
