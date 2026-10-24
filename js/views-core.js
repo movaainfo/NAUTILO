@@ -225,22 +225,23 @@ A.calSrc = b => { const o = Object.assign({}, OS.ui.calOff || {}); o[b.dataset.v
 A.calDay = (b, e) => { if (e.target.closest('[data-edit]')) return; OS.ui.calDate = b.dataset.d; OS.ui.calView = 'dia'; OS.go('calendario.dia'); };
 A.calSlot = (b, e) => { if (e.target.closest('[data-edit]')) return; const r = b.getBoundingClientRect(); const h = Math.floor((e.clientY - r.top) / 44) + 6; UI.openForm('events', null, { date: b.dataset.d, start: U.pad(h) + ':00', end: U.pad(h + 1) + ':00' }); };
 
-/* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; dentro do claude.ai também pelo conector */
+/* Integração Google Calendar: pelo teu script Google (Parte 3, versão 11), de qualquer aparelho; nas contas sem script pela conta Google ligada (google.js, só leitura); dentro do claude.ai também pelo conector */
 let gcalUnsub = null, gcalTimer = 0, gcalBusy = false;
 const gscr = () => { const c = OS.one('inbox'); return c && c.url && c.key && +(c.ver || 0) >= 11 ? c : null; };
 // os calendários "Náutilo" e "Náutilo · …" são a cópia que a app põe no Google: não se leem de volta (senão aparecia tudo duas vezes)
 const gmap = L => L.filter(x => !/^(Oceanum|Náutilo)( · .+)?$/.test(String(x.cal || ''))).map(x => { const sd = new Date(x.s), ed = new Date(x.e); return { date: U.iso(sd), start: x.all ? '' : U.hm(sd), end: x.all ? '' : U.hm(ed), title: x.t || '(sem título)', sub: [x.loc, x.cal].filter(Boolean).join(' · ').slice(0, 120), gid: x.id }; }).filter(x => x.date);
 try { const sv = U.ls.get('os2gcal', null); if (sv && OS.one('integ').gcal) Cal.gcal = sv.ev || []; } catch (e) { }
-const gcalScript = async quiet => { const c = gscr(); if (!c || gcalBusy) return; gcalBusy = true;
+const gapi = () => !gscr() && !!(OS.Goog && OS.Goog.cal());
+const gcalScript = async quiet => { const c = gscr(), viaG = !c && gapi(); if ((!c && !viaG) || gcalBusy) return; gcalBusy = true;
   const from = U.addDays(U.today(), -14), to = U.addDays(U.today(), 90);
-  try { const j = await OS.Inbox.getJSON(c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=cl&a=' + from + '&b=' + to + '&_=' + Date.now(), 2);
+  try { const j = viaG ? await OS.Goog.call('cl', { a: from, b: to }) : await OS.Inbox.getJSON(c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=cl&a=' + from + '&b=' + to + '&_=' + Date.now(), 2);
     if (!j || !j.ok) throw new Error((j && j.msg) || 'o script não respondeu');
     Cal.gcal = gmap(j.ev || []); U.ls.set('os2gcal', { at: Date.now(), ev: Cal.gcal });
     OS.gcalState = `${Cal.gcal.length} eventos entre ${U.fmtDS(from)} e ${U.fmtDS(to)} · atualizado às ${U.hm(new Date())}`; }
-  catch (e) { OS.gcalState = /Calendar|autoriz|permiss/i.test(e.message || '') ? 'Falta autorizar a Agenda no script: no Apps Script escolhe a função "autorizar" → ▶ Executar → Permitir, e faz Nova versão na implementação.' : 'Não consegui ler a agenda agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.'; if (!quiet) UI.toast(OS.gcalState, 'warn'); }
+  catch (e) { OS.gcalState = viaG ? 'Não consegui ler a agenda Google agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.' : /Calendar|autoriz|permiss/i.test(e.message || '') ? 'Falta autorizar a Agenda no script: no Apps Script escolhe a função "autorizar" → ▶ Executar → Permitir, e faz Nova versão na implementação.' : 'Não consegui ler a agenda agora (' + (e.message || 'erro') + '). Os dados anteriores mantêm-se.'; if (!quiet) UI.toast(OS.gcalState, 'warn'); }
   gcalBusy = false; OS.request(); };
 OS.gcalStart = async () => {
-  if (gscr()) { gcalScript(true); if (!gcalTimer) gcalTimer = setInterval(() => { if (!document.hidden && OS.one('integ').gcal) gcalScript(true); }, 15 * 60 * 1000); return; }
+  if (gscr() || gapi()) { gcalScript(true); if (!gcalTimer) gcalTimer = setInterval(() => { if (!document.hidden && OS.one('integ').gcal) gcalScript(true); }, 15 * 60 * 1000); return; }
   if (gcalUnsub) return; let mcp = null;
   try { mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { }
   if (!mcp) { OS.gcalState = OS.one('inbox').url ? 'Para ver a tua agenda Google aqui, atualiza o script Google (Definições → Script Google → Parte 3).' : 'Para ver a tua agenda Google aqui, liga o script Google (Definições → Sincronizar aparelhos).'; OS.request(); return; }
@@ -259,15 +260,17 @@ OS.gcalStart = async () => {
   }, { refetchInterval: 15 * 60 * 1000 });
 };
 // criar um evento na agenda Google (o Spyke usa isto quando pedes "põe na minha agenda Google")
-OS.gcalAdd = async ev => { const c = gscr(); if (!c) return { ok: false, msg: 'o script Google ainda não tem a Parte 3' };
+OS.gcalAdd = async ev => { const c = gscr(); if (!c) return { ok: false, msg: gapi() ? 'a ligação à agenda Google é só de leitura' : 'o script Google ainda não tem a Parte 3' };
   const u = c.url.trim() + (c.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(c.key) + '&op=ce&t=' + encodeURIComponent(ev.title || '') + '&d=' + encodeURIComponent(ev.date || '') + (ev.start ? '&h=' + ev.start : '') + (ev.end ? '&f=' + ev.end : '') + (ev.loc ? '&l=' + encodeURIComponent(ev.loc) : '');
   try { const j = await OS.Inbox.getJSON(u, 2); if (j && j.ok) setTimeout(() => gcalScript(true), 1500); return j || { ok: false }; } catch (e) { return { ok: false, msg: e.message }; } };
 // Definições → Ligações: a agenda Google (pelo script) liga-se e desliga-se aqui; o Calendário só mostra os eventos
 OS.gcalPanel = () => { const integ = OS.one('integ');
-  return `<div class="pn" id="gcalSet"><div class="pn-h"><h3>${UI.ic('link')}Agenda Google (Calendário)</h3><span class="mut" style="font-size:12px">${integ.gcal ? 'ligada' : 'desligada'}</span></div><p class="mut" style="margin:0 0 10px;font-size:13px">${integ.gcal ? esc(OS.gcalState || 'A carregar os teus eventos…') : 'Mostra no Calendário, em Hoje e no Painel os eventos da tua agenda Google (todas as agendas), pelo teu script Google.'}</p>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div>`; };
+  // conta sem script e sem a agenda Google autorizada: o cartão de ligar a conta Google (o mesmo do E-mail)
+  if (!gscr() && OS.Goog && OS.Goog.on() && !OS.Goog.cal()) return OS.Goog.card();
+  return `<div class="pn" id="gcalSet"><div class="pn-h"><h3>${UI.ic('link')}Agenda Google (Calendário)</h3><span class="mut" style="font-size:12px">${integ.gcal ? 'ligada' : 'desligada'}</span></div><p class="mut" style="margin:0 0 10px;font-size:13px">${integ.gcal ? esc(OS.gcalState || 'A carregar os teus eventos…') : 'Mostra no Calendário, em Hoje e no Painel os eventos da tua agenda Google (todas as agendas), ' + (gapi() ? 'pela tua conta Google ligada.' : 'pelo teu script Google.')}</p>${integ.gcal ? `<div class="row gap8"><button class="btn sm" data-act="gcalRefresh">${UI.ic('sync')}Atualizar</button><button class="btn ghost sm" data-act="gcalOff">Desligar</button></div>` : `<button class="btn sm pri" data-act="gcalOn">Ligar</button>`}</div>`; };
 A.gcalOn = () => { OS.setOne('integ', { gcal: true }); OS.gcalStart(); };
 A.gcalOff = () => { OS.setOne('integ', { gcal: false }); if (gcalUnsub) { gcalUnsub(); gcalUnsub = null; } clearInterval(gcalTimer); gcalTimer = 0; Cal.gcal = []; OS.gcalState = ''; U.ls.del ? U.ls.del('os2gcal') : U.ls.set('os2gcal', null); };
-A.gcalRefresh = async () => { if (gscr()) return gcalScript(false); try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
+A.gcalRefresh = async () => { if (gscr() || gapi()) return gcalScript(false); try { const mcp = await window.claude.use('mcp'); await mcp.invalidate('Google Calendar', 'list_events'); } catch (e) { } UI.toast('A atualizar a agenda…'); };
 OS.on('ready', () => { if (OS.one('integ').gcal) OS.gcalStart(); });
 
 /* ================= TAREFAS ================= */

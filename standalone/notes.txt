@@ -1,6 +1,4 @@
-Definições arrumadas: cada bloco abre e fecha pela seta, e a página Geral está por temas (Tu, Segurança e conta, Aparelhos e dados, Aplicação). Há "Abrir tudo" e "Fechar tudo", e o que abres fica aberto neste aparelho.
-O perfil em Definições está dividido em Sobre ti, Estudos, Trabalho e Metas. O atalho de gastos do iPhone passou para Definições › Atalhos do iPhone.
-Sono no Painel: as noites do app Saúde do iPhone (com um atalho que corre sozinho ao acordar) aparecem com as horas, adormeci → acordei, as fases (profundo, REM, leve), a semana, a média e a dívida de sono. Também podes registar uma noite à mão.
-Editar perfil: escolhe uma foto tua ou um personagem do Dominus (heróis e monstros em pixel art) para a bolinha do perfil.
-IA para todos: nas contas a IA já vem ligada, sem chave nem configuração. Cada pessoa dá um nome à sua IA e chama-a por voz por esse nome.
-Termos de Serviço, Política de Privacidade (LGPD e RGPD), cookies, os teus direitos (com pedido e número de protocolo), acessibilidade e créditos, em Definições › Privacidade e termos. Aceitas uma vez, ao criar a conta ou na primeira entrada.
+Gmail e agenda Google para todas as contas: em Definições › E-mail toca em «Ligar a minha conta Google», autoriza uma vez e o Náutilo passa a ler os teus e-mails (separados e resumidos pela IA) e os eventos da tua agenda, em todos os teus aparelhos.
+Só leitura: o Náutilo nunca envia, apaga nem muda nada no teu Google. Para responder, escreve (ou pede à IA) e toca em «Copiar e abrir no Gmail».
+Quem já usa o script Google continua exatamente como antes.
+A Política de Privacidade inclui agora os dados da conta Google (só leitura, Utilização Limitada).

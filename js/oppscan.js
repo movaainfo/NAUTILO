@@ -93,7 +93,8 @@ OS.on('upd:decisions', d => { if (!d || !d.opp || d.status !== 'Decidida' || !d.
 const card = g => `<div class="ops-c"><div class="ops-h"><span class="bdg ${g.src === 'LinkedIn' ? 'acc' : ''}">${esc(g.src)}</span><span class="eyebrow">${esc(g.kind || '')}</span>${g.deadline ? UI.badge('prazo ' + U.fmtDS(g.deadline), U.diff(g.deadline, U.today()) <= 7 ? 'neg' : 'warn') : ''}</div>
   <b>${esc(g.name)}</b>${g.inst || g.loc ? `<small class="mut">${esc([g.inst, g.loc].filter(Boolean).join(' · '))}</small>` : ''}${g.why ? `<small class="tx2">${esc(g.why)}</small>` : ''}
   <div class="ops-a"><button class="btn sm pri" data-act="opsTake" data-id="${esc(g.id)}">${UI.ic('plus')}Adicionar</button><button class="btn sm" data-act="opsLater" data-id="${esc(g.id)}">Depois</button><button class="btn sm ghost" data-act="opsNo" data-id="${esc(g.id)}">Não me interessa</button><a class="btn sm ghost" href="${esc(g.mail)}" target="_blank" rel="noopener">Ver e-mail</a></div></div>`;
-const panel = () => { const ok = (() => { const c = OS.one('inbox'); return !!(c.url && c.key); })(), P = ok ? pending() : { now: [], later: [] }, li = OS.Mail && OS.Mail.li ? OS.Mail.li() : {}, at = Math.max((OS.Mail && OS.Mail.counts ? OS.Mail.counts().at : 0) || 0, (li && li.at) || 0);
+const mailOk = () => { const c = OS.one('inbox'); return !!(c.url && c.key) || !!(OS.Goog && OS.Goog.mail()); };
+const panel = () => { const ok = mailOk(), P = ok ? pending() : { now: [], later: [] }, li = OS.Mail && OS.Mail.li ? OS.Mail.li() : {}, at = Math.max((OS.Mail && OS.Mail.counts ? OS.Mail.counts().at : 0) || 0, (li && li.at) || 0);
   if (ok && P.now.length && aiOn()) setTimeout(() => aiScan(), 800);
   return `<section class="pn ops"><div class="pn-h"><h3>${UI.ic('mail')} Encontradas no teu e-mail e no LinkedIn</h3><button class="btn sm" data-act="opsScan" ${ok ? '' : 'disabled'}>${UI.ic('sync')}${busy ? 'A ler…' : 'Procurar agora'}</button></div>
     ${!ok ? `<p class="mut" style="margin:0">Liga o teu Gmail em <a class="acc" href="#definicoes.email">Definições → E-mail</a>. O LinkedIn entra pelas notificações que ele te manda para o Gmail (vagas, alertas de emprego, eventos). Depois disto as oportunidades aparecem aqui sozinhas e tu decides cada uma.</p>`
@@ -106,6 +107,6 @@ OS.on('mail', () => { if (aiOn()) setTimeout(() => aiScan(), 1500); });
 
 // Centro de controlo: há oportunidades à espera de decisão
 const I = OS.Intel;
-if (I && I.alerts) { const _a = I.alerts; I.alerts = () => { const out = _a(); try { const c = OS.one('inbox'); if (c.url && c.key) { const n = pending().now.length; if (n) out.push({ lvl: 'attention', area: 'Oportunidades', title: `${n} oportunidade${n > 1 ? 's' : ''} encontrada${n > 1 ? 's' : ''} no e-mail e no LinkedIn`, detail: 'Decide: adicionar, ver depois ou recusar', href: '#oportunidades' }); } } catch (e) { } return out; }; }
+if (I && I.alerts) { const _a = I.alerts; I.alerts = () => { const out = _a(); try { if (mailOk()) { const n = pending().now.length; if (n) out.push({ lvl: 'attention', area: 'Oportunidades', title: `${n} oportunidade${n > 1 ? 's' : ''} encontrada${n > 1 ? 's' : ''} no e-mail e no LinkedIn`, detail: 'Decide: adicionar, ver depois ou recusar', href: '#oportunidades' }); } } catch (e) { } return out; }; }
 OS.OppScan = { all, pending, guess, deadline, aiScan };
 })();

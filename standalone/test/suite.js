@@ -16,10 +16,36 @@ let OFFLINE = false, GSFAIL = 0, SLOWIDX = 0, FAILP = '';
 const SECH = (() => { try { const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')), all = v.headers.find(h => h.source === '/(.*)'), o = {}; all.headers.forEach(h => { o[h.key] = h.key === 'Content-Security-Policy' ? h.value.replace("connect-src 'self'", `connect-src 'self' http://127.0.0.1:${PORT}`) : h.value; }); delete o['Strict-Transport-Security']; return o; } catch (e) { return {}; } })();
 // servidor das contas para os testes: pasta temporária em vez do Vercel Blob (apagada no fim)
 const ACCDIR = fs.mkdtempSync(path.join(require('os').tmpdir(), 'nautilo-contas-')); process.env.NAUTILO_STORE_DIR = ACCDIR; process.env.NAUTILO_ADMIN = 'ana@exemplo.pt'; process.env.NAUTILO_IA_LIVRE = 'http://localhost:' + PORT + '/iamock'; delete process.env.GEMINI_API_KEY; process.env.NAUTILO_CACHE_MS = '0'; process.env.NAUTILO_RSS_BASE = 'http://localhost:' + PORT + '/rssmock'; delete process.env.BLOB_READ_WRITE_TOKEN;
+Object.assign(process.env, { GOOGLE_CLIENT_SECRET: 'teste-segredo', GOOGLE_REDIRECT: BASE + 'api/google', GOOGLE_AUTH_URL: 'http://localhost:' + PORT + '/gmock/auth', GOOGLE_TOKEN_URL: 'http://localhost:' + PORT + '/gmock/token', GOOGLE_REVOKE_URL: 'http://localhost:' + PORT + '/gmock/revoke', GOOGLE_API: 'http://localhost:' + PORT + '/gmock/api/' }); delete process.env.GOOGLE_CLIENT_ID;
 process.on('exit', () => { try { fs.rmSync(ACCDIR, { recursive: true, force: true }); } catch (e) { } });
 const ACCFN = {}; const ACCAPI = n => { if (!(n in ACCFN)) { try { ACCFN[n] = require(path.join(ROOT, 'api', n + '.js')); } catch (e) { ACCFN[n] = null; } } return ACCFN[n]; };
 // servidor estático + caixa de entrada simulada (Apps Script)
 const INBOX = [], STORE = {}, IAMOCK = [], INFL = new Map(); if (process.env.DEBUGAPI) setInterval(() => { const L = [...INFL.values()].map(f => f()).filter(x => +x.split(' ').pop().replace('ms', '') > 5000); if (L.length) console.log('    [api pendurada]', L.join(' | ')); }, 5000).unref();
+// Google simulado: autorização (volta logo com um code), tokens (RT-1 e AT-n), Gmail (2 conversas) e Calendar (3 agendas, 1 escondida)
+const GM = { reset() { this.tokenCalls = []; this.queries = []; this.revoked = new Set(); this.reject = new Set(); this.issued = []; this.n = 0; },
+  b64: s => Buffer.from(s).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+  handle(req, res, u, body) { const J = (st, o) => { res.writeHead(st, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(o)); }, q = u.query, SC = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly';
+    if (u.pathname === '/gmock/auth') { res.writeHead(302, { Location: q.redirect_uri + '?code=C1&scope=' + encodeURIComponent(SC) + '&state=' + encodeURIComponent(q.state || '') }); return res.end(); }
+    if (u.pathname === '/gmock/token') { const f = Object.fromEntries(new URLSearchParams(body)); this.tokenCalls.push(f); if (f.client_secret !== 'teste-segredo') return J(401, { error: 'invalid_client' });
+      if (f.grant_type === 'authorization_code') { if (f.code !== 'C1') return J(400, { error: 'invalid_grant' }); const at = 'AT-' + (++this.n); this.issued.push(at); return J(200, { access_token: at, refresh_token: 'RT-1', expires_in: 3599, scope: SC, token_type: 'Bearer' }); }
+      if (f.grant_type === 'refresh_token') { if (this.revoked.has(f.refresh_token) || f.refresh_token !== 'RT-1') return J(400, { error: 'invalid_grant' }); const at = 'AT-' + (++this.n); this.issued.push(at); return J(200, { access_token: at, expires_in: 3599, scope: SC }); }
+      return J(400, { error: 'unsupported_grant_type' }); }
+    if (u.pathname === '/gmock/revoke') { this.revoked.add(Object.fromEntries(new URLSearchParams(body)).token); return J(200, {}); }
+    const tk = String(req.headers.authorization || '').replace(/^Bearer /, ''); if (!/^AT-\d+$/.test(tk) || this.reject.has(tk)) return J(401, { error: { code: 401, message: 'Invalid Credentials' } });
+    const a = u.pathname.replace('/gmock/api/', ''), H = (n, v) => ({ name: n, value: v }), day = o => { const d = new Date(); d.setDate(d.getDate() + o); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }, at = (o, h) => { const d = new Date(); d.setDate(d.getDate() + o); d.setHours(h, 0, 0, 0); return d.toISOString(); };
+    const TH = { t1aaaaaa: { from: 'Prof. Silva <silva@ua.pt>', s: 'Entrega do trabalho de Estatística', sn: 'Olá Joana, o prazo do trabalho é amanhã &amp; não há prorrogação.', l: ['INBOX', 'UNREAD', 'IMPORTANT'] }, t2bbbbbb: { from: 'Loja <promo@loja.pt>', s: '50% de desconto só hoje', sn: 'Black Friday antecipada. Cancelar subscrição.', l: ['INBOX', 'CATEGORY_PROMOTIONS'] } };
+    if (a === 'gmail/v1/users/me/profile') return J(200, { emailAddress: 'joana@gmail.com' });
+    if (a === 'gmail/v1/users/me/threads') { this.queries.push(q.q); return J(200, { threads: Object.keys(TH).map(id => ({ id })) }); }
+    let m = a.match(/^gmail\/v1\/users\/me\/threads\/(\w+)$/); if (m) { const t = TH[m[1]]; if (!t) return J(404, { error: { code: 404, message: 'Not Found' } });
+      const msg = { id: m[1], threadId: m[1], labelIds: t.l, snippet: t.sn, internalDate: String(Date.now() - 3600e3), payload: { mimeType: 'multipart/mixed', headers: [H('From', t.from), H('To', 'joana@gmail.com'), H('Subject', t.s), H('Date', new Date().toUTCString())] } };
+      if (q.format === 'full') msg.payload.parts = [{ mimeType: 'multipart/alternative', parts: [{ mimeType: 'text/plain', headers: [H('Content-Type', 'text/plain; charset="UTF-8"')], body: { data: this.b64('Corpo completo do e-mail de teste: o prazo é amanhã às 18h.') } }, { mimeType: 'text/html', headers: [H('Content-Type', 'text/html; charset=UTF-8')], body: { data: this.b64('<p>Corpo completo do e-mail de teste</p>') } }] }, { mimeType: 'application/pdf', filename: 'enunciado.pdf', body: { attachmentId: 'x1', size: 1200 } }];
+      return J(200, { id: m[1], messages: [msg] }); }
+    if (a === 'calendar/v3/users/me/calendarList') return J(200, { items: [{ id: 'joana@gmail.com', summary: 'joana@gmail.com', primary: true }, { id: 'equipa@group.calendar.google.com', summary: 'Trabalho' }, { id: 'escondido@group.calendar.google.com', summary: 'Escondida', hidden: true }] });
+    m = a.match(/^calendar\/v3\/calendars\/([^/]+)\/events$/); if (m) { const id = decodeURIComponent(m[1]);
+      if (id === 'joana@gmail.com') return J(200, { items: [{ id: 'e1', summary: 'Dentista', location: 'Aveiro', start: { dateTime: at(0, 15) }, end: { dateTime: at(0, 16) } }, { id: 'e2', summary: 'Aniversário da Rita', start: { date: day(1) }, end: { date: day(2) } }, { id: 'e3', summary: 'Cancelado', status: 'cancelled', start: { dateTime: at(0, 9) }, end: { dateTime: at(0, 10) } }] });
+      if (id === 'equipa@group.calendar.google.com') return J(200, { items: [{ id: 'e4', summary: 'Reunião de equipa', start: { dateTime: at(2, 10) }, end: { dateTime: at(2, 11) } }] });
+      return J(200, { items: [{ id: 'e5', summary: 'Escondido', start: { dateTime: at(0, 11) }, end: { dateTime: at(0, 12) } }] }); }
+    J(404, { error: { code: 404, message: 'Not Found' } }); } }; GM.reset();
 const srv = http.createServer((req, res) => {
   const u = url.parse(req.url, true);
   if (u.pathname === '/gs') { // simula o Apps Script
@@ -39,11 +65,13 @@ const srv = http.createServer((req, res) => {
     return; }
   if (u.pathname === '/iamock') { let body = ''; req.on('data', c => body += c); req.on('end', () => { let j = {}; try { j = JSON.parse(body); } catch (e) { } IAMOCK.push(j); const json = j.response_format && j.response_format.type === 'json_object';
       res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: json ? '{"ok":true,"resposta":"feito"}' : 'Olá! Aqui é a tua IA.' } }] })); }); return; }
+  // Google simulado (OAuth, Gmail e Calendar) para api/google
+  if (u.pathname.startsWith('/gmock/')) { let body = ''; req.on('data', c => body += c); req.on('end', () => GM.handle(req, res, u, body)); return; }
   if (OFFLINE) { req.socket.destroy(); return; }
   // contas: as funções do servidor a sério (api/conta.js e api/dados.js), com uma pasta temporária no lugar do Vercel Blob
   if (u.pathname.startsWith('/rssmock/')) { const q = u.query.q || '', n = (k) => `<item><title>${k} - Jornal Teste</title><link>https://exemplo.pt/${encodeURIComponent(k)}</link><pubDate>${new Date().toUTCString()}</pubDate><source url="https://exemplo.pt">Jornal Teste</source><description></description></item>`;
     res.writeHead(200, { 'Content-Type': 'application/rss+xml' }); return res.end(`<?xml version="1.0"?><rss><channel>${[1, 2, 3].map(i => n((q ? 'Pesquisa ' : 'Notícia da conta ') + i)).join('')}</channel></rss>`); }
-  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias|ia)$/);
+  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias|ia|google)$/);
   if (am) { const fn = ACCAPI(am[1]); if (!fn) { res.writeHead(404); return res.end(); } req.query = u.query;
     if (process.env.DEBUGAPI) { const t0 = Date.now(), id = Math.random().toString(36).slice(2, 7); let op = ''; const oe = req.emit; req.emit = function (ev, ch) { if (ev === 'data' && !op) op = String(ch).slice(0, 40); return oe.apply(this, arguments); };
       INFL.set(id, () => am[1] + ' ' + op + ' ' + (Date.now() - t0) + 'ms'); res.on('finish', () => { INFL.delete(id); if (Date.now() - t0 > 2500) console.log('    [api lenta]', am[1], op, Date.now() - t0, 'ms'); }); }
@@ -2232,12 +2260,95 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     try { await C.screenshot({ path: path.join(process.env.SHOTS || require('os').tmpdir(), 'conta-admin-pedidos.png'), fullPage: true }); } catch (e) { }
     await E(C, () => { const b = document.querySelector('#admPed [data-act=admPedido]'); b && b.click(); }); await sleep(1200);
     const adm2 = await api({ op: 'admin' }, await E(C, () => JSON.parse(localStorage.getItem('nau:s')).t));
-    ok('Administração: marcar o pedido como respondido; o que falta configurar (chave Google, Gmail) só para o administrador', ((adm2.pedidos || []).find(x => x.id === prot) || {}).estado === 'respondido' && await E(C, () => document.querySelectorAll('#admPend details').length === 2 && /GEMINI_API_KEY/.test(document.getElementById('admPend').innerText)) && !(await E(L, () => !!document.getElementById('admPend'))), '');
+    ok('Administração: marcar o pedido como respondido; o que falta configurar (chave da IA) só para o administrador; o Gmail já não está pendente (chave do Google verificada)', ((adm2.pedidos || []).find(x => x.id === prot) || {}).estado === 'respondido' && await E(C, () => document.querySelectorAll('#admPend details').length === 1 && /GEMINI_API_KEY/.test(document.getElementById('admPend').innerText) && !/Gmail e agenda/.test(document.getElementById('admPend').innerText)) && !(await E(L, () => !!document.getElementById('admPend'))), '');
     const pin = await E(L, () => { const h = OS.Diet && OS.Diet.img ? OS.Diet.img('Arroz branco tipo 1 (agulha)', 'Cereais') : ''; return { pub: OS.Acc.pub, pin: /pinimg/.test(h) }; });
     ok('Contas públicas mostram as mesmas fotos dos alimentos', pin.pub && pin.pin, JSON.stringify(pin));
   }
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | '));
   for (const c of ctxs) await c.close(); }
+async function googleTests(b) { cur = 'Google'; console.log('\n=== Gmail e agenda pela conta Google (contas sem script) ===');
+  GM.reset(); const prof = PROFILES[0];
+  const { ctx, p, errs } = await newPage(b, prof, await mkAcc()); await p.goto(BASE); await unlock(p);
+  await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); location.hash = 'definicoes.email'; });
+  await p.waitForSelector('[data-gggo]', { timeout: 10000 }).catch(() => { });
+  const c0 = await E(p, () => { const a = document.querySelector('[data-gggo]'); return { has: !!a, href: a ? a.getAttribute('href') : '', t: (document.querySelector('.gg-card') || {}).innerText || '', on: OS.Goog.on(), mail: OS.Goog.mail() }; });
+  const q0 = c0.href ? new URL(c0.href).searchParams : new URLSearchParams();
+  ok('Conta sem script: Definições › E-mail mostra "Ligar a minha conta Google" com os passos (aviso de app não verificada)', c0.has && c0.on && !c0.mail && /Avançado/.test(c0.t) && /Só leitura/.test(c0.t), JSON.stringify(c0).slice(0, 300));
+  ok('O link vai ao Google com o ID de cliente, só leitura do Gmail e da agenda, offline e state assinado', q0.get('client_id') === '298711842985-i89rgem2i0gq35lse2fvsc0pmmai5cr8.apps.googleusercontent.com' && q0.get('redirect_uri') === BASE + 'api/google' && /gmail\.readonly/.test(q0.get('scope')) && /calendar\.readonly/.test(q0.get('scope')) && !/gmail\.(modify|send|compose)/.test(q0.get('scope')) && q0.get('access_type') === 'offline' && /^[\w-]+\.[\w-]+$/.test(q0.get('state') || ''), c0.href.slice(0, 200));
+  await E(p, () => location.hash = 'email'); await sleep(500);
+  ok('Página E-mail (sem nada ligado): mostra o mesmo cartão para ligar a conta Google', await E(p, () => !!document.querySelector('#view .gg-card [data-gggo], #view .gg-card button[disabled]')));
+  await E(p, () => location.hash = 'definicoes.email'); await p.waitForSelector('[data-gggo]', { timeout: 8000 });
+  // tocar no link: abre o Google noutra janela; o Google volta a api/google, que guarda a autorização
+  const [pop] = await Promise.all([ctx.waitForEvent('page'), p.click('[data-gggo]')]);
+  await pop.waitForLoadState('domcontentloaded'); await pop.waitForSelector('main', { timeout: 10000 }).catch(() => { });
+  const r1 = await pop.evaluate(() => ({ ok: !!document.getElementById('g-ok'), t: document.body.innerText, back: (document.querySelector('main a') || {}).href || '' }));
+  ok('Regresso do Google: "Conta Google ligada" com o e-mail e um botão para voltar ao Náutilo', r1.ok && /Conta Google ligada/.test(r1.t) && /joana@gmail\.com/.test(r1.t) && /#definicoes\.email$/.test(r1.back), JSON.stringify(r1).slice(0, 300));
+  const gfiles = (() => { const out = []; const walk = d => { try { for (const f of fs.readdirSync(d, { withFileTypes: true })) f.isDirectory() ? walk(path.join(d, f.name)) : out.push(path.join(d, f.name)); } catch (e) { } }; walk(path.join(ACCDIR, 'g')); return out; })();
+  ok('A autorização fica guardada cifrada no perfil (g/<conta>/<perfil>), sem o token à vista', gfiles.length === 1 && !fs.readFileSync(gfiles[0]).includes('RT-1') && GM.tokenCalls.some(c => c.grant_type === 'authorization_code' && c.client_secret === 'teste-segredo' && c.redirect_uri === BASE + 'api/google'), JSON.stringify({ n: gfiles.length, calls: GM.tokenCalls.map(c => c.grant_type) }));
+  await pop.close(); await p.bringToFront(); await E(p, () => window.dispatchEvent(new Event('focus')));
+  await p.waitForFunction(() => OS.Goog.st().ligado, null, { timeout: 9000 }).catch(() => { });
+  await sleep(600);
+  const c1 = await E(p, () => ({ toast: [...document.querySelectorAll('.toast, #toasts *')].map(x => x.innerText).join(' | '), st: OS.Goog.st(), t: (document.querySelector('.gg-card') || {}).innerText || '', mail: OS.Goog.mail(), cal: OS.Goog.cal(), gcal: OS.one('integ').gcal }));
+  ok('De volta à app: fica ligada sozinha (✓ ligada, joana@gmail.com, Gmail ✓ e Agenda ✓) e liga a agenda no Calendário', c1.st.ligado && c1.mail && c1.cal && c1.gcal && /ligada/.test(c1.t) && /joana@gmail\.com/.test(c1.t) && /Gmail ✓/.test(c1.t) && /Agenda ✓/.test(c1.t) && /Conta Google ligada/.test(c1.toast), JSON.stringify(c1).slice(0, 300));
+  // e-mails pelo servidor
+  await E(p, () => location.hash = 'email.caixa'); await E(p, () => OS.Mail.refresh(true)); await p.waitForFunction(() => OS.Mail.items().length >= 2, null, { timeout: 10000 }).catch(() => { }); await sleep(400);
+  const m1 = await E(p, () => ({ L: OS.Mail.items().map(x => ({ id: x.id, s: x.s, f: x.f, sn: x.sn, u: x.u })), arch: document.querySelectorAll('#view [data-act=mlDo]').length, rows: document.querySelectorAll('#view .ml-it').length, err: (document.querySelector('#view .ib-st.bad') || {}).innerText || '' }));
+  const t1 = (m1.L || []).find(x => x.id === 't1aaaaaa');
+  ok('E-mail: lê os e-mails pela conta Google (assunto, remetente, início do texto sem &amp;) e mostra-os na Caixa', m1.L.length === 2 && t1 && t1.s === 'Entrega do trabalho de Estatística' && /silva@ua\.pt/.test(t1.f) && /amanhã & não há/.test(t1.sn) && t1.u === true && m1.rows === 2 && !m1.err, JSON.stringify(m1).slice(0, 400));
+  ok('Só leitura: sem "Arquivar" nem "Spam" nas linhas', m1.arch === 0);
+  ok('A pesquisa do Gmail das Definições vai para o Google', GM.queries.includes('in:inbox newer_than:3d'), JSON.stringify(GM.queries));
+  await E(p, () => OS.Mail.read('t1aaaaaa')); await p.waitForFunction(() => { const m = document.querySelector('#modal .ml-rd'); return m && !m.querySelector('.fd-spin'); }, null, { timeout: 8000 }).catch(() => { });
+  const rd = await E(p, () => { const m = document.querySelector('#modal .ml-rd'); return m ? { t: m.innerText, fmt: !!m.querySelector('[data-act=mlFmt]'), arch: !!m.querySelector('[data-act=mlDo]'), gm: (m.querySelector('a[href*="mail.google.com"]') || {}).href || '' } : null; });
+  ok('Ler o e-mail inteiro dentro da app: texto completo, anexo, "Ver formatado" e link para o Gmail certo (authuser)', rd && /Corpo completo do e-mail de teste/.test(rd.t) && /enunciado\.pdf/.test(rd.t) && rd.fmt && !rd.arch && /authuser=joana%40gmail\.com#all\/t1aaaaaa$/.test(rd.gm), JSON.stringify(rd).slice(0, 300));
+  await E(p, () => { OS.UI.closeModal(); const b = document.querySelector('#view [data-act=mlReply][data-id=t1aaaaaa]'); b ? b.click() : OS.act.mlReply({ dataset: { id: 't1aaaaaa' } }); }); await sleep(300);
+  const rp = await E(p, () => { const m = document.querySelector('#modal .ml-rp'); return m ? { cp: (m.querySelector('[data-mlrcopy]') || {}).href || '', save: !!m.querySelector('[data-act=mlRsave]'), t: m.innerText } : null; });
+  ok('Responder: "Copiar e abrir no Gmail" (a ligação é só de leitura), sem "Guardar rascunho"', rp && /authuser=joana%40gmail\.com#all\/t1aaaaaa$/.test(rp.cp) && !rp.save && /só lê o teu Gmail/.test(rp.t), JSON.stringify(rp).slice(0, 300));
+  await E(p, () => OS.UI.closeModal());
+  // agenda pelo servidor
+  await E(p, () => OS.act.gcalRefresh()); await p.waitForFunction(() => OS.Cal.gcal.length >= 3, null, { timeout: 8000 }).catch(() => { });
+  const cal = await E(p, () => { const U = OS.U, t = U.today(), tm = U.addDays(t, 1), L = OS.Cal.items(t, U.addDays(t, 3)).filter(x => x.src === 'gcal'); return { L: L.map(x => [x.date === t ? 'hoje' : x.date === tm ? 'amanha' : x.date, x.start, x.end, x.title]), st: OS.gcalState || '' }; });
+  const has = (d, s, ti) => cal.L.some(x => x[0] === d && x[1] === s && x[3] === ti);
+  ok('Agenda: os eventos do Google aparecem no Calendário (com hora, dia inteiro e outras agendas), sem as agendas escondidas', has('hoje', '15:00', 'Dentista') && has('amanha', '', 'Aniversário da Rita') && cal.L.some(x => x[3] === 'Reunião de equipa') && !cal.L.some(x => x[3] === 'Escondido'), JSON.stringify(cal).slice(0, 400));
+  await E(p, () => location.hash = 'definicoes.ligacoes'); await sleep(500);
+  ok('Definições › Ligações: Agenda Google ligada "pela tua conta Google ligada"', await E(p, () => /pela tua conta Google ligada|eventos entre/.test((document.getElementById('gcalSet') || {}).innerText || '')));
+  // o token de 1 hora caduca: o servidor pede outro com a autorização guardada, sem a pessoa fazer nada
+  GM.reject = new Set(['AT-1']); const nRef = GM.tokenCalls.filter(c => c.grant_type === 'refresh_token').length;
+  await E(p, () => OS.Mail.refresh(true)); await sleep(1500);
+  ok('Token caducado: o servidor renova-o sozinho e os e-mails continuam a chegar', GM.tokenCalls.filter(c => c.grant_type === 'refresh_token').length === nRef + 1 && await E(p, () => OS.Mail.items().length === 2 && !document.querySelector('#view .ib-st.bad')));
+  // segurança da rota
+  const post = (body, h = {}) => fetch(BASE + 'api/google', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json', origin: 'http://localhost:' + PORT }, h), body: JSON.stringify(body) }).then(async r => ({ s: r.status, j: await r.json().catch(() => ({})) }));
+  const tok = await E(p, () => OS.Acc.token()), pid = await E(p, () => OS.Acc.pid());
+  const s1 = await post({ op: 'gm', p: pid }), s2 = await post({ op: 'gm', p: pid }, { authorization: 'Bearer ' + tok, origin: 'https://atacante.exemplo' }), s3 = await post({ op: 'gm', p: 'aaaaaaaaaaaa' }, { authorization: 'Bearer ' + tok });
+  const ge = await fetch(BASE + 'api/google?p=estado', { headers: { origin: 'http://localhost:' + PORT } }).then(r => r.json()).catch(() => ({}));
+  ok('Verificação da chave secreta (sem a mostrar): o Google aceita o cliente e a chave', ge.ok && ge.pronto && ge.chave === 'ok' && !JSON.stringify(ge).includes('teste-segredo'), JSON.stringify(ge));
+  ok('Sem sessão → 401; de outro site → 403; perfil de outra conta → 404', s1.s === 401 && s2.s === 403 && s3.s === 404, [s1.s, s2.s, s3.s].join(','));
+  const st0 = q0.get('state'), bad = st0.slice(0, -3) + (st0.endsWith('AAA') ? 'BBB' : 'AAA');
+  const cb1 = await fetch(BASE + 'api/google?code=C1&state=' + encodeURIComponent(bad)).then(r => r.text()), cb2 = await fetch(BASE + 'api/google?error=access_denied&state=' + encodeURIComponent(st0)).then(r => r.text());
+  ok('Regresso falsificado (state mudado) é recusado; "Cancelar" no Google não liga nada', /g-erro/.test(cb1) && /expirou/.test(cb1) && /g-erro/.test(cb2) && /Cancelaste/.test(cb2));
+  // desligar: revoga no Google e apaga a autorização
+  await E(p, () => location.hash = 'definicoes.email'); await sleep(400); await E(p, () => document.querySelector('[data-act=ggOff]').click()); await sleep(200); await E(p, () => document.querySelector('#modal [data-mok]').click());
+  await p.waitForFunction(() => !OS.Goog.st().ligado, null, { timeout: 6000 }).catch(() => { }); await sleep(500);
+  const off = await E(p, () => ({ st: OS.Goog.st(), link: !!document.querySelector('[data-gggo], .gg-card button[disabled]'), items: OS.Mail.items().length, gcal: OS.Cal.gcal.length }));
+  ok('Desligar: revoga no Google, apaga a autorização no servidor e limpa os e-mails e a agenda deste aparelho', !off.st.ligado && off.link && off.items === 0 && off.gcal === 0 && GM.revoked.has('RT-1') && !fs.existsSync(gfiles[0]), JSON.stringify(off));
+  // ligar outra vez e o Google retirar o acesso (pela conta Google): a app volta a pedir para ligar
+  GM.revoked.clear(); GM.reject = new Set(); await p.waitForSelector('[data-gggo]', { timeout: 8000 });
+  const [pop2] = await Promise.all([ctx.waitForEvent('page'), p.click('[data-gggo]')]); await pop2.waitForSelector('main', { timeout: 10000 }).catch(() => { }); await pop2.close();
+  await p.bringToFront(); await E(p, () => window.dispatchEvent(new Event('focus'))); await p.waitForFunction(() => OS.Goog.st().ligado, null, { timeout: 9000 }).catch(() => { });
+  GM.revoked.add('RT-1'); GM.reject = new Set(GM.issued); await E(p, () => location.hash = 'email'); await sleep(300); await E(p, () => OS.Mail.refresh(true)); await sleep(1500);
+  const rv = await E(p, () => ({ st: OS.Goog.st(), err: (document.querySelector('#view .ib-st.bad') || {}).innerText || '', card: !!document.querySelector('#view .gg-card [data-gggo], #view .gg-card button[disabled]') }));
+  ok('O Google retirou o acesso: a app avisa e volta a mostrar "Ligar a minha conta Google"', !rv.st.ligado && /Liga a conta Google outra vez/.test(rv.err) && rv.card, JSON.stringify(rv));
+  await ctx.close();
+  // a conta com script (a do Ryan) continua exatamente igual: script, sem o cartão do Google
+  const k2 = await newPage(b, prof, await mkAcc()); await k2.p.goto(BASE); await unlock(k2.p);
+  await E(k2.p, port => { OS.setOne('inbox', { url: 'http://127.0.0.1:' + port + '/gs', key: 'KEY_T', ver: 11 }); location.hash = 'definicoes.email'; }, PORT); await sleep(800);
+  const sc = await E(k2.p, () => ({ card: !!document.querySelector('.gg-card'), t: (document.querySelector('#view') || {}).innerText || '', mail: OS.Goog.mail() }));
+  ok('Conta com script Google (a do Ryan): fica tudo igual, pelo script, sem o cartão do Google', !sc.card && /Gmail principal/.test(sc.t) && !sc.mail, JSON.stringify({ card: sc.card, mail: sc.mail }));
+  await k2.ctx.close();
+  // aparelho pessoal (sem conta): nada muda
+  const k3 = await newPage(b, prof); await k3.p.goto(BASE); await unlock(k3.p); await E(k3.p, () => location.hash = 'definicoes.email'); await sleep(600);
+  ok('Modo pessoal (sem conta): sem cartão do Google', await E(k3.p, () => !document.querySelector('.gg-card') && !OS.Goog.on()));
+  await k3.ctx.close();
+  ok('sem erros de JavaScript', !errs.concat(k2.errs, k3.errs).length, errs.concat(k2.errs, k3.errs).slice(0, 3).join(' | ')); }
 async function sonoTests(b) { cur = 'Sono'; console.log('\n=== Sono: app Saúde no Painel ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.all('sleep').splice(0); location.hash = 'visao'; }); await sleep(600);
   ok('Painel: cartão do Sono vazio convida a ligar o app Saúde ou registar à mão', await E(p, () => { const c = [...document.querySelectorAll('.dash .dc')].find(d => /^Sono/.test(d.querySelector('h3').textContent)); return !!c && /Ligar ao app Saúde/.test(c.innerText) && !!c.querySelector('[data-act=slAdd]'); }));
@@ -2551,7 +2662,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('google')) await googleTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); try { for (const c of b.contexts()) for (const pg of c.pages()) { const d = await pg.evaluate(() => ({ u: location.hash, now: Date.now(), pend: window.__pend ? [...window.__pend.values()] : null, acc: ((document.getElementById('acc') || {}).innerText || '').slice(0, 80).replace(/\n/g, ' '), msg: (document.querySelector('#acc .ac-msg') || {}).textContent || '' })).catch(() => null); if (d && d.pend) console.log('    [pagina]', JSON.stringify(d)); } } catch (e2) { } }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);
