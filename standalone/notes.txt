@@ -1,4 +1,1 @@
-Gmail e agenda Google para todas as contas: em Definições › E-mail toca em «Ligar a minha conta Google», autoriza uma vez e o Náutilo passa a ler os teus e-mails (separados e resumidos pela IA) e os eventos da tua agenda, em todos os teus aparelhos.
-Só leitura: o Náutilo nunca envia, apaga nem muda nada no teu Google. Para responder, escreve (ou pede à IA) e toca em «Copiar e abrir no Gmail».
-Quem já usa o script Google continua exatamente como antes.
-A Política de Privacidade inclui agora os dados da conta Google (só leitura, Utilização Limitada).
+Menu de cima no tablet deitado e em janelas estreitas: os grupos que não cabem passam para «Mais», em vez de ficarem por baixo dos ícones (o «Admin» já não fica tapado pelo microfone).

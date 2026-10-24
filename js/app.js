@@ -38,8 +38,9 @@ function renderTop(cur) {
   const grp = (NAV.find(([, items]) => items.some(([k]) => k === cur)) || [''])[0];
   setH(U.$('#top'), `<button class="icon-btn tn-menu" data-act="navOpen" aria-label="Menu">${UI.ic('menu')}</button>
   <a class="tn-brand" href="#visao" aria-label="Náutilo, Painel">${OS.Lock.logo(22, '#EDF1F6')}<b>Náutilo</b></a>
-  <nav class="tn" aria-label="Secções">${NAV.map(([g, items]) => `<div class="tn-g ${grp === g ? 'cur' : ''}"><button class="tn-b" data-act="tnToggle" aria-haspopup="true">${g === 'Visão geral' ? 'Visão Geral' : g}<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button>
-    <div class="tn-dd">${items.map(([k, l, ic]) => `<a href="#${k}" class="${cur === k ? 'on' : ''}">${UI.ic(ic)}<span><b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${esc(DESC[k] || '')}</small></span></a>`).join('')}</div></div>`).join('')}</nav>
+  <nav class="tn" aria-label="Secções">${NAV.map(([g, items], i) => `<div class="tn-g ${grp === g ? 'cur' : ''}" data-tni="${i}"><button class="tn-b" data-act="tnToggle" aria-haspopup="true">${g === 'Visão geral' ? 'Visão Geral' : g}<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="tn-dd">${tnLinks(items, cur)}</div></div>`).join('')}
+    <div class="tn-g tn-more" hidden><button class="tn-b" data-act="tnToggle" aria-haspopup="true">Mais<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button><div class="tn-dd">${NAV.map(([g, items], i) => `<div class="tn-mg" data-tni="${i}" hidden><small class="tn-mh">${g === 'Visão geral' ? 'Visão Geral' : g}</small>${tnLinks(items, cur)}</div>`).join('')}</div></div></nav>
   <div class="tn-r"><i class="sync-dot ${OS.sync.status}" id="syncDot2" title="${esc(OS.sync.msg)}"></i>
   <button class="icon-btn spy-tb" data-act="spyOpen" aria-label="Spyke" title="Spyke (assistente de voz)">${UI.ic('mic')}</button>
   <button class="icon-btn" data-act="cmdOpen" aria-label="Procurar (Ctrl K)" title="Procurar (Ctrl K)">${UI.ic('search')}</button>
@@ -47,6 +48,17 @@ function renderTop(cur) {
   <a class="icon-btn" href="#definicoes" aria-label="Definições" title="Definições">${UI.ic('settings')}</a>${OS.Acc && OS.Acc.on && OS.Acc.bubble ? OS.Acc.bubble() : ''}
   <button class="btn pri sm tn-add" data-act="quickAdd" aria-label="Registar">${UI.ic('plus')}<span>Registar</span></button></div>`);
 }
+const tnLinks = (items, cur) => items.map(([k, l, ic]) => `<a href="#${k}" class="${cur === k ? 'on' : ''}">${UI.ic(ic)}<span><b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${esc(DESC[k] || '')}</small></span></a>`).join('');
+// menu de cima: os grupos que não cabem na largura (tablet deitado, janela estreita) passam para "Mais", em vez de ficarem por baixo dos ícones
+const fitNav = () => { const nav = U.$('#top .tn'); if (!nav || !nav.offsetParent) return; const G = [...nav.querySelectorAll(':scope > .tn-g[data-tni]')], more = nav.querySelector('.tn-more'); if (!more) return;
+  G.forEach(g => g.hidden = false); more.hidden = true; more.classList.remove('cur'); more.querySelectorAll('.tn-mg').forEach(m => m.hidden = true);
+  const lim = () => nav.getBoundingClientRect().right, over = el => el.getBoundingClientRect().right > lim() + 0.5;
+  if (!G.length || !over(G[G.length - 1])) return;
+  more.hidden = false;
+  for (let i = G.length - 1; i > 0 && over(more); i--) { G[i].hidden = true; const m = more.querySelector(`.tn-mg[data-tni="${G[i].dataset.tni}"]`); if (m) m.hidden = false; if (G[i].classList.contains('cur')) more.classList.add('cur'); } };
+OS.fitNav = fitNav;
+window.addEventListener('resize', U.deb ? U.deb(fitNav, 120) : fitNav);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNav);
 function renderTab(cur) {
   setH(U.$('#tabbar'), '');
   let fab = document.getElementById('gameFab');
@@ -90,7 +102,7 @@ function render() {
   document.body.classList.toggle('dom-mode', cur === 'dominus');
   const a = document.activeElement; let fsel = null, caret = null;
   if (a && a !== document.body && U.$('#view').contains(a)) { for (const at of FOCUS_ATTRS) { const v = a.getAttribute(at); if (v) { fsel = `[${at}="${CSS.escape(v)}"]`; break; } } try { caret = a.selectionStart; } catch (e) { } }
-  try { renderSide(cur); renderTop(cur); renderTab(cur); } catch (e) { console.error(e); }
+  try { renderSide(cur); renderTop(cur); fitNav(); renderTab(cur); } catch (e) { console.error(e); }
   C.reset(); let html;
   try { html = cur === 'definicoes' && OS.settingsView ? OS.Fold.html(OS.settingsView(r.sub), r.sub) : V[cur](r.sub); } catch (e) { console.error(e); html = `<div class="pn"><b>Não foi possível mostrar esta página.</b><p class="mut">${esc(e.message)}</p></div>`; }
   if (OS.aiN) html = OS.aiN(String(html || ''));
