@@ -1,7 +1,7 @@
-/* NÁUTILO — Spyke: assistente de voz (estilo J.A.R.V.I.S.), voz masculina.
+/* PRUMO — Spyke: assistente de voz (estilo J.A.R.V.I.S.), voz masculina.
    Com a app aberta: toca no microfone, diz "Spyke…" (palavra de ativação) ou bate duas palmas.
    Com a app fechada (limite do iPhone: uma app web não pode ouvir em segundo plano): Atalhos da Siri + "Atalhos vocais" do iOS
-   chamam o teu script Google, que devolve o resumo do dia (o Náutilo envia-o sempre que está aberto) ou responde com a IA.
+   chamam o teu script Google, que devolve o resumo do dia (o Prumo envia-o sempre que está aberto) ou responde com a IA.
    Voz: Gemini TTS (voz masculina, ex.: Charon) com a tua chave; sem chave, a voz do sistema (masculina se existir). */
 (() => {
 'use strict';
@@ -645,7 +645,7 @@ V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key 
     ${c.clap ? `<div class="ws-form" style="margin-top:8px"><label>Sensibilidade das palmas<input type="range" min="1" max="9" data-bind="spyke.sens" value="${c.sens}"></label></div><button class="btn sm" data-act="spyClapTest" style="margin-top:6px">${UI.ic('mic')}Testar o microfone e as palmas</button>` : ''}
     <label class="switch" style="margin-top:10px"><input type="checkbox" data-bind="spyke.morning" ${c.morning ? 'checked' : ''}><span></span>De manhã, ao abrir a app pela primeira vez, o Spyke dá o resumo do dia</label>
     <div class="spy-note"><b>Para o iPhone não pedir o microfone sempre</b><small>${MICSET}. Na app do ecrã principal o iPhone pode voltar a perguntar uma vez cada vez que a abres: é uma regra da Apple para apps web.</small></div>
-    <div class="spy-note"><b>Com a app fechada</b><small>O iPhone não deixa nenhuma app web ouvir em segundo plano: quando sais do NÁUTILO o microfone desliga-se e volta a ligar sozinho quando voltas. Para chamar o Spyke com a app fechada diz <b>"E aí Siri, abre o NÁUTILO"</b> (abre já a ouvir) ou usa os Atalhos vocais do guia em baixo.</small></div>
+    <div class="spy-note"><b>Com a app fechada</b><small>O iPhone não deixa nenhuma app web ouvir em segundo plano: quando sais do Prumo o microfone desliga-se e volta a ligar sozinho quando voltas. Para chamar o Spyke com a app fechada diz <b>"E aí Siri, abre o PRUMO"</b> (abre já a ouvir) ou usa os Atalhos vocais do guia em baixo.</small></div>
     ${SR ? '' : '<p class="neg" style="font-size:12.5px;margin:8px 0 0">Este navegador não tem reconhecimento de voz: usa o Safari no iPhone ou o Chrome.</p>'}</div>
   <div class="pn"><div class="pn-h"><h3>Conversa</h3></div>
     <label class="switch"><input type="checkbox" data-bind="spyke.cont" ${c.cont ? 'checked' : ''}><span></span>Conversa contínua: depois de responder continua a ouvir sem dizeres o nome outra vez</label>

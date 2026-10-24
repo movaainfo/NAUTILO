@@ -1,4 +1,4 @@
-/* NÁUTILO — a cena: o mar visto da muralha de um forte antigo, na costa de Aveiro, como num filme a preto e azul.
+/* PRUMO — a cena: o mar visto da muralha de um forte antigo, na costa de Aveiro, como num filme a preto e azul.
    O céu segue a hora real (madrugada, amanhecer, dia, fim de tarde, noite com estrelas). Ao fundo, os palheiros da Costa Nova,
    um moliceiro na água e o Farol da Barra, a única luz quente, que gira de noite. Grão de filme por cima.
    Desenhada em SVG à medida do ecrã: no ecrã de entrada mexe-se devagar (água, barco, farol); no Painel fica parada. */

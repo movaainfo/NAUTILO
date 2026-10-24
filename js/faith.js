@@ -1,4 +1,4 @@
-/* NÁUTILO — Fé & Devoção: uma parte dedicada a Deus.
+/* PRUMO — Fé & Devoção: uma parte dedicada a Deus.
    Hoje com Deus (versículo do dia, como estás, uma palavra para hoje pela IA com base no teu dia, leitura, oração guiada) ·
    Bíblia completa (Bíblia Livre 2018 e Almeida 1911, sem internet), com pesquisa, destaques e notas ·
    Meu devocional (método SOAP: Escritura, Observação, Aplicação, Oração + gratidão) · Pedidos de oração e respostas · Planos de leitura. */
@@ -66,7 +66,7 @@ let WB = false, WERR = '';
 A.feWord = async () => { if (WB) return; const d = todayDevo() || {}, ctx = dayContext();
   if (!(OS.AI && OS.AI.key())) { const R = pickByMood(d.moods, 'w'); cfg().word = { date: today(), ref: R.b + ' ' + R.c + ':' + R.v1 + (R.v2 !== R.v1 ? '-' + R.v2 : ''), frase: (d.moods || []).map(m => PHR[m]).filter(Boolean)[0] || 'Deus está contigo neste dia — em cada tarefa, em cada conversa, em cada silêncio.', porque: (d.moods || []).length ? 'Escolhido para quem hoje se sente ' + d.moods.join(', ') + '.' : 'O versículo do dia.', ai: false }; OS.touch('faith'); return; }
   WB = true; WERR = ''; OS.request();
-  try { const o = await OS.AI.json([{ text: `És um conselheiro devocional cristão, fiel à Bíblia, caloroso e sem julgamentos, a falar com ${OS.whoCtx('o Ryan (brasileiro, vive em Aveiro, Portugal, estudante)')}. Com base em como ele está hoje e no que a vida dele mostra (dados do Náutilo abaixo), escolhe a palavra de Deus que ele provavelmente PRECISA de ouvir hoje.
+  try { const o = await OS.AI.json([{ text: `És um conselheiro devocional cristão, fiel à Bíblia, caloroso e sem julgamentos, a falar com ${OS.whoCtx('o Ryan (brasileiro, vive em Aveiro, Portugal, estudante)')}. Com base em como ele está hoje e no que a vida dele mostra (dados do Prumo abaixo), escolhe a palavra de Deus que ele provavelmente PRECISA de ouvir hoje.
 DADOS DE HOJE: ${JSON.stringify(ctx)}
 Regras: usa versículos reais e adequados ao contexto (não tires versículos do contexto para prometer riqueza ou sucesso); não inventes factos sobre a vida dele; português de Portugal, 2.ª pessoa (tu); a frase deve ser curta e memorável; se houver sinais de sofrimento grave ou risco, preenche "alerta" com uma mensagem de cuidado.
 Responde APENAS JSON: {"frase":"máx 25 palavras","ref":{"livro":"código USFM de 3 letras (GEN, EXO, PSA, PRO, ISA, MAT, MRK, LUK, JHN, ACT, ROM, 1CO, 2CO, GAL, EPH, PHP, COL, 1TH, 2TI, HEB, JAS, 1PE, 1JN, REV…)","cap":numero,"v1":numero,"v2":numero},"porque":"1–2 frases a ligar a palavra ao dia dele, concreto","reflexao":"3 a 5 frases","oracao":"oração curta em 1.ª pessoa","passo":"um passo prático de fé para hoje","alerta":null}` }], .4);

@@ -1,4 +1,4 @@
-/* NÁUTILO — Treino (estilo Hevy), corpo integrado, alongamentos e dieta com fotos */
+/* PRUMO — Treino (estilo Hevy), corpo integrado, alongamentos e dieta com fotos */
 /* imagens animadas dos exercícios: as duas fases do movimento alternam */
 .exi{position:relative;display:inline-block;flex:none;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--line2)}
 .exi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}

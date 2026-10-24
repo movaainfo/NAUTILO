@@ -1,4 +1,4 @@
-/* NÁUTILO — Faltas por disciplina (Universidade → Faltas).
+/* PRUMO — Faltas por disciplina (Universidade → Faltas).
    Cada aula do teu horário que já passou é marcada sozinha:
    - Sem aula: feriado (Portugal; Aveiro também a 12 de maio) ou fora do semestre;
    - Falta: estavas num turno do trabalho a essa hora, ou a tua rotina não te põe na faculdade a essa hora;

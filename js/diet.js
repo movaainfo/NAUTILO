@@ -1,4 +1,4 @@
-/* NÁUTILO — Dieta: refeições, calorias, macros, água, biblioteca de alimentos e metas.
+/* PRUMO — Dieta: refeições, calorias, macros, água, biblioteca de alimentos e metas.
    Registar a dieta e bater a proteína alimenta o pilar Corpo no DOMINUS. */
 (() => {
 'use strict';

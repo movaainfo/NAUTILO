@@ -1,4 +1,4 @@
-/* NÁUTILO — animação 3D dos exercícios, ao estilo Hevy: corpo anatómico com a musculatura toda (BodyParts3D, CC BY-SA),
+/* PRUMO — animação 3D dos exercícios, ao estilo Hevy: corpo anatómico com a musculatura toda (BodyParts3D, CC BY-SA),
    posto em movimento com os padrões de anim.js. O músculo principal fica vermelho (e brilha na contração), os secundários a laranja.
    As mãos agarram mesmo o equipamento: barra, halteres, kettlebell, cabo com corda/barra/pega, ou a máquina certa para o exercício.
    Ficheiros em vendor/ (three.js + body.bin), servidos pela própria app e guardados para funcionar sem internet. Arrasta para rodar. */

@@ -1,4 +1,4 @@
-/* NÁUTILO — MUNDO › Ilhas e territórios.
+/* PRUMO — MUNDO › Ilhas e territórios.
    Quase 200 ilhas, arquipélagos e territórios que não entram nos 195 países: as de Portugal (Madeira, Porto Santo, as 9 dos Açores…),
    as do Brasil (Noronha, Ilha Grande, Ilhabela, Florianópolis…), o Mediterrâneo, o Norte da Europa e o Ártico, as Caraíbas e as Américas,
    o Índico e África, a Ásia e o Pacífico, e os territórios com bandeira própria (Gronelândia, Porto Rico, Bermudas, Taiwan, Polinésia…).

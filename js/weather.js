@@ -1,4 +1,4 @@
-/* NÁUTILO — Clima (Open-Meteo: grátis, sem chave). Cidade do perfil (por omissão Aveiro). Guarda 30 min neste aparelho. */
+/* PRUMO — Clima (Open-Meteo: grátis, sem chave). Cidade do perfil (por omissão Aveiro). Guarda 30 min neste aparelho. */
 (() => {
 'use strict';
 const U = OS.U;

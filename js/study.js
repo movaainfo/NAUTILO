@@ -1,4 +1,4 @@
-/* NÁUTILO — Estudos: Cursos · Certificações · Leituras.
+/* PRUMO — Estudos: Cursos · Certificações · Leituras.
    Leituras = estante virtual: pesquisa em todos os livros (Google Books + Open Library), Quero ler / A ler / Lido / Abandonado,
    progresso por página, nota, resenha, citações, categorias, a minha estante (físico, ebook, audiolivro; emprestar, doar, vender, trocar),
    desafios literários e estatísticas. */

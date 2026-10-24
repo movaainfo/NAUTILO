@@ -1,4 +1,4 @@
-/* NÁUTILO — marcas por tipo de alimento e por país (as que se encontram nos supermercados de cada país).
+/* PRUMO — marcas por tipo de alimento e por país (as que se encontram nos supermercados de cada país).
    Os valores nutricionais de uma marca escolhida aqui são os médios do alimento; para a tabela exata da embalagem
    a app procura também o produto no Open Food Facts. '*' = marcas internacionais (usadas quando o país não tem lista própria). */
 OS.BrandLists = {

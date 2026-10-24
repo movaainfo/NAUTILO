@@ -1,4 +1,4 @@
-/* NÁUTILO — ecrã de abertura e bloqueio.
+/* PRUMO — ecrã de abertura e bloqueio.
    Face ID / impressão digital: WebAuthn com autenticador da plataforma, registado por dispositivo.
    Código: só o hash SHA-256 fica no código ou na base de dados; o código nunca é guardado em texto.
    Nota: é um bloqueio de privacidade no dispositivo. A proteção real da página é a tua conta claude.ai (artifact privado). */
@@ -8,16 +8,10 @@ const U = OS.U;
 const L = OS.Lock = {};
 const SALT = 'oceanum-v1|';
 const DEFAULT_HASH = 'e18cf01ee14b8fc1001060a44feca6635d905597402a61e893d315e38bb72d5c';
-// logo: rosa dos ventos com o norte em crista de onda (a direção da tua vida); os traços do anel só aparecem nos tamanhos grandes
-const compassMark = (o = {}) => { const c = o.color || '#E6FAFF', ac = o.accent || '#38BDF8', bg = o.bg || '#04101F', ticks = o.ticks !== false;
-  const pt = (ang, len, w, c1, c2) => { const a = ang * Math.PI / 180, s = p => (50 + p[0] * Math.cos(a) - p[1] * Math.sin(a)).toFixed(2) + ' ' + (50 + p[0] * Math.sin(a) + p[1] * Math.cos(a)).toFixed(2);
-    return `<path d="M${s([0, -len])}L${s([w, 0])}L${s([0, 0])}Z" fill="${c1}"/><path d="M${s([0, -len])}L${s([-w, 0])}L${s([0, 0])}Z" fill="${c2}"/>`; };
-  const tk = ticks ? Array.from({ length: 24 }, (_, i) => { const a = i * 15 * Math.PI / 180, r1 = 42, r2 = i % 6 === 0 ? 37.5 : 39.6; return `<line x1="${(50 + r1 * Math.sin(a)).toFixed(2)}" y1="${(50 - r1 * Math.cos(a)).toFixed(2)}" x2="${(50 + r2 * Math.sin(a)).toFixed(2)}" y2="${(50 - r2 * Math.cos(a)).toFixed(2)}" stroke="${c}" stroke-width="${i % 6 === 0 ? 1.2 : .7}" opacity="${i % 6 === 0 ? .85 : .45}"/>`; }).join('') : '';
-  return `<circle cx="50" cy="50" r="42" fill="none" stroke="${c}" stroke-width="1.1" opacity=".55"/>${tk}${[45, 135, 225, 315].map(a => pt(a, 18, 4.3, c, c).replace(/fill="([^"]+)"\/><path/, 'fill="$1" opacity=".38"/><path').replace(/(<path[^>]*)(\/>)$/, '$1 opacity=".62"$2')).join('')}
-  ${[90, 180, 270].map(a => pt(a, 27.5, 5.9, c, c).replace(/(<path[^>]*)(\/>)$/, '$1 opacity=".7"$2')).join('')}
-  <path d="M50 18C46.1 23.4 44.1 31.25 44.1 50L50 50Z" fill="${c}"/><path d="M50 18C58.6 20.3 62.1 27.3 58.6 33.2C57 29.3 53.9 28.5 52.3 30.9C54.7 37.1 55.9 43 55.9 50L50 50Z" fill="${ac}"/>
-  <circle cx="50" cy="50" r="4.4" fill="${bg}" stroke="${c}" stroke-width="1.3"/><circle cx="50" cy="50" r="1.5" fill="${ac}"/>`; };
-L.logo = (size = 96, color = '#EAF6FF') => `<svg class="oc-logo" viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true">${compassMark({ color, accent: '#38BDF8', bg: '#04101F', ticks: size >= 40 })}</svg>`;
+// logo do Prumo: quatro anéis (mais finos para fora) cortados no topo pela linha de prumo, e o ponto vermelho ao centro
+const MARK = 'M53.42 32.72A17.61 17.61 0 1 1 46.58 32.72L46.58 38.71A11.8 11.8 0 1 0 53.42 38.71ZM53.42 21.99A28.22 28.22 0 1 1 46.58 21.99L46.58 26.48A23.77 23.77 0 1 0 53.42 26.48ZM53.42 12.71A37.45 37.45 0 1 1 46.58 12.71L46.58 15.8A34.37 34.37 0 1 0 53.42 15.8ZM53.42 4.13A46 46 0 1 1 46.58 4.13L46.58 5.84A44.29 44.29 0 1 0 53.42 5.84Z', MDOT = 4.86;
+L.logo = (size = 96, color = '#E9E3D8', dot = '#E0431F') => `<svg class="oc-logo pr-logo" viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true"><path fill="${color}" d="${MARK}"/><circle cx="50" cy="50" r="${MDOT}" fill="${dot}"/></svg>`;
+L.word = (t = 'Prumo') => `<span class="pr-word">${t}</span>`;
 
 const sha = async s => { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); };
 const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -43,13 +37,13 @@ L.bioId = () => IPHONE ? U.ls.get('os2bio', null) : null;
 L.bioAvailable = async () => { if (!IPHONE) return false; try { return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (e) { return false; } };
 const bioErr = e => { const n = e && e.name;
   if (n === 'NotAllowedError') return 'O Face ID foi cancelado ou bloqueado. Tenta outra vez; confirma em Ajustes → Face ID e código que o Safari pode usar o Face ID e que o Porta-chaves do iCloud está ligado (Ajustes → o teu nome → iCloud → Palavras-passe e porta-chaves).';
-  if (n === 'InvalidStateError') return 'Este iPhone já tem o Face ID registado no Náutilo.';
+  if (n === 'InvalidStateError') return 'Este iPhone já tem o Face ID registado no Prumo.';
   if (n === 'SecurityError') return 'O endereço da app não permite Face ID. Abre pelo link ' + location.origin + location.pathname + '.';
   if (n === 'NotSupportedError') return 'O iPhone não suporta este tipo de chave. Atualiza o iOS.';
   return 'Face ID indisponível: ' + ((e && (e.message || e.name)) || 'erro desconhecido'); };
 L.register = async () => { if (ANDROID) { OS.UI.toast('No Android a biometria está desligada. Usa "Entrar direto" em Definições.', 'warn'); return false; }
   try {
-    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'NÁUTILO' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || OS.who() }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
+    const cred = await navigator.credentials.create({ publicKey: { challenge: rand(32), rp: { name: 'Prumo' }, user: { id: rand(16), name: 'ryan', displayName: OS.one('profile').short || OS.who() }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
     U.ls.set('os2bio', { id: b64u(cred.rawId), at: U.today() }); U.ls.set('os2bioAsk', true); try { OS.UI.closeModal(); } catch (e) { } OS.UI.toast('Face ID ativado. Da próxima vez entras com a cara.', 'pos'); OS.request(); return true;
   } catch (e) { U.ls.set('os2bioAsk', true); OS.UI.toast(bioErr(e), 'warn'); return false; }
 };
@@ -101,7 +95,7 @@ async function showLock() {
   const qs = q.length < 42 ? 'l' : q.length < 75 ? 'm' : 's';
   s.innerHTML = `${scene()}<div class="lk-top"><div class="lk-time" id="lkTime">${hm()}</div><div class="lk-date">${OS.U ? OS.U.esc(OS.U.longDate(OS.U.today())) : ''}</div></div>
     <div class="lk-mid"><p class="lk-hi">${hello()}, ${OS.U ? OS.U.esc(name) : 'Ryan'}.</p>${q ? `<p class="lk-q ${qs}">${OS.U.esc(q)}</p>` : ''}</div>
-    <div class="sp-in lk-bot"><div class="lk-brand">${L.logo(26)}<span class="sp-name">Náutilo</span></div>
+    <div class="sp-in lk-bot"><div class="lk-brand">${L.logo(26)}<span class="sp-name">Prumo</span></div>
     <form class="lk" id="lkForm" autocomplete="off">
       ${can ? `<button type="button" class="lk-bio" id="lkBio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3H5a2 2 0 0 0-2 2v2M17 3h2a2 2 0 0 1 2 2v2M7 21H5a2 2 0 0 1-2-2v-2M17 21h2a2 2 0 0 0 2-2v-2M9 9v1M15 9v1M12 9v4h-1M9 16c1.5 1 4.5 1 6 0"/></svg>Desbloquear com Face ID</button><div class="lk-or">ou código</div>` : ''}
       ${codeInput()}

@@ -1,4 +1,4 @@
-/* NÁUTILO — Ligações entre áreas: o que mudas num sítio muda nos outros.
+/* PRUMO — Ligações entre áreas: o que mudas num sítio muda nos outros.
    A maior parte da app já lê das mesmas coleções (calendário, contas a pagar, progresso de projetos e metas, hábitos automáticos…).
    Aqui ficam as ligações que dependiam de cópias ou que deixavam registos órfãos ao apagar/editar. */
 (() => {

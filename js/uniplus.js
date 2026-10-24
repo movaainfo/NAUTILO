@@ -1,4 +1,4 @@
-/* NÁUTILO — Universidade+: o que os melhores apps de estudo têm.
+/* PRUMO — Universidade+: o que os melhores apps de estudo têm.
    Flashcards com repetição espaçada (SM-2, como o Anki) e criados pela IA · Simulados de escolha múltipla gerados pela IA ·
    Tutor IA (explicar, resumir, Feynman, mapa mental, exercícios) · Calculadora de notas ("quanto preciso no exame?") ·
    Plano de estudo até ao exame · Materiais por disciplina · Presenças/faltas · Contagem decrescente, mapa de calor e sequência. */

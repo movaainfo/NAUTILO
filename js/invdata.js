@@ -1,4 +1,4 @@
-/* NÁUTILO — motor de mercado dos Investimentos.
+/* PRUMO — motor de mercado dos Investimentos.
    Cotações ao vivo: Yahoo Finance através do teu script Google (ações, ETFs, fundos, FII, índices, câmbio, cripto de todas as bolsas),
    cripto em tempo real por streaming (Binance) e CoinGecko, câmbio diário do BCE (Frankfurter), EUA em streaming com chave Finnhub (opcional).
    Renda fixa: rende sozinha com CDI, Selic, IPCA e poupança diários do Banco Central do Brasil, ou taxa pré-fixada.

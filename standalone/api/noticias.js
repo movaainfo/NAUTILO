@@ -1,4 +1,4 @@
-// NÁUTILO · Jornal para todas as contas (função do Vercel): Google Notícias por edição, tema ou pesquisa,
+// PRUMO · Jornal para todas as contas (função do Vercel): Google Notícias por edição, tema ou pesquisa,
 // no mesmo formato que o script Google pessoal devolve ({ nw: { id: [notícias] } }). Guardado 4 min; só responde à própria app.
 'use strict';
 const N = require('./_nuvem');

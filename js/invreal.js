@@ -1,4 +1,4 @@
-/* NÁUTILO — Imóveis e Renda passiva (dentro de Investimentos).
+/* PRUMO — Imóveis e Renda passiva (dentro de Investimentos).
    · Imóveis: a casa onde vives e os imóveis para arrendar também são investimento. Valor de mercado, a tua parte, crédito,
      capital próprio, valorização desde a compra, rendas, despesas (IMI, condomínio, seguro, manutenção, gestão), rentabilidade
      bruta e líquida, cash flow depois da prestação e o real (movimentos das Finanças ligados ao imóvel).
@@ -72,7 +72,7 @@ IX.passive = (months = 24) => { const ms = Fin.months(months), by = {}; ms.forEa
 /* ================= ecrã: Imóveis ================= */
 const kv = (l, v, cls = '') => `<div><small>${l}</small><b class="mono ${cls}">${v}</b></div>`;
 T.imoveis = () => { const R = IX.realEstate(), P = R.P;
-  if (!P.length && !R.legacy.length) return `<div class="pn inv-on"><h3>${UI.ic('building')}Os teus imóveis</h3><p class="mut">A casa onde vives, um apartamento para arrendar, um terreno ou a tua parte na casa da família também são investimento. Regista o valor de mercado, o crédito (se houver), as rendas e as despesas: o Náutilo calcula o capital próprio, a valorização, a rentabilidade e o cash flow, e junta tudo ao teu património.</p>
+  if (!P.length && !R.legacy.length) return `<div class="pn inv-on"><h3>${UI.ic('building')}Os teus imóveis</h3><p class="mut">A casa onde vives, um apartamento para arrendar, um terreno ou a tua parte na casa da família também são investimento. Regista o valor de mercado, o crédito (se houver), as rendas e as despesas: o Prumo calcula o capital próprio, a valorização, a rentabilidade e o cash flow, e junta tudo ao teu património.</p>
     <div class="row gap8" style="flex-wrap:wrap">${UI.addBtn('props', 'Adicionar a minha casa', { tipo: 'Habitação própria', uso: 'Habitação própria e permanente' }, 'pri')}${UI.addBtn('props', 'Imóvel para arrendar', { tipo: 'Para arrendar', uso: 'Arrendado', occ: 12 }, '')}${UI.addBtn('props', 'Terreno / outro', { tipo: 'Terreno', uso: 'Vazio' }, 'ghost')}</div></div>`;
   const rent = P.filter(p => p.rented);
   return `<div class="kpis">${UI.kpi('Valor dos imóveis', M(R.val + R.legacyVal, { dec: 0 }), `${P.length + R.legacy.length} imóvel(is) · a tua parte`)}${UI.kpi('Capital próprio', M(R.eq + R.legacyVal, { dec: 0 }), R.loan ? 'valor − crédito' : 'sem crédito')}${UI.kpi('Crédito em dívida', M(R.loan, { dec: 0 }), R.val ? 'LTV ' + U.pct(R.loan / R.val, 0) : '', { tone: R.loan ? 'warn' : '' })}${UI.kpi('Valorização', R.basis ? M(R.gain, { sign: 1, dec: 0 }) : '—', R.basis ? pctS(R.gain / R.basis) + ' desde a compra' : 'indica o preço de compra', { tone: tone(R.gain) })}${UI.kpi('Rendas por ano', M(R.rentY, { dec: 0 }), rent.length ? `líquido ${M(R.noi, { dec: 0 })} · ${U.pct(R.val ? R.noi / R.val : 0, 2)}` : 'sem imóveis arrendados')}${UI.kpi('Cash flow por mês', M(R.cf / 12, { sign: 1, dec: 0 }), 'depois de despesas e prestações', { tone: tone(R.cf) })}</div>

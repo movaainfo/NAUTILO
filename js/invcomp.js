@@ -1,4 +1,4 @@
-/* NÁUTILO — Análise de empresas: escreves o nome e recebes tudo o que precisas para decidir.
+/* PRUMO — Análise de empresas: escreves o nome e recebes tudo o que precisas para decidir.
    O que faz · quem manda e quem é dono · demonstrações financeiras (resultados, balanço, fluxos de caixa) · múltiplos ·
    dividendos · analistas · calendário · checklists dos mestres (Graham, Buffett, Lynch, Bazin, Fisher) · Piotroski · Altman Z ·
    preço justo de Graham e preço-teto de Bazin · notícias · relatório completo da IA (com pesquisa web e verificação).

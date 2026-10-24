@@ -1,4 +1,4 @@
-/* NÁUTILO — DESPORTO › AVENTURAS: a tua lista de aventuras e desportos radicais.
+/* PRUMO — DESPORTO › AVENTURAS: a tua lista de aventuras e desportos radicais.
    Um catálogo grande (montanha, céu, neve, água, terra, provas e desportos para experimentar) para escolheres o que queres viver;
    cada aventura fica com estado (Quero fazer · Planeada · Feita), data, sítio e notas. As feitas dão XP de Corpo no Dominus. */
 (() => {

@@ -1,4 +1,4 @@
-/* NÁUTILO — Sono: as noites que o app Saúde do iPhone regista (relógio, iPhone ou outra app ligada ao Saúde), ou registadas à mão.
+/* PRUMO — Sono: as noites que o app Saúde do iPhone regista (relógio, iPhone ou outra app ligada ao Saúde), ou registadas à mão.
    Como a app não pode ler o Saúde diretamente, um atalho do iPhone (automação "Ao acordar") lê a "Análise do sono" e envia-a:
    - numa conta: para o link do perfil (fica na caixa da conta e entra sozinho, sem abrir a app);
    - em qualquer modo: abrindo o endereço …/#sono-add?s=<as amostras>.
@@ -86,7 +86,7 @@ Sono.panel = link => `<div class="pn" id="slSet"><div class="pn-h"><h3>${UI.ic('
   <p class="mut" style="margin:0 0 12px">Todas as manhãs o iPhone envia a noite (do relógio, do iPhone ou de outra app ligada ao Saúde) e ela aparece no Painel, com as fases do sono.</p>
   <div class="ib-w"><div class="ib-s"><i>1</i><div><b>Criar a automação</b><p>App <b>Atalhos</b> → <b>Automação</b> → <b>+</b> → <b>Despertar</b> (ou <b>Hora do dia</b>, 9:00) → <b>Executar imediatamente</b> → <b>Novo atalho</b>.</p></div></div>
     <div class="ib-s"><i>2</i><div><b>Ler o sono (3 ações)</b><div class="ib-sc"><div><b>1 · Encontrar amostras de saúde</b> → Tipo: <b>Análise do sono</b> → Data de início: <b>nos últimos 2 dias</b>.</div><div><b>2 · Repetir com cada</b> → lá dentro <b>Texto</b>: <code>Valor|Data de início|Data de fim</code> (toca em cada data e escolhe o formato <b>ISO 8601</b>).</div><div><b>3 · Combinar texto</b> (Repetir resultados) com <b>Nova linha</b>.</div></div></div></div>
-    <div class="ib-s"><i>3</i><div><b>Enviar para o Náutilo</b>${link ? `<p><b>Obter conteúdo do URL</b> → cola o link abaixo → Método <b>POST</b> → Corpo <b>Formulário</b> → campo <code>s</code> = <b>Texto combinado</b>. Fica registado sem abrir a app.</p><div class="ib-link"><code>${esc(link)}</code><button class="btn sm pri" data-act="slCopy" data-l="${esc(link)}">Copiar link</button></div>`
+    <div class="ib-s"><i>3</i><div><b>Enviar para o Prumo</b>${link ? `<p><b>Obter conteúdo do URL</b> → cola o link abaixo → Método <b>POST</b> → Corpo <b>Formulário</b> → campo <code>s</code> = <b>Texto combinado</b>. Fica registado sem abrir a app.</p><div class="ib-link"><code>${esc(link)}</code><button class="btn sm pri" data-act="slCopy" data-l="${esc(link)}">Copiar link</button></div>`
       : `<p><b>Abrir URL</b> → <code>${esc(location.origin + location.pathname)}#sono-add?s=</code> seguido do <b>Texto combinado</b> (Codificar URL). A app abre e regista a noite.</p>`}</div></div></div>
   <div class="row gap8" style="margin-top:10px"><button class="btn sm" data-act="slAdd">Registar uma noite à mão</button></div></div>`;
 A.slCopy = async b => { try { await navigator.clipboard.writeText(b.dataset.l); UI.toast('Link copiado: cola-o no atalho', 'pos'); } catch (e) { UI.toast('Toca no link, seleciona e copia', 'warn'); } };

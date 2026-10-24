@@ -1,4 +1,4 @@
-/* NÁUTILO — Assistente de decisão com IA nos Simuladores.
+/* PRUMO — Assistente de decisão com IA nos Simuladores.
    Lê o simulador aberto (valores, resultados, regras e taxas ao vivo do país) e a tua situação financeira real,
    e responde: veredicto, porquê, riscos, cenários alternativos (aplicáveis com um toque) e próximos passos.
    Usa a mesma IA da app (Google Gemini com a chave do utilizador). */
@@ -41,7 +41,7 @@ const readSim = () => { const v = document.getElementById('view'); if (!v) retur
   return { simulador: tab.trim() || cur, inputs, opcoes_escolhidas: seg, resultados: kpis, notas: notes, taxas_ao_vivo: live };
 };
 const PROMPT = (q, sim, hist) => { const f = OS.FinCountry ? OS.FinCountry.get() : {}, c = OS.Country ? OS.Country.get()[1] : 'Portugal';
-  return `És o assistente financeiro pessoal da app Náutilo. O utilizador (${OS.whoFlat('Ryan, brasileiro, vive em Aveiro, Portugal')}) está a usar um SIMULADOR e quer ajuda para tomar a MELHOR decisão.
+  return `És o assistente financeiro pessoal da app Prumo. O utilizador (${OS.whoFlat('Ryan, brasileiro, vive em Aveiro, Portugal')}) está a usar um SIMULADOR e quer ajuda para tomar a MELHOR decisão.
 Escreve em português de Portugal, direto e concreto, como um amigo que percebe muito de finanças. Usa os números da simulação e da vida real dele; não inventes taxas nem dados que não estão aqui (se faltar algo, diz o que falta). Aplica as regras do país escolhido (${c}: moeda ${f.cur || 'EUR'}, impostos: ${f.taxL || ''}). Lembra que as taxas ao vivo são médias de mercado. Não recomendes produtos de uma empresa específica; fala de tipos de produto. Se a decisão for má para a situação dele (ex.: sem reserva de emergência, dívidas caras, prestação pesada), diz claramente.
 PAÍS E REGRAS: ${strip(f.note || '')}
 SIMULAÇÃO ATUAL: ${JSON.stringify(sim)}

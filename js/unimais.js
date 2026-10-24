@@ -1,4 +1,4 @@
-/* NÁUTILO — Universidade: cor de cada disciplina e Trabalhos & TPC.
+/* PRUMO — Universidade: cor de cada disciplina e Trabalhos & TPC.
    Cada disciplina tem uma cor (escolhes tu ou fica uma automática) que aparece em toda a Universidade, no horário e no calendário.
    Trabalhos & TPC: o sítio para anotar as lições, os exercícios, as leituras e os trabalhos que tens para fazer, com prazo.
    Ficam como tarefas da área Universidade (aparecem também em Tarefas, no calendário e nos Próximos passos), e os trabalhos

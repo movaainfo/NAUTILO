@@ -1,4 +1,4 @@
-/* NÁUTILO — Oportunidades automáticas.
+/* PRUMO — Oportunidades automáticas.
    Lê os teus e-mails e as notificações do LinkedIn que chegam ao Gmail (o mesmo script Google da página E-mail) e encontra oportunidades:
    vagas, estágios, bolsas, cursos, certificações, eventos, palestras, competições, programas e negócios. Não adiciona nada sozinho:
    aparecem como sugestões e tu decides — adicionar, recusar ou ver depois. As que adicionas entram no quadro como "Identificada"

@@ -1,4 +1,4 @@
-// NÁUTILO · contas (função do Vercel): criar conta, entrar, perfis (como na Netflix), senha, recuperação e apagar a conta.
+// PRUMO · contas (função do Vercel): criar conta, entrar, perfis (como na Netflix), senha, recuperação e apagar a conta.
 // Uma conta = e-mail + senha (guardada em scrypt, nunca em texto). Cada conta tem até 5 perfis; cada perfil tem os seus dados.
 // Sem serviço de e-mail: ao criar a conta mostramos um código de recuperação (só aparece uma vez) para repor a senha.
 'use strict';
@@ -9,7 +9,7 @@ const isAdmin = e => String(process.env.NAUTILO_ADMIN || '').toLowerCase().split
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/;
 // aceitação dos termos: versão (data) + o que a pessoa confirmou + quando (prova do consentimento, LGPD art. 8 / RGPD art. 7)
 const TV = /^\d{4}-\d{2}-\d{2}$/;
-const termsOf = b => { if (!TV.test(String(b.termos || '')) || b.saude !== true || b.idade !== true) throw N.err('termos', 'Para usar o Náutilo tens de aceitar os Termos de Serviço e a Política de Privacidade e confirmar as outras duas caixas.', 400);
+const termsOf = b => { if (!TV.test(String(b.termos || '')) || b.saude !== true || b.idade !== true) throw N.err('termos', 'Para usar o Prumo tens de aceitar os Termos de Serviço e a Política de Privacidade e confirmar as outras duas caixas.', 400);
   return { v: b.termos, at: new Date().toISOString(), saude: true, idade: true }; };
 const pub = (r, eid) => ({ email: r.email, nome: r.nome || '', criado: r.criado, adm: isAdmin(r.email), termos: (r.termos || {}).v || '', termosAt: (r.termos || {}).at || '', perfis: (r.perfis || []).map(p => ({ id: p.id, nome: p.nome, cor: p.cor, av: p.av || '', lk: p.lk || '', inf: !!p.inf, ps: !!p.ps, img: p.img || '', criado: p.criado })) });
 const cleanName = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);

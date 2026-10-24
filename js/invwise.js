@@ -1,4 +1,4 @@
-/* NÁUTILO — Biblioteca dos mestres: os princípios dos maiores investidores, pensadores e livros de investimento,
+/* PRUMO — Biblioteca dos mestres: os princípios dos maiores investidores, pensadores e livros de investimento,
    resumidos por palavras nossas (sem citações longas). A IA de investimentos raciocina SEMPRE através destas lentes,
    diz que mestres sustentam cada recomendação e onde eles discordam. */
 (() => {

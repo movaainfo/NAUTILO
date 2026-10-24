@@ -1,4 +1,4 @@
-/* NÁUTILO — sincronização entre aparelhos (uma só conta) através do script Google do utilizador.
+/* PRUMO — sincronização entre aparelhos (uma só conta) através do script Google do utilizador.
    O motor de dados (core.js) fala com uma "base de dados" com collection().onSnapshot() e doc().set().
    Aqui essa base é o ficheiro "Náutilo · dados.json" no Google Drive do utilizador, servido pelo seu Apps Script.
    - Primeiro aparelho a ligar: envia tudo o que tem.

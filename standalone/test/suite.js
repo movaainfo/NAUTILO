@@ -247,7 +247,7 @@ async function sharedTests(b) {
     for (let i = 0; i < 30 && !sawUpdating; i++) { await sleep(200); sawUpdating = await E(p, () => !!document.querySelector('.upd')).catch(() => false); }
     let saw = ''; for (let i = 0; i < 40 && !/Atualizado/.test(saw); i++) { await sleep(150); saw = await E(p, () => (document.querySelector('.upd') || {}).innerText || '').catch(() => ''); }
     const ver = await E(p, () => (window.OceanumVersion || {}).v || '').catch(() => '');
-    ok('atualização: aparece "A atualizar o Náutilo…"', sawUpdating);
+    ok('atualização: aparece "A atualizar o Prumo…"', sawUpdating);
     ok('atualização: depois mostra "Atualizado" e a versão nova', /Atualizado/.test(saw) && /9\.9/.test(saw + ver), (saw || '').replace(/\n/g, ' · ').slice(0, 80));
     OVERRIDE = {}; await ctx.close(); }
   // L · modo de segurança
@@ -683,7 +683,7 @@ async function sharedTests(b) {
     ok('floresta: árvore cresce até ao fim, dá moedas e regista estudo', await E(p, () => { const t = OS.all('trees').slice(-1)[0]; return t && t.alive && t.sp === 'natal' && t.mins === 25 && OS.one('forest').coins >= 30 && OS.all('sessions').some(x => /Floresta/.test(x.learned || '')) && /Plantaste/.test(document.querySelector('#view').textContent); }));
     await p.click('#view [data-act=foAgain]'); await sleep(300); await p.click('#view [data-act=foPlant]'); await sleep(400);
     await E(p, () => { Object.defineProperty(document, 'hidden', { get: () => true, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); OS.Forest.run().hid = Date.now() - 90000; Object.defineProperty(document, 'hidden', { get: () => false, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(500);
-    ok('floresta: sair do Náutilo mata a árvore', await E(p, () => OS.all('trees').slice(-1)[0].alive === false && /morreu/.test(document.querySelector('#view').textContent)));
+    ok('floresta: sair do Prumo mata a árvore', await E(p, () => OS.all('trees').slice(-1)[0].alive === false && /morreu/.test(document.querySelector('#view').textContent)));
     await E(p, () => { delete document.hidden; location.hash = 'floresta.floresta'; }); await sleep(600);
     ok('floresta: a minha floresta e catálogo', await E(p, () => /árvore/.test(document.querySelector('#view .fo-ov').textContent)) && (await E(p, () => { location.hash = 'floresta.loja'; }), await sleep(400), await E(p, () => document.querySelectorAll('#view .fo-card').length >= 34)));
     // UNIVERSIDADE+
@@ -747,7 +747,7 @@ async function sharedTests(b) {
     ok('e-mail: urgente aparece no Control Room', await E(p, () => OS.Intel.alerts().some(a => a.area === 'E-mail')));
     ok('google script completo é JavaScript válido', await E(p, () => { try { new Function(OS.Inbox.script('abc')); return true; } catch (e) { return false; } }));
     const gp = await E(p, () => { const P = OS.Inbox.parts('abc'), full = OS.Inbox.script('abc'), v = t => { try { new Function(t); return true; } catch (e) { return false; } };
-      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Náutilo · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4] + P[5] + P[6]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] && OS.Inbox.addon6() === P[5] && OS.Inbox.addon7() === P[6] }; });
+      return { P, n: P.length, ok: P.map(v), len: P.map(x => x.length), same: (P[0] + P[1].replace(/^\/\/ Prumo · parte 2[^\n]*\n/, '') + P[2] + P[3] + P[4] + P[5] + P[6]).replace(/\s+/g, '') === full.replace(/\s+/g, ''), key1: /const KEY = 'abc'/.test(P[0]), core: OS.Inbox.core('abc').length, addon: OS.Inbox.addon() === P[2] && OS.Inbox.addon4() === P[3] && OS.Inbox.addon5() === P[4] && OS.Inbox.addon6() === P[5] && OS.Inbox.addon7() === P[6] }; });
     ok('script em 7 partes: 1 e 2 = núcleo, 3 a 7 = ficheiros das novidades; cada parte é JavaScript válido e juntas dão o código completo', gp.n === 7 && gp.ok.every(Boolean) && gp.same && gp.key1 && gp.addon, JSON.stringify(Object.assign({}, gp, { P: undefined })));
     ok('script em 7 partes: cada parte tem menos de 15 mil caracteres (não é cortada ao colar no telemóvel)', gp.len.every(l => l < 15000), gp.len.join(' + '));
     { // como o Apps Script: cada ficheiro é carregado à parte, pela ordem; a Parte 3 substitui o doGet e liga-se às funções das partes 1 e 2
@@ -1174,7 +1174,7 @@ async function newFeatureTests(b) {
     const er2 = errs.filter(e => !/sandboxed|about:srcdoc|Content Security Policy/.test(e)); ok('sem erros de JavaScript (leitores)', !er2.length, er2.slice(0, 3).join(' | ')); await ctx.close(); }
   // nome da app
   { const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), m = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8'));
-    ok('nome da app: NÁUTILO no ecrã principal, no título e no manifesto', m.name === 'NÁUTILO' && m.short_name === 'NÁUTILO' && /<title>NÁUTILO<\/title>/.test(html) && /apple-mobile-web-app-title" content="NÁUTILO"/.test(html)); }
+    ok('nome da app: PRUMO no ecrã principal, no título e no manifesto', m.name === 'PRUMO' && m.short_name === 'PRUMO' && /<title>PRUMO<\/title>/.test(html) && /apple-mobile-web-app-title" content="PRUMO"/.test(html)); }
 }
 
 /* ================= PAINEL ÚNICO, PRÓXIMOS PASSOS, NOMES EM PORTUGUÊS E OUTLOOK DA FACULDADE ================= */
@@ -2048,8 +2048,8 @@ async function muTests(b) { cur = 'Mundo'; console.log('\n=== Mundo: mapa, país
   await E(p, () => { OS.setOne('inbox', { url: 'https://script.google.com/macros/s/AKfyTESTE/exec', key: 'k', ver: 11 }); location.hash = 'definicoes.script'; }); await sleep(600);
   const rn = await E(p, () => ({ panel: !!document.getElementById('nautilo'), btns: document.querySelectorAll('#nautilo [data-act=ibCopy]').length }));
   await E(p, () => { OS.setOne('inbox', Object.assign({}, OS.one('inbox'), { ver: 12 })); OS.request(); }); await sleep(500);
-  ok('Nome Náutilo: Definições mostra como passar o Google para o nome novo (partes 1 a 3) até o script ser da versão 12', rn.panel && rn.btns === 3 && !(await E(p, () => !!document.getElementById('nautilo'))), JSON.stringify(rn));
-  ok('Nome Náutilo: os calendários antigos "Oceanum…" continuam a ser reconhecidos como do app (sem duplicar)', await E(p, () => OS.CalPush && OS.CalPush.CATS.every(c => /^Náutilo/.test(c[1]))));
+  ok('Nome Prumo: Definições mostra como passar o Google para o nome novo (partes 1 a 3) até o script ser da versão 12', rn.panel && rn.btns === 3 && !(await E(p, () => !!document.getElementById('nautilo'))), JSON.stringify(rn));
+  ok('Nome Prumo: os calendários antigos "Oceanum…" continuam a ser reconhecidos como do app (sem duplicar)', await E(p, () => OS.CalPush && OS.CalPush.CATS.every(c => /^Náutilo/.test(c[1]))));
   ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
 async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis (versão pública) ===');
   const errs = [], ctxs = [];
@@ -2149,7 +2149,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   await E(A, () => OS.UI.closeModal());
   // o modo pessoal não muda
   { const { ctx, p, errs: e2 } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p);
-    ok('Modo pessoal (aparelho que já tinha o Náutilo): igual a antes, sem ecrã de conta nem bolinha', await E(p, () => !OS.Acc.on && !document.getElementById('acc') && !document.querySelector('.ac-bub') && OS.one('profile').short === 'Ryan'));
+    ok('Modo pessoal (aparelho que já tinha o Prumo): igual a antes, sem ecrã de conta nem bolinha', await E(p, () => !OS.Acc.on && !document.getElementById('acc') && !document.querySelector('.ac-bub') && OS.one('profile').short === 'Ryan'));
     errs.push(...e2); await ctx.close(); }
   // sair da conta no telemóvel: limpa o aparelho e volta ao ecrã da conta
   await Promise.all([A.waitForNavigation({ timeout: 15000 }).catch(() => { }), E(A, () => OS.Acc.logout())]); await gateUp(A);
@@ -2168,7 +2168,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
   const sr = ak ? await fetch(ak.url.replace(/^https?:\/\/[^/]+/, 'http://localhost:' + PORT), { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ k: ak.key, v: '12,40', d: 'café com a Ana' }) }).then(r => r.text()) : '';
   const bad = ak ? await fetch('http://localhost:' + PORT + '/Oceanum/api/atalho', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ k: ak.key.slice(0, -3) + 'abc', v: '5' }) }).then(r => r.status) : 0;
   await E(C, () => OS.Inbox.pull(false)); await sleep(500);
-  ok('Atalho de gastos do iPhone numa conta sem script: o link do perfil regista e o gasto entra nas finanças desse perfil', /registado no Náutilo/.test(sr) && bad === 403 && await E(C, () => OS.all('transactions').some(t => t.amount === 12.4 && /café/i.test(t.desc))), sr + ' / ' + bad);
+  ok('Atalho de gastos do iPhone numa conta sem script: o link do perfil regista e o gasto entra nas finanças desse perfil', /registado no Prumo/.test(sr) && bad === 403 && await E(C, () => OS.all('transactions').some(t => t.amount === 12.4 && /café/i.test(t.desc))), sr + ' / ' + bad);
   await E(C, () => location.hash = 'definicoes.atalhos'); await sleep(500);
   ok('Definições › Atalhos do iPhone mostra o link do perfil (sem pedir o script Google)', await E(C, () => { const t = document.querySelector('#view').innerText; return /api\/atalho\?k=/.test(t) && !/script\.google\.com\/create/.test(t); }));
   { const lk = await E(C, () => ((document.getElementById('slSet') || {}).innerText || '').match(/https?:\S+tipo=sono/));
@@ -2180,7 +2180,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     const sl = await E(C, () => OS.Sono.list().map(r => ({ d: r.date, m: r.min, src: r.src })));
     ok('Sono numa conta: o atalho do app Saúde envia para o link do perfil (tipo=sono) e a noite entra no Painel', !!lk && /Sono enviado/.test(r1) && sl.length === 1 && sl[0].m === 450 && sl[0].src === 'saude', JSON.stringify({ lk: !!lk, r1, sl })); }
   await E(C, () => location.hash = 'jornal'); await C.waitForFunction(() => /Notícia da conta 1/.test(document.querySelector('#view').innerText), null, { timeout: 12000 }).catch(() => { });
-  ok('Jornal numa conta sem script: as notícias vêm do servidor do Náutilo', await E(C, () => /Notícia da conta 1/.test(document.querySelector('#view').innerText)));
+  ok('Jornal numa conta sem script: as notícias vêm do servidor do Prumo', await E(C, () => /Notícia da conta 1/.test(document.querySelector('#view').innerText)));
   // IA para todos sem configurar + cada pessoa dá nome à sua IA
   { const D = await fresh(PROFILES[1], () => { window.__noAsk = 0; }); await gateUp(D); await D.click('#acc [data-ac=m][data-v=entrar]'); await D.fill('#acc input[name=email]', 'ana@exemplo.pt'); await D.fill('#acc input[name=senha]', 'novasenha1'); await D.click('#acc button[type=submit]');
     await D.waitForSelector('#acc .ac-p[data-ac=escolher]'); await D.click('#acc .ac-p[data-ac=escolher]'); await code(D, 'abc123');
@@ -2194,7 +2194,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     ok('Definições: o separador e os blocos usam o nome da IA (sem "Spyke")', await E(D, () => { const v = document.getElementById('view').innerText; return /Luna \(assistente\)/.test(v) && /Cérebro da Luna/.test(v) && !/Spyke/.test(v); }));
     IAMOCK.length = 0; const r1 = await E(D, async () => { try { return await OS.AI.text('Diz olá ao Spyke'); } catch (e) { return 'ERRO ' + e.message; } });
     const sent = JSON.stringify(IAMOCK.slice(-1)[0] || {});
-    ok('IA sem configurar (servidor do Náutilo → IA grátis): responde, e o pedido leva o nome dela', /Olá/.test(r1) && /Luna/.test(sent) && !/Spyke/.test(sent), r1 + ' · ' + sent.slice(0, 140));
+    ok('IA sem configurar (servidor do Prumo → IA grátis): responde, e o pedido leva o nome dela', /Olá/.test(r1) && /Luna/.test(sent) && !/Spyke/.test(sent), r1 + ' · ' + sent.slice(0, 140));
     const r2 = await E(D, async () => { try { return JSON.stringify(await OS.AI.json([{ text: 'Responde com JSON {"ok":true}' }])); } catch (e) { return 'ERRO ' + e.message; } });
     ok('IA sem configurar: pedidos em JSON (decisões, resumos, tutor) também funcionam', /"ok":true/.test(r2), r2);
     const r3 = await E(D, async () => { try { await OS.AI.json([{ text: 'Lê esta foto' }, { inline_data: { mime_type: 'image/png', data: 'iVBORw0KGgo=' } }]); return 'sem erro'; } catch (e) { return e.message; } });
@@ -2202,10 +2202,10 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     const r4 = await fetch('http://localhost:' + PORT + '/Oceanum/api/ia?p=v1beta/models/gemini-x:generateContent', { method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://localhost:' + PORT }, body: '{}' }).then(r => r.status);
     ok('A IA do servidor só responde a quem tem sessão numa conta', r4 === 401, String(r4));
   }
-  // o Náutilo pessoal (do Ryan) guardado numa conta: tudo igual, o mesmo código, os marcos e textos dele
+  // o Prumo pessoal (do Ryan) guardado numa conta: tudo igual, o mesmo código, os marcos e textos dele
   { const { ctx, p, errs: e3 } = await newPage(b, PROFILES[0]); ctxs.push(ctx); p.removeAllListeners('dialog'); p.on('dialog', d => d.accept()); await p.goto(BASE); await unlock(p);
     await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.add('tasks', { title: 'Tarefa antiga do Ryan', status: 'Inbox' }); OS.add('goals', { title: 'Meta antiga do Ryan', status: 'Ativa', steps: [] }); location.hash = 'definicoes'; }); await sleep(700);
-    ok('Modo pessoal: Definições tem "Conta Náutilo" para guardar o Náutilo numa conta', await E(p, () => !!document.querySelector('#accMig [data-act=accMigNew]')));
+    ok('Modo pessoal: Definições tem "Conta Prumo" para guardar o Prumo numa conta', await E(p, () => !!document.querySelector('#accMig [data-act=accMigNew]')));
     await p.fill('#accMigE', 'ryan@exemplo.pt'); await p.fill('#accMigP', 'senhaDoRyan1'); for (const n of ['t_termos', 't_saude', 't_idade']) await p.check('#accMig input[name=' + n + ']');
     await Promise.all([p.waitForNavigation({ timeout: 20000 }).catch(() => { }), p.click('#accMig [data-act=accMigNew]')]);
     await unlock(p); await app(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); });
@@ -2216,7 +2216,7 @@ async function accTests(b) { cur = 'Contas'; console.log('\n=== Contas e perfis 
     const R = await fresh(PROFILES[4]); await gateUp(R); await R.click('#acc [data-ac=m][data-v=entrar]'); await R.fill('#acc input[name=email]', 'ryan@exemplo.pt'); await R.fill('#acc input[name=senha]', 'senhaDoRyan1'); await R.click('#acc button[type=submit]');
     await R.waitForSelector('#acc .ac-p[data-ac=escolher]'); await Promise.all([R.waitForNavigation({ timeout: 20000 }).catch(() => { }), R.click('#acc .ac-p[data-ac=escolher]')]); await code(R, CODE);
     ok('Conta sem administração: sem o separador "Admin" e o servidor recusa a lista de contas', await E(R, async () => { const S = JSON.parse(localStorage.getItem('nau:s')), r = await fetch('api/conta', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + S.t }, body: JSON.stringify({ op: 'admin' }) }); return !OS.Acc.adm() && !document.querySelector('a[href="#admin"]') && r.status === 403; }));
-    ok('Noutro aparelho: entra na conta do Ryan e aparece tudo o que estava no Náutilo pessoal', await E(R, () => OS.all('tasks').some(t => t.title === 'Tarefa antiga do Ryan') && OS.all('goals').some(g => g.title === 'Meta antiga do Ryan') && !OS.Acc.pub && OS.Dom.LEG.int.length === 100));
+    ok('Noutro aparelho: entra na conta do Ryan e aparece tudo o que estava no Prumo pessoal', await E(R, () => OS.all('tasks').some(t => t.title === 'Tarefa antiga do Ryan') && OS.all('goals').some(g => g.title === 'Meta antiga do Ryan') && !OS.Acc.pub && OS.Dom.LEG.int.length === 100));
     errs.push(...e3); }
   // outro aparelho ainda no modo pessoal: Definições oferece entrar na conta (o aviso chega pelo Google Drive)
   { const { ctx, p } = await newPage(b, PROFILES[1]); ctxs.push(ctx); p.removeAllListeners('dialog'); p.on('dialog', d => d.accept()); await p.goto(BASE); await unlock(p);
@@ -2283,7 +2283,7 @@ async function googleTests(b) { cur = 'Google'; console.log('\n=== Gmail e agend
   const [pop] = await Promise.all([ctx.waitForEvent('page'), p.click('[data-gggo]')]);
   await pop.waitForLoadState('domcontentloaded'); await pop.waitForSelector('main', { timeout: 10000 }).catch(() => { });
   const r1 = await pop.evaluate(() => ({ ok: !!document.getElementById('g-ok'), t: document.body.innerText, back: (document.querySelector('main a') || {}).href || '' }));
-  ok('Regresso do Google: "Conta Google ligada" com o e-mail e um botão para voltar ao Náutilo', r1.ok && /Conta Google ligada/.test(r1.t) && /joana@gmail\.com/.test(r1.t) && /#definicoes\.email$/.test(r1.back), JSON.stringify(r1).slice(0, 300));
+  ok('Regresso do Google: "Conta Google ligada" com o e-mail e um botão para voltar ao Prumo', r1.ok && /Conta Google ligada/.test(r1.t) && /joana@gmail\.com/.test(r1.t) && /#definicoes\.email$/.test(r1.back), JSON.stringify(r1).slice(0, 300));
   const gfiles = (() => { const out = []; const walk = d => { try { for (const f of fs.readdirSync(d, { withFileTypes: true })) f.isDirectory() ? walk(path.join(d, f.name)) : out.push(path.join(d, f.name)); } catch (e) { } }; walk(path.join(ACCDIR, 'g')); return out; })();
   ok('A autorização fica guardada cifrada no perfil (g/<conta>/<perfil>), sem o token à vista', gfiles.length === 1 && !fs.readFileSync(gfiles[0]).includes('RT-1') && GM.tokenCalls.some(c => c.grant_type === 'authorization_code' && c.client_secret === 'teste-segredo' && c.redirect_uri === BASE + 'api/google'), JSON.stringify({ n: gfiles.length, calls: GM.tokenCalls.map(c => c.grant_type) }));
   await pop.close(); await p.bringToFront(); await E(p, () => window.dispatchEvent(new Event('focus')));

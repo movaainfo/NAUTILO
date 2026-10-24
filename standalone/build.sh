@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Monta a versão independente do Náutilo em dist/ (pronta para Netlify, Vercel, GitHub Pages ou qualquer alojamento estático).
+# Monta a versão independente do Prumo em dist/ (pronta para Netlify, Vercel, GitHub Pages ou qualquer alojamento estático).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 OUT=dist; rm -rf "$OUT"; mkdir -p "$OUT/js" "$OUT/css" "$OUT/icons"
@@ -20,14 +20,14 @@ cat > "$OUT/index.html" <<HTML
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>NÁUTILO</title>
-<meta name="description" content="Náutilo — o sistema operativo da tua vida: finanças, estudos, treino, dieta, metas e o jogo Dominus.">
+<title>Prumo</title>
+<meta name="description" content="Prumo — o sistema operativo da tua vida: finanças, estudos, treino, dieta, metas e o jogo Dominus.">
 <meta name="theme-color" content="#070D16">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NÁUTILO">
+<meta name="apple-mobile-web-app-title" content="Prumo">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -47,8 +47,8 @@ $BODY
 HTML
 cat > "$OUT/manifest.webmanifest" <<'JSON'
 {
-  "name": "NÁUTILO",
-  "short_name": "NÁUTILO",
+  "name": "Prumo",
+  "short_name": "Prumo",
   "description": "O sistema operativo da tua vida.",
   "lang": "pt",
   "start_url": "./#visao",

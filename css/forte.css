@@ -1,4 +1,4 @@
-/* NÁUTILO — "noite no forte": o mar visto da muralha, a preto e azul, com uma só luz quente (a do Farol da Barra).
+/* PRUMO — "noite no forte": o mar visto da muralha, a preto e azul, com uma só luz quente (a do Farol da Barra).
    Três vozes: Anton para o que se diz alto (títulos, a frase do dia), Cormorant para o que é íntimo (saudação, datas, o nome),
    Geist para tudo o que se usa. Cartões planos, sem brilhos nem gradientes; a cena do mar é o único momento de cor. */
 :root{
@@ -246,3 +246,10 @@ html.spy-ear #jvFab{box-shadow:0 0 0 4px rgba(242,196,141,.22),0 8px 22px rgba(0
 .tn-mg{display:flex;flex-direction:column;gap:2px}.tn-mg+.tn-mg{margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
 .tn-mh{display:block;padding:4px 12px 2px;font-size:12px;color:var(--mut)}
 .tn-mg[hidden],.tn-g[hidden]{display:none}
+/* marca Prumo: símbolo de anéis + o nome em Bodoni Moda (só na marca; o resto da app mantém as suas letras) */
+.pr-word,.tn-brand b.pr-word,.brand b.pr-word,.sp-name.pr-word,.lk-brand .sp-name,.ac-brand>span{font-family:'Bodoni Moda','Bodoni 72',Didot,Georgia,serif!important;font-weight:500!important;font-optical-sizing:auto;letter-spacing:.005em!important;text-transform:none!important;color:#ECE7DE}
+.tn-brand b.pr-word{font-size:23px;line-height:1}.brand b.pr-word{font-size:21px}
+.sp-name.pr-word{font-size:40px;line-height:1;margin-top:18px;padding-left:0}
+.lk-brand .sp-name{font-size:24px}
+.ac-brand>span{font-size:26px}
+.brand-mark.oc{background:#0B0B0C}

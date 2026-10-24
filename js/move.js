@@ -1,17 +1,22 @@
-/* NÁUTILO — mudança de endereço (oceanum-movaa → nautilo-app) com os dados.
+/* PRUMO — mudança de endereço (oceanum-movaa → nautilo-app → prumo-vida) com os dados.
    Os dados ficam guardados por endereço no aparelho, por isso a mudança leva-os:
    1) com a sincronização ligada: o novo endereço liga-se ao teu Google Drive e recebe tudo;
    2) sem sincronização: exportas um ficheiro aqui e importas no novo endereço. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
-const NEW = 'https://nautilo-app.vercel.app', OLDS = ['https://oceanum-movaa.vercel.app', 'https://oceanum-rho.vercel.app', 'https://nautilo-movaa.vercel.app', 'https://kd25gpgdw9-lang.github.io', 'https://movaainfo.github.io', 'https://oceanum-ryan.vercel.app'], OLD = OLDS[0];
+const NEW = 'https://prumo-vida.vercel.app', OLDS = ['https://oceanum-movaa.vercel.app', 'https://nautilo-app.vercel.app', 'https://prumo-movaa.vercel.app', 'https://oceanum-rho.vercel.app', 'https://nautilo-movaa.vercel.app', 'https://kd25gpgdw9-lang.github.io', 'https://movaainfo.github.io', 'https://oceanum-ryan.vercel.app'], OLD = OLDS[0];
 const isOld = OLDS.includes(location.origin), SY = () => window.OceanumSync || {};
 const host = NEW.replace(/^https:\/\//, '');
 
 /* ---------- endereço antigo: aviso de mudança ---------- */
-const movePanel = () => { const on = !!SY().on;
-  UI.modal(`<div class="mv-p"><div class="pn-h"><h3>O Náutilo mudou de endereço</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+const accPanel = () => UI.modal(`<div class="mv-p"><div class="pn-h"><h3>O Prumo tem um endereço novo</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
+    <p>O endereço oficial passa a ser <b>${host}</b>. Os teus dados estão na tua conta, por isso não precisas de levar nada:</p>
+    <ol class="mv-steps"><li>Abre o novo endereço e entra com o teu e-mail e a senha da conta.</li><li>No iPhone: Partilhar → <b>Adicionar ao ecrã principal</b>, e apaga o ícone antigo.</li></ol>
+    <a class="btn pri" href="${NEW}/" target="_blank" rel="noopener">Abrir o novo endereço</a>
+    <p class="mut" style="font-size:12.5px;margin:10px 0 0">Este endereço continua a funcionar por agora, e os atalhos do iPhone que já tens também.</p></div>`, 'tall');
+const movePanel = () => { if (OS.Acc && OS.Acc.on) return accPanel(); const on = !!SY().on;
+  UI.modal(`<div class="mv-p"><div class="pn-h"><h3>O Prumo mudou de endereço</h3><button class="icon-btn" data-mclose aria-label="Fechar">${UI.ic('x')}</button></div>
     <p>O novo endereço é <b>${host}</b>. Este vai deixar de funcionar, por isso leva os teus dados contigo:</p>
     ${on ? `<div class="mv-o rec"><b>Com a sincronização (recomendado)</b><small>Envio as últimas alterações para o teu Google Drive e abro o novo endereço já ligado. Tudo aparece lá.</small><button class="btn pri" data-act="mvSync">Mudar agora</button></div>` : ''}
     <div class="mv-o ${on ? '' : 'rec'}"><b>${on ? 'Ou com um ficheiro' : 'Com um ficheiro'}</b><small>1. Guarda os dados num ficheiro (Guardar em Ficheiros).<br>2. Abre o novo endereço e toca em <b>Importar</b>.</small>
@@ -23,7 +28,7 @@ A.mvSync = () => { const s = SY(); if (!s.on || !s.linkCode) return movePanel();
   setTimeout(() => { location.href = NEW + '/#ligar=' + encodeURIComponent(s.linkCode()); }, 2500); };
 if (isOld) {
   OS.on('ready', () => { if (navigator.webdriver) return; let seen = false; try { seen = sessionStorage.getItem('os2mvSeen') === '1'; sessionStorage.setItem('os2mvSeen', '1'); } catch (e) { } if (!seen) setTimeout(movePanel, 1200); });
-  OS.on('ready', () => { const o = V.visao; if (!o || o._mv) return; V.visao = s => `<button class="mv-bar" data-act="mvOpen"><b>Novo endereço: ${host}</b><span>Mudar e levar os dados</span></button>` + o(s); V.visao._mv = 1; });
+  OS.on('ready', () => { const o = V.visao; if (!o || o._mv) return; V.visao = s => `<button class="mv-bar" data-act="mvOpen"><b>Novo endereço: ${host}</b><span>${OS.Acc && OS.Acc.on ? 'Abrir e entrar na conta' : 'Mudar e levar os dados'}</span></button>` + o(s); V.visao._mv = 1; });
 }
 
 /* ---------- endereço novo: boas-vindas e importação ---------- */
@@ -47,7 +52,7 @@ if (!isOld) {
   // a importação (Definições ou boas-vindas) fecha a mudança
   document.addEventListener('change', e => { if (e.target.id === 'impData' && e.target.files[0]) { U.ls.set('os2mvDone', 1); setTimeout(() => { try { UI.closeModal(); } catch (er) { } }, 600); } });
 }
-OS.on('ready', () => { const o = V.definicoes; if (!o || o._mv) return; V.definicoes = sub => o(sub) + `<div class="pn"><div class="pn-h"><h3>Mudança de endereço</h3></div><p class="mut" style="margin:0 0 8px">Trazer os dados de outro endereço do Náutilo: ficheiro exportado ou sincronização do Google Drive.</p><button class="btn" data-act="mvWelcome">Trazer os meus dados</button></div>`; V.definicoes._mv = 1; });
+OS.on('ready', () => { const o = V.definicoes; if (!o || o._mv) return; V.definicoes = sub => o(sub) + `<div class="pn"><div class="pn-h"><h3>Mudança de endereço</h3></div><p class="mut" style="margin:0 0 8px">Trazer os dados de outro endereço do Prumo: ficheiro exportado ou sincronização do Google Drive.</p><button class="btn" data-act="mvWelcome">Trazer os meus dados</button></div>`; V.definicoes._mv = 1; });
 A.mvWelcome = () => welcome();
 OS.Move = { NEW, OLD, isOld, welcome, panel: movePanel };
 })();

@@ -1,4 +1,4 @@
-/* NÁUTILO — Limpar os dados de teste (Definições → Dados).
+/* PRUMO — Limpar os dados de teste (Definições → Dados).
    Separa sozinho, registo a registo, o que é teu do que foi teste:
    - fica o que veio de ti: o horário do trabalho importado da foto, as disciplinas do curso, a biografia e a entrevista,
      o que veio dos e-mails, os movimentos importados da B3/corretora, o plano inicial (metas, hábitos, competências,

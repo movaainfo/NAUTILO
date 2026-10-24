@@ -1,4 +1,4 @@
-/* NÁUTILO — Painel (antes Visão Geral + Painel, agora uma só página): o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
+/* PRUMO — Painel (antes Visão Geral + Painel, agora uma só página): o painel inicial. Período (hoje, semana, mês) e cartões da vida inteira:
    dinheiro, agenda, tarefas, corpo, dieta, estudos e jogo. */
 (() => {
 'use strict';
@@ -82,7 +82,7 @@ V.gasto = sub => { const pre = U.num(String(sub || '').replace(',', '.')) || '',
 // Definições → Atalhos do iPhone: abrir sempre no Gasto rápido e registar sem abrir a app (o Gasto rápido só regista)
 OS.quickSettings = () => { const start = !!U.ls.get('os2startGasto', false);
   return `<div class="pn" id="qgSet"><div class="pn-h"><h3>Gasto rápido</h3><span class="mut" style="font-size:12px">${start ? 'abre no Gasto rápido' : ''}</span></div>
-    <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Náutilo sempre no Gasto rápido neste aparelho</label>
+    <label class="switch"><input type="checkbox" data-act="qgStart" ${start ? 'checked' : ''}><span></span>Abrir o Prumo sempre no Gasto rápido neste aparelho</label>
     <p class="mut" style="margin:10px 0 0;font-size:13px"><b>Android:</b> no Chrome, menu ⋮ → <i>Adicionar ao ecrã principal</i>. Com a opção acima ligada, o ícone abre logo no Gasto rápido.</p></div>${OS.Inbox && OS.Inbox.panel ? OS.Inbox.panel() : ''}`; };
 OS.forms = OS.forms || {};
 OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 0)) { UI.toast('Escreve o valor', 'warn'); return; }
@@ -94,7 +94,7 @@ OS.forms.qgSave = (f, v) => { const amount = U.num(v('amount')); if (!(amount > 
   UI.toast(`Registado: ${U.eur(amount)}${cat ? ' · ' + cat : ''}`, 'pos'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } };
 A.qgCopy = () => { const url = (() => { try { return window.top.location.href.split('#')[0]; } catch (e) { return ''; } })() || document.referrer || 'https://claude.ai/artifact/AUtUtqFR4x46BWPVcR3kLZ'; const ok = () => UI.toast('Link copiado', 'pos'); try { navigator.clipboard.writeText(url).then(ok, () => UI.toast(url)); } catch (e) { UI.toast(url); } };
 A.ibGo = (b, e) => { e && e.preventDefault(); OS.Fold.go('atalhos', 'inboxPn'); };
-A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Náutilo vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
+A.qgStart = b => { U.ls.set('os2startGasto', !!b.checked); UI.toast(b.checked ? 'O Prumo vai abrir no Gasto rápido' : 'Abre normalmente no Painel'); };
 A.dashPer = b => OS.setUI('dashPer', b.dataset.p);
 A.dashYM = b => { const cur = OS.ui.dashYM || U.ym(U.today()), n = U.addMonths(cur, +b.dataset.d); OS.setUI('dashYM', n > U.ym(U.today()) ? U.ym(U.today()) : n); };
 })();

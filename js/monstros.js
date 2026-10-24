@@ -1,4 +1,4 @@
-/* NÁUTILO — o bestiário do Dominus: monstros e chefes em pixel art (64 × 64), sinistros, como os chefes do Terraria.
+/* PRUMO — o bestiário do Dominus: monstros e chefes em pixel art (64 × 64), sinistros, como os chefes do Terraria.
    Cada monstro é desenhado a partir de um corpo-base (golem, hidra, espectro, dragão, demónio, olho, aranha, lich, verme, lodo,
    titã, gárgula, vazio, lobo, cavaleiro oco) com a sua paleta, olhos que brilham, contorno escuro colorido e uma aura.
    Ferido ganha rachas; derrotado fica cinzento com os olhos apagados. A imagem é feita uma vez e guardada como PNG. */

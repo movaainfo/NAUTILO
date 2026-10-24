@@ -1,4 +1,4 @@
-/* NÁUTILO — Modo Jarvis: painel em ecrã inteiro com o essencial do dia, ao vivo.
+/* PRUMO — Modo Jarvis: painel em ecrã inteiro com o essencial do dia, ao vivo.
    O X fecha o painel mas o botão redondo (núcleo) fica no canto para voltar quando quiseres. */
 (() => {
 'use strict';

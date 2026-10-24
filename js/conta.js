@@ -1,6 +1,6 @@
-/* NÁUTILO — contas e perfis (a versão para o público).
-   Modo pessoal: os aparelhos que já tinham o Náutilo (o do Ryan) continuam exatamente iguais: o mesmo código, o mesmo Google Drive.
-   Modo conta: entras com e-mail e senha, escolhes o perfil (como na Netflix) e os dados desse perfil ficam na nuvem do Náutilo
+/* PRUMO — contas e perfis (a versão para o público).
+   Modo pessoal: os aparelhos que já tinham o Prumo (o do Ryan) continuam exatamente iguais: o mesmo código, o mesmo Google Drive.
+   Modo conta: entras com e-mail e senha, escolhes o perfil (como na Netflix) e os dados desse perfil ficam na nuvem do Prumo
    (Vercel Blob privado, cifrado) e iguais no telemóvel e no computador. O ecrã de bloqueio é o mesmo, com o código de cada perfil.
    O motor de dados (core.js) fala com uma "base de dados" com collection().onSnapshot() e doc().set(); aqui essa base é api/dados. */
 (() => {
@@ -36,7 +36,7 @@ const takeConta = (j, email) => { S = Object.assign(S || {}, { t: j.token || (S 
 const Acc = OS.Acc = { on: !personal };
 const A = OS.act = OS.act || {}; OS.forms = OS.forms || {};
 if (personal) {
-  /* ---------- modo pessoal: guardar este Náutilo numa conta (o que é do Ryan vai para a conta dele) ---------- */
+  /* ---------- modo pessoal: guardar este Prumo numa conta (o que é do Ryan vai para a conta dele) ---------- */
   const moved = () => OS.one('meta').acc || '';
   // cria (ou entra n)a conta, cria o perfil pessoal com o mesmo código de bloqueio e envia todos os dados deste aparelho
   Acc.migrate = async (email, senha, criar, termos) => { email = String(email || '').trim().toLowerCase();
@@ -60,23 +60,23 @@ if (personal) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em.value.trim())) return OS.UI.toast('Escreve o teu e-mail.', 'warn');
     if (pw.value.length < 8) return OS.UI.toast('A senha precisa de pelo menos 8 caracteres.', 'warn');
     const tm = OS.Legal ? OS.Legal.read(document.getElementById('accMig')) : null; if (criar && !tm) return OS.UI.toast('Para criar a conta, marca as três caixas (termos, dados de saúde e de fé, idade).', 'warn');
-    OS.UI.toast('A guardar o teu Náutilo na conta…');
+    OS.UI.toast('A guardar o teu Prumo na conta…');
     try { const r = await Acc.migrate(em.value, pw.value, criar, tm); OS.UI.toast(`Guardado: ${r.docs} partes dos teus dados na conta. A abrir com a conta…`, 'pos'); setTimeout(() => location.reload(), 900); }
     catch (e) { OS.UI.toast(e.net ? 'Sem internet. Tenta outra vez.' : e.message, 'neg'); } };
   A.accMigNew = () => go(true); A.accMigIn = () => go(false);
-  // noutro aparelho do Ryan: o Náutilo já está na conta → entrar nela aqui (os dados vêm da conta)
+  // noutro aparelho do Ryan: o Prumo já está na conta → entrar nela aqui (os dados vêm da conta)
   A.accJoin = () => { const em = moved(); if (!em) return; OS.UI.closeModal();
     if (!confirm(`Este aparelho passa a usar a conta ${em}. Os dados vêm da conta (o que mudaste só aqui e ainda não sincronizou pelo Google Drive perde-se). Continuar?`)) return;
     OS.noSave = true; LS.keys().forEach(k => { if (!/^(nau:|os2lite$|__)/.test(k)) LS.del(k); }); LS.set(K.owner, em); LS.del(K.pers); location.reload(); };
   A.accJoinLater = () => { LS.set('nau:joinAsk', Date.now()); OS.UI.closeModal(); };
   const panel = () => { const em = moved(), e = U.esc;
-    return `<div class="pn" id="accMig"><div class="pn-h"><h3>${OS.UI.ic('user')}Conta Náutilo</h3>${em ? `<span class="mut">${e(em)}</span>` : ''}</div>
-    ${em ? `<p class="mut" style="margin:0 0 10px">O teu Náutilo está guardado na conta <b>${e(em)}</b>. Este aparelho ainda usa o modo antigo (só neste aparelho e no Google Drive).</p><button class="btn pri" data-act="accJoin">Entrar na conta neste aparelho</button>`
-    : `<p class="mut" style="margin:0 0 12px">Guarda o teu Náutilo numa conta: tudo o que tens aqui (dados, metas, jogo, definições, ligações) vai para a tua conta, cifrado, com o mesmo código de bloqueio. Depois entras com e-mail e senha em qualquer aparelho e podes criar outros perfis.</p>
+    return `<div class="pn" id="accMig"><div class="pn-h"><h3>${OS.UI.ic('user')}Conta Prumo</h3>${em ? `<span class="mut">${e(em)}</span>` : ''}</div>
+    ${em ? `<p class="mut" style="margin:0 0 10px">O teu Prumo está guardado na conta <b>${e(em)}</b>. Este aparelho ainda usa o modo antigo (só neste aparelho e no Google Drive).</p><button class="btn pri" data-act="accJoin">Entrar na conta neste aparelho</button>`
+    : `<p class="mut" style="margin:0 0 12px">Guarda o teu Prumo numa conta: tudo o que tens aqui (dados, metas, jogo, definições, ligações) vai para a tua conta, cifrado, com o mesmo código de bloqueio. Depois entras com e-mail e senha em qualquer aparelho e podes criar outros perfis.</p>
       <div class="col gap8"><label>E-mail<input class="field" id="accMigE" type="email" autocomplete="email"></label><label>Senha da conta (pelo menos 8 caracteres)<input class="field" id="accMigP" type="password" autocomplete="new-password"></label>${OS.Legal ? OS.Legal.checks() : ''}
       <div class="row gap8" style="flex-wrap:wrap"><button class="btn pri" data-act="accMigNew">Criar conta e guardar</button><button class="btn" data-act="accMigIn">Já tenho conta: entrar e guardar</button></div></div>`}</div>`; };
   OS.on('ready', () => { const orig = OS.views.definicoes; if (orig) OS.views.definicoes = sub => orig(sub) + (String(sub || '') === '' ? panel() : '');
-    const ask = LS.get('nau:joinAsk', 0); if (moved() && !navigator.webdriver && (!ask || Date.now() - ask > 3 * 864e5)) setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">O teu Náutilo está na conta</h3><p class="mut" style="margin:0 0 14px">Guardaste o teu Náutilo na conta <b>${U.esc(moved())}</b>. Entra nela também neste aparelho para ficar tudo igual em todo o lado.</p><div class="row gap8"><button class="btn pri" data-act="accJoin">Entrar na conta</button><button class="btn ghost" data-act="accJoinLater">Agora não</button></div></div>`), 1800); });
+    const ask = LS.get('nau:joinAsk', 0); if (moved() && !navigator.webdriver && (!ask || Date.now() - ask > 3 * 864e5)) setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">O teu Prumo está na conta</h3><p class="mut" style="margin:0 0 14px">Guardaste o teu Prumo na conta <b>${U.esc(moved())}</b>. Entra nela também neste aparelho para ficar tudo igual em todo o lado.</p><div class="row gap8"><button class="btn pri" data-act="accJoin">Entrar na conta</button><button class="btn ghost" data-act="accJoinLater">Agora não</button></div></div>`), 1800); });
   return;
 }
 
@@ -87,7 +87,7 @@ const pid = () => LS.get(K.p, '');
 const profiles = () => (S && S.perfis) || [];
 const cur = () => profiles().find(p => p.id === pid()) || null;
 const first = n => String(n || '').trim().split(/\s+/)[0] || '';
-// pub: perfil de uma pessoa qualquer (textos e valores neutros); o perfil pessoal (ps) é o Náutilo do Ryan passado para a conta: fica como era
+// pub: perfil de uma pessoa qualquer (textos e valores neutros); o perfil pessoal (ps) é o Prumo do Ryan passado para a conta: fica como era
 Object.assign(Acc, { sess: () => S, profiles, profile: cur, email: () => (S && S.e) || '', lk: () => (cur() || {}).lk || '', pub: !(cur() && cur().ps) });
 
 // numa conta nova nada do Ryan: o perfil começa com o nome de quem o criou (o resto preenche em Definições)
@@ -217,13 +217,13 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
 const view = () => {
   const m = gMode, msg = gMsg ? `<p class="ac-msg" role="status">${esc(gMsg)}</p>` : '';
   if (m === 'perfis') { const L = profiles();
-    return `<div class="ac-who"><h1 class="ac-h">${L.length ? 'Quem está a usar o Náutilo?' : 'Cria o teu primeiro perfil'}</h1>${msg}
+    return `<div class="ac-who"><h1 class="ac-h">${L.length ? 'Quem está a usar o Prumo?' : 'Cria o teu primeiro perfil'}</h1>${msg}
       <div class="ac-grid">${L.map(p => `<button class="ac-p${gManage ? ' edit' : ''}" data-ac="${gManage ? 'editar' : 'escolher'}" data-id="${p.id}">${avatar(p, 1)}<b>${esc(p.nome)}</b>${gManage ? `<em>Editar</em>` : ''}</button>`).join('')}
       ${L.length < 5 ? `<button class="ac-p add" data-ac="novo"><span class="ac-av big plus">+</span><b>Adicionar perfil</b></button>` : ''}</div>
       <div class="ac-row">${L.length ? `<button class="ac-btn ghost" data-ac="gerir">${gManage ? 'Feito' : 'Gerir perfis'}</button>` : ''}<button class="ac-link" data-ac="sair">Sair da conta${S && S.e ? ' (' + esc(S.e) + ')' : ''}</button></div></div>`; }
   if (m === 'novo' || m === 'editar') { const p = m === 'editar' ? profiles().find(x => x.id === gEdit) || {} : { cor: PCOL[profiles().length % PCOL.length] };
     return `<form class="ac-card" data-acf="${m}"><h2>${m === 'novo' ? 'Novo perfil' : 'Editar perfil'}</h2>
-      <p class="ac-sub">${m === 'novo' ? 'Cada perfil tem os seus próprios dados, metas, finanças e jogo. O código de bloqueio é pedido ao abrir o Náutilo com este perfil.' : 'Muda o nome, a cor ou o avatar (emoji, uma foto tua ou um personagem do Dominus). O código e os dados ficam como estão.'}</p>
+      <p class="ac-sub">${m === 'novo' ? 'Cada perfil tem os seus próprios dados, metas, finanças e jogo. O código de bloqueio é pedido ao abrir o Prumo com este perfil.' : 'Muda o nome, a cor ou o avatar (emoji, uma foto tua ou um personagem do Dominus). O código e os dados ficam como estão.'}</p>
       ${field('nome', 'Nome', 'text', `maxlength="24" required autocomplete="off" value="${esc(p.nome || '')}"`)}
       ${avEditor(p)}<div class="ac-f"><span>Cor</span>${swatches(p.cor)}</div>
       ${m === 'novo' ? lockFields() : ''}${msg}
@@ -243,7 +243,7 @@ const view = () => {
       <p class="ac-sub">Os teus dados ficam na tua conta, cifrados, e aparecem iguais no telemóvel e no computador. Podes ter até 5 perfis.</p>${OS.Legal ? OS.Legal.checks() : ''}${msg}
       <button class="ac-btn wide" type="submit" ${gBusy ? 'disabled' : ''}>${gBusy ? 'A criar…' : 'Criar conta'}</button></form>`;
   if (m === 'termos') return `<form class="ac-card" data-acf="termos"><h2>Antes de continuar</h2>
-      <p class="ac-sub">O Náutilo tem agora Termos de Serviço e uma Política de Privacidade (LGPD e RGPD). Lê-os e aceita uma vez: fica guardado na tua conta, em todos os aparelhos.</p>
+      <p class="ac-sub">O Prumo tem agora Termos de Serviço e uma Política de Privacidade (LGPD e RGPD). Lê-os e aceita uma vez: fica guardado na tua conta, em todos os aparelhos.</p>
       ${OS.Legal ? OS.Legal.checks() : ''}${msg}
       <button class="ac-btn wide" type="submit" ${gBusy ? 'disabled' : ''}>${gBusy ? 'A guardar…' : 'Aceitar e continuar'}</button>
       <button class="ac-link" type="button" data-ac="sair">Não aceito: sair da conta</button></form>`;
@@ -258,12 +258,12 @@ const paint = () => { if (!G) return; const box = G.querySelector('.ac-in');
   // ao mostrar um erro, o que já escreveste fica (menos as senhas e códigos)
   const was = box.querySelector('form[data-acf]'), keep = {}; if (was) [...was.querySelectorAll('input[type=text],input[type=email],input[type=radio]:checked,input[type=hidden][name=img]')].forEach(i => { keep[i.name] = i.value; });
   const kind = was && was.dataset.acf;
-  box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Náutilo</span></div>${gMode === 'perfis' || gMode === 'codigo-rec' ? '' : '<p class="ac-hi">O sistema operativo da tua vida: dinheiro, estudos, treino, metas e o teu jogo, num só sítio.</p>'}${view()}<nav class="ac-foot" aria-label="Documentos legais"><a href="#" data-lgl="termos">Termos</a><a href="#" data-lgl="privacidade">Privacidade</a><a href="#" data-lgl="cookies">Cookies</a><a href="#" data-lgl="acessibilidade">Acessibilidade</a></nav>`;
+  box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Prumo</span></div>${gMode === 'perfis' || gMode === 'codigo-rec' ? '' : '<p class="ac-hi">O sistema operativo da tua vida: dinheiro, estudos, treino, metas e o teu jogo, num só sítio.</p>'}${view()}<nav class="ac-foot" aria-label="Documentos legais"><a href="#" data-lgl="termos">Termos</a><a href="#" data-lgl="privacidade">Privacidade</a><a href="#" data-lgl="cookies">Cookies</a><a href="#" data-lgl="acessibilidade">Acessibilidade</a></nav>`;
   const now = box.querySelector('form[data-acf]'); if (now && kind === now.dataset.acf) { Object.entries(keep).forEach(([n, v]) => { const L = [...now.querySelectorAll(`input[name="${n}"]`)]; if (L[0] && L[0].type === 'radio') L.forEach(r => { r.checked = r.value === v; }); else if (L[0] && v) L[0].value = v; }); if (now.querySelector('.ac-ave')) avPrev(now); }
   // cursor no primeiro campo, mas nunca a meio do que já estás a escrever noutro
   const f = box.querySelector('input:not([type=radio])'); if (f && !f.value && matchMedia('(pointer:fine)').matches) setTimeout(() => { const a = document.activeElement; if (!G || (a && a !== document.body && G.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return; f.focus(); }, 60); };
 const set = (mode, msg) => { gMode = mode; gMsg = msg || ''; gBusy = false; paint(); };
-const showGate = (mode, msg) => { if (!G) { G = document.createElement('div'); G.id = 'acc'; G.className = 'acx'; G.setAttribute('role', 'dialog'); G.setAttribute('aria-modal', 'true'); G.setAttribute('aria-label', 'Conta Náutilo');
+const showGate = (mode, msg) => { if (!G) { G = document.createElement('div'); G.id = 'acc'; G.className = 'acx'; G.setAttribute('role', 'dialog'); G.setAttribute('aria-modal', 'true'); G.setAttribute('aria-label', 'Conta Prumo');
     G.innerHTML = `${scene()}<div class="ac-in"></div>`; document.body.appendChild(G); G.addEventListener('click', onClick); G.addEventListener('submit', onSubmit); }
   G.hidden = false; document.documentElement.classList.add('ac-open'); gManage = false; set(mode, msg); };
 const hideGate = () => { if (G) { G.hidden = true; G.innerHTML = ''; G.remove(); G = null; } document.documentElement.classList.remove('ac-open'); };
@@ -274,7 +274,7 @@ const choose = async id => { const was = LS.get(K.data, ''), booted = !!OS.dbRef
     if (booted && pend.size && !(await Acc.flush().catch(() => false)) && !confirm('Há alterações deste perfil que ainda não chegaram à nuvem (sem internet?). Se trocares agora, perdem-se. Trocar na mesma?')) return;
     LS.set(K.p, id); if (was !== id) wipeLocal(); try { sessionStorage.removeItem('os2unlock'); } catch (e) { } location.reload(); return; }
   LS.set(K.p, id); known = LS.get(kKnown(), {}); pend = new Set(LS.get(kPend(), []));
-  gMsg = ''; const box = G && G.querySelector('.ac-in'); if (box) box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Náutilo</span></div><p class="ac-hi">A abrir o perfil de ${esc(first((cur() || {}).nome))}…</p>`;
+  gMsg = ''; const box = G && G.querySelector('.ac-in'); if (box) box.innerHTML = `<div class="ac-brand">${OS.Lock ? OS.Lock.logo(28) : ''}<span>Prumo</span></div><p class="ac-hi">A abrir o perfil de ${esc(first((cur() || {}).nome))}…</p>`;
   try { prefetched = await prefetch(); } catch (e) { if (!hasLocal) { set('perfis', e.net ? 'Sem internet. Para abrir este perfil pela primeira vez neste aparelho precisas de rede.' : e.message); return; } }
   hideGate(); release(); };
 const afterLogin = (j, email) => { if (LS.get(K.owner, '') && LS.get(K.owner, '') !== email) { LS.del(K.p); wipeLocal(); } LS.set(K.owner, email); takeConta(j, email); endedOnce = false; };
@@ -368,11 +368,11 @@ A.admPedido = async b => { try { await conta('pedidoFeito', { id: b.dataset.id, 
 // o que falta ao administrador configurar (some sozinho quando estiver feito)
 const pendPn = () => { const g = !!(OS.AI && OS.AI.srvGoogle && OS.AI.srvGoogle()), gs = U.ls.get('os2gSrv', null);
   const L = [[!g, 'Chave Google da IA para todos (GEMINI_API_KEY)', 'Para a IA das contas ler fotos (comida, exames, escala) e PDFs. 1) aistudio.google.com/apikey → Create API key. 2) Vercel → projeto nautilo → Settings → Environment Variables → nome <b>GEMINI_API_KEY</b>, valor a chave, Production. 3) Deployments → Redeploy. Este aviso some sozinho quando a chave estiver ativa.'],
-    [!(gs && gs.pronto && gs.chave === 'ok'), 'Gmail e agenda para todos (Google)', !gs ? 'A verificar a ligação ao Google…' : gs.chave === 'errada' ? 'O Google não aceita a chave secreta que está no Vercel. Google Cloud → Google Auth Platform → Clientes → Náutilo web → Adicionar chave secreta; depois Vercel → nautilo → Settings → Environment Variables → <b>GOOGLE_CLIENT_SECRET</b> → Edit, cola a nova → Save → Redeploy.' : gs.chave === 'redirecionamento' ? 'Falta o URI de redirecionamento no cliente do Google: Clientes → Náutilo web → URIs de redirecionamento autorizados → <b>https://nautilo-app.vercel.app/api/google</b> → Salvar.' : !gs.pronto || gs.chave === 'falta' ? 'Falta a chave secreta do cliente OAuth no servidor: Google Cloud → Google Auth Platform → Clientes → Náutilo web → Adicionar chave secreta. Depois Vercel → projeto nautilo → Settings → Environment Variables → nome <b>GOOGLE_CLIENT_SECRET</b>, Production → Save → Redeploy.' : 'O Google não respondeu à verificação (' + esc(gs.erro || '?') + '). Toca em Atualizar daqui a pouco.']];
+    [!(gs && gs.pronto && gs.chave === 'ok'), 'Gmail e agenda para todos (Google)', !gs ? 'A verificar a ligação ao Google…' : gs.chave === 'errada' ? 'O Google não aceita a chave secreta que está no Vercel. Google Cloud → Google Auth Platform → Clientes → Prumo web → Adicionar chave secreta; depois Vercel → nautilo → Settings → Environment Variables → <b>GOOGLE_CLIENT_SECRET</b> → Edit, cola a nova → Save → Redeploy.' : gs.chave === 'redirecionamento' ? 'Falta o URI de redirecionamento no cliente do Google: Clientes → Prumo web → URIs de redirecionamento autorizados → <b>https://nautilo-app.vercel.app/api/google</b> → Salvar.' : !gs.pronto || gs.chave === 'falta' ? 'Falta a chave secreta do cliente OAuth no servidor: Google Cloud → Google Auth Platform → Clientes → Prumo web → Adicionar chave secreta. Depois Vercel → projeto nautilo → Settings → Environment Variables → nome <b>GOOGLE_CLIENT_SECRET</b>, Production → Save → Redeploy.' : 'O Google não respondeu à verificação (' + esc(gs.erro || '?') + '). Toca em Atualizar daqui a pouco.']];
   const P = L.filter(x => x[0]);
   return `<div class="pn" id="admPend"><div class="pn-h"><h3>Por fazer</h3><span class="mut" style="font-size:12px">${P.length ? P.length + ' pendente' + (P.length > 1 ? 's' : '') : 'tudo feito'}</span></div>
   <div class="adm-risk">${P.map(([, t, d]) => `<details open><summary><span class="bdg warn">pendente</span><b>${esc(t)}</b></summary><p>${d}</p></details>`).join('') || '<p class="mut" style="margin:0">Nada pendente.</p>'}</div></div>`; };
-OS.views.admin = () => { const UI = OS.UI, head = UI.head('Administração', 'Quem tem conta no Náutilo, quem entrou e quanto tempo usa. As senhas e os dados das pessoas nunca aparecem aqui.', `<button class="btn" data-act="admRefresh">${UI.ic('sync')}Atualizar</button>`, 'Admin');
+OS.views.admin = () => { const UI = OS.UI, head = UI.head('Administração', 'Quem tem conta no Prumo, quem entrou e quanto tempo usa. As senhas e os dados das pessoas nunca aparecem aqui.', `<button class="btn" data-act="admRefresh">${UI.ic('sync')}Atualizar</button>`, 'Admin');
   if (!Acc.adm()) return head + '<div class="pn"><p class="mut" style="margin:0">Esta área é só para a conta de administração.</p></div>';
   if (!ADM || Date.now() - ADM.at > 120e3) { if (!admBusy && !admErr) setTimeout(admLoad, 0); if (!ADM) return head + `<div class="pn"><p class="mut" style="margin:0">${admErr ? esc(admErr) + ' <button class="btn sm" data-act="admRefresh">Tentar outra vez</button>' : 'A carregar as contas…'}</p></div>`; }
   const L = ADM.contas || [], t = today(), D7 = lastDays(7), act = days => L.filter(c => Math.max(c.ultUso || 0, c.ultEntrada || 0) > Date.now() - days * 864e5).length;
@@ -385,7 +385,7 @@ OS.views.admin = () => { const UI = OS.UI, head = UI.head('Administração', 'Qu
       return `<button class="adm-r" role="row" data-act="admOne" data-i="${i}" data-q="${esc((c.nome + ' ' + c.email + ' ' + P.join(' ')).toLowerCase())}"><span role="cell" class="adm-who"><b>${esc(c.nome || P[0] || '—')}${c.admin ? ' <small class="mu-tag">admin</small>' : ''}</b><small>${esc(c.email)}</small><small class="mut">${P.length} ${P.length === 1 ? 'perfil' : 'perfis'}${P.length ? ': ' + esc(P.join(', ')) : ''}</small></span>
         <span role="cell"><em>Último acesso</em>${ago(c.ultUso || c.ultEntrada)}</span><span role="cell"><em>Última entrada</em>${ago(c.ultEntrada)}${c.entradas ? ` <small class="mut">(${c.entradas}×)</small>` : ''}</span><span role="cell" class="mono"><em>Hoje</em>${hmin((c.dias || {})[t] || 0)}</span><span role="cell"><em>7 dias</em>${bars(c.dias || {}, 7, 22)} <small class="mono">${hmin(d7)}</small></span><span role="cell"><em>Criada</em>${c.criado ? new Date(c.criado).toLocaleDateString('pt-PT') : '—'}</span></button>`; }).join('') || '<p class="mut" style="padding:12px">Ainda não há contas.</p>'}</div></div>
   ${pendPn()}${pedidosPn()}
-  <p class="mut adm-note">Atualizado ${ago(ADM.at)}. O tempo de uso conta os minutos com o Náutilo aberto e à vista (desbloqueado). Estes dados estão descritos na Política de Privacidade.</p></div>`; };
+  <p class="mut adm-note">Atualizado ${ago(ADM.at)}. O tempo de uso conta os minutos com o Prumo aberto e à vista (desbloqueado). Estes dados estão descritos na Política de Privacidade.</p></div>`; };
 A.admRefresh = () => { ADM = null; admErr = ''; admLoad(); OS.request(); };
 A.admOne = b => { const c = ADM && ADM.contas[+b.dataset.i]; if (!c) return; const D = lastDays(30), tot = D.reduce((m, d) => m + ((c.dias || {})[d] || 0), 0), on = D.filter(d => (c.dias || {})[d]).length;
   OS.UI.modal(`<div style="padding:20px"><div class="row between" style="align-items:center"><h3 style="margin:0">${esc(c.nome || c.email)}</h3><button class="icon-btn" data-mclose aria-label="Fechar">${OS.UI.ic('x')}</button></div><p class="mut" style="margin:4px 0 14px">${esc(c.email)}</p>
@@ -393,13 +393,13 @@ A.admOne = b => { const c = ADM && ADM.contas[+b.dataset.i]; if (!c) return; con
     <h4 style="margin:16px 0 6px">Minutos por dia (30 dias)</h4>${bars(c.dias || {}, 30, 90)}<div class="adm-ax"><span>${D[0].slice(8)}/${D[0].slice(5, 7)}</span><span>hoje</span></div></div>`); };
 A.admCsv = () => { if (!ADM) return; const D = lastDays(30), q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
   const rows = [['Nome', 'E-mail', 'Perfis', 'Criada', 'Última entrada', 'Último acesso', 'Entradas'].concat(D)].concat(ADM.contas.map(c => [c.nome, c.email, (c.perfis || []).join(' / '), c.criado ? new Date(c.criado).toISOString() : '', c.ultEntrada ? new Date(c.ultEntrada).toISOString() : '', c.ultUso ? new Date(c.ultUso).toISOString() : '', c.entradas || 0].concat(D.map(d => (c.dias || {})[d] || 0))));
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(q).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' })); a.download = 'nautilo-contas-' + today() + '.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(q).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' })); a.download = 'prumo-contas-' + today() + '.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
 document.addEventListener('input', e => { if (e.target.id !== 'admQ') return; const q = e.target.value.trim().toLowerCase(); document.querySelectorAll('.adm-r[data-q]').forEach(r => { r.hidden = !!q && !r.dataset.q.includes(q); }); });
 OS.on('ready', () => Acc.navAdm());
 
 /* ---------- dentro da app ---------- */
 OS.on('ready', () => { const p = cur(); if (!p) return;
-  // conta criada ao guardar o Náutilo pessoal: o código de recuperação aparece uma vez
+  // conta criada ao guardar o Prumo pessoal: o código de recuperação aparece uma vez
   const rc = LS.get('nau:rec', ''); if (rc) { LS.del('nau:rec'); setTimeout(() => OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">Guarda o teu código de recuperação</h3><p class="mut" style="margin:0 0 12px">Se te esqueceres da senha da conta, é com este código que a recuperas. Aparece só agora: tira uma fotografia ou guarda-o no gestor de senhas.</p><div class="ac-code">${esc(rc)}</div><div class="row gap8" style="margin-top:14px"><button class="btn pri" data-mclose>Já guardei</button></div></div>`), 900); }
   const pr = OS.one('profile'); if (!pr.short && !pr.name) OS.setOne('profile', { name: p.nome, short: first(p.nome) });
   const sec = OS.one('security'), r = LS.get(K.reset, {});
@@ -437,25 +437,25 @@ const akLink = () => { const a = Acc.atalho(); return a ? a.url + '?k=' + encode
 A.accAkCopy = async () => { const l = akLink(); if (!l) { await ensureAk().catch(() => { }); OS.request(); return; } try { await navigator.clipboard.writeText(l); OS.UI.toast('Link copiado: cola-o no atalho', 'pos'); } catch (e) { OS.UI.toast('Toca no link, seleciona e copia', 'warn'); } };
 A.accAkNew = async () => { if (!confirm('Criar um link novo? O atalho antigo deixa de funcionar até colares o novo.')) return; try { await ensureAk(true); OS.UI.toast('Link novo criado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 A.accAkTest = async () => { const a = Acc.atalho(); if (!a) return; try { const r = await fetch(a.url, { method: 'POST', body: new URLSearchParams({ k: a.key, v: '1', d: '__teste__' }) }); if (!r.ok) throw new Error(await r.text());
-    OS.Inbox.testOk = false; await OS.Inbox.pull(false); OS.UI.toast(OS.Inbox.testOk ? 'O atalho está a funcionar: o Náutilo recebeu o teste (não conta nas finanças).' : 'O teste ainda não chegou. Tenta outra vez.', OS.Inbox.testOk ? 'pos' : 'warn'); }
+    OS.Inbox.testOk = false; await OS.Inbox.pull(false); OS.UI.toast(OS.Inbox.testOk ? 'O atalho está a funcionar: o Prumo recebeu o teste (não conta nas finanças).' : 'O teste ainda não chegou. Tenta outra vez.', OS.Inbox.testOk ? 'pos' : 'warn'); }
   catch (e) { OS.UI.toast('O teste falhou: ' + e.message, 'neg'); } };
 Acc.atalhoPanel = () => { const l = akLink(), UI = OS.UI;
   return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3></div>
-  <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado neste perfil, sem abrir o Náutilo. Não precisas de configurar nada fora do Náutilo.</p>
+  <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado neste perfil, sem abrir o Prumo. Não precisas de configurar nada fora do Prumo.</p>
   <div class="ib-w"><div class="ib-s"><i>1</i><div><b>O teu link</b><p>É só deste perfil. Não o partilhes: quem o tiver pode registar gastos aqui.</p>
     ${l ? `<div class="ib-link"><code>${esc(l)}</code><button class="btn sm pri" data-act="accAkCopy">Copiar link</button></div><div class="row gap8" style="margin-top:8px"><button class="btn sm" data-act="accAkTest">Testar agora</button><button class="btn sm ghost" data-act="accAkNew">Criar link novo</button></div>` : `<button class="btn sm pri" data-act="accAkCopy">Criar o link</button>`}</div></div>
     <div class="ib-s"><i>2</i><div><b>Criar o atalho (3 ações)</b><p>App <b>Atalhos</b> → <b>+</b> → nome "Gasto". Adiciona:</p>
       <div class="ib-sc"><div><b>1 · Pedir entrada</b> → toca em "Texto" e muda para <b>Número</b> → pergunta: <i>Quanto gastaste?</i></div><div><b>2 · Pedir entrada</b> → Texto → pergunta: <i>Em quê?</i></div><div><b>3 · Obter conteúdo do URL</b> → cola o <b>link</b> → ▸ (mostrar mais) → Método: <b>POST</b> → Corpo do pedido: <b>Formulário</b> → <b>Adicionar campo → Texto</b>: chave <code>v</code> com a 1.ª <b>Entrada fornecida</b>; chave <code>d</code> com a 2.ª.</div></div>
-      <p>Toca em ▶️ para experimentar: deve aparecer "✓ … registado no Náutilo".</p></div></div>
+      <p>Toca em ▶️ para experimentar: deve aparecer "✓ … registado no Prumo".</p></div></div>
     <div class="ib-s"><i>3</i><div><b>Pôr no Centro de Controlo</b><p>Centro de Controlo → <b>+</b> → <b>Adicionar controlo</b> → <b>Atalhos</b> → <b>Atalho</b> → <b>Escolher</b> → "Gasto". Também podes pô-lo no <b>botão de Ação</b> ou no ecrã principal.</p></div></div></div>
-  <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças quando abres o Náutilo, com a categoria adivinhada pela descrição e a etiqueta <i>atalho</i>.</p></div>`; };
+  <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças quando abres o Prumo, com a categoria adivinhada pela descrição e a etiqueta <i>atalho</i>.</p></div>`; };
 OS.forms.accPw = async f => { try { const j = await conta('senha', { atual: f.elements.atual.value, nova: f.elements.nova.value }); takeConta(j); OS.UI.toast('Senha mudada. Os outros aparelhos vão pedir a senha nova.', 'pos'); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 OS.forms.accRec = async f => { try { const j = await conta('novocodigo', { senha: f.elements.senha.value }); OS.UI.modal(`<div style="padding:20px"><h3 style="margin:0 0 8px">Código de recuperação novo</h3><p class="mut">O antigo deixou de valer. Guarda este:</p><div class="ac-code">${esc(j.recuperacao)}</div><div class="row gap8" style="margin-top:14px"><button class="btn pri" data-mclose>Já guardei</button></div></div>`); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 OS.forms.accName = async f => { try { const j = await conta('nome', { nome: f.elements.nome.value }); takeConta(j); OS.UI.toast('Nome guardado', 'pos'); OS.request(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 OS.forms.accDel = async f => { if (!confirm('Apagar a conta, todos os perfis e todos os dados, em todos os aparelhos? Não dá para desfazer.')) return;
   try { await conta('apagar', { senha: f.elements.senha.value }); S = null; saveS(); LS.del(K.owner); LS.del(K.p); wipeLocal(); location.replace(location.pathname); location.reload(); } catch (e) { OS.UI.toast(e.message, 'neg'); } };
 const settings = () => { const UI = OS.UI, p = cur() || {}, L = profiles(), ago = SY.last ? Math.max(0, Math.round((Date.now() - SY.last) / 1000)) : null;
-  const head = UI.head('Definições', 'A tua conta Náutilo: perfis, senha e sincronização entre aparelhos.', '', 'Sistema') + UI.tabs('definicoes', OS.SETT, 'conta');
+  const head = UI.head('Definições', 'A tua conta Prumo: perfis, senha e sincronização entre aparelhos.', '', 'Sistema') + UI.tabs('definicoes', OS.SETT, 'conta');
   return head + `<div class="set-page ac-set">
   <div class="pn"><div class="pn-h"><h3>${UI.ic('user')}Conta</h3><span class="mut">${esc(Acc.email())}</span></div>
     <form data-form="accName" class="row gap8" style="align-items:flex-end"><label class="grow">Nome da conta<input class="field" name="nome" maxlength="40" value="${esc((S && S.n) || '')}"></label><button class="btn">Guardar</button></form></div>

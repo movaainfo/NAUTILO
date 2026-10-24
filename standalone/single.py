@@ -1,4 +1,4 @@
-# Gera dist-gh/: o Náutilo num único index.html (CSS e JS embutidos) + manifesto, service worker, config e ícones na raiz.
+# Gera dist-gh/: o Prumo num único index.html (CSS e JS embutidos) + manifesto, service worker, config e ícones na raiz.
 import re, os, shutil, hashlib
 src = 'dist'; out = 'dist-gh'
 shutil.rmtree(out, ignore_errors=True); os.makedirs(out)

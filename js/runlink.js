@@ -1,4 +1,4 @@
-/* NÁUTILO — corridas do relógio (Aurea Fit → app Saúde → Atalho do iPhone → Náutilo).
+/* PRUMO — corridas do relógio (Aurea Fit → app Saúde → Atalho do iPhone → Prumo).
    O atalho lê a última corrida no Saúde e abre este endereço:
    …/Oceanum/#corrida-add?km=5,2&seg=1860&bpm=152&bpmmax=178&kcal=410&data=2026-10-04
    (aceita também tempo=31:00, min=31, metros=5200). Abre o registo de corrida já preenchido para confirmar. */
@@ -32,16 +32,16 @@ if (/^#corrida-add/.test(location.hash)) { todo = pending(); }
 /* ---------- Definições → Atalhos do iPhone: ligar o relógio ---------- */
 const step = (i, t, b) => `<div class="ib-s"><i>${i}</i><div><b>${t}</b>${b}</div></div>`;
 RL.panel = () => { const ex = BASE() + '#corrida-add?km=5,2&seg=1860&bpm=152&kcal=410';
-  return UI.toggle('Ligar o relógio (Aurea Fit → Saúde → Náutilo)', `<div class="ib-steps">
+  return UI.toggle('Ligar o relógio (Aurea Fit → Saúde → Prumo)', `<div class="ib-steps">
     ${step(1, 'Confirma que o relógio envia a corrida para o Saúde', '<p>App <b>Aurea Fit</b> → definições → <b>Apple Saúde</b> → ativa <b>Treinos</b>, <b>Distância</b>, <b>Frequência cardíaca</b> e <b>Energia ativa</b>. Depois de uma corrida, abre <b>Saúde → Explorar → Atividade → Treinos</b> e vê se aparece a distância.</p>')}
-    ${step(2, 'Cria o atalho "Corrida → Náutilo"', `<p>App <b>Atalhos</b> → <b>+</b>. Junta estas ações por ordem:</p><ol class="rl-ol">
+    ${step(2, 'Cria o atalho "Corrida → Prumo"', `<p>App <b>Atalhos</b> → <b>+</b>. Junta estas ações por ordem:</p><ol class="rl-ol">
       <li><b>Encontrar amostras de saúde</b> → Tipo: <b>Treinos</b> · Ordenar por <b>Data de início</b>, <b>Mais recente primeiro</b> · Limite <b>1</b>.</li>
       <li><b>Obter detalhes de amostras de saúde</b> → <b>Duração</b> (o atalho dá-a em segundos; se aparecer em minutos usa <code>min=</code> em vez de <code>seg=</code>).</li>
       <li>Outra vez <b>Encontrar amostras de saúde</b> → Tipo: <b>Distância (a pé e a correr)</b> · Data de início <b>é hoje</b> → <b>Calcular estatísticas</b> → <b>Soma</b>, em <b>km</b>.</li>
       <li>Opcional: o mesmo para <b>Frequência cardíaca</b> → Estatística <b>Média</b>, e <b>Energia ativa</b> → <b>Soma</b>.</li>
       <li><b>Texto</b>: <code>${U.esc(BASE())}#corrida-add?km=</code>[Soma da distância]<code>&amp;seg=</code>[Duração]<code>&amp;bpm=</code>[Média]<code>&amp;kcal=</code>[Energia]</li>
       <li><b>Abrir URL</b> → o Texto.</li></ol>`)}
-    ${step(3, 'Usa depois de correr', '<p>Toca no atalho (ou pede à Siri "Corrida para Náutilo"). O Náutilo abre o registo já preenchido com km, tempo, ritmo e frequência cardíaca: confirma e guarda. Conta logo para os desafios, o calendário de disciplina e as calorias da dieta.</p>')}
+    ${step(3, 'Usa depois de correr', '<p>Toca no atalho (ou pede à Siri "Corrida para Prumo"). O Prumo abre o registo já preenchido com km, tempo, ritmo e frequência cardíaca: confirma e guarda. Conta logo para os desafios, o calendário de disciplina e as calorias da dieta.</p>')}
     ${step(4, 'Testar já', `<p>Abre este endereço de teste (corrida de 5,2 km em 31 min):</p><div class="row gap8"><a class="btn sm" href="${U.esc(ex)}">Abrir teste</a><button class="btn ghost sm" data-act="rlCopy">Copiar endereço base</button></div>`)}
   </div>`, 'rlink', 'run'); };
 A.rlCopy = () => { const t = BASE() + '#corrida-add?km='; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => UI.toast('Endereço copiado', 'pos')).catch(() => UI.toast(t, '')); };

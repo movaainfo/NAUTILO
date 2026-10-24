@@ -1,4 +1,4 @@
-/* NÁUTILO — Ficheiros na nuvem: PDFs, slides, exames e documentos da Universidade e dos Cursos guardados no TEU Google Drive
+/* PRUMO — Ficheiros na nuvem: PDFs, slides, exames e documentos da Universidade e dos Cursos guardados no TEU Google Drive
    (pasta "Náutilo · Ficheiros", uma subpasta por disciplina e por curso). Depois de enviados, podes apagá-los do aparelho:
    ficam no Drive e abrem-se daqui em qualquer aparelho. Precisa da Parte 5 do script Google (Definições → Script Google). */
 (() => {
@@ -11,7 +11,7 @@ OS.S.files = { label: 'Ficheiro', title: r => r.name, fields: [
   { k: 'notes', l: 'Notas', t: 'area', rows: 2 }], defaults: () => ({ kind: 'PDF' }) };
 
 /* ---------- Parte 5 do script ---------- */
-IB.addon5 = () => `// Náutilo · PARTE 5 — Ficheiros na nuvem (pasta "Náutilo · Ficheiros" no TEU Google Drive): PDFs e documentos da Universidade e dos Cursos.
+IB.addon5 = () => `// Prumo · PARTE 5 — Ficheiros na nuvem (pasta "Náutilo · Ficheiros" no TEU Google Drive): PDFs e documentos da Universidade e dos Cursos.
 // Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte5), por baixo da Parte4. Não apagues as outras partes.
 function fRaiz_() { const P = PropertiesService.getScriptProperties(); let f = null; const id = P.getProperty('F_ROOT');
   if (id) { try { f = DriveApp.getFolderById(id); if (f.isTrashed()) f = null; } catch (e) { f = null; } }

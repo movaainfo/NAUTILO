@@ -1,4 +1,4 @@
-// NÁUTILO · IA para todas as contas (função do Vercel), sem ninguém configurar nada.
+// PRUMO · IA para todas as contas (função do Vercel), sem ninguém configurar nada.
 // A app fala com a IA no formato do Google Gemini; numa conta, em vez da chave de cada pessoa, os pedidos vêm para aqui:
 //   - se o projeto tiver GEMINI_API_KEY (posta pelo dono no Vercel), seguem para o Google (texto, fotos e voz);
 //   - senão, o texto segue para a IA grátis da Pollinations (modelo aberto) e a resposta volta no formato do Gemini.

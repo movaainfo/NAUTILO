@@ -1,4 +1,4 @@
-/* NÁUTILO — componentes de interface: ícones, blocos, tabelas, formulários, gaveta, gráficos. */
+/* PRUMO — componentes de interface: ícones, blocos, tabelas, formulários, gaveta, gráficos. */
 (() => {
 'use strict';
 const U = OS.U;

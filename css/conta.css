@@ -1,4 +1,4 @@
-/* NÁUTILO — ecrã da conta e perfis: o mesmo mar do ecrã de entrada, com os formulários por baixo, à luz do farol. */
+/* PRUMO — ecrã da conta e perfis: o mesmo mar do ecrã de entrada, com os formulários por baixo, à luz do farol. */
 #acc{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;justify-content:flex-end;background:#04070D;overflow:hidden auto;color:#E9E3D8;-webkit-overflow-scrolling:touch}
 #acc[hidden]{display:none}
 html.ac-open,html.ac-open body{overflow:hidden}

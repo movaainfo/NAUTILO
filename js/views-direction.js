@@ -1,4 +1,4 @@
-/* NÁUTILO — Direção: North Star, Roadmap, Long Term, Decision Center, Revisões, Minha Evolução, Definições. */
+/* PRUMO — Direção: North Star, Roadmap, Long Term, Decision Center, Revisões, Minha Evolução, Definições. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, L = OS.L, esc = U.esc, A = OS.act, I = OS.Intel, Goal = OS.Goal, Fin = OS.Fin;
@@ -87,7 +87,7 @@ OS.forms.decThink = async f => { const t = f.elements.t.value.trim(); if (t.leng
   if (THINK.busy) return; THINK.busy = true; THINK.err = ''; OS.request();
   try { const r = await OS.AI.json([{ text: `És o Spyke, o assistente pessoal do ${who()}. Ele escreveu isto sobre uma decisão que está a pensar tomar:
 """${t.slice(0, 3000)}"""
-VIDA DELE (dados do NÁUTILO):
+VIDA DELE (dados do PRUMO):
 ${OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx() : ''}
 Organiza a decisão em português de Portugal. Responde só JSON: {"titulo":"a decisão em poucas palavras","contexto":"o que está em jogo, em 2 a 3 frases, com as palavras dele","prazo":"AAAA-MM-DD se ele indicou uma data, senão vazio","alternativas":[{"nome":"nome curto","notas":"o que ele disse sobre esta opção"}]}
 Inclui 2 a 4 alternativas: as que ele referiu e, se só falou de uma, também "Não fazer / manter como está".` }], .3);
@@ -141,7 +141,7 @@ const who = () => OS.one('profile').short || OS.who();
 const decPrompt = (d, task) => [{ text: `És o Spyke, o assistente pessoal do ${who()}. Ajudas a pensar uma decisão importante: és honesto, concreto e usas os dados dele; não decides por ele. Escreve em português claro (de Portugal), sem emojis, frases curtas.
 DECISÃO:
 ${decCtx(d)}
-VIDA DELE (dados do NÁUTILO):
+VIDA DELE (dados do PRUMO):
 ${OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx() : ''}
 ${task}` }];
 const AN = `Analisa o que ele ESCREVEU (título, contexto, alternativas, notas, valores e pesos) e a vida dele. Responde só JSON: {"resumo":"2 a 3 frases sobre o que está em jogo","sobre_o_que_escreveste":"comentário honesto ao que ele escreveu: suposições, contradições, o que falta, o que está a desvalorizar","alternativas":[{"nome":"nome exato da alternativa","fortes":[{"t":"ponto forte","peso":1-5}],"fracos":[{"t":"ponto fraco","peso":1-5}],"oportunidades":["o que pode abrir"],"ameacas":["o que pode correr mal"],"encaixe":"como encaixa nas metas, finanças, estudos, trabalho e rotina dele"}],"pesa_mais":[{"fator":"o que mais pesa nesta decisão para ELE","porque":"ligado às metas/valores/dados dele","peso":1-5}],"pesos":{"cost":0-5,"benefit":0-5,"risk":0-5,"time":0-5,"fin":0-5,"goals":0-5,"routine":0-5},"pesos_porque":"uma frase sobre os pesos sugeridos","riscos":["riscos ou custos escondidos que ele não escreveu (até 4)"],"perguntas":["perguntas que ele devia responder antes de decidir (até 5)"],"nova":"uma alternativa que ele não considerou, ou vazio","inclinacao":{"nome":"alternativa para onde os dados apontam, ou vazio se não dá para saber","porque":"uma frase","confianca":"baixa|média|alta"},"emocao":"se parece uma decisão emocional ou impulsiva diz porquê numa frase, senão vazio","passo":"o próximo passo concreto (ex.: pedir orçamento, falar com alguém, esperar 24 h)"}
@@ -301,7 +301,7 @@ A.evM = b => OS.setUI('evM', b.dataset.v);
 V.definicoes = () => {
   const p = OS.one('profile'), sec = OS.one('security');
   // o perfil em 4 blocos pequenos (cada um abre e fecha): quem és, estudos, trabalho e metas
-  const PF = [['pfMe', 'Sobre ti', 'Nome e cidade: como o Náutilo te trata.', [['name', 'Nome completo'], ['short', 'Como te trato'], ['city', 'Cidade']]],
+  const PF = [['pfMe', 'Sobre ti', 'Nome e cidade: como o Prumo te trata.', [['name', 'Nome completo'], ['short', 'Como te trato'], ['city', 'Cidade']]],
     ['pfUni', 'Estudos', 'Universidade, curso e semestre: usados na Universidade, nas faltas e no calendário.', [['uni', 'Universidade'], ['course', 'Curso'], ['year', 'Ano letivo'], ['semester', 'Semestre atual'], ['semStart', 'Início do semestre', 'date'], ['semEnd', 'Fim do semestre', 'date'], ['ectsTotal', 'ECTS do curso', 'number']]],
     ['pfWork', 'Trabalho', 'Onde trabalhas e quanto ganhas por hora: usados no Trabalho e nas Finanças.', [['employer', 'Onde trabalho'], ['jobRole', 'Função'], ['hourly', 'Valor por hora (€)', 'number']]],
     ['pfGoals', 'Metas', 'Alvos de poupança, treino e corrida: o Painel e o Dominus medem-te por eles.', [['savingsTarget', 'Taxa de poupança alvo (%)', 'number'], ['emergencyTarget', 'Fundo de emergência alvo (€)', 'number'], ['trainTarget', 'Treinos por semana (meta)', 'number'], ['runKmTarget', 'Km de corrida por semana (meta)', 'number'], ['sleepH', 'Horas de sono por noite (meta)', 'number']]]];
@@ -315,8 +315,8 @@ V.definicoes = () => {
   <div class="pn"><div class="pn-h"><h3>Contextos</h3></div><div class="row gap4">${L.CTX.map(c => UI.badge(c, 'acc')).join('')}</div><div class="note" style="margin-top:8px">Usa-os nas tarefas para filtrar em Próximos passos pelo sítio onde estás. Na captura rápida basta escrever @Casa, @Rua, @Mova…</div></div>
   ${OS.Reset ? OS.Reset.panel() : ''}`;
 };
-A.exportData = async () => { const name = 'nautilo-' + U.today() + '.json', txt = JSON.stringify(OS.exportAll());
-  try { const f = new File([txt], name, { type: 'application/json' }); if (navigator.canShare && navigator.canShare({ files: [f] }) && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: 'Náutilo · cópia dos dados' }); UI.toast('Cópia pronta. Guarda-a em Ficheiros.', 'pos'); return; } } catch (e) { if (e && e.name === 'AbortError') return UI.toast('Exportação cancelada'); }
+A.exportData = async () => { const name = 'prumo-' + U.today() + '.json', txt = JSON.stringify(OS.exportAll());
+  try { const f = new File([txt], name, { type: 'application/json' }); if (navigator.canShare && navigator.canShare({ files: [f] }) && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: 'Prumo · cópia dos dados' }); UI.toast('Cópia pronta. Guarda-a em Ficheiros.', 'pos'); return; } } catch (e) { if (e && e.name === 'AbortError') return UI.toast('Exportação cancelada'); }
   let dl = null; try { dl = window.claude && await window.claude.use('downloads'); } catch (e) { } if (!dl) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(OS.exportAll())], { type: 'application/json' })); a.download = 'nautilo-' + U.today() + '.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); UI.toast('Cópia exportada', 'pos'); } catch (e) { UI.toast('Exportação indisponível nesta vista', 'warn'); } return; } try { await dl.save({ filename: 'nautilo-' + U.today() + '.json', data: JSON.stringify(OS.exportAll()) }); UI.toast('Cópia exportada', 'pos'); } catch (e) { UI.toast('Exportação cancelada'); } };
-document.addEventListener('change', e => { if (e.target.id !== 'impData' || !e.target.files[0]) return; const fr = new FileReader(); fr.onload = () => { try { OS.importAll(JSON.parse(fr.result)); UI.toast('Cópia importada', 'pos'); } catch (er) { UI.toast('Ficheiro inválido: escolhe um .json exportado do Náutilo', 'neg'); } }; fr.readAsText(e.target.files[0]); });
+document.addEventListener('change', e => { if (e.target.id !== 'impData' || !e.target.files[0]) return; const fr = new FileReader(); fr.onload = () => { try { OS.importAll(JSON.parse(fr.result)); UI.toast('Cópia importada', 'pos'); } catch (er) { UI.toast('Ficheiro inválido: escolhe um .json exportado do Prumo', 'neg'); } }; fr.readAsText(e.target.files[0]); });
 })();

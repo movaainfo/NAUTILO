@@ -1,4 +1,4 @@
-/* NÁUTILO — Investimentos+: alertas de preço (no ecrã, notificação e email pelo script Google mesmo com a app fechada)
+/* PRUMO — Investimentos+: alertas de preço (no ecrã, notificação e email pelo script Google mesmo com a app fechada)
    e comparação de ativos lado a lado (rentabilidade, risco e múltiplos). */
 (() => {
 'use strict';
@@ -21,7 +21,7 @@ IX.checkAlerts = () => { const today = U.today(); AL().filter(a => a.on && a.s).
     if (a.k === 'abaixo' && q.p <= n(a.v)) hit = `${a.s} desceu para ${U.nf(q.p, 2)} ${q.cur || ''} (alvo ${U.nf(n(a.v), 2)})`;
     if (a.k === 'queda' && ch <= -Math.abs(n(a.v))) hit = `${a.s} cai ${U.nf(ch, 2)}% hoje`;
     if (a.k === 'subida' && ch >= Math.abs(n(a.v))) hit = `${a.s} sobe ${U.nf(ch, 2)}% hoje`; }
-  if (!hit) return; const msg = hit + (a.n ? ' — ' + a.n : ''); UI.toast('' + msg, 'pos'); notify('Náutilo · alerta', msg);
+  if (!hit) return; const msg = hit + (a.n ? ' — ' + a.n : ''); UI.toast('' + msg, 'pos'); notify('Prumo · alerta', msg);
   OS.upd('palerts', a.id, a.r === 'diario' ? { firedAt: today, last: msg } : { firedAt: today, last: msg, on: false }, { silent: true }); }); };
 OS.on('ready', () => { const t = IX.tick; IX.tick = async f => { await t(f); try { IX.checkAlerts(); } catch (e) { } }; AL().forEach(a => a.s && a.on && a.k !== 'dataex' && IX.extra.add(a.s)); });
 /* símbolos dos alertas também entram no ciclo ao vivo */
@@ -32,7 +32,7 @@ const pushAlerts = U.deb(async () => { const c = OS.one('inbox'); if (!c.url || 
 OS.on('change', c => { if (c === 'palerts') pushAlerts(); });
 OS.on('ready', () => setTimeout(pushAlerts, 4000));
 A.invAlert = b => UI.openForm('palerts', null, { s: b.dataset.s || '', k: b.dataset.k || 'abaixo', v: b.dataset.v ? U.r2(+b.dataset.v) : '', r: 'uma', on: true }, { title: 'Novo alerta' + (b.dataset.s ? ' · ' + b.dataset.s : '') });
-A.invNotif = async () => { if (!('Notification' in window)) { UI.toast('Este navegador não suporta notificações. No iPhone, instala o Náutilo no ecrã principal.', 'warn'); return; } const p = await Notification.requestPermission(); UI.toast(p === 'granted' ? 'Notificações ligadas' : 'Notificações recusadas', p === 'granted' ? 'pos' : 'warn'); OS.request(); };
+A.invNotif = async () => { if (!('Notification' in window)) { UI.toast('Este navegador não suporta notificações. No iPhone, instala o Prumo no ecrã principal.', 'warn'); return; } const p = await Notification.requestPermission(); UI.toast(p === 'granted' ? 'Notificações ligadas' : 'Notificações recusadas', p === 'granted' ? 'pos' : 'warn'); OS.request(); };
 IX.alertsPanel = () => { const L = U.sortBy(AL(), a => (a.on ? 0 : 1) + (a.s || '')), np = 'Notification' in window ? Notification.permission : 'n/a', em = IX.st.alerts;
   return `<div class="pn"><div class="pn-h"><h3>Alertas de preço</h3><button class="btn sm pri" data-act="invAlert">+ Alerta</button></div>
     ${L.length ? `<div class="list">${L.map(a => { const q = IX.q(a.s), kk = (KINDS.find(k => k[0] === a.k) || [, ''])[1]; return `<div class="li ${a.on ? '' : 'mut'}"><div class="li-t click" data-edit="palerts:${a.id}"><b>${esc(a.s)} · ${esc(kk)} ${a.k !== 'dataex' ? U.nf(n(a.v), 2) + (a.k === 'queda' || a.k === 'subida' ? '%' : '') : ''}</b><small>${q ? 'agora ' + U.nf(q.p, 2) + ' ' + esc(q.cur || '') + ' · ' : ''}${a.on ? (a.r === 'diario' ? 'todos os dias' : 'uma vez') : 'disparado' + (a.firedAt ? ' a ' + U.fmtD(a.firedAt) : '')}${a.n ? ' · ' + esc(a.n) : ''}</small></div>${a.on ? '<span class="bdg pos">ativo</span>' : `<button class="btn xs ghost" data-act="invAlertOn" data-id="${a.id}">reativar</button>`}</div>`; }).join('')}</div>` : UI.empty('Cria alertas para seres avisado quando um ativo chegar ao preço que queres, cair muito num dia ou tiver data-ex amanhã.')}
@@ -40,7 +40,7 @@ IX.alertsPanel = () => { const L = U.sortBy(AL(), a => (a.on ? 0 : 1) + (a.s || 
 // Definições → Ligações: como os alertas de preço chegam (notificações do aparelho e e-mail pelo script)
 IX.alertSettings = () => { const np = 'Notification' in window ? Notification.permission : 'n/a', em = IX.st.alerts;
   return `<div class="pn" id="alertSet"><div class="pn-h"><h3>Alertas de preço (Investimentos)</h3><span class="bdg ${np === 'granted' || em === 'email' ? 'pos' : ''}">${np === 'granted' || em === 'email' ? 'ligados' : 'só com a app aberta'}</span></div>
-    <div class="list"><div class="li"><div class="li-t"><b>Notificações neste aparelho</b><small>${np === 'granted' ? '✓ Ligadas (com a app aberta).' : np === 'n/a' ? 'Este navegador não tem notificações. No iPhone, instala o Náutilo no ecrã principal.' : 'Mostram o alerta mesmo noutra página da app.'}</small></div><div class="li-r">${np === 'granted' || np === 'n/a' ? '' : '<button class="btn sm" data-act="invNotif">Ligar</button>'}</div></div>
+    <div class="list"><div class="li"><div class="li-t"><b>Notificações neste aparelho</b><small>${np === 'granted' ? '✓ Ligadas (com a app aberta).' : np === 'n/a' ? 'Este navegador não tem notificações. No iPhone, instala o Prumo no ecrã principal.' : 'Mostram o alerta mesmo noutra página da app.'}</small></div><div class="li-r">${np === 'granted' || np === 'n/a' ? '' : '<button class="btn sm" data-act="invNotif">Ligar</button>'}</div></div>
     <div class="li"><div class="li-t"><b>E-mail com a app fechada</b><small>${em === 'email' ? '✓ Ligado: o script verifica a cada 15 min, mesmo com a app fechada.' : IX.hasScript() ? 'No Apps Script, escolhe a função <b>ativarAlertas</b> → ▶ Executar → autoriza (uma vez).' : 'Precisa do script Google ligado (cotações, acima).'}</small></div></div></div>
     <small class="mut">Os alertas em si (preço, queda, subida, data-ex) crias em Investimentos.</small></div>`; };
 A.invAlertOn = b => OS.upd('palerts', b.dataset.id, { on: true, firedAt: '' });

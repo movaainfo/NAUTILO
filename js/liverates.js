@@ -1,4 +1,4 @@
-/* NÁUTILO — taxas e inflação AO VIVO para os simuladores.
+/* PRUMO — taxas e inflação AO VIVO para os simuladores.
    Vai buscar os últimos valores publicados às fontes oficiais (sem chave, direto do navegador) e guarda-os 6 h:
    zona euro → Eurostat (inflação HICP) + BCE (taxas dos bancos: depósitos, poupança, crédito ao consumo);
    Brasil → Banco Central do Brasil (IPCA 12 m, CDI, Selic, poupança, crédito pessoal);

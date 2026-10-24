@@ -1,8 +1,11 @@
 {
- "n": 138,
- "hash": "a6061a047fbc",
+ "n": 139,
+ "hash": "78059f4a484e",
  "notes": [
-  "Menu de cima no tablet deitado e em janelas estreitas: os grupos que não cabem passam para «Mais», em vez de ficarem por baixo dos ícones (o «Admin» já não fica tapado pelo microfone)."
+  "O app chama-se agora Prumo, com a logo nova: os anéis com a linha de prumo e o ponto vermelho ao centro. O nome usa a letra Bodoni Moda.",
+  "Endereço novo: prumo-vida.vercel.app. O antigo continua a funcionar; numa conta basta entrar no novo com o teu e-mail e senha.",
+  "Ícones novos no ecrã principal (para os ver no iPhone, adiciona outra vez ao ecrã principal a partir do endereço novo).",
+  "Editar o perfil (foto ou personagem) já não dá o erro «a conta está a ser alterada noutro aparelho»."
  ],
  "date": "24/10/2026"
 }

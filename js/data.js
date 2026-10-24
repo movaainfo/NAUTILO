@@ -1,4 +1,4 @@
-/* NÁUTILO — modelo de dados: esquemas, singletons, sementes, migração e lógica de domínio. */
+/* PRUMO — modelo de dados: esquemas, singletons, sementes, migração e lógica de domínio. */
 (() => {
 'use strict';
 const U = OS.U, S = OS.S;

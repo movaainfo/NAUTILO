@@ -1,4 +1,4 @@
-/* NÁUTILO — MUNDO: a tua volta ao mundo.
+/* PRUMO — MUNDO: a tua volta ao mundo.
    Os 195 países (os 193 da ONU, o Vaticano e a Palestina) num mapa que se pinta à medida que os conheces, a lista toda com procura,
    a percentagem do mundo que já conheces (em países e em área), os continentes, o passaporte com os carimbos e os sítios onde queres ir.
    Cada país conhecido dá XP de Mente no Dominus. Mapa: Natural Earth 1:110m (domínio público); dados dos países: mledoze/countries (ODbL). */

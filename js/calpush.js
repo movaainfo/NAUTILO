@@ -1,4 +1,4 @@
-/* NÁUTILO — A tua agenda do Náutilo também FORA da app: TUDO o que está no Calendário do Náutilo (trabalho e folgas — também os da
+/* PRUMO — A tua agenda do Prumo também FORA da app: TUDO o que está no Calendário do Prumo (trabalho e folgas — também os da
    escala importada por foto —, compromissos, aulas, provas e entregas, tarefas com data, prazos, metas, rotina, treinos, contas,
    aniversários…) vai sozinho para um calendário "Náutilo" no teu Google Calendar, que aparece no Calendário do iPhone.
    Quando alteras ou apagas na app, atualiza ou apaga lá. É feito pela Parte 6 do script (um ficheiro novo: não mexe nas outras partes).
@@ -19,7 +19,7 @@ const win = (k) => { const w = TW[k] || [BACK, AHEAD]; return [U.addDays(U.today
 const st = () => OS.one('inbox') || {};
 const has6 = () => +(st().c6 || 0) >= 1, has7 = () => +(st().c7 || 0) >= 1, old6 = () => !!(OS.Files && OS.Files.has6());   // Parte 7 (cores), Parte 6 ou a Parte 5 versão 6 (antiga)
 const ready = () => !!(OS.Files && OS.Files.ready() && (has7() || has6() || old6()));
-// com eventos já nos calendários de cor, a Parte 6 (um só calendário) criava-os outra vez no "Náutilo": nesse caso não envia até a Parte 7 responder
+// com eventos já nos calendários de cor, a Parte 6 (um só calendário) criava-os outra vez no "Prumo": nesse caso não envia até a Parte 7 responder
 const catUsed = () => Object.values(cfg().map || {}).some(m => m && m.c && m.c !== 'outros');
 const OP = () => has7() ? 'cal7' : catUsed() ? '' : has6() ? 'cal6' : 'calsync';
 // cores lá fora (só no Google Calendar e no iPhone; a app fica igual): cada tipo vai para o seu calendário, com uma cor pastel
@@ -31,12 +31,12 @@ const CALS = () => Object.fromEntries(CATS.map(c => [c[0], [c[1], c[2]]]));
 CP.CATS = CATS;
 
 /* ---------- Parte 6 do script (ficheiro novo Parte6) ---------- */
-IB.addon6 = () => `// Náutilo · PARTE 6 — A tua agenda do Náutilo no Google Calendar (calendário "Náutilo"), que aparece também no Calendário do iPhone.
-// Tudo o que está no Calendário do Náutilo vai para lá (trabalho, folgas, compromissos, aulas, provas, tarefas…); o que mudas ou apagas na app muda lá.
+IB.addon6 = () => `// Prumo · PARTE 6 — A tua agenda do Prumo no Google Calendar (calendário "Náutilo"), que aparece também no Calendário do iPhone.
+// Tudo o que está no Calendário do Prumo vai para lá (trabalho, folgas, compromissos, aulas, provas, tarefas…); o que mudas ou apagas na app muda lá.
 // Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte6), por baixo da Parte5. Não apagues nem mudes as outras partes.
 function oc6Cal_() { const P = PropertiesService.getScriptProperties(); let c = null; const id = P.getProperty('OC_CAL');
   if (id) { try { c = CalendarApp.getCalendarById(id); } catch (e) { c = null; } }
-  if (!c) { const l = CalendarApp.getCalendarsByName('Náutilo').concat(CalendarApp.getCalendarsByName('Oceanum')); c = l.length ? l[0] : CalendarApp.createCalendar('Náutilo', { summary: 'Tudo o que registas no Náutilo: trabalho, folgas, compromissos, aulas, provas, tarefas…' }); P.setProperty('OC_CAL', c.getId()); }
+  if (!c) { const l = CalendarApp.getCalendarsByName('Náutilo').concat(CalendarApp.getCalendarsByName('Oceanum')); c = l.length ? l[0] : CalendarApp.createCalendar('Náutilo', { summary: 'Tudo o que registas no Prumo: trabalho, folgas, compromissos, aulas, provas, tarefas…' }); P.setProperty('OC_CAL', c.getId()); }
   if (c.getName() === 'Oceanum') { try { c.setName('Náutilo'); } catch (e) { } }
   return c; }
 function oc6Dia_(s) { const d = String(s).split('-'); return new Date(+d[0], +d[1] - 1, +d[2]); }
@@ -51,12 +51,12 @@ function op_cal6(p) { const c = oc6Cal_(), J = JSON.parse(String(p.j || '{}')), 
       map[it.id] = e.getId(); n++; } catch (er) { map[it.id] = ''; if (/too many|rate|limit|demasiad/i.test(String(er))) parar = String(er); } }
   return { ok: true, v: 1, map: map, n: n, apagados: x, cal: c.getName(), parar: parar }; }
 `;
-IB.addon7 = () => `// Náutilo · PARTE 7 — Cores na tua agenda: cada tipo vai para o seu calendário, com a sua cor pastel
+IB.addon7 = () => `// Prumo · PARTE 7 — Cores na tua agenda: cada tipo vai para o seu calendário, com a sua cor pastel
 // (Trabalho, Folgas, Tarefas, Estudos, Compromissos, Treino e rotina, e o calendário "Náutilo" para o resto). Aparece assim no Google Calendar e no iPhone.
 // Vai num FICHEIRO NOVO do mesmo projeto (＋ → Script → nome Parte7), por baixo da Parte6. Não apagues nem mudes as outras partes.
 function oc7Cal_(k, nome, cor) { const P = PropertiesService.getScriptProperties(), pk = 'OC7_' + k; let c = null; const id = P.getProperty(pk) || (k === 'outros' ? P.getProperty('OC_CAL') : null);
   if (id) { try { c = CalendarApp.getCalendarById(id); } catch (e) { c = null; } }
-  if (!c) { const l = CalendarApp.getCalendarsByName(nome).concat(CalendarApp.getCalendarsByName(String(nome).replace(/^Náutilo/, 'Oceanum'))); c = l.length ? l[0] : CalendarApp.createCalendar(nome, { summary: 'Criado pelo Náutilo: o que registas na app aparece aqui.' }); }
+  if (!c) { const l = CalendarApp.getCalendarsByName(nome).concat(CalendarApp.getCalendarsByName(String(nome).replace(/^Náutilo/, 'Oceanum'))); c = l.length ? l[0] : CalendarApp.createCalendar(nome, { summary: 'Criado pelo Prumo: o que registas na app aparece aqui.' }); }
   if (nome && /^Oceanum/.test(c.getName()) && c.getName() !== nome) { try { c.setName(nome); } catch (e) { } }
   if (P.getProperty(pk) !== c.getId()) P.setProperty(pk, c.getId());
   if (cor && P.getProperty(pk + '_cor') !== cor) { try { c.setColor(cor); P.setProperty(pk + '_cor', cor); } catch (e) { } }
@@ -98,7 +98,7 @@ CP.items = () => { const T = cfg().types || {}, out = [], seen = new Set();
     let s, e, all = false; if (!hm) { all = true; s = x.date; e = x.date; }
     else { s = iso(x.date, hm); e = he ? (he > hm ? iso(x.date, he) : iso(U.addDays(x.date, 1), he)) : plusMin(x.date, hm, DUR[x.src] || 60); } // turno da noite: acaba no dia seguinte
     const place = x.src === 'event' || x.src === 'class' ? String(x.sub || '') : '', more = !place && x.sub ? String(x.sub) + '\n' : '';
-    out.push({ id, k: x.src, c: CAT_OF[x.src] || 'outros', date: x.date, t: TITLE(x).slice(0, 200), s, e, all, l: place.slice(0, 200), d: more + 'Criado pelo Náutilo (' + ((OS.Cal.src[x.src] || [x.src])[0]) + '). Para mudar, altera na app.' }); });
+    out.push({ id, k: x.src, c: CAT_OF[x.src] || 'outros', date: x.date, t: TITLE(x).slice(0, 200), s, e, all, l: place.slice(0, 200), d: more + 'Criado pelo Prumo (' + ((OS.Cal.src[x.src] || [x.src])[0]) + '). Para mudar, altera na app.' }); });
   return out; };
 const H = it => U.hash ? U.hash([it.t, it.s, it.e, it.all ? 1 : 0, it.l, it.d].join('|')).toString(36) : JSON.stringify([it.t, it.s, it.e, it.all, it.l, it.d]);
 const catOf = (x, op) => op === 'cal7' ? x.c : 'outros';   // sem a Parte 7 vai tudo para o calendário "Náutilo"
@@ -188,11 +188,11 @@ A.cpNow = () => CP.sync(false);
 A.cpType = b => { const t = Object.assign({}, cfg().types || {}); t[b.dataset.k] = t[b.dataset.k] ? 0 : 1; OS.setOne('calx', { types: t }); CP.soon(1500); OS.request(); };
 CP.panel = () => { const c = cfg(), T = c.types || {}, ok = ready(), P = c.on && ok ? CP.plan() : null;
   return `<div class="pn" id="cpSet"><div class="pn-h"><h3>${UI.ic('cal')}A tua agenda também fora da app</h3>${c.on ? `<span class="bdg ${c.err ? 'warn' : 'pos'}">${c.err ? 'com erro' : 'ligado'}</span>` : ''}</div>
-    <p class="mut" style="margin:0 0 10px">Tudo o que está no Calendário do Náutilo vai sozinho para um calendário <b>Náutilo</b> no teu Google Calendar e aparece no <b>Calendário do iPhone</b>: o trabalho (também a escala que importas por foto), as folgas, os compromissos, as aulas, as provas… Quando alteras ou apagas na app, muda lá também. Os teus outros calendários não são tocados.</p>
+    <p class="mut" style="margin:0 0 10px">Tudo o que está no Calendário do Prumo vai sozinho para um calendário <b>Náutilo</b> no teu Google Calendar e aparece no <b>Calendário do iPhone</b>: o trabalho (também a escala que importas por foto), as folgas, os compromissos, as aulas, as provas… Quando alteras ou apagas na app, muda lá também. Os teus outros calendários não são tocados.</p>
     <div class="cp-types">${TYPES.map(([k, l]) => `<button class="chip ${T[k] ? 'on' : ''}" data-act="cpType" data-k="${k}" aria-pressed="${T[k] ? 'true' : 'false'}">${T[k] ? '✓ ' : ''}${l}</button>`).join('')}</div>
-    ${ok && has7() ? `<div class="cp-cols" aria-label="Cores no Google Calendar e no iPhone"><small class="mut">Cores lá fora (Google Calendar e iPhone):</small>${CATS.map(c => `<span class="cp-col"><i style="background:${c[2]}"></i>${esc(c[1].replace('Náutilo · ', '').replace(/^Náutilo$/, 'Outros (metas, contas, aniversários)'))}</span>`).join('')}</div>` : ''}
+    ${ok && has7() ? `<div class="cp-cols" aria-label="Cores no Google Calendar e no iPhone"><small class="mut">Cores lá fora (Google Calendar e iPhone):</small>${CATS.map(c => `<span class="cp-col"><i style="background:${c[2]}"></i>${esc(c[1].replace('Prumo · ', '').replace(/^Prumo$/, 'Outros (metas, contas, aniversários)'))}</span>`).join('')}</div>` : ''}
     ${!ok ? `<div class="note" style="margin-top:10px">Precisa da <b>Parte 7</b> do script, em <a class="acc" href="#definicoes.script">Definições → Script Google</a>. É um <b>ficheiro novo</b> (Parte7): não apagas nem mudas nenhuma das outras partes. Depois de a colares, liga-se sozinho e cada tipo aparece com a sua cor pastel (Trabalho, Folgas, Tarefas…).</div>` : !has7() ? `<div class="note" style="margin-top:10px">Para cada tipo ter a <b>sua cor</b> lá fora (Trabalho azul, Folgas verde, Tarefas amarelo…), cola a <b>Parte 7</b> em <a class="acc" href="#definicoes.script">Definições → Script Google</a>: é um ficheiro novo, não mexes na Parte 6 nem nas outras. Os eventos que já lá estão mudam sozinhos para o calendário da sua cor.</div>` : ''}
     <div class="row gap8" style="margin-top:10px;flex-wrap:wrap">${c.on ? `<button class="btn sm" data-act="cpNow">${UI.ic('sync')}Atualizar agora</button><button class="btn sm" data-act="cpDup">${UI.ic('trash')}Apagar repetidos</button><button class="btn sm ghost" data-act="cpOff">Desligar</button>` : `<button class="btn sm pri" data-act="cpOn">${UI.ic('cal')}Pôr a minha agenda no Google Calendar</button>`}</div>
     ${c.on ? `<p class="mut" style="font-size:12.5px;margin:8px 0 0">${c.n || 0} evento(s) no calendário Náutilo${c.at ? ' · última atualização ' + new Date(c.at).toLocaleString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}${P && (P.up.length || P.del.length) ? ` · ${P.up.length + P.del.length} por enviar` : ''}${c.err ? `<br><span class="warn">${esc(c.err)}</span>` : ''}</p>` : ''}
-    <details class="tog" style="margin-top:10px"><summary><span>Ver no iPhone</span>${UI.ic('down', 'chev')}</summary><div class="tog-b"><ol class="ai-steps"><li>No iPhone: <b>Ajustes → Apps → Calendário → Contas</b> (ou Ajustes → Calendário → Contas).</li><li>Se a tua conta Google não estiver lá: <b>Adicionar conta → Google</b>. Se estiver, abre-a e liga <b>Calendários</b>.</li><li>Abre a app Calendário → <b>Calendários</b> (em baixo) e confirma que o <b>Náutilo</b> está marcado.</li></ol><p class="mut" style="font-size:12.5px">Também aparece no Google Calendar no telemóvel e no computador. As alterações chegam em poucos minutos.</p></div></details></div>`; };
+    <details class="tog" style="margin-top:10px"><summary><span>Ver no iPhone</span>${UI.ic('down', 'chev')}</summary><div class="tog-b"><ol class="ai-steps"><li>No iPhone: <b>Ajustes → Apps → Calendário → Contas</b> (ou Ajustes → Calendário → Contas).</li><li>Se a tua conta Google não estiver lá: <b>Adicionar conta → Google</b>. Se estiver, abre-a e liga <b>Calendários</b>.</li><li>Abre a app Calendário → <b>Calendários</b> (em baixo) e confirma que o <b>Prumo</b> está marcado.</li></ol><p class="mut" style="font-size:12.5px">Também aparece no Google Calendar no telemóvel e no computador. As alterações chegam em poucos minutos.</p></div></details></div>`; };
 })();

@@ -1,4 +1,4 @@
-/* NÁUTILO — aplicação: navegação, barra superior, paleta de comandos, registo rápido, eventos globais, arranque. */
+/* PRUMO — aplicação: navegação, barra superior, paleta de comandos, registo rápido, eventos globais, arranque. */
 (() => {
 'use strict';
 const U = OS.U, UI = OS.UI, C = OS.C, V = OS.views, A = OS.act, esc = U.esc;
@@ -24,20 +24,20 @@ const unlocked = () => new Set(CORE.concat(Object.keys((OS.ui.nav) || {})));
 const unlock = k => { if (!k || CORE.includes(k) || !DESC[k]) return; const n = Object.assign({}, OS.ui.nav || {}); if (!n[k]) { n[k] = 1; OS.ui.nav = n; try { OS.setUI('nav', n); } catch (e) { } } };
 const setH = (el, h) => { if (OS.aiN) h = OS.aiN(h); if (el && el._h !== h) { el.innerHTML = h; el._h = h; } };
 function renderSide(cur) {
-  setH(U.$('#side'), `<a class="brand" href="#visao"><span class="brand-mark oc">${OS.Lock.logo(20, '#EAF6FF')}</span><span><b>Náutilo</b></span></a>
+  setH(U.$('#side'), `<a class="brand" href="#visao"><span class="brand-mark oc">${OS.Lock.logo(20)}</span><span><b class="pr-word">Prumo</b></span></a>
   <a class="side-set ${cur === 'definicoes' ? 'on' : ''}" href="#definicoes">${UI.ic('settings')}<span>Definições</span></a>
   ${NAV.map(([g, items]) => `<div class="nav-g"><h6>${g}</h6>${items.map(([k, l, ic, cnt]) => { let c = null; if (cnt) { try { c = cnt(); } catch (e) { } } return `<a href="#${k}" class="${cur === k ? 'on' : ''}">${UI.ic(ic)}<span>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</span>${c && c[1] === 'neg' ? `<span class="cnt neg">${c[0]}</span>` : ''}</a>`; }).join('')}</div>`).join('')}
   <div class="side-foot"><i class="sync-dot ${OS.sync.status}" id="syncDot"></i><span id="syncMsg">${esc(OS.sync.msg)}</span><button class="icon-btn" style="margin-left:auto" data-act="lockNow" aria-label="Bloquear" title="Bloquear">${UI.ic('lock')}</button><a class="icon-btn" href="#definicoes" aria-label="Definições">${UI.ic('settings')}</a></div>`);
 }
-V.explorar = () => { const un = unlocked(); return `<div class="exp"><div class="exp-h"><h1>Explorar</h1><p>Tudo o que o Náutilo faz. Abre um lugar e ele passa a aparecer no teu menu.</p></div>
+V.explorar = () => { const un = unlocked(); return `<div class="exp"><div class="exp-h"><h1>Explorar</h1><p>Tudo o que o Prumo faz. Abre um lugar e ele passa a aparecer no teu menu.</p></div>
   ${NAV.map(([g, items]) => `<section class="exp-g"><h6>${g}</h6><div class="exp-grid">${items.map(([k, l, ic]) => `<a class="exp-t ${un.has(k) ? 'in' : ''}" href="#${k}">${UI.ic(ic)}<b>${k === 'mova' ? esc(OS.one('mova').name || 'Mova') : l}</b><small>${DESC[k] || ''}</small>${un.has(k) ? '<em>no menu</em>' : '<em class="new">novo</em>'}</a>`).join('')}</div></section>`).join('')}
   <section class="exp-g"><h6>Jogo</h6><div class="exp-grid"><a class="exp-t in" href="#dominus">${UI.ic('crown')}<b>Dominus</b><small>O teu herói: 8 atributos que sobem sozinhos com tudo o que fazes, missões, chefes e baús.</small><em>no menu</em></a></div></section></div>`; };
-TITLES.explorar = ['Explorar', 'NÁUTILO'];
+TITLES.explorar = ['Explorar', 'Prumo'];
 TITLES.visao = ['Painel', 'Visão geral'];
 function renderTop(cur) {
   const grp = (NAV.find(([, items]) => items.some(([k]) => k === cur)) || [''])[0];
   setH(U.$('#top'), `<button class="icon-btn tn-menu" data-act="navOpen" aria-label="Menu">${UI.ic('menu')}</button>
-  <a class="tn-brand" href="#visao" aria-label="Náutilo, Painel">${OS.Lock.logo(22, '#EDF1F6')}<b>Náutilo</b></a>
+  <a class="tn-brand" href="#visao" aria-label="Prumo, Painel">${OS.Lock.logo(22)}<b class="pr-word">Prumo</b></a>
   <nav class="tn" aria-label="Secções">${NAV.map(([g, items], i) => `<div class="tn-g ${grp === g ? 'cur' : ''}" data-tni="${i}"><button class="tn-b" data-act="tnToggle" aria-haspopup="true">${g === 'Visão geral' ? 'Visão Geral' : g}<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button>
     <div class="tn-dd">${tnLinks(items, cur)}</div></div>`).join('')}
     <div class="tn-g tn-more" hidden><button class="tn-b" data-act="tnToggle" aria-haspopup="true">Mais<svg viewBox="0 0 24 24" class="ic tn-car"><path d="M6 9l6 6 6-6"/></svg></button><div class="tn-dd">${NAV.map(([g, items], i) => `<div class="tn-mg" data-tni="${i}" hidden><small class="tn-mh">${g === 'Visão geral' ? 'Visão Geral' : g}</small>${tnLinks(items, cur)}</div>`).join('')}</div></div></nav>
@@ -114,7 +114,7 @@ function render() {
     try { progressive(cur, r.raw); } catch (e) { console.error(e); } }
   if (fsel) { const el = U.$('#view').querySelector(fsel); if (el) { el.focus({ preventScroll: true }); try { if (caret != null && el.setSelectionRange) el.setSelectionRange(caret, caret); } catch (e) { } } }
   if (r.raw !== lastRoute) { window.scrollTo(0, 0); lastRoute = r.raw; }
-  document.title = OS.focusState && OS.focusState() ? document.title : 'NÁUTILO';
+  document.title = OS.focusState && OS.focusState() ? document.title : 'Prumo';
 }
 OS.on('render', render);
 OS.on('sync', s => { const d = U.$('#syncDot'), d2 = U.$('#syncDot2'), m = U.$('#syncMsg'); if (d) d.className = 'sync-dot ' + s.status; if (d2) { d2.className = 'sync-dot ' + s.status; d2.title = s.msg; } if (m) m.textContent = s.msg; });
@@ -190,7 +190,7 @@ document.addEventListener('submit', e => {
   V.definicoes = sub => { const f = U.ls.get('os2lite', null), on = document.documentElement.classList.contains('lite');
     return orig(sub) + `<div class="pn"><div class="pn-h"><h3>Desempenho</h3><span class="mut" style="font-size:12px">${on ? 'modo leve ligado' : 'efeitos completos'}</span></div><p class="mut" style="margin:0 0 10px">O modo leve tira sombras, desfoques e animações. Liga-o se a app estiver lenta ou travar (fica ligado sozinho em Android e aparelhos com pouca memória).</p><div class="seg" role="group">${[['auto', 'Automático'], ['1', 'Leve'], ['0', 'Completo']].map(([v, l]) => `<button class="${(f == null ? 'auto' : String(f)) === v ? 'on' : ''}" data-act="liteSet" data-v="${v}">${l}</button>`).join('')}</div></div>`; };
   const origV = V.definicoes; V.definicoes = sub => { const vv = window.OceanumVersion || {};
-    return origV(sub) + `<div class="pn" id="verPn"><div class="pn-h"><h3>Versão do NÁUTILO</h3><span class="mut" style="font-size:12px">v${esc(vv.v || '')}${vv.date ? ' · ' + esc(vv.date) : ''}</span></div><p class="mut" style="margin:0 0 10px">As atualizações chegam sozinhas quando abres a app. Se um aparelho ficar para trás, toca aqui: ele compara com a versão publicada e atualiza já (os teus dados ficam).</p><button class="btn sm" data-act="updCheck">${UI.ic('sync')}Procurar atualização</button></div>`; };
+    return origV(sub) + `<div class="pn" id="verPn"><div class="pn-h"><h3>Versão do Prumo</h3><span class="mut" style="font-size:12px">v${esc(vv.v || '')}${vv.date ? ' · ' + esc(vv.date) : ''}</span></div><p class="mut" style="margin:0 0 10px">As atualizações chegam sozinhas quando abres a app. Se um aparelho ficar para trás, toca aqui: ele compara com a versão publicada e atualiza já (os teus dados ficam).</p><button class="btn sm" data-act="updCheck">${UI.ic('sync')}Procurar atualização</button></div>`; };
   const orig2 = V.definicoes; V.definicoes = sub => { const t = OS.Lock.trusted();
     return orig2(sub) + `<div class="pn"><div class="pn-h"><h3>Código neste aparelho</h3><span class="mut" style="font-size:12px">${t ? 'não pede código' : 'pede código ao abrir'}</span></div><p class="mut" style="margin:0 0 10px">Num aparelho só teu (como o teu tablet), podes entrar direto sem escrever o código. Os outros aparelhos continuam a pedir. O botão do cadeado volta a ligar o código.${OS.Lock.android ? ' Neste aparelho Android a biometria está desligada para não abrir o ecrã de senha do sistema.' : ''}</p><div class="seg" role="group"><button class="${t ? '' : 'on'}" data-act="trustSet" data-v="0">Pedir código</button><button class="${t ? 'on' : ''}" data-act="trustSet" data-v="1">Entrar direto</button></div></div>`; };
   A.trustSet = b => { OS.Lock.setTrusted(b.dataset.v === '1'); UI.toast(b.dataset.v === '1' ? 'Este aparelho entra direto' : 'O código volta a ser pedido', 'pos'); OS.request(); };
@@ -201,7 +201,7 @@ document.addEventListener('submit', e => {
 OS.SETT = [['', 'Geral'], ['email', 'E-mail'], ['ligacoes', 'Ligações'], ['atalhos', 'Atalhos do iPhone'], ['spyke', 'Spyke (assistente)'], ['impostos', 'Impostos'], ['script', 'Script Google']];
 OS.settingsView = sub => { const s = String(sub || ''), k = ['script', 'email', 'ligacoes', 'atalhos', 'impostos'].includes(s) ? s : /^spyke(\.|$)/.test(s) ? 'spyke' : '';
   const sp = k === 'spyke' ? `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>` : '';
-  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Náutilo: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Náutilo: a tua agenda no Google Calendar e no iPhone, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, sono do app Saúde, relógio da corrida e bloquear apps no bloco de foco.' : k === 'impostos' ? 'A tua situação fiscal, para os Relatórios saírem no formato certo da declaração de IRS (e do IRPF no Brasil).' : 'Tudo o que configuras no Náutilo, arrumado por temas. Toca num bloco para o abrir.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
+  const head = UI.head('Definições', k === 'spyke' ? 'O Spyke, o teu assistente de voz: estado, cérebro, voz, escuta, memória e Siri.' : k === 'script' ? 'O teu script Google, parte a parte: o que cada uma faz e o botão para a copiar.' : k === 'email' ? 'As contas de e-mail ligadas ao Prumo: Gmail, faculdade e outras.' : k === 'ligacoes' ? 'Serviços ligados ao Prumo: a tua agenda no Google Calendar e no iPhone, cotações da bolsa e alertas.' : k === 'atalhos' ? 'Atalhos do iPhone: gasto rápido, sono do app Saúde, relógio da corrida e bloquear apps no bloco de foco.' : k === 'impostos' ? 'A tua situação fiscal, para os Relatórios saírem no formato certo da declaração de IRS (e do IRPF no Brasil).' : 'Tudo o que configuras no Prumo, arrumado por temas. Toca num bloco para o abrir.', sp, 'Sistema') + UI.tabs('definicoes', OS.SETT, k);
   if (k === 'spyke') return head + (OS.Spyke && OS.Spyke.namePanel ? OS.Spyke.namePanel() : '') + String(V.spyke ? V.spyke(s.slice(6)) : '').replace(/^\s*<header class="phead">[\s\S]*?<\/header>/, '');
   if (k === 'script') return head + (OS.Inbox && OS.Inbox.scriptTab ? OS.Inbox.scriptTab() : '');
   const sec = (t, h) => h ? `<h4 class="set-h">${t}</h4>${h}` : '';
@@ -219,7 +219,7 @@ OS.Fold = (() => {
   const tabOf = sub => String(sub || '').split('.')[0] || 'geral';
   const CHEV = '<svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
   // Geral: os blocos por temas (chave = id do bloco ou o título)
-  const GROUPS = [['Tu', 'Os teus dados e metas: entram nos cálculos de todo o Náutilo.', ['pfMe', 'pfUni', 'pfWork', 'pfGoals', 'contextos']],
+  const GROUPS = [['Tu', 'Os teus dados e metas: entram nos cálculos de todo o Prumo.', ['pfMe', 'pfUni', 'pfWork', 'pfGoals', 'contextos']],
     ['Segurança e conta', 'Código de bloqueio, Face ID e a tua conta.', ['seguranca', 'codigo neste aparelho', 'accMig']],
     ['Aparelhos e dados', 'Sincronizar aparelhos, cópias de segurança e mudar de endereço.', ['syncPn', 'dataPn', 'mudanca de endereco']],
     ['Aplicação', 'Desempenho e atualizações.', ['desempenho', 'verPn']]];

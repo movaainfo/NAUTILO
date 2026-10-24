@@ -1,4 +1,4 @@
-// NÁUTILO · dados de cada perfil (função do Vercel). O motor de dados da app guarda "documentos" (um por fragmento de coleção
+// PRUMO · dados de cada perfil (função do Vercel). O motor de dados da app guarda "documentos" (um por fragmento de coleção
 // e um por definição) e aqui cada um vai para o Vercel Blob privado, cifrado com a chave da conta.
 //   marca  → a etiqueta da última alteração (os aparelhos perguntam isto a cada 20 s; é a operação mais barata)
 //   todas confirmam que a sessão ainda vale e que o perfil é da conta

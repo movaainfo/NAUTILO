@@ -1,4 +1,4 @@
-/* NÁUTILO — núcleo: utilitários, armazenamento, sincronização, rotas, eventos.
+/* PRUMO — núcleo: utilitários, armazenamento, sincronização, rotas, eventos.
    Camadas: core (dados) → data (domínio) → intel (inteligência) → views (interface) → dominus (jogo) → app (arranque). */
 (() => {
 'use strict';

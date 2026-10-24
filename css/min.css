@@ -1,4 +1,4 @@
-/* NÁUTILO — camada minimalista: menos linhas, mais espaço, uma coisa de cada vez. */
+/* PRUMO — camada minimalista: menos linhas, mais espaço, uma coisa de cada vez. */
 :root{--line:rgba(150,180,210,.06);--pn:#0C121A;--side:220px}
 #side{background:var(--bg);border-right:none;padding:22px 12px 28px;gap:0}
 .brand{padding:2px 10px 22px}.brand b{letter-spacing:.34em;font-weight:500;font-size:12.5px}

@@ -1,8 +1,8 @@
-/* NÁUTILO — DOMINUS: a tua vida como um RPG.
+/* PRUMO — DOMINUS: a tua vida como um RPG.
    O herói és tu, com a tua foto real (recortada do fundo no próprio telemóvel) numa carta de jogo que muda sozinha com o que fazes:
    brilho à volta do corpo com o Corpo, aura com a Mente, símbolos com o Intelecto, ouro com a Fortuna, companheiros com as Relações,
    halo com o Espírito, insígnias com a Carreira e estandartes com a Disciplina.
-   Os 8 atributos sobem sozinhos com TUDO o que registas no Náutilo (nunca escolhes onde pôr pontos): o XP é calculado a partir
+   Os 8 atributos sobem sozinhos com TUDO o que registas no Prumo (nunca escolhes onde pôr pontos): o XP é calculado a partir
    dos teus registos, por isso está sempre certo e atualizado, em todos os aparelhos.
    Missões diárias e semanais (escolhidas pelos teus pontos fracos), um chefe por semana, conquistas, baús com recompensas reais
    a cada nível, moedas de ouro para o visual (molduras, cenários, efeitos) e os teus 100 marcos do Codex. */
@@ -1122,7 +1122,7 @@ T.heroi = st => { const s = S(), H = st.H, md = MOODT[st.mood] || MOODT.forma, M
       <div class="d3-chips"><span title="Dias seguidos com algum registo">${ic('flame')}<b class="mono">${st.streak}</b> ${st.streak === 1 ? 'dia' : 'dias'} seguidos</span><span>${ic('coin')}<b class="mono">${U.nf(st.gold)}</b> ouro</span><span class="d3-mood ${st.mood}" title="${esc(md[1])}">${esc(md[0])}</span></div>
       <p class="dm d3-moodp">${esc(md[1])}</p></div></section>
   <section class="d3-today"><div class="d3-h"><span class="cz">Hoje</span><span class="dm mono">${tx ? '+' + xpTxt(tx) + ' XP' : ''}${wx ? ' · +' + xpTxt(wx) + ' esta semana' : ''}</span></div>
-    ${tx ? `<div class="d3-gain">${AK.filter(k => st.todayX[k] > 0).map(k => `<span style="--c:${AO[k].c}">${ic(AO[k].ic)}+${xpTxt(st.todayX[k])} ${esc(AO[k].n)}</span>`).join('')}</div>` : '<p class="dm">Ainda nada hoje. Regista qualquer coisa no Náutilo (um treino, estudo, um gasto, um devocional…) e o teu herói ganha XP na hora.</p>'}
+    ${tx ? `<div class="d3-gain">${AK.filter(k => st.todayX[k] > 0).map(k => `<span style="--c:${AO[k].c}">${ic(AO[k].ic)}+${xpTxt(st.todayX[k])} ${esc(AO[k].n)}</span>`).join('')}</div>` : '<p class="dm">Ainda nada hoje. Regista qualquer coisa no Prumo (um treino, estudo, um gasto, um devocional…) e o teu herói ganha XP na hora.</p>'}
     <div class="d3-mini">${M.dl.map(m => `<a href="#dominus.missoes" class="${m.ok ? 'ok' : ''}" style="--c:${AO[m.a].c}"><i>${m.ok ? '✓' : ''}</i><span>${esc(m.t)}</span><small class="mono">${U.nf(m.c)}/${U.nf(m.n)}</small></a>`).join('')}</div></section>
   <section><div class="d3-h"><span class="cz">Atributos</span><span class="dm">sobem sozinhos com o que fazes</span></div><div class="d3-attrs">${AT.map(a => { const l = st.lv[a.k], nx = nextLook(a.k, l.l);
     return `<details class="d3-at" data-tog="d3at_${a.k}" ${OS.ui['tog_d3at_' + a.k] ? 'open' : ''} style="--c:${a.c}"><summary><span class="d3-ati">${ic(a.ic)}</span><span class="d3-atn"><b>${esc(a.n)}</b><small class="dm">${esc(LOOKS[a.k][tierOf(l.l)])}</small></span><b class="mono d3-atl">${l.l}</b>${bar(l.p, a.c)}<small class="dm mono d3-atx">${xpTxt(l.into)}/${xpTxt(l.need)} XP${st.wkX[a.k] ? ` · +${xpTxt(st.wkX[a.k])} esta semana` : ''}</small></summary>
@@ -1138,7 +1138,7 @@ T.missoes = st => { const M = D.missions(), all = M.dl.length && M.dl.every(m =>
   <section><div class="d3-h"><span class="cz">Missões da semana</span><span class="dm">${M.left > 1 ? M.left + ' dias para acabar' : 'último dia'}</span></div><div class="d3-ms">${M.wl.map(mRow).join('')}</div></section>
   <section><div class="d3-h"><span class="cz">Campanhas do mês</span><span class="dm">${M.mleft > 1 ? M.mleft + ' dias para acabar' : 'último dia'} · +${U.nf(QX.m)} XP cada</span></div><div class="d3-ms d3-camp">${M.ml.map(mRow).join('')}</div></section>
   <section class="d3-card"><div class="d3-h"><span class="cz">Últimos dias</span><span class="dm mono">${st.mis.n} missões cumpridas</span></div><div class="d3-hist">${days.map(d => { const n = done.filter(x => x.d === d && !x.w).length, tot = (S().q[d] || []).length; return `<div><span class="mono dm">${U.fmtDS(d)}</span><span>${tot ? '●'.repeat(n) + '○'.repeat(Math.max(0, tot - n)) : '<small class="dm">sem missões</small>'}</span></div>`; }).join('')}</div>
-    <p class="dm d3-note">As missões são escolhidas pelos teus atributos mais fracos e completam-se sozinhas com o que registas no Náutilo. São difíceis de propósito: um dia com as 3 feitas é um dia a sério.</p></section>`; };
+    <p class="dm d3-note">As missões são escolhidas pelos teus atributos mais fracos e completam-se sozinhas com o que registas no Prumo. São difíceis de propósito: um dia com as 3 feitas é um dia a sério.</p></section>`; };
 
 const bossArt = f => OS.Monstros && f.mid ? OS.Monstros.img(f.mid, { t: f.t, hurt: f.dead ? 0 : f.dmg / f.hp, dead: f.dead && f.over }, 'd3-boss' + (f.dead ? ' dead' : '')) : '';
 T.chefe = st => { const f = D.bossFight(), a = AO[f.a], left = U.diff(U.addDays(f.w, 7), today()), past = Object.keys(S().boss || {}).filter(w => w < f.w).sort().reverse().slice(0, 10), cf = D.colossus(), cl = U.dim(cf.ym) - +today().slice(8, 10) + 1;
@@ -1210,7 +1210,7 @@ T.diario = st => { const days = U.lastN(14), per = days.map(d => { const o = Obj
 
 // criação do personagem
 const born = () => { const s = S(), st = D.state();
-  return `<div class="dom d3"><section class="d3-new"><div class="cz d3-k">NÁUTILO · O JOGO</div><h1>DOMINUS</h1><p class="d3-lead">O herói és tu. Já o fiz à tua imagem (pele, cabelo cacheado, óculos, cavanhaque): muda o que quiseres. Ele cresce sozinho com tudo o que fazes na vida real e registas no Náutilo.</p>
+  return `<div class="dom d3"><section class="d3-new"><div class="cz d3-k">PRUMO · O JOGO</div><h1>DOMINUS</h1><p class="d3-lead">O herói és tu. Já o fiz à tua imagem (pele, cabelo cacheado, óculos, cavanhaque): muda o que quiseres. Ele cresce sozinho com tudo o que fazes na vida real e registas no Prumo.</p>
     <div class="d3-newg"><div class="d3-cardw">${D.card()}</div>
       <div><div class="d3-step"><span class="cz">1 · O teu visual</span></div>${lookEd()}
         <div class="d3-step"><span class="cz">2 · O teu nome</span></div><form class="d3-name" data-form="d3Born"><div><input class="field" id="d3n" name="n" value="${esc(s.name || OS.one('profile').short || '')}" maxlength="24" placeholder="O teu nome" aria-label="Nome do herói"><button class="dbtn gold">${ic('crown')}Criar o meu herói</button></div></form>

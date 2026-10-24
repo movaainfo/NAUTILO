@@ -1,4 +1,4 @@
-/* NÁUTILO — Senhas: um cofre para senhas, e-mails, contas, bancos, Wi-Fi e notas seguras.
+/* PRUMO — Senhas: um cofre para senhas, e-mails, contas, bancos, Wi-Fi e notas seguras.
    Tudo é cifrado no teu aparelho (AES-GCM de 256 bits, chave tirada da tua senha mestra com PBKDF2-SHA256, 310 000 voltas)
    antes de ser guardado ou sincronizado: no armazenamento e na sincronização só existe texto cifrado.
    A senha mestra nunca é guardada nem enviada a lado nenhum, e o cofre nunca vai para a IA nem para o Spyke.
@@ -37,7 +37,7 @@ const copy = async (t, what) => { try { await navigator.clipboard.writeText(t); 
 /* ---------- página ---------- */
 const hostOf = u => { try { return new URL(/^https?:/.test(u) ? u : 'https://' + u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
 const setup = () => `<section class="pn vlt-gate"><div class="vlt-ic">${UI.ic('key')}</div><h2>Criar o teu cofre</h2>
-  <p class="mut">Escolhe uma senha mestra: é a única que vais ter de decorar. Tudo o que guardares aqui é cifrado no teu aparelho com ela, antes de ir para a sincronização. Ninguém a vê: nem o Náutilo, nem o Google, nem eu.</p>
+  <p class="mut">Escolhe uma senha mestra: é a única que vais ter de decorar. Tudo o que guardares aqui é cifrado no teu aparelho com ela, antes de ir para a sincronização. Ninguém a vê: nem o Prumo, nem o Google, nem eu.</p>
   <form data-form="vltNew" class="vlt-f" autocomplete="off"><label>Senha mestra (12 caracteres ou mais)<input class="field" type="password" name="p1" minlength="12" required autocomplete="new-password"></label><label>Repete a senha mestra<input class="field" type="password" name="p2" minlength="12" required autocomplete="new-password"></label>
   <label class="vlt-ck"><input type="checkbox" name="ok" required> Percebi: se eu esquecer a senha mestra, o cofre não pode ser aberto por ninguém.</label><button class="btn pri">${UI.ic('lock')}Criar cofre</button></form></section>`;
 const gate = () => { const v = OS.one('vault'); return `<section class="pn vlt-gate"><div class="vlt-ic">${UI.ic('lock')}</div><h2>Cofre fechado</h2><p class="mut">${v.n ? `${v.n} ${v.n === 1 ? 'item guardado' : 'itens guardados'}, cifrados.` : 'Cofre vazio.'} Escreve a senha mestra para abrir. Fecha-se sozinho ao fim de 5 minutos sem uso.</p>

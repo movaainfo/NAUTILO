@@ -1,4 +1,4 @@
-/* DOMINUS — o jogo, nos azuis do Náutilo (abismo, maré e espuma), com o carmesim só para o perigo. Só vive dentro de .dom */
+/* DOMINUS — o jogo, nos azuis do Prumo (abismo, maré e espuma), com o carmesim só para o perigo. Só vive dentro de .dom */
 body.dom-mode{--dbg:#04101F}
 body.dom-mode,body.dom-mode #top{background:#04101F}
 body.dom-mode #top{border-bottom-color:rgba(88,170,207,.14)}

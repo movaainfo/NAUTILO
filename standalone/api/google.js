@@ -1,9 +1,9 @@
-// NÁUTILO · Gmail e agenda Google para todas as contas, sem script (função do Vercel).
+// PRUMO · Gmail e agenda Google para todas as contas, sem script (função do Vercel).
 // A pessoa toca em "Ligar a minha conta Google", autoriza uma vez no Google e a autorização (refresh token) fica guardada
 // cifrada no perfil dela (g/<conta>/<perfil>), por isso funciona em todos os aparelhos. Só leitura: gmail.readonly e calendar.readonly.
 // Os e-mails e eventos passam por aqui a caminho da app e não ficam guardados no servidor.
 //   inicio → o endereço do Google para autorizar (com um "state" assinado: a que perfil pertence, válido 15 min)
-//   GET ?code=&state= → o Google volta aqui: troca o code, guarda e mostra "pronto, volta ao Náutilo"
+//   GET ?code=&state= → o Google volta aqui: troca o code, guarda e mostra "pronto, volta ao Prumo"
 //   estado → ligado? com que e-mail? · gm → e-mails (pesquisa do Gmail) · gx → um e-mail inteiro · cl → eventos · sair → desliga
 // O ID de cliente é público; a chave secreta só existe nas variáveis do projeto (GOOGLE_CLIENT_SECRET).
 'use strict';
@@ -11,7 +11,8 @@ const N = require('./_nuvem');
 const CID = () => process.env.GOOGLE_CLIENT_ID || '298711842985-i89rgem2i0gq35lse2fvsc0pmmai5cr8.apps.googleusercontent.com';
 const SECRET = () => String(process.env.GOOGLE_CLIENT_SECRET || '').trim();
 const REDIR = () => process.env.GOOGLE_REDIRECT || 'https://nautilo-app.vercel.app/api/google';
-const APP = () => REDIR().replace(/api\/google$/, '');
+// o regresso do Google continua no endereço antigo (é o que está registado no Google); o botão leva ao endereço novo do Prumo
+const APP = () => process.env.GOOGLE_APP || (process.env.GOOGLE_REDIRECT ? REDIR().replace(/api\/google$/, '') : 'https://prumo-vida.vercel.app/');
 const AUTH = () => process.env.GOOGLE_AUTH_URL || 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOK = () => process.env.GOOGLE_TOKEN_URL || 'https://oauth2.googleapis.com/token';
 const REVOKE = () => process.env.GOOGLE_REVOKE_URL || 'https://oauth2.googleapis.com/revoke';
@@ -55,7 +56,7 @@ const gget = async (uid, pid, p) => { let fresh = false;
     if (r.ok) return j; const msg = (j.error && j.error.message) || '';
     if (r.status === 401) { if (i === 0) { fresh = true; continue; } throw N.err('desligado', 'A autorização do Google deixou de valer. Liga a conta Google outra vez.', 409); }
     if ((r.status === 429 || (r.status === 403 && /rate ?limit|quota/i.test(msg))) && i < 3) { await N.sleep(700 * (i + 1)); continue; }
-    if (r.status === 403 && /has not been used|is disabled|not enabled|accessNotConfigured/i.test(msg + JSON.stringify(j.error || {}))) throw N.err('api', 'A API ' + (/calendar/.test(p) ? 'do Google Calendar' : 'do Gmail') + ' não está ativada no projeto Google do Náutilo (Google Cloud → APIs e serviços → Biblioteca → Ativar).', 503);
+    if (r.status === 403 && /has not been used|is disabled|not enabled|accessNotConfigured/i.test(msg + JSON.stringify(j.error || {}))) throw N.err('api', 'A API ' + (/calendar/.test(p) ? 'do Google Calendar' : 'do Gmail') + ' não está ativada no projeto Google do Prumo (Google Cloud → APIs e serviços → Biblioteca → Ativar).', 503);
     if (r.status === 403 && /insufficient|scope|permission/i.test(msg)) throw N.err('escopo', 'Na autorização do Google ficou por marcar a caixa do Gmail ou da agenda. Desliga e liga outra vez, com as caixas marcadas.', 403);
     if (r.status === 404) throw N.err('nao_encontrado', 'Não encontrei isto no Google (pode ter sido apagado).', 404);
     if (r.status === 429 || r.status === 403) throw N.err('limite', 'O Google pediu para esperar um pouco. Tenta daqui a um minuto.', 429);
@@ -110,28 +111,28 @@ const checkSecret = async () => { if (!SECRET()) return { v: 'falta', e: '' }; i
 /* ---------- o regresso do Google (GET no navegador da pessoa) ---------- */
 const page = (res, ok, title, text) => { res.statusCode = ok ? 200 : 400; res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.setHeader('Referrer-Policy', 'no-referrer');
   const e = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  res.end(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(title)} · Náutilo</title>
+  res.end(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(title)} · Prumo</title>
 <style>:root{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#070D16;color:#C9D2DD;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:24px;box-sizing:border-box}
-main{max-width:430px}h1{font:500 30px/1.15 Georgia,"Times New Roman",serif;color:#F1F4F8;margin:0 0 10px}p{margin:0 0 18px}a{display:inline-block;background:#F2C48D;color:#0B1522;text-decoration:none;font-weight:600;border-radius:999px;padding:11px 20px}
+@font-face{font-family:"Bodoni Moda";src:url(${e(APP())}vendor/fonts/bodoni-moda.woff2) format("woff2");font-weight:400 900;font-display:swap}main{max-width:430px}h1{font:500 32px/1.12 "Bodoni Moda",Didot,Georgia,serif;color:#F1F4F8;margin:14px 0 10px}p{margin:0 0 18px}a{display:inline-block;background:#F2C48D;color:#0B1522;text-decoration:none;font-weight:600;border-radius:999px;padding:11px 20px}
 a:focus-visible{outline:2px solid #F1F4F8;outline-offset:3px}small{display:block;margin-top:16px;color:#7A8BA0;font-size:13px}</style></head>
-<body><main id="g-${ok ? 'ok' : 'erro'}"><h1>${e(title)}</h1><p>${e(text)}</p><p>Já podes fechar esta janela (no iPhone: <b>OK</b> ou <b>Concluído</b>, em cima) e voltar ao Náutilo.</p><a href="${e(APP())}#definicoes.email">Abrir o Náutilo</a></main></body></html>`); };
+<body><main id="g-${ok ? 'ok' : 'erro'}"><svg viewBox="0 0 100 100" width="44" height="44" aria-hidden="true"><path fill="#E9E3D8" d="M53.42 32.72A17.61 17.61 0 1 1 46.58 32.72L46.58 38.71A11.8 11.8 0 1 0 53.42 38.71ZM53.42 21.99A28.22 28.22 0 1 1 46.58 21.99L46.58 26.48A23.77 23.77 0 1 0 53.42 26.48ZM53.42 12.71A37.45 37.45 0 1 1 46.58 12.71L46.58 15.8A34.37 34.37 0 1 0 53.42 15.8ZM53.42 4.13A46 46 0 1 1 46.58 4.13L46.58 5.84A44.29 44.29 0 1 0 53.42 5.84Z"/><circle cx="50" cy="50" r="4.86" fill="#E0431F"/></svg><h1>${e(title)}</h1><p>${e(text)}</p><p>Já podes fechar esta janela (no iPhone: <b>OK</b> ou <b>Concluído</b>, em cima) e voltar ao Prumo.</p><a href="${e(APP())}#definicoes.email">Abrir o Prumo</a></main></body></html>`); };
 const callback = async (req, res, q) => {
   const st = await readState(q.state);
-  if (!st) return page(res, false, 'O pedido expirou', 'Passaram mais de ' + STATE_MIN + ' minutos ou o endereço não é válido. Volta ao Náutilo e toca outra vez em "Ligar a minha conta Google".');
+  if (!st) return page(res, false, 'O pedido expirou', 'Passaram mais de ' + STATE_MIN + ' minutos ou o endereço não é válido. Volta ao Prumo e toca outra vez em "Ligar a minha conta Google".');
   if (q.error) return page(res, false, 'Não ficou ligado', q.error === 'access_denied' ? 'Cancelaste a autorização no Google. Nada foi ligado.' : 'O Google não autorizou (' + String(q.error).slice(0, 40) + ').');
-  if (!SECRET()) return page(res, false, 'Ainda não está pronto', 'A ligação ao Google ainda não está configurada no servidor do Náutilo.');
-  try { await checkProfile({ u: st.u, a: st.a, v: st.v }, st.p); } catch (e) { return page(res, false, 'Não ficou ligado', 'A sessão do Náutilo terminou entretanto. Entra outra vez e liga de novo.'); }
+  if (!SECRET()) return page(res, false, 'Ainda não está pronto', 'A ligação ao Google ainda não está configurada no servidor do Prumo.');
+  try { await checkProfile({ u: st.u, a: st.a, v: st.v }, st.p); } catch (e) { return page(res, false, 'Não ficou ligado', 'A sessão do Prumo terminou entretanto. Entra outra vez e liga de novo.'); }
   const r = await fetch(TOK(), { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: form({ code: String(q.code || ''), client_id: CID(), client_secret: SECRET(), redirect_uri: REDIR(), grant_type: 'authorization_code' }) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok || !j.access_token) return page(res, false, 'Não ficou ligado', 'O Google não aceitou o pedido (' + String(j.error || r.status).slice(0, 40) + '). Tenta outra vez daqui a uns minutos.');
   const old = await readLink(st.u, st.p), rt = j.refresh_token || (old && old.rt);
-  if (!rt) return page(res, false, 'Falta um passo', 'O Google não deu a autorização permanente. Em myaccount.google.com → Segurança → Apps com acesso, remove o Náutilo e liga outra vez.');
+  if (!rt) return page(res, false, 'Falta um passo', 'O Google não deu a autorização permanente. Em myaccount.google.com → Segurança → Apps com acesso, remove o Prumo e liga outra vez.');
   const sc = String(j.scope || SCOPES); let email = '';
   if (/gmail\.readonly/.test(sc)) { try { const pr = await fetch(GAPI() + 'gmail/v1/users/me/profile', { headers: { authorization: 'Bearer ' + j.access_token } }); if (pr.ok) email = String((await pr.json()).emailAddress || '').slice(0, 200); } catch (e) { } }
   await N.store().put(linkPath(st.u, st.p), N.seal(await N.userKey(st.u), { rt, sc, email, at: new Date().toISOString() }));
   TK.set(st.u + '|' + st.p, { tk: j.access_token, x: Date.now() + (+j.expires_in || 3600) * 1000 });
   const gm = /gmail\.readonly/.test(sc), cal = /calendar\.readonly/.test(sc);
-  return page(res, true, 'Conta Google ligada', (email ? email + ': ' : '') + (gm && cal ? 'o Náutilo já pode ler o teu Gmail e a tua agenda.' : gm ? 'o Náutilo já pode ler o teu Gmail (a agenda ficou por marcar).' : cal ? 'o Náutilo já pode ler a tua agenda (o Gmail ficou por marcar).' : 'ligada, mas sem o Gmail nem a agenda marcados.') + ''); };
+  return page(res, true, 'Conta Google ligada', (email ? email + ': ' : '') + (gm && cal ? 'o Prumo já pode ler o teu Gmail e a tua agenda.' : gm ? 'o Prumo já pode ler o teu Gmail (a agenda ficou por marcar).' : cal ? 'o Prumo já pode ler a tua agenda (o Gmail ficou por marcar).' : 'ligada, mas sem o Gmail nem a agenda marcados.') + ''); };
 
 module.exports = N.handler(async (req, res) => {
   const q = req.query || {};
@@ -149,7 +150,7 @@ module.exports = N.handler(async (req, res) => {
   const pronto = !!SECRET();
   if (op === 'estado') { const L = pronto ? await readLink(t.u, pid) : null; const sc = (L && L.sc) || '';
     return N.send(res, 200, { ok: true, pronto, ligado: !!(L && L.rt), email: (L && L.email) || '', gmail: /gmail\.readonly/.test(sc), agenda: /calendar\.readonly/.test(sc) }); }
-  if (!pronto) return N.send(res, 503, { ok: false, code: 'config', msg: 'A ligação ao Google ainda não está ativa no servidor do Náutilo.' });
+  if (!pronto) return N.send(res, 503, { ok: false, code: 'config', msg: 'A ligação ao Google ainda não está ativa no servidor do Prumo.' });
   if (op === 'inicio') { const hint = String(b.email || '').trim().toLowerCase();
     const url = AUTH() + '?' + form(Object.assign({ client_id: CID(), redirect_uri: REDIR(), response_type: 'code', scope: SCOPES, access_type: 'offline', prompt: 'consent', include_granted_scopes: 'true', state: await makeState(t, pid) }, /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(hint) ? { login_hint: hint } : {}));
     return N.send(res, 200, { ok: true, url, validade: STATE_MIN * 60 }); }

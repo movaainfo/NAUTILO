@@ -1,4 +1,4 @@
-/* NÁUTILO — Próximos passos: o plano da tua vida inteira, do passo mais pequeno ao maior, por área.
+/* PRUMO — Próximos passos: o plano da tua vida inteira, do passo mais pequeno ao maior, por área.
    Junta tudo o que a app sabe: estrela-guia, metas (e as etapas de cada uma), marcos, projetos, tarefas, hábitos,
    estudos e avaliações, treino e corrida, dinheiro (contas, poupança, dívidas), carreira e oportunidades.
    A "Próxima ação agora" (o que fazer neste minuto, com filtros de sítio, tempo e energia) continua numa aba. */

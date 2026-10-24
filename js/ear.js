@@ -1,4 +1,4 @@
-/* NÁUTILO — Ouvido do Spyke (silencioso).
+/* PRUMO — Ouvido do Spyke (silencioso).
    O ditado do iPhone (reconhecimento de voz do Safari) toca um som sempre que liga e desliga — ao entrar e ao sair da app.
    Este ouvido não usa o ditado: abre o microfone uma vez (sem som nenhum), percebe sozinho quando começas e acabas de falar
    (espera uma pausa a sério antes de responder, e guarda o meio segundo antes de começares para não cortar a 1.ª palavra)
