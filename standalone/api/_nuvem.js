@@ -33,8 +33,9 @@ const blobStore = token => {
       try { const r = await api('/?' + new URLSearchParams({ pathname: p }), { method: 'PUT', body: buf, headers: h }); return { etag: r.etag, url: r.url }; }
       catch (e) { if (e.code === 'precondition_failed') throw err('conflict'); if (o.overwrite === false && (e.status === 400 || e.status === 409 || /exist/i.test(e.message))) throw err('exists'); throw e; } },
     async get(p) { let last = null;
-      for (let i = 0; i < 3; i++) { try { const r = await fetch(full(p) + '?cache=0', { headers: { authorization: 'Bearer ' + token } });
-          if (r.status === 404) return null; if (r.ok) return { buf: Buffer.from(await r.arrayBuffer()), etag: r.headers.get('etag') || '' };
+      // sem compressão no caminho: comprimida, a etiqueta pode vir "fraca" (W/"…") e as gravações condicionais falhavam sempre
+      for (let i = 0; i < 3; i++) { try { const r = await fetch(full(p) + '?cache=0', { headers: { authorization: 'Bearer ' + token, 'accept-encoding': 'identity' } });
+          if (r.status === 404) return null; if (r.ok) return { buf: Buffer.from(await r.arrayBuffer()), etag: String(r.headers.get('etag') || '').replace(/^W\//, '') };
           last = err('read_failed', 'leitura ' + r.status, r.status); if (r.status < 500 && r.status !== 429) break; } catch (e) { last = err('unavailable', e.message); }
         await sleep(150 * 2 ** i); }
       throw last; },
