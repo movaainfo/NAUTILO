@@ -412,7 +412,7 @@ IB.check = async () => { const u = base(), c = cfg();
   } catch (e) { return IB.st = { ok: false, m: 'Não consegui falar com o script. Confirma: (1) "Quem tem acesso: Qualquer pessoa"; (2) autorizaste a app com a tua conta Google; (3) o código tem "doGet" (cola-o outra vez se for antigo).' }; } };
 const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && base()); if (OS.Acc && OS.Acc.on && !(c.url && c.key) && OS.Acc.atalhoPanel) return OS.Acc.atalhoPanel();
   return `<div class="pn" id="inboxPn"><div class="pn-h"><h3>Atalho de gastos no iPhone</h3><span class="mut" style="font-size:12px">${c.n ? c.n + ' gastos importados' : ''}</span></div>
-  ${c.url && c.key ? `<div class="ib-now"><button class="btn sm pri" data-act="ibTest">${UI.ic('sync')}Ir buscar gastos agora</button><span class="mut">${c.last ? 'última verificação: ' + new Date(c.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não verificou'}${c.err ? ' · <span class="neg">' + esc(c.err) + '</span>' : ''}</span></div>` : ''}
+  ${c.url && c.key ? `<div class="ib-now"><button class="btn sm pri" data-act="ibTest">${UI.ic('sync')}Ir buscar gastos agora</button><span class="mut">${c.last ? 'última verificação: ' + new Date(c.last).toLocaleTimeString(OS.loc ? OS.loc() : 'pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'ainda não verificou'}${c.err ? ' · <span class="neg">' + esc(c.err) + '</span>' : ''}</span></div>` : ''}
   <p class="mut" style="margin:0 0 14px">Um toque no Centro de Controlo → valor → descrição → fica registado, sem abrir o Prumo. Precisa de uma folha Google tua como caixa de entrada (grátis, uma vez só).</p>
   <div class="ib-w">
     <div class="ib-s ${c.key ? 'done' : ''}"><i>1</i><div><b>Copiar o código</b><p>Toca no botão: o código fica copiado.</p><button class="btn sm pri" data-act="ibCopy" data-t="code">${UI.ic('link')}Copiar código</button>
@@ -431,7 +431,7 @@ const panel = () => { const c = cfg(), st = IB.st || {}, ready = !!(c.key && bas
   </div>
   <p class="mut" style="margin:12px 0 0;font-size:12.5px">Os gastos entram em Finanças sempre que abres o Prumo, com a categoria adivinhada pela descrição (Uber → Transporte, café → Alimentação) e a etiqueta <i>atalho</i>.</p></div>`; };
 const syncPanel = () => { const c = cfg(), SY = window.OceanumSync || {}, on = !!SY.on, ready = !!(c.url && c.key), v3 = (c.ver || 0) >= 3 && c.drive !== 0, st = IB.st || {};
-  const t = SY.last ? new Date(SY.last).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '';
+  const t = SY.last ? new Date(SY.last).toLocaleTimeString(OS.loc ? OS.loc() : 'pt-PT', { hour: '2-digit', minute: '2-digit' }) : '';
   return `<div class="pn" id="syncPn"><div class="pn-h"><h3>Sincronizar aparelhos</h3><span class="${on && !SY.err ? 'pos' : 'mut'}" style="font-size:12px">${on ? esc(SY.state || '') + (t ? ' · ' + t : '') : 'desligada'}</span></div>
   <p class="mut" style="margin:0 0 12px">Uma só conta: o que fazes no telemóvel aparece no tablet e vice-versa. Os dados ficam no teu Google Drive ("Náutilo · dados.json"), com uma cópia de segurança por dia.</p>
   ${on ? `<div class="ib-st ${SY.err ? 'bad' : 'ok'}">${SY.err ? '✗ ' + esc(SY.err) + ' — os dados ficam guardados aqui e são enviados quando a ligação voltar.' : '✓ Ligada neste aparelho.'}</div>

@@ -53,7 +53,7 @@ const streak = () => { const days = new Set(OS.all('devos').filter(d => d.obs ||
 
 /* ---------- palavra para hoje (IA + o teu dia) ---------- */
 const dayContext = () => { const t = today(), d = todayDevo() || {}, safe = f => { try { return f(); } catch (e) { return null; } };
-  return { hoje: new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }), hora: new Date().getHours(), como_estou: (d.moods || []).join(', ') || null, o_que_me_pesa: d.note || null,
+  return { hoje: new Date().toLocaleDateString(OS.loc ? OS.loc() : 'pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }), hora: new Date().getHours(), como_estou: (d.moods || []).join(', ') || null, o_que_me_pesa: d.note || null,
     agenda_hoje: safe(() => OS.all('events').filter(e => e.date === t).map(e => (e.start ? e.start + ' ' : '') + e.title).slice(0, 6)),
     tarefas_atrasadas: safe(() => OS.Tasks.open().filter(OS.Tasks.late).map(x => x.title).slice(0, 5)), tarefas_abertas: safe(() => OS.Tasks.open().length),
     avaliacoes_proximas: safe(() => OS.all('assessments').filter(a => a.date >= t && U.diff(a.date, t) <= 10 && !(a.grade > 0)).map(a => a.title + ' (' + U.fmtD(a.date) + ')').slice(0, 4)),
@@ -100,7 +100,7 @@ A.feGo = b => { OS.setUI('bRef', b.dataset.r); OS.setUI('bSel', []); location.ha
 /* ---------- ecrã principal ---------- */
 const TABS = [['', 'Hoje com Deus'], ['biblia', 'Bíblia'], ['devocional', 'Meu devocional'], ['oracoes', 'Orações'], ['planos', 'Planos de leitura']];
 V.fe = sub => { bible(); const h = new Date().getHours(), nm = (OS.one('profile').short || OS.who());
-  return UI.head(`${h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'}, ${esc(nm)}`, 'Um tempo dedicado a Deus: a Palavra, a oração e o que Ele te diz hoje.', '', 'Fé & Devoção') + UI.tabs('fe', TABS, sub || '') + `<div class="fe">${(T[sub || ''] || T[''])()}</div>`; };
+  return UI.head(`${(g => OS.Lang ? OS.Lang.t(g) : g)(h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite')}, ${esc(nm)}`, 'Um tempo dedicado a Deus: a Palavra, a oração e o que Ele te diz hoje.', '', 'Fé & Devoção') + UI.tabs('fe', TABS, sub || '') + `<div class="fe">${(T[sub || ''] || T[''])()}</div>`; };
 const T = {};
 const verseCard = (R, title, extra = '') => { const vs = verses(R); return `<div class="fe-v"><div class="eyebrow">${title}</div><blockquote>${vs.map(([n, t]) => `<sup>${n}</sup>${esc(t)}`).join(' ') || '…'}</blockquote><div class="fe-vr"><b>${esc(label(R))}</b><span class="mut">${esc(VERS[ver()])}</span></div>
   <div class="row gap6" style="flex-wrap:wrap;margin-top:10px"><button class="btn xs" data-act="feGo" data-r="${R.b}.${R.c}">Ler o capítulo</button><button class="btn xs ghost" data-act="feCopy" data-ref="${R.b} ${R.c}:${R.v1 || 1}${R.v2 && R.v2 !== R.v1 ? '-' + R.v2 : ''}">Copiar</button><button class="btn xs ghost" data-act="feUse" data-ref="${R.b} ${R.c}:${R.v1 || 1}${R.v2 && R.v2 !== R.v1 ? '-' + R.v2 : ''}">Usar no devocional</button>${extra}</div></div>`; };

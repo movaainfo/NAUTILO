@@ -7,7 +7,7 @@ const Fin = OS.Fin, Cal = OS.Cal;
 const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
 // a janela do Painel: o mesmo mar do ecrã de entrada, parado, à hora real
 const sky = () => { if (!OS.Scene) return ''; const m = innerWidth < 860, w = m ? Math.max(320, innerWidth) : Math.min(1280, Math.max(700, innerWidth - 60)); return `<div class="dash-sc">${OS.Scene.svg(w, m ? 420 : 320, { id: 'dsh' })}</div>`; };
-const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const greet = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };   // já na língua da pessoa (vem colado ao nome)
 const range = () => { const per = OS.ui.dashPer || 'mes', t = U.today(), ym = OS.ui.dashYM || U.ym(t);
   if (per === 'hoje') return { per, a: t, b: t, label: 'Hoje', ym };
   if (per === 'semana') { const w = U.monday(t); return { per, a: w, b: U.addDays(w, 6), label: `${U.fmtDS(w)} – ${U.fmtDS(U.addDays(w, 6))}`, ym }; }

@@ -41,7 +41,7 @@ I.alerts = () => {
   const rev = St.revDue(), revLate = rev.filter(r => St.revNext(r) < t);
   if (revLate.length) A(revLate.length > 3 ? 'urgent' : 'attention', 'Universidade', `${revLate.length} revisão(ões) espaçada(s) atrasada(s)`, 'Revisões atrasadas antes de matéria nova', '#universidade.revisoes');
   if (wd >= 4 || wd === 0) St.current().forEach(s => { const x = St.stats(s); if (x.targetWk && x.hWk < x.targetWk * .5) A('attention', 'Universidade', `${s.name}: ${x.hWk} h de ${x.targetWk} h esta semana`, 'Abaixo de metade do alvo semanal', '#universidade'); });
-  St.current().forEach(s => { const x = St.stats(s); if (x.avg && x.avg < 10) A('urgent', 'Universidade', `Risco de reprovar a ${s.name}`, `Média atual ${x.avg} com ${x.w}% avaliado`, '#universidade.disciplinas'); });
+  St.current().forEach(s => { const x = St.stats(s); if (x.avg && !(OS.Grade ? OS.Grade.ok(x.avg) : x.avg >= 10)) A('urgent', 'Universidade', `Risco de reprovar a ${s.name}`, `Média atual ${x.avg} com ${x.w}% avaliado`, '#universidade.disciplinas'); });
   // Metas e projetos
   OS.all('goals').filter(g => g.status === 'Ativa').forEach(g => { const i = Goal.info(g); if (i.late) A('urgent', 'Metas', g.title, `Prazo passou a ${U.fmtDS(g.due)} · ${Math.round(i.p * 100)}% feito`, '#metas'); else if (i.behind) A('attention', 'Metas', g.title, `${Math.round(i.p * 100)}% feito, esperado ${Math.round(i.exp * 100)}% por esta altura`, '#metas'); });
   OS.all('projects').forEach(p => { const i = Proj.info(p); if (i.late) A('urgent', 'Projetos', p.name, `Prazo passou a ${U.fmtDS(p.due)} · ${Math.round(i.prog * 100)}%`, '#projetos'); else if (i.stalled) A('attention', 'Projetos', `${p.name} está parado`, `Sem atividade há ${i.idle} dias`, '#projetos'); });

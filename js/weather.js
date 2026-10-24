@@ -7,17 +7,20 @@ const W = OS.Weather = {};
 const CODES = { 0: 'céu limpo', 1: 'quase limpo', 2: 'parcialmente nublado', 3: 'nublado', 45: 'nevoeiro', 48: 'nevoeiro com geada', 51: 'chuvisco fraco', 53: 'chuvisco', 55: 'chuvisco forte', 56: 'chuvisco gelado', 57: 'chuvisco gelado', 61: 'chuva fraca', 63: 'chuva', 65: 'chuva forte', 66: 'chuva gelada', 67: 'chuva gelada forte', 71: 'neve fraca', 73: 'neve', 75: 'neve forte', 77: 'grãos de neve', 80: 'aguaceiros fracos', 81: 'aguaceiros', 82: 'aguaceiros fortes', 85: 'aguaceiros de neve', 86: 'aguaceiros de neve fortes', 95: 'trovoada', 96: 'trovoada com granizo', 99: 'trovoada forte com granizo' };
 W.desc = c => CODES[c] || 'tempo variável';
 W.kind = c => c === 0 || c === 1 ? 'sol' : c === 2 ? 'sol-nuvem' : c === 3 || c === 45 || c === 48 ? 'nuvem' : c >= 71 && c <= 86 && ![80, 81, 82].includes(c) ? 'neve' : c >= 95 ? 'trovoada' : 'chuva';
-W.city = () => (OS.one('profile').city || (OS.Acc && OS.Acc.pub ? 'Lisboa' : 'Aveiro')).trim();
+W.city = () => { const p = OS.one('profile'), cc = p.country; if (p.city) return p.city.trim(); if (!(OS.Acc && OS.Acc.pub)) return 'Aveiro'; return cc && cc !== 'PT' && OS.Pais && OS.Pais.has(cc) ? OS.Pais.name(cc, 'en') : 'Lisboa'; };
+// noutros países: procura a cidade nesse país, no fuso dele, e em °F/mph onde se usa o sistema imperial
+const cc = () => { const c = OS.one('profile').country; return OS.Acc && OS.Acc.pub && c && OS.Pais && OS.Pais.has(c) ? c : ''; };
+const imp = () => !!(OS.Units && OS.Units.imp());
 let data = U.ls.get(K, null), busy = null;
-const geo = async name => { const g = U.ls.get('os2wxgeo', null); if (g && g.n === name) return g;
-  const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=pt&name=' + encodeURIComponent(name)), j = await r.json(), x = (j.results || [])[0];
-  const o = x ? { n: name, lat: x.latitude, lon: x.longitude, label: x.name } : { n: name, lat: 40.6405, lon: -8.6538, label: 'Aveiro' }; U.ls.set('os2wxgeo', o); return o; };
-W.get = async force => { const city = W.city(); if (!force && data && data.city === city && Date.now() - data.at < 30 * 6e4) return data; if (busy) return busy;
+const geo = async name => { const g = U.ls.get('os2wxgeo', null), k = name + '|' + cc(); if (g && (g.k || g.n) === k) return g;
+  const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=' + (OS.Lang ? OS.Lang.base() : 'pt') + (cc() ? '&countryCode=' + cc() : '') + '&name=' + encodeURIComponent(name)), j = await r.json(), x = (j.results || [])[0];
+  const o = x ? { n: name, k, lat: x.latitude, lon: x.longitude, label: x.name } : { n: name, k, lat: 40.6405, lon: -8.6538, label: 'Aveiro' }; U.ls.set('os2wxgeo', o); return o; };
+W.get = async force => { const city = W.city(); if (!force && data && data.city === city && !!data.imp === imp() && Date.now() - data.at < 30 * 6e4) return data; if (busy) return busy;
   busy = (async () => { try { const g = await geo(city);
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${g.lat}&longitude=${g.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation,relative_humidity_2m&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset&timezone=Europe%2FLisbon&forecast_days=4`);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${g.lat}&longitude=${g.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation,relative_humidity_2m&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset&timezone=${cc() && cc() !== 'PT' ? 'auto' : 'Europe%2FLisbon'}&forecast_days=4${imp() ? '&temperature_unit=fahrenheit&wind_speed_unit=mph' : ''}`);
     const j = await r.json(); if (!j.current) throw new Error('sem dados');
     const h = new Date().getHours(), pp = (j.hourly && j.hourly.precipitation_probability || []).slice(h, h + 12);
-    data = { at: Date.now(), city, label: g.label, now: { t: Math.round(j.current.temperature_2m), feel: Math.round(j.current.apparent_temperature), code: j.current.weather_code, wind: Math.round(j.current.wind_speed_10m), hum: j.current.relative_humidity_2m, rainNext: pp.length ? Math.max(...pp) : null },
+    data = { at: Date.now(), city, imp: imp(), label: g.label, now: { t: Math.round(j.current.temperature_2m), feel: Math.round(j.current.apparent_temperature), code: j.current.weather_code, wind: Math.round(j.current.wind_speed_10m), hum: j.current.relative_humidity_2m, rainNext: pp.length ? Math.max(...pp) : null },
       days: (j.daily.time || []).map((d, i) => ({ d, code: j.daily.weather_code[i], max: Math.round(j.daily.temperature_2m_max[i]), min: Math.round(j.daily.temperature_2m_min[i]), rain: j.daily.precipitation_probability_max[i], sunrise: (j.daily.sunrise[i] || '').slice(11, 16), sunset: (j.daily.sunset[i] || '').slice(11, 16) })) };
     U.ls.set(K, data); return data; } catch (e) { return data; } finally { busy = null; } })();
   return busy; };

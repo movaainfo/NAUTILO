@@ -8,7 +8,7 @@ const cfg = () => Object.assign({ jarvisStart: true }, OS.one('spyke'));
 let el = null, fab = null, raf = 0, dataAt = 0, newsX = 0, newsW = 0;
 const name = () => OS.one('profile').short || OS.who();
 const eur = v => U.eur(v);
-const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'; };
+const greet = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };
 
 /* ---------- dados ---------- */
 const D = () => { const t = U.today(), nowM = new Date().getHours() * 60 + new Date().getMinutes(), o = {};
@@ -36,7 +36,7 @@ function render() { if (!el) return; const o = D(), t = U.today(), urg = o.alert
   const un = o.exam ? `<div class="jv-big">${Math.max(0, U.diff(o.exam.date, t))}<small>dias para ${esc(o.exam.type || 'avaliação')}</small></div><small>${esc((OS.get('subjects', o.exam.subject) || {}).name || o.exam.title)}</small>${o.rev ? `<small class="jv-al">${o.rev} revisões para hoje</small>` : ''}` : `<small class="mut">Sem avaliações marcadas.</small>${o.rev ? `<small class="jv-al">${o.rev} revisões para hoje</small>` : ''}`;
   const ml = o.mail && o.mail.at ? `<div class="jv-kv"><span>Urgentes</span><b class="${o.mail.urg ? 'neg' : ''}">${o.mail.urg}</b></div><div class="jv-kv"><span>Para responder</span><b>${o.mail.resp}</b></div><div class="jv-kv"><span>Não lidos</span><b>${o.mail.unread}</b></div>` : '<small class="mut">E-mail não ligado.</small>';
   el.innerHTML = `<div class="jv-in">
-    <header class="jv-h"><div class="jv-brand"><b>SPYKE</b><small>MODO JARVIS</small></div><div class="jv-clock"><b data-jvt>${U.hm()}</b><small>${esc(new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }))}</small></div><button class="jv-x" data-act="jvClose" aria-label="Fechar o modo Jarvis">${UI.ic('x')}</button></header>
+    <header class="jv-h"><div class="jv-brand"><b>SPYKE</b><small>MODO JARVIS</small></div><div class="jv-clock"><b data-jvt>${U.hm()}</b><small>${esc(new Date().toLocaleDateString(OS.loc ? OS.loc() : 'pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }))}</small></div><button class="jv-x" data-act="jvClose" aria-label="Fechar o modo Jarvis">${UI.ic('x')}</button></header>
     <div class="jv-grid">
       <section class="jv-core"><canvas class="jv-cv" width="520" height="520" aria-hidden="true"></canvas><div class="jv-hi">${esc(greet())}, ${esc(name())}</div>
         <div class="jv-meta"><span><i style="background:#38bdf8"></i>Dia ${Math.round(o.dayP * 100)}%</span><span><i style="background:#22c55e"></i>Hábitos ${o.hab[0]}/${o.hab[1]}</span><span><i style="background:#f59e0b"></i>Estudo ${o.study} min</span></div>

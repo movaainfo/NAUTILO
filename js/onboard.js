@@ -21,18 +21,23 @@ const toggleArea = (hide, k) => { if (MUST.includes(k)) return; hide.has(k) ? hi
 const toggleGroup = (hide, g) => { const it = (groups().find(x => x[0] === g) || [, []])[1].map(x => x[0]).filter(k => !MUST.includes(k)); const allOn = it.every(k => !hide.has(k)); it.forEach(k => allOn ? hide.add(k) : hide.delete(k)); };
 
 /* ---------- respostas ---------- */
-const CUR = { PT: 'EUR', ES: 'EUR', FR: 'EUR', IT: 'EUR', DE: 'EUR', IE: 'EUR', BE: 'EUR', NL: 'EUR', LU: 'EUR', AT: 'EUR', FI: 'EUR', GR: 'EUR', BR: 'BRL', US: 'USD', GB: 'GBP', CH: 'CHF' };
+const CUR = new Proxy({}, { get: (o, cc) => OS.Pais ? OS.Pais.curOf(cc) : cc === 'BR' ? 'BRL' : 'EUR' });
+// moedas para escolher: a do país primeiro, depois as mais usadas e todas as outras
+const CURS = cc => { const all = OS.Pais ? [...new Set(Object.values(OS.Pais.data).map(x => x.cur))] : ['EUR', 'BRL', 'USD']; const top = [CUR[cc], 'EUR', 'USD', 'BRL', 'GBP', 'CHF']; return [...new Set(top.concat(all.sort()))]; };
+const curName = c => { try { return new Intl.DisplayNames([OS.Lang ? OS.Lang.base() : 'pt'], { type: 'currency' }).of(c); } catch (e) { return c; } };
+// vozes para escolher logo no início (as 30 estão em Definições › Spyke)
+const VOZ = [['Charon', '♂ Grave'], ['Puck', '♂ Animada'], ['Iapetus', '♂ Clara'], ['Kore', '♀ Firme'], ['Aoede', '♀ Leve'], ['Sulafat', '♀ Calorosa']];
 const NAMES = ['Spyke', 'Jarvis', 'Atlas', 'Nova', 'Luna', 'Aurora', 'Max', 'Íris'], FEM = /^(Nova|Luna|Aurora|Íris|Iris|Sofia|Ana|Maria|Alice|Eva|Lia|Mia|Clara)$/i;
 const SPORTS = [['corrida', 'Corrida'], ['futebol', 'Futebol'], ['futsal', 'Futsal'], ['basquetebol', 'Basquetebol'], ['voleibol', 'Voleibol'], ['natacao', 'Natação'], ['ciclismo', 'Ciclismo'], ['tenis', 'Ténis'], ['padel', 'Padel'], ['jiujitsu', 'Jiu-Jitsu'], ['boxe', 'Boxe'], ['muaythai', 'Muay Thai'], ['surf', 'Surf'], ['escalada', 'Escalada'], ['crossfit', 'CrossFit'], ['calistenia', 'Calistenia']];
 const HABITS = [['acordar', 'Acordar à hora, sem snooze', 'Manhã', 1], ['treino', 'Treino ou corrida', 'Dia', 1, 'workout'], ['estudo', '2 blocos de foco (100 min)', 'Dia', 1, 'study100'], ['ler', '20 páginas de leitura', 'Noite', 0],
   ['agua', 'Beber 2 litros de água', 'Dia', 0], ['gastos', 'Registar gastos do dia', 'Noite', 0, 'cash'], ['tele', 'Telemóvel fora do quarto', 'Noite', 0], ['meditar', 'Meditar 10 minutos', 'Manhã', 0],
   ['fe', 'Oração e leitura da Bíblia', 'Manhã', 0], ['diario', 'Escrever no diário', 'Noite', 0], ['deitar', 'Deitar à hora', 'Noite', 0]];
-const defaults = () => { const p = OS.one('profile'), d = OS.one('diet'), sp = OS.one('spyke'), cc = p.country || 'PT', nm = (OS.Acc && OS.Acc.profile && OS.Acc.profile() || {}).nome || '';
-  return { short: p.short || nm, country: cc, city: p.city || '', ia: sp.nome || 'Spyke', hide: [...hiddenSet()],
+const defaults = () => { const p = OS.one('profile'), d = OS.one('diet'), sp = OS.one('spyke'), cc = p.country || (OS.Lang && OS.Lang.code() === 'pt-BR' ? 'BR' : 'PT'), nm = (OS.Acc && OS.Acc.profile && OS.Acc.profile() || {}).nome || '';
+  return { short: p.short || nm, country: cc, lang: p.lang || (OS.Lang ? OS.Lang.code() : 'pt-PT'), city: p.city || '', ia: sp.nome || 'Spyke', hide: [...hiddenSet()],
     est: p.uni ? 'uni' : '', inst: p.uni || '', curso: p.course || '', ano: p.curYear || '', subs: '',
     trab: p.jobRole ? 'emp' : '', cargo: p.jobRole || '', empresa: p.employer || '', horas: p.workHours || '',
     obj: '', nivel: 'Iniciante', dias: '', onde: '', desp: [], peso: '', altura: d.h || '', idade: d.age || '', sexo: d.sex || '',
-    moeda: CUR[cc] || 'EUR', dinh: [], poup: '20', acordar: p.wakeTime || '', deitar: p.sleepTime || '', hab: [], metas: ['', '', ''] }; };
+    moeda: p.cur || CUR[cc] || 'EUR', dinh: [], poup: '20', acordar: p.wakeTime || '', deitar: p.sleepTime || '', hab: [], metas: ['', '', ''] }; };
 
 /* ---------- os passos ---------- */
 const on = (a, ...ks) => ks.some(k => !new Set(a.hide).has(k));
@@ -40,8 +45,10 @@ const chips = (a, k, opts, multi) => `<div class="onb-chips">${opts.map(([v, l])
 const inp = (a, k, l, o = {}) => `<label class="onb-f"><span>${esc(l)}</span><input class="field" data-ok="${k}" type="${o.t || 'text'}" value="${esc(a[k] == null ? '' : a[k])}"${o.ph ? ` placeholder="${esc(o.ph)}"` : ''}${o.min != null ? ` min="${o.min}"` : ''}${o.max != null ? ` max="${o.max}"` : ''}${o.t === 'number' ? ' inputmode="decimal"' : ''} autocomplete="off"></label>`;
 const STEPS = [
   { id: 'tu', t: 'Vamos fazer o Prumo à tua medida', s: 'São dois minutos. Tudo fica editável depois, e podes saltar quando quiseres.',
-    b: a => `${inp(a, 'short', 'Como te chamas?', { ph: 'O teu nome' })}<div class="onb-2">${`<label class="onb-f"><span>País onde vives</span><select class="field" data-ok="country">${((OS.Country && OS.Country.list) || [['PT', 'Portugal'], ['BR', 'Brasil']]).map(c => `<option value="${c[0]}"${c[0] === a.country ? ' selected' : ''}>${esc(c[1])}</option>`).join('')}</select></label>`}${inp(a, 'city', 'Cidade', { ph: 'ex.: Lisboa, São Paulo' })}</div>
-      <div class="onb-f"><span>Como queres chamar a tua IA? (é por este nome que a chamas por voz)</span>${chips(a, 'ia', NAMES.map(n => [n, n]))}<input class="field" data-ok="ia" value="${esc(NAMES.includes(a.ia) ? '' : a.ia)}" placeholder="Ou escreve outro nome"></div>` },
+    b: a => `${inp(a, 'short', 'Como te chamas?', { ph: 'O teu nome' })}<div class="onb-2">${`<label class="onb-f"><span>País onde vives</span><select class="field" data-ok="country">${(OS.Pais ? OS.Pais.list() : [['PT', 'Portugal'], ['BR', 'Brasil']]).map(c => `<option value="${c[0]}"${c[0] === a.country ? ' selected' : ''}>${OS.Pais ? OS.Pais.flag(c[0]) + ' ' : ''}${esc(c[1])}</option>`).join('')}</select></label>`}${inp(a, 'city', 'Cidade', { ph: 'ex.: Lisboa, São Paulo' })}</div>
+      ${OS.Lang ? `<label class="onb-f"><span>Língua do app</span><select class="field" data-ok="lang" data-notr>${OS.Lang.list().map(c => `<option value="${c}"${c === a.lang ? ' selected' : ''}>${esc(OS.Lang.name(c))}</option>`).join('')}</select></label>` : ''}
+      <div class="onb-f"><span>Como queres chamar a tua IA? (é por este nome que a chamas por voz)</span>${chips(a, 'ia', NAMES.map(n => [n, n]))}<input class="field" data-ok="ia" value="${esc(NAMES.includes(a.ia) ? '' : a.ia)}" placeholder="Ou escreve outro nome"></div>
+      <div class="onb-f"><span>E a voz? (toca para ouvir)</span>${chips(a, 'voz', VOZ)}</div>` },
   { id: 'areas', t: 'O que queres no teu Prumo?', s: 'Toca para escolher as abas que vais usar. As outras ficam escondidas do menu e podes ligá-las quando quiseres em Definições.',
     b: a => areaChips(new Set(a.hide), 'data-oa') },
   { id: 'estudos', show: a => on(a, 'universidade', 'cursos'), t: 'Estudas?', s: 'Com isto monto a tua Universidade: disciplinas, faltas, notas e o tutor.',
@@ -62,7 +69,7 @@ const STEPS = [
       <div class="onb-3">${inp(a, 'peso', 'Peso (kg)', { t: 'number', min: 30, max: 250 })}${inp(a, 'altura', 'Altura (cm)', { t: 'number', min: 120, max: 230 })}${inp(a, 'idade', 'Idade', { t: 'number', min: 12, max: 100 })}</div>
       <div class="onb-f"><span>Para as contas das calorias</span>${chips(a, 'sexo', [['M', 'Homem'], ['F', 'Mulher']])}</div>` },
   { id: 'dinheiro', show: a => on(a, 'financas', 'investimentos'), t: 'O teu dinheiro', s: 'Para as contas, as metas de poupança e os marcos de Fortuna.',
-    b: a => `<label class="onb-f"><span>Moeda principal</span><select class="field" data-ok="moeda">${['EUR', 'BRL', 'USD', 'GBP', 'CHF'].map(m => `<option${m === a.moeda ? ' selected' : ''}>${m}</option>`).join('')}</select></label>
+    b: a => `<label class="onb-f"><span>Moeda principal</span><select class="field" data-ok="moeda">${CURS(a.country).map(m => `<option value="${m}"${m === a.moeda ? ' selected' : ''}>${m} · ${esc(curName(m))}</option>`).join('')}</select></label>
       <div class="onb-f"><span>O que queres agora? (podes escolher vários)</span>${chips(a, 'dinh', [['controlar', 'Saber para onde vai o dinheiro'], ['divida', 'Sair das dívidas'], ['reserva', 'Criar um fundo de emergência'], ['poupar', 'Poupar para um objetivo'], ['investir', 'Começar a investir']], 1)}</div>
       <div class="onb-f"><span>Quanto do que ganhas queres poupar?</span>${chips(a, 'poup', [['10', '10%'], ['15', '15%'], ['20', '20%'], ['30', '30%']])}</div>` },
   { id: 'rotina', t: 'A tua rotina e as tuas metas', s: 'Os hábitos entram no teu quadro de hábitos; as metas entram em Metas e no jogo.',
@@ -111,7 +118,7 @@ const pillarOf = t => /dinheiro|poupar|poupan|€|reais|r\$|invest|dívida|divid
   : /fé|deus|igreja|orar|oração|bíblia|biblia|paz|ansiedade|meditar|espiritual/i.test(t) ? 'esp' : 'int';
 const marcosFor = a => { const m = { int: [], for: [], cor: [], inf: [], esp: [] }, w = +a.peso || 0, d = +a.dias || 0, cc = a.country;
   metasOf(a).forEach(t => m[pillarOf(t)].push(t.charAt(0).toUpperCase() + t.slice(1)));
-  if (a.est === 'uni' && a.curso) { m.int.push(`Fechar o ${a.ano ? a.ano + '.º ano' : 'ano'} de ${a.curso} sem nenhuma cadeira em atraso`); if (cc === 'PT') m.int.push('Média do semestre igual ou acima de 14'); if (cc === 'BR') m.int.push('Média do semestre igual ou acima de 7'); }
+  if (a.est === 'uni' && a.curso) { m.int.push(`Fechar o ${a.ano ? a.ano + '.º ano' : 'ano'} de ${a.curso} sem nenhuma cadeira em atraso`); if (cc === 'PT') m.int.push('Média do semestre igual ou acima de 14'); else if (cc === 'BR') m.int.push('Média do semestre igual ou acima de 7'); else if (OS.Grade) m.int.push(OS.Grade.inv() ? `Média do semestre de ${OS.Grade.fmt(OS.Grade.good())} ou melhor` : `Média do semestre igual ou acima de ${OS.Grade.fmt(OS.Grade.good())}`); }
   if (a.est === 'sec') m.int.push(`Acabar o ${a.ano ? a.ano + '.º ano' : 'ano'} com média igual ou acima de 15`);
   if (a.est === 'curso' && a.curso) m.int.push(`Acabar o curso de ${a.curso} e pôr em prática num projeto real`);
   const dn = new Set(a.dinh || []);
@@ -133,6 +140,7 @@ const apply = async a => { const t = U.today(), S = subsOf(a), done = [];
   if (OS.seedBase) OS.seedBase();
   // perfil, país e nome da IA
   const prof = { short: String(a.short || '').trim().slice(0, 30), country: a.country || 'PT', city: String(a.city || '').trim().slice(0, 60) };
+  if (a.moeda) prof.cur = a.moeda; if (a.lang && OS.Lang && OS.Lang.ok(a.lang)) prof.lang = a.lang;
   if (a.est === 'uni') Object.assign(prof, { uni: String(a.inst || '').trim(), course: String(a.curso || '').trim(), curYear: a.ano || '', semester: semNow() });
   else if (a.est === 'sec') Object.assign(prof, { uni: 'Ensino secundário', course: a.ano ? a.ano + '.º ano' : '', curYear: a.ano || '', semester: semNow() });
   else if (a.est === 'curso') Object.assign(prof, { course: String(a.curso || '').trim() });
@@ -142,15 +150,16 @@ const apply = async a => { const t = U.today(), S = subsOf(a), done = [];
   if (a.poup) prof.savingsTarget = +a.poup;
   OS.setOne('profile', prof);
   const ia = String(a.ia || 'Spyke').trim().slice(0, 24) || 'Spyke';
-  OS.setOne('spyke', { nome: ia === 'Spyke' ? '' : ia, art: FEM.test(ia) ? 'a' : 'o', nomeAt: t, accent: a.country === 'BR' ? 'BR' : 'PT', azVoice: a.country === 'BR' ? 'pt-BR-AntonioNeural' : 'pt-PT-DuarteNeural' });
+  const lg = prof.lang || (a.country === 'BR' ? 'pt-BR' : 'pt-PT');
+  OS.setOne('spyke', Object.assign({ nome: ia === 'Spyke' ? '' : ia, art: FEM.test(ia) ? 'a' : 'o', nomeAt: t }, a.voz ? { voice: a.voz, eng: 'gemini' } : {}, lg === 'pt-BR' ? { accent: 'BR', azVoice: 'pt-BR-AntonioNeural' } : lg === 'pt-PT' ? { accent: 'PT', azVoice: 'pt-PT-DuarteNeural' } : { accent: lg, azVoice: '' }));
   try { OS.Spyke && OS.Spyke.setWakeName && OS.Spyke.setWakeName(); } catch (e) { }
-  if (['PT', 'BR'].includes(a.country)) OS.setOne('news', { tabs: a.country === 'BR' ? ['BR', 'PT'] : ['PT', 'BR'] });
+  if (['PT', 'BR'].includes(a.country)) OS.setOne('news', { tabs: a.country === 'BR' ? ['BR', 'PT'] : ['PT', 'BR'] }); else if (OS.News && OS.News.has && OS.News.has(a.country)) OS.setOne('news', { tabs: [a.country] });
   OS.Areas.set(a.hide || []);
   // moeda das contas (só enquanto não há movimentos)
   if (a.moeda && !OS.all('transactions').length) OS.all('accounts').forEach(x => { if (x.currency !== a.moeda) OS.upd('accounts', x.id, { currency: a.moeda }, { silent: true }); });
   // disciplinas
   const have = new Set(OS.all('subjects').map(s => String(s.name || '').toLowerCase()));
-  let ns = 0; S.forEach(n => { if (have.has(n.toLowerCase())) return; OS.add('subjects', Object.assign({ name: n, sem: semNow(), status: 'Em curso', ects: a.country === 'PT' && a.est === 'uni' ? 6 : '', hoursWeek: 4, diff: 'Média' }, a.country === 'PT' ? { target: 14 } : a.country === 'BR' ? { target: 7 } : {}), { silent: true }); ns++; });
+  let ns = 0; S.forEach(n => { if (have.has(n.toLowerCase())) return; OS.add('subjects', Object.assign({ name: n, sem: semNow(), status: 'Em curso', ects: a.country === 'PT' && a.est === 'uni' ? 6 : '', hoursWeek: 4, diff: 'Média' }, a.country === 'PT' ? { target: 14 } : a.country === 'BR' ? { target: 7 } : OS.Grade ? { target: OS.Grade.good() } : {}), { silent: true }); ns++; });
   if (ns) done.push(`${ns} disciplina${ns > 1 ? 's' : ''}`);
   // treino: divisão da semana e rotinas com os exercícios da biblioteca
   const sp = splitFor(a);
@@ -189,7 +198,7 @@ const apply = async a => { const t = U.today(), S = subsOf(a), done = [];
 const aiOn = () => !!(OS.AI && OS.AI.key && OS.AI.key());
 const ctxOf = a => JSON.stringify({ nome: a.short, pais: a.country, cidade: a.city, estudos: a.est, instituicao: a.inst, curso: a.curso, ano: a.ano, trabalho: a.trab, cargo: a.cargo, objetivo_corpo: a.obj, dias_treino: a.dias, desportos: a.desp, dinheiro: a.dinh, metas: metasOf(a), fe: on(a, 'fe') });
 A.onbSug = async () => { if (!W || W.sug) return; if (!aiOn()) { W.sugErr = 'A IA ainda não está ligada nesta conta.'; return draw(); } W.sug = true; W.sugErr = ''; draw();
-  try { const a = W.a, o = await OS.AI.json([{ text: `Lista as disciplinas (unidades curriculares) típicas do ${a.est === 'sec' ? (a.ano || '') + '.º ano do ensino secundário' : (a.ano ? a.ano + '.º ano' : '1.º ano') + ' do curso de ' + a.curso + (a.inst ? ' em ' + a.inst : '')}, no semestre atual (${semNow()}), em ${a.country === 'BR' ? 'Brasil' : 'Portugal'}. Usa os nomes oficiais mais prováveis, em português${a.country === 'BR' ? ' do Brasil' : ' de Portugal'}. Se não tiveres a certeza, dá as mais comuns desse curso e ano. Entre 4 e 8.
+  try { const a = W.a, o = await OS.AI.json([{ text: `Lista as disciplinas (unidades curriculares) típicas do ${a.est === 'sec' ? (a.ano || '') + '.º ano do ensino secundário' : (a.ano ? a.ano + '.º ano' : '1.º ano') + ' do curso de ' + a.curso + (a.inst ? ' em ' + a.inst : '')}, no semestre atual (${semNow()}), em ${a.country === 'BR' ? 'Brasil' : a.country === 'PT' ? 'Portugal' : OS.Pais ? OS.Pais.name(a.country, 'pt') : a.country}. Usa os nomes oficiais mais prováveis, ${a.country === 'BR' ? 'em português do Brasil' : a.country === 'PT' ? 'em português de Portugal' : 'na língua em que são ensinadas nesse país'}. Se não tiveres a certeza, dá as mais comuns desse curso e ano. Entre 4 e 8.
 JSON: {"disciplinas":["…"]}` }], .2);
     const L = (o.disciplinas || []).map(s => String(s).trim()).filter(Boolean).slice(0, 10); if (!L.length) throw new Error('vazio');
     W.a.subs = [...new Set(subsOf(W.a).concat(L))].join('\n'); }
@@ -220,10 +229,15 @@ const draw = () => { if (!W) return; const h = host(), L = steps(), s = L[Math.m
     <div class="onb-foot">${W.i > 0 && !W.only ? `<button class="btn ghost" data-onb="voltar">Voltar</button>` : ''}<span class="grow"></span>${W.only ? `<button class="btn pri" data-onb="guardarAreas">Guardar</button>` : last ? `<button class="btn pri" data-onb="criar" ${W.busy ? 'disabled' : ''}>${W.busy ? 'A preparar…' : 'Criar o meu Prumo'}</button>` : `<button class="btn pri" data-onb="seguinte">Continuar</button>`}</div></div>`;
   h.hidden = false; document.body.classList.add('onb-open'); };
 const close = () => { const h = document.getElementById('onb'); if (h) { h.hidden = true; h.innerHTML = ''; } document.body.classList.remove('onb-open'); W = null; OS.request(); };
-const onInput = e => { if (!W) return; const el = e.target, k = el.dataset.ok, m3 = el.dataset.om3; if (k) { W.a[k] = el.value; if (k === 'ia') { /* nome escrito à mão */ } if (k === 'country' && e.type === 'change') { W.a.moeda = CUR[el.value] || W.a.moeda; } }
+// a língua muda logo, para o resto das perguntas já aparecer nela
+const langNow = c => { if (OS.Lang && OS.Lang.ok(c)) OS.Lang.set(c); };
+const onInput = e => { if (!W) return; const el = e.target, k = el.dataset.ok, m3 = el.dataset.om3; if (k) { W.a[k] = el.value; if (k === 'ia') { /* nome escrito à mão */ } if (k === 'country' && e.type === 'change') { W.a.moeda = CUR[el.value] || W.a.moeda; if (OS.Pais && !W.langSet) { W.a.lang = OS.Pais.langOf(el.value); langNow(W.a.lang); } draw(); }
+    if (k === 'lang' && e.type === 'change') { W.langSet = 1; langNow(el.value); draw(); } }
   if (m3 != null) W.a.metas[+m3] = el.value; };
 const onClick = async e => { if (!W) return; const b = e.target.closest('button'); if (!b || b.disabled) return; const a = W.a, hide = new Set(a.hide);
-  if (b.dataset.oc) { a[b.dataset.oc] = isNaN(+b.dataset.v) || b.dataset.oc === 'poup' || b.dataset.oc === 'nivel' ? b.dataset.v : +b.dataset.v; if (b.dataset.oc === 'ia') { const f = document.querySelector('#onb [data-ok=ia]'); if (f) f.value = ''; } return draw(); }
+  if (b.dataset.oc) { a[b.dataset.oc] = isNaN(+b.dataset.v) || b.dataset.oc === 'poup' || b.dataset.oc === 'nivel' ? b.dataset.v : +b.dataset.v; if (b.dataset.oc === 'ia') { const f = document.querySelector('#onb [data-ok=ia]'); if (f) f.value = ''; }
+    if (b.dataset.oc === 'voz' && OS.Spyke && OS.Spyke.say) { const prev = OS.one('spyke').voice; OS.one('spyke').voice = b.dataset.v; try { OS.Spyke.say(`Olá${a.short ? ', ' + a.short.split(' ')[0] : ''}. É assim que eu falo.`, { bg: true, tap: true, eng: 'gemini' }); } catch (e) { } setTimeout(() => { if (!OS.one('onb').done) OS.one('spyke').voice = prev; }, 8000); }
+    return draw(); }
   if (b.dataset.om) { const L = new Set(a[b.dataset.om] || []); L.has(b.dataset.v) ? L.delete(b.dataset.v) : L.add(b.dataset.v); a[b.dataset.om] = [...L]; return draw(); }
   if (b.dataset.oa) { toggleArea(hide, b.dataset.oa); a.hide = [...hide]; return draw(); }
   if (b.dataset.oag) { toggleGroup(hide, b.dataset.oag); a.hide = [...hide]; return draw(); }

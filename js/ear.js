@@ -58,7 +58,7 @@ const azure = async (b64, lang) => { const c = cfg(), bin = atob(b64), u8 = new 
   const r = await fetch(`https://${encodeURIComponent((c.azRegion || 'westeurope').trim().toLowerCase())}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${lang}&format=simple`, { method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': c.azKey.trim(), 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000', Accept: 'application/json' }, body: u8 });
   if (!r.ok) throw new Error('Microsoft ' + r.status); const j = await r.json().catch(() => ({})); return j.RecognitionStatus && j.RecognitionStatus !== 'Success' ? '' : clean(j.DisplayText); };
 // sem dizer à IA o nome do assistente: quando o sabia, "ouvia-o" em frases normais ("isso aí que…" virava "Spyke")
-const PROMPT = lang => `Transcreve exatamente o que a pessoa diz neste áudio (${lang === 'pt-PT' ? 'português de Portugal' : 'português do Brasil'}), palavra por palavra. Não completes, não corrijas e não inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -`;
+const PROMPT = lang => `Transcreve exatamente o que a pessoa diz neste áudio (${lang === 'pt-PT' ? 'português de Portugal' : lang === 'pt-BR' ? 'português do Brasil' : OS.Lang ? OS.Lang.en() : lang}), palavra por palavra. Não completes, não corrijas e não inventes palavras. Responde só com as palavras ditas, sem aspas nem comentários. Se não houver fala percetível (só ruído, música ou palavras impercetíveis), responde só: -`;
 const gemini = async (b64, lang) => { const key = OS.AI && OS.AI.gkey(); if (!key) throw new Error('sem chave da IA'); try { await OS.AI.discover(); } catch (e) { }
   // os modelos "lite" respondem mais depressa (a transcrição é simples)
   const L = (OS.AI.gemini ? OS.AI.gemini() : []).slice().sort((a, b) => (/lite/.test(b) - /lite/.test(a))); let last = '';
@@ -70,7 +70,7 @@ const gemini = async (b64, lang) => { const key = OS.AI && OS.AI.gkey(); if (!ke
   throw new Error('não consegui transcrever (' + String(last).slice(0, 80) + ')'); };
 E.engine = () => cfg().azKey && cfg().azKey.trim() ? 'Microsoft' : OS.AI && OS.AI.gkey() ? 'Google' : '';
 E.can = () => E.supported() && !!E.engine();
-E.stt = async b64 => { const lang = cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR';
+E.stt = async b64 => { const lang = OS.Lang && OS.Lang.on() && !/^pt/.test(OS.Lang.code()) ? OS.Lang.speech() : cfg().accent === 'PT' ? 'pt-PT' : 'pt-BR';
   if (cfg().azKey && cfg().azKey.trim()) { try { return await azure(b64, lang); } catch (e) { if (!(OS.AI && OS.AI.gkey())) throw e; } }
   return gemini(b64, lang); };
 })();

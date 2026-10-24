@@ -359,7 +359,7 @@ OS.FinCountry = { FP, get: F };
 const nice = v => { if (!v) return 0; const p = Math.pow(10, Math.max(0, Math.floor(Math.log10(Math.abs(v))) - 1)); return Math.round(v / p) * p; };
 const M = (v, o = {}) => { const f = F(), n = Number(v) || 0, d = o.dec ?? 2; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + f.sym + ' ' + Math.abs(n).toLocaleString(f.loc, { minimumFractionDigits: d, maximumFractionDigits: d }); };
 const MK = v => { const s = F().sym, a = Math.abs(v), g = v < 0 ? '−' : ''; return a >= 1e9 ? g + s + U.r1(a / 1e9) + 'B' : a >= 1e6 ? g + s + U.r1(a / 1e6) + 'M' : a >= 1e4 ? g + s + Math.round(a / 1e3) + 'k' : g + s + Math.round(a); };
-const pp = v => (+v).toLocaleString('pt-PT', { maximumFractionDigits: 2 }) + '%';
+const pp = v => (+v).toLocaleString(OS.loc ? OS.loc() : 'pt-PT', { maximumFractionDigits: 2 }) + '%';
 const SIMS = [['juros', 'Juros compostos'], ['emprestimo', 'Empréstimo'], ['parcelado', 'Parcelado vs à vista'], ['compra', 'Impacto de uma compra'], ['meta', 'Meta financeira'], ['independencia', 'Independência financeira'], ['taxas', 'Comparar taxas'], ['inflacao', 'Inflação']];
 const skey = k => cc() === 'PT' ? k : k + '_' + cc(); // cada país guarda os seus valores
 const sv = (k, d) => Object.assign({}, d, OS.ui['sim_' + skey(k)] || {});

@@ -14,6 +14,7 @@ for f in ['config.js', 'LANCAR.md', 'firestore.rules']: shutil.copy(f'{src}/{f}'
 if os.path.isdir(f'{src}/vendor'): shutil.copytree(f'{src}/vendor', f'{out}/vendor')
 # funções do Vercel (cotações de reserva)
 if os.path.isdir('standalone/api'): shutil.copytree('standalone/api', f'{out}/api')
+if os.path.isdir(f'{src}/i18n'): shutil.copytree(f'{src}/i18n', f'{out}/i18n')  # dicionários das línguas e a lista dos textos
 shutil.copy('standalone/vercel.json', f'{out}/vercel.json')
 # páginas públicas dos documentos legais (/privacidade, /termos…)
 import subprocess; subprocess.run(['node', 'standalone/legalpages.js', out], check=True)

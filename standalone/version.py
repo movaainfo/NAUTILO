@@ -2,7 +2,7 @@
 import hashlib, json, glob, datetime, os
 os.chdir(os.path.dirname(os.path.abspath(__file__)) + '/..')
 h = hashlib.sha1()
-for f in sorted(glob.glob('js/*.js') + glob.glob('css/*.css') + ['standalone/update.js', 'standalone/cloud.js', 'index.html']): h.update(open(f, 'rb').read())
+for f in sorted(glob.glob('js/*.js') + glob.glob('css/*.css') + glob.glob('standalone/i18n/packs/*.json') + ['standalone/update.js', 'standalone/cloud.js', 'index.html']): h.update(open(f, 'rb').read())
 h = h.hexdigest()[:12]
 V = json.load(open('standalone/version.json'))
 notes = [l.strip() for l in open('standalone/notes.txt') if l.strip()] if os.path.exists('standalone/notes.txt') else []

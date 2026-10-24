@@ -12,7 +12,7 @@ const RP = OS.Reports = {};
 // país e moeda do relatório: seguem o país escolhido na app; um relatório já arquivado fica com o país com que foi gerado
 let RK = 'PT', RC = 'EUR';
 RP.cty = () => (OS.Country && OS.Country.code ? OS.Country.code() : 'PT') || 'PT';
-RP.setCtx = k => { RK = k || 'PT'; RC = RK === 'BR' ? 'BRL' : 'EUR'; return RK; };
+RP.setCtx = k => { RK = k || 'PT'; RC = RK === 'BR' ? 'BRL' : RK === 'PT' ? 'EUR' : (OS.cur ? OS.cur() : 'EUR'); return RK; };
 RP.ctx = () => ({ k: RK, cur: RC });
 // histórico do país (para um período que já passou sem relatório arquivado ficar no país de então): [[desde, país], …]
 RP.ctyAt = d => { let k = ''; (OS.one('tax').ctyH || []).forEach(([f, c]) => { if (!f || f <= d) k = c; }); return k || RP.cty(); };
@@ -228,7 +228,7 @@ const brBlock = y => { const B = RP.br(y), Mc = IX() ? (v => IX().Mc(v, 'BRL')) 
 const periodBar = R => `<div class="rp-bar"><div class="seg" role="group" aria-label="Período">${PER.map(([k, l]) => `<button class="${R.per === k ? 'on' : ''}" data-act="rpPer" data-v="${k}">${l}</button>`).join('')}</div>
   <div class="rp-nav"><button class="icon-btn" data-act="rpGo" data-d="prev" aria-label="Período anterior">${UI.ic('left')}</button><b>${esc(R.label)}</b><button class="icon-btn" data-act="rpGo" data-d="next" aria-label="Período seguinte" ${R.from > U.today() ? 'disabled' : ''}>${UI.ic('right')}</button></div>
   <span class="grow"></span><button class="btn sm ghost" data-act="rpPrint">${UI.ic('note')}Imprimir / PDF</button><button class="btn sm ghost" data-act="rpDown">${UI.ic('arrowDown')}Descarregar</button></div>`;
-const CTYN = k => ((OS.Country && OS.Country.list || []).find(c => c[0] === k) || [k, k === 'BR' ? 'Brasil' : 'Portugal'])[1];
+const CTYN = k => OS.Pais && OS.Pais.has(k) ? OS.Pais.name(k) : ((OS.Country && OS.Country.list || []).find(c => c[0] === k) || [k, k === 'BR' ? 'Brasil' : 'Portugal'])[1];
 const docHead = (R, kind) => `<div class="rp-doc-h"><div><span class="eyebrow">Prumo · relatório ${R.per === 'm' ? 'mensal' : R.per === 'q' ? 'trimestral' : 'anual'} · ${esc(CTYN(RK))}</span><h2>${kind} — ${esc(R.long)}</h2><span class="mut">${esc((OS.one('profile') || {}).name || '')} · gerado a ${U.fmtD(U.today())}${R.to >= U.today() ? ' · período ainda a decorrer' : ''}</span></div></div>`;
 const summary = (R, M, I) => sec('Resumo', '', kpis([['Entrou', E(M.inc)], ['Saiu', E(M.exp)], ['Poupado', ES(M.sav), M.inc ? P(M.rate) + ' do que entrou' : '', tone(M.sav)], ['Investido', E(I.buys)], ['Proventos', E(I.provNet)], ['Mais-valias', ES(I.gains), '', tone(I.gains)]]));
 const taxMonth = (R, I) => { const brS = I.sales.filter(s => s.a.currency === 'BRL'), pt = I.sales.filter(s => s.a.currency !== 'BRL'), resv = Math.max(0, U.sum(pt, s => s.gainE)) * .28 + Math.max(0, U.sum(I.provRows.filter(r => r.cty !== 'Portugal'), r => r.gross * .28 - Math.min(r.tax, r.gross * .28)));

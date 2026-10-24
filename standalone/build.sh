@@ -11,6 +11,9 @@ cp standalone/cloud.js "$OUT/js/cloud.js"
 [ -f standalone/config.local.js ] && cp standalone/config.local.js "$OUT/config.js"
 cp standalone/icons/* "$OUT/icons/"
 mkdir -p "$OUT/vendor" && cp -r standalone/vendor/. "$OUT/vendor/"
+# línguas: a lista dos textos do app (para a IA do servidor traduzir) e os dicionários que vêm com o app
+mkdir -p "$OUT/i18n"; NODE_PATH="${NODE_PATH:-/opt/node22/lib/node_modules}" I18N_SKIP=brands.js,fastfood.js node standalone/i18n/extract.js && cp standalone/i18n/strings.json "$OUT/i18n/"
+[ -d standalone/i18n/packs ] && cp standalone/i18n/packs/*.json "$OUT/i18n/" 2>/dev/null || true
 BODY=$(sed -e '/<title>/d' -e '/os2lite/d' -e '/rel="preconnect"/d' -e '/fonts.googleapis.com\/css2/d' -e '/<link rel="stylesheet"/d' index.html \
   | sed -e 's#<script src="js/app.js"></script>#<script src="js/cloud.js"></script>\n<script src="js/app.js"></script>#')
 CSS=$(grep '<link rel="stylesheet" href="css/' index.html)

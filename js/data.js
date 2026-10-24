@@ -208,7 +208,7 @@ S.invtx = { label: 'Movimento de investimento', title: r => r.type, fields: [
 /* ---- Universidade ---- */
 S.subjects = { label: 'Disciplina', title: r => r.name, fields: [
   F('name', 'Disciplina', 'text', { req: 1, wide: 1 }), F('sem', 'Semestre', 'sel', { o: L.SEM }), F('status', 'Estado', 'sel', { o: ['Em curso', 'Plano', 'Aprovada', 'Reprovada', 'Em atraso'] }),
-  F('ects', 'ECTS', 'num'), F('target', 'Nota alvo', 'num', { h: '0–20' }), F('final', 'Nota final', 'num'),
+  F('ects', 'ECTS', 'num'), { k: 'target', l: 'Nota alvo', t: 'num', get h() { return OS.Grade ? OS.Grade.label() : '0–20'; } }, F('final', 'Nota final', 'num'),
   F('hoursWeek', 'Horas de estudo alvo / semana', 'num'), F('diff', 'Dificuldade', 'sel', { o: ['Baixa', 'Média', 'Alta'] }),
   F('prof', 'Professor(a)'), F('mail', 'Palavras dos e-mails', 'text', { h: 'Sigla, código da cadeira ou e-mail do professor, separados por vírgula: servem para separar os e-mails da faculdade por matéria' }), F('room', 'Sala'), F('notes', 'Notas', 'area', { rows: 2 })
 ], defaults: () => ({ sem: '1.º Semestre 26/27', status: 'Em curso', target: 15, ects: 6, hoursWeek: 4, diff: 'Média' }) };
@@ -222,7 +222,7 @@ S.topics = { label: 'Conteúdo', title: r => r.title, fields: [
 ], defaults: () => ({ status: 'Por estudar' }), after: r => OS.St.topicAfter(r) };
 S.assessments = { label: 'Avaliação', title: r => r.title, fields: [
   F('title', 'Avaliação', 'text', { req: 1, wide: 1 }), rel('subject', 'Disciplina', 'subjects', { req: 1 }), F('type', 'Tipo', 'sel', { o: ['Teste', 'Exame', 'Exame de recurso', 'Trabalho', 'Apresentação', 'Mini-teste', 'Projeto'] }),
-  F('date', 'Data / entrega', 'date', { req: 1 }), F('time', 'Hora', 'time'), F('weight', 'Peso', 'pct'), F('grade', 'Nota (0–20)', 'num'),
+  F('date', 'Data / entrega', 'date', { req: 1 }), F('time', 'Hora', 'time'), F('weight', 'Peso', 'pct'), { k: 'grade', get l() { return 'Nota (' + (OS.Grade ? OS.Grade.label() : '0–20') + ')'; }, t: 'num' },
   F('prep', 'Preparação', 'sel', { o: ['Não comecei', 'A preparar', 'Pronto', 'Feito'] }), F('content', 'Matéria', 'area', { rows: 2 })
 ], defaults: () => ({ type: 'Teste', prep: 'Não comecei' }) };
 S.sessions = { label: 'Sessão de estudo', title: r => (OS.get('subjects', r.subject) || OS.get('skills', r.skill) || {}).name || 'Sessão', fields: [
@@ -462,7 +462,7 @@ Fin.nwSeries = () => U.sortBy(OS.all('snapshots'), s => s.ym);
 
 /* ---- Investimentos ---- */
 const Inv = OS.Inv = {};
-Inv.fx = cur => { if (!cur || cur === 'EUR') return 1; const v = U.num((OS.one('profile').fx || {})[cur]); return v || 1; };
+Inv.fx = cur => { const B = OS.cur ? OS.cur() : 'EUR', e = c => { if (!c || c === 'EUR') return 1; return U.num((OS.one('profile').fx || {})[c]) || 1; }; if (!cur || cur === B) return 1; return e(cur) / e(B); };
 Inv.fxMissing = () => [...new Set(OS.all('assets').map(a => a.currency).filter(c => c && c !== 'EUR' && !U.num((OS.one('profile').fx || {})[c])))];
 Inv.pos = a => {
   let qty = 0, cost = 0, realized = 0, divs = 0, fees = 0, bought = 0;
@@ -496,9 +496,9 @@ St.stats = s => {
   const ses = OS.all('sessions').filter(x => x.subject === s.id), mins = U.sum(ses, x => x.minutes);
   const graded = OS.all('assessments').filter(a => a.subject === s.id && a.grade !== '' && a.grade != null);
   const w = U.sum(graded, a => a.weight), acc = U.sum(graded, St.contrib), avg = w ? U.r1(acc * 100 / w) : 0;
-  const tgt = U.num(s.target) || 15, wk = U.monday(U.today());
+  const G = OS.Grade, tgt = U.num(s.target) || (G && G.key() !== 'p20' ? G.good() : 15), wk = U.monday(U.today());
   const minWk = U.sum(ses.filter(x => x.date >= wk), x => x.minutes);
-  const sit = !avg ? ['Sem notas', ''] : avg >= tgt ? ['Acima do alvo', 'pos'] : avg >= 10 ? ['Abaixo do alvo', 'warn'] : ['Risco de reprovar', 'neg'];
+  const sit = !avg ? ['Sem notas', ''] : (G ? G.better(avg, tgt) : avg >= tgt) ? ['Acima do alvo', 'pos'] : (G ? G.ok(avg) : avg >= 10) ? ['Abaixo do alvo', 'warn'] : ['Risco de reprovar', 'neg'];
   const topics = OS.all('topics').filter(t => t.subject === s.id), dom = topics.filter(t => ['Revisto', 'Dominado'].includes(t.status)).length;
   const next = U.sortBy(OS.all('assessments').filter(a => a.subject === s.id && a.date >= U.today() && a.prep !== 'Feito'), a => a.date)[0];
   return { mins, hours: U.r1(mins / 60), avg, w, tgt, sit, minWk, hWk: U.r1(minWk / 60), targetWk: U.num(s.hoursWeek), topics: topics.length, topicsDone: dom, next, errors: OS.all('errors').filter(e => e.subject === s.id && !e.redone).length, last: U.sortBy(ses, x => x.date).pop() };

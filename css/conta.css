@@ -1,10 +1,10 @@
 /* PRUMO — ecrã da conta e perfis: o mesmo mar do ecrã de entrada, com os formulários por baixo, à luz do farol. */
-#acc{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;justify-content:flex-end;background:#04070D;overflow:hidden auto;color:#E9E3D8;-webkit-overflow-scrolling:touch}
+#acc{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;justify-content:flex-start;background:#04070D;overflow:hidden auto;color:#E9E3D8;-webkit-overflow-scrolling:touch}
 #acc[hidden]{display:none}
 html.ac-open,html.ac-open body{overflow:hidden}
 #acc .lk-scene{position:fixed}
 #acc .lk-scene::after{background:linear-gradient(180deg,rgba(4,7,13,.55) 0%,rgba(4,7,13,.05) 22%,rgba(4,7,13,.35) 40%,rgba(4,7,13,.88) 62%,rgba(4,7,13,.97) 82%)}
-.ac-in{position:relative;z-index:1;width:100%;max-width:460px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.ac-in{position:relative;z-index:1;width:100%;max-width:460px;margin:auto auto 0;padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
 .ac-brand{display:flex;align-items:center;gap:9px;font:500 24px/1 var(--serif);letter-spacing:.02em;color:#E9E3D8}
 .ac-hi{margin:0;font:italic 500 21px/1.25 var(--serif);color:#E9E3D8;max-width:22em}
 .ac-h{margin:4px 0 2px;font:400 34px/1.02 var(--display);letter-spacing:.01em;text-transform:uppercase;color:#F6F7F9;text-wrap:balance;text-shadow:0 2px 20px rgba(0,0,0,.5)}
@@ -73,7 +73,8 @@ html.ac-open,html.ac-open body{overflow:hidden}
 .ac-avtop{display:flex;align-items:center;gap:16px;margin:4px 0 10px}
 .ac-avbtns{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .ac-btn.sm{min-height:38px;padding:0 14px;font-size:14px}
-.ac-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.ac-avbtns .ac-btn{position:relative}
+.ac-f input.ac-file,.ac-file{position:absolute!important;left:0;top:0;width:1px!important;height:1px!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
 .ac-btn:has(.ac-file:focus-visible){outline:2px solid var(--farol,#F2C48D);outline-offset:3px}
 .ac-domg{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px;margin:0 0 12px;max-height:220px;overflow:auto;padding:2px}
 .ac-domg button{padding:0;border:1.5px solid rgba(233,227,216,.18);border-radius:14px;background:none;cursor:pointer;aspect-ratio:1;overflow:hidden}

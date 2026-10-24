@@ -84,16 +84,21 @@ const FXLIVE = { USD: 'EURUSD=X', BRL: 'EURBRL=X', GBP: 'EURGBP=X', CHF: 'EURCHF
 /* quantos EUR vale 1 unidade de "cur" */
 const fxBase = Inv.fx;
 IX.perEur = cur => { if (!cur || cur === 'EUR') return 1; const q = FXLIVE[cur] && PX[FXLIVE[cur]]; if (q && q.p && Date.now() - q.at < 864e5) return q.p; return IX.fxRates && IX.fxRates[cur] ? IX.fxRates[cur] : null; };
-Inv.fx = cur => { if (!cur || cur === 'EUR') return 1; const r = IX.perEur(cur); if (r) return 1 / r; return fxBase(cur); };
+const toEur = cur => { if (!cur || cur === 'EUR') return 1; const r = IX.perEur(cur); if (r) return 1 / r; return fxBase(cur); };
+// quanto vale 1 unidade de "cur" na moeda principal do perfil (euros, para quem não escolheu outra)
+Inv.fx = cur => { const B = OS.cur ? OS.cur() : 'EUR'; if (!cur || cur === B) return 1; if (B === 'EUR') return toEur(cur); const b = toEur(B); return b ? toEur(cur) / b : 1; };
 const fxMissBase = Inv.fxMissing;
 Inv.fxMissing = () => fxMissBase().filter(c => !IX.perEur(c));
 /* moeda de visualização (EUR, BRL, USD…) */
-IX.view = () => cfg().view || 'EUR';
-IX.toView = eur => { const v = IX.view(); if (v === 'EUR') return eur; const r = IX.perEur(v); return r ? eur * r : eur; };
+IX.view = () => cfg().view || (OS.cur ? OS.cur() : 'EUR');
+// valores na moeda principal → moeda de visualização
+IX.toView = eur => { const v = IX.view(), B = OS.cur ? OS.cur() : 'EUR'; if (v === B) return eur; const r = IX.perEur(v), rb = IX.perEur(B); return r && rb ? eur * r / rb : eur; };
 const SYM = { EUR: '€', BRL: 'R$', USD: 'US$', GBP: '£', CHF: 'CHF', CAD: 'C$', JPY: '¥' };
-IX.M = (eur, o = {}) => { const v = IX.toView(eur), d = o.dec ?? 2, x = Number(v) || 0; return (o.sign && x > 0 ? '+' : '') + (x < 0 ? '−' : '') + (SYM[IX.view()] || IX.view()) + ' ' + Math.abs(x).toLocaleString(IX.view() === 'BRL' ? 'pt-BR' : 'pt-PT', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+// números como a pessoa lê: em português, reais à brasileira e o resto à portuguesa; noutra língua, no formato do país dela
+const LOC = cur => { const l = OS.loc ? OS.loc() : 'pt-PT'; return /^pt/.test(l) ? (cur === 'BRL' ? 'pt-BR' : l === 'pt-BR' ? 'pt-BR' : 'pt-PT') : l; };
+IX.M = (eur, o = {}) => { const v = IX.toView(eur), d = o.dec ?? 2, x = Number(v) || 0; return (o.sign && x > 0 ? '+' : '') + (x < 0 ? '−' : '') + (SYM[IX.view()] || IX.view()) + ' ' + Math.abs(x).toLocaleString(LOC(IX.view()), { minimumFractionDigits: d, maximumFractionDigits: d }); };
 IX.MK = eur => { const v = IX.toView(eur), a = Math.abs(v), s = SYM[IX.view()] || '', g = v < 0 ? '−' : ''; return a >= 1e6 ? g + s + U.r1(a / 1e6) + 'M' : a >= 1e4 ? g + s + Math.round(a / 1e3) + 'k' : g + s + Math.round(a); };
-IX.Mc = (v, cur, d = 2) => (SYM[cur] || cur || '€') + ' ' + (Number(v) || 0).toLocaleString(cur === 'BRL' ? 'pt-BR' : 'pt-PT', { minimumFractionDigits: d, maximumFractionDigits: d });
+IX.Mc = (v, cur, d = 2) => (SYM[cur] || cur || '€') + ' ' + (Number(v) || 0).toLocaleString(LOC(cur), { minimumFractionDigits: d, maximumFractionDigits: d });
 
 /* ================= renda fixa (CDI, Selic, IPCA, poupança do Banco Central do Brasil) ================= */
 const SER = { cdi: 12, selic: 11, ipca: 433, poup: 195 };
@@ -320,6 +325,13 @@ IX.risk = (h, benchCum) => { if (!h || h.dates.length < 25) return null; const N
   const Pall = IX.positions(), stress = IX.STRESS.map(([nm, ds, sh]) => { let loss = 0; Pall.forEach(p => { const k = kindOf(p.a), base = IX.isLev(p.a) || p.a.cls === 'Opção' ? (p.short ? -p.exposure : p.exposure) : p.value; if (sh.cur) loss += p.value * (sh.cur[p.a.currency || 'EUR'] || 0); else loss += base * (sh[k] || 0); }); return { nm, ds, loss, pct: val ? loss / val : 0 }; });
   const liq = U.sum(Pall.filter(p => !(IX.isRF(p.a) && p.a.liq && p.a.liq !== 'Diária') && !['Imóvel', 'PPR', 'Previdência', 'Crowdlending/P2P'].includes(p.a.cls)), p => p.value) / (val || 1);
   return { vol, sri: IX.SRI(vol), var1, cvar1, varP, var1e: var1 * val, var21e: var1 * Math.sqrt(21) * val, cvar21e: cvar1 * Math.sqrt(21) * val, mdd, curDD: dd[dd.length - 1], maxUw, dd, beta, corr, assets, C, names: P.map(p => p.a.ticker || p.a.sym || p.a.name), divRatio, stress, liq, n: R.length }; };
-IX.BENCH = cc => cc === 'BR' ? [['CDI', 'CDI'], ['IPCA', 'IPCA (inflação)'], ['^BVSP', 'Ibovespa'], ['^GSPC', 'S&P 500']] : [['URTH', 'MSCI World'], ['^GSPC', 'S&P 500'], ['PSI20.LS', 'PSI (Lisboa)'], ['dep:' + ((((OS.LiveRates && OS.LiveRates.vals(cc)) || {}).dep || {}).v || 1.6), 'Depósito a prazo']];
-IX.INDICES = cc => (cc === 'BR' ? [['^BVSP', 'Ibovespa'], ['IFIX.SA', 'IFIX'], ['BRL=X', 'Dólar (USD/BRL)'], ['^GSPC', 'S&P 500'], ['^IXIC', 'Nasdaq'], ['BTC-BRL', 'Bitcoin']] : [['PSI20.LS', 'PSI (Lisboa)'], ['^STOXX50E', 'Euro Stoxx 50'], ['^GDAXI', 'DAX'], ['^GSPC', 'S&P 500'], ['^IXIC', 'Nasdaq'], ['EURUSD=X', 'EUR/USD'], ['EURBRL=X', 'EUR/BRL'], ['GC=F', 'Ouro'], ['BTC-EUR', 'Bitcoin']]);
+// a bolsa principal de cada país (para o Painel de mercados e as comparações)
+const LIDX = { US: [['^DJI', 'Dow Jones']], GB: [['^FTSE', 'FTSE 100']], DE: [['^GDAXI', 'DAX']], FR: [['^FCHI', 'CAC 40']], ES: [['^IBEX', 'IBEX 35']], IT: [['FTSEMIB.MI', 'FTSE MIB']], NL: [['^AEX', 'AEX']], CH: [['^SSMI', 'SMI']], BE: [['^BFX', 'BEL 20']], AT: [['^ATX', 'ATX']], IE: [['^ISEQ', 'ISEQ']],
+  SE: [['^OMX', 'OMX Stockholm 30']], DK: [['^OMXC25', 'OMX Copenhaga 25']], JP: [['^N225', 'Nikkei 225']], CN: [['000001.SS', 'Xangai']], HK: [['^HSI', 'Hang Seng']], TW: [['^TWII', 'Taiex']], IN: [['^NSEI', 'Nifty 50'], ['^BSESN', 'Sensex']], KR: [['^KS11', 'KOSPI']],
+  AU: [['^AXJO', 'ASX 200']], NZ: [['^NZ50', 'NZX 50']], CA: [['^GSPTSE', 'S&P/TSX']], MX: [['^MXX', 'IPC México']], AR: [['^MERV', 'Merval']], CL: [['^IPSA', 'IPSA']], SG: [['^STI', 'Straits Times']], IL: [['^TA125.TA', 'TA-125']], ZA: [['^J203.JO', 'JSE All Share']] };
+IX.LIDX = LIDX;
+const otherIdx = cc => { const B = OS.cur ? OS.cur() : 'EUR', fx = B === 'USD' ? [] : B === 'EUR' ? [['EURUSD=X', 'EUR/USD']] : [[B + '=X', 'Dólar (USD/' + B + ')']];
+  return (LIDX[cc] || []).concat([['^GSPC', 'S&P 500'], ['^IXIC', 'Nasdaq'], ['^STOXX50E', 'Euro Stoxx 50']]).concat(fx).concat([['GC=F', 'Ouro'], ['BTC-' + (['EUR', 'USD', 'GBP', 'BRL', 'JPY', 'CAD', 'AUD', 'CHF'].includes(B) ? B : 'USD'), 'Bitcoin']]).filter((x, i, a) => a.findIndex(y => y[0] === x[0]) === i); };
+IX.BENCH = cc => cc !== 'BR' && cc !== 'PT' && LIDX[cc] ? [['URTH', 'MSCI World'], ['^GSPC', 'S&P 500'], LIDX[cc][0], ['dep:' + ((((OS.LiveRates && OS.LiveRates.vals(cc)) || {}).dep || {}).v || 2), 'Depósito a prazo']].filter((x, i, a) => a.findIndex(y => y[0] === x[0]) === i) : cc === 'BR' ? [['CDI', 'CDI'], ['IPCA', 'IPCA (inflação)'], ['^BVSP', 'Ibovespa'], ['^GSPC', 'S&P 500']] : [['URTH', 'MSCI World'], ['^GSPC', 'S&P 500'], ['PSI20.LS', 'PSI (Lisboa)'], ['dep:' + ((((OS.LiveRates && OS.LiveRates.vals(cc)) || {}).dep || {}).v || 1.6), 'Depósito a prazo']];
+IX.INDICES = cc => cc !== 'BR' && cc !== 'PT' && OS.Pais && OS.Pais.pub() ? otherIdx(cc) : (cc === 'BR' ? [['^BVSP', 'Ibovespa'], ['IFIX.SA', 'IFIX'], ['BRL=X', 'Dólar (USD/BRL)'], ['^GSPC', 'S&P 500'], ['^IXIC', 'Nasdaq'], ['BTC-BRL', 'Bitcoin']] : [['PSI20.LS', 'PSI (Lisboa)'], ['^STOXX50E', 'Euro Stoxx 50'], ['^GDAXI', 'DAX'], ['^GSPC', 'S&P 500'], ['^IXIC', 'Nasdaq'], ['EURUSD=X', 'EUR/USD'], ['EURBRL=X', 'EUR/BRL'], ['GC=F', 'Ouro'], ['BTC-EUR', 'Bitcoin']]);
 })();

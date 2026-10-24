@@ -23,11 +23,14 @@ U.MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', '
 U.MESL = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 U.WD = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 U.WDS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-U.fmtD = s => s ? String(s).slice(8, 10) + '/' + String(s).slice(5, 7) + '/' + String(s).slice(0, 4) : '—';
-U.fmtDS = s => s ? +String(s).slice(8, 10) + ' ' + U.MES[+String(s).slice(5, 7) - 1] : '—';
+// datas: em português como sempre; noutra língua, no formato do país (ex.: 10/24/2026 nos EUA)
+const XL = () => !!(OS.Lang && OS.Lang.on() && !/^pt/.test(OS.Lang.code()));
+const IDT = (s, o) => { try { return new Intl.DateTimeFormat(LC(), o).format(U.parse(String(s).slice(0, 10))); } catch (e) { return ''; } };
+U.fmtD = s => s ? (XL() && IDT(s, { day: '2-digit', month: '2-digit', year: 'numeric' })) || String(s).slice(8, 10) + '/' + String(s).slice(5, 7) + '/' + String(s).slice(0, 4) : '—';
+U.fmtDS = s => s ? (XL() && IDT(s, { day: 'numeric', month: 'short' })) || +String(s).slice(8, 10) + ' ' + U.MES[+String(s).slice(5, 7) - 1] : '—';
 U.fmtYM = ym => ym ? U.MES[+ym.slice(5, 7) - 1] + ' ' + ym.slice(2, 4) : '—';
 U.fmtYML = ym => ym ? U.MESL[+ym.slice(5, 7) - 1] + ' ' + ym.slice(0, 4) : '—';
-U.longDate = s => { const d = U.parse(s); return U.WD[d.getDay()] + ', ' + d.getDate() + ' de ' + U.MESL[d.getMonth()]; };
+U.longDate = s => { const d = U.parse(s); if (XL()) { const t = IDT(s, { weekday: 'long', day: 'numeric', month: 'long' }); if (t) return t.charAt(0).toUpperCase() + t.slice(1); } return U.WD[d.getDay()] + ', ' + d.getDate() + ' de ' + U.MESL[d.getMonth()]; };
 U.rel = s => { if (!s) return '—'; const d = U.diff(s, U.today()); if (d === 0) return 'hoje'; if (d === 1) return 'amanhã'; if (d === -1) return 'ontem'; return d > 0 ? 'em ' + d + ' dias' : 'há ' + (-d) + ' dias'; };
 U.esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 U.num = v => { const n = typeof v === 'string' ? parseFloat(v.replace(',', '.')) : Number(v); return isFinite(n) ? n : 0; };
@@ -37,13 +40,19 @@ U.avg = (a, f = x => x) => AR(a).length ? U.sum(a, f) / a.length : 0;
 U.r1 = v => Math.round(v * 10) / 10;
 U.r2 = v => Math.round(v * 100) / 100;
 U.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-U.nf = (v, d = 0) => (Number(v) || 0).toLocaleString('pt-PT', { minimumFractionDigits: d, maximumFractionDigits: d });
-U.eur = (v, o = {}) => { const n = Number(v) || 0; const s = (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + '€ ' + Math.abs(n).toLocaleString('pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); return s; };
+const LC = () => (OS.loc ? OS.loc() : 'pt-PT');   // formato de números e datas (português de Portugal, salvo noutra língua/país)
+U.nf = (v, d = 0) => (Number(v) || 0).toLocaleString(LC(), { minimumFractionDigits: d, maximumFractionDigits: d });
+// valor na moeda principal do perfil (euros para quem não escolheu outra)
+const curFmt = (n, cur, d) => { try { return new Intl.NumberFormat(LC(), { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol', minimumFractionDigits: d, maximumFractionDigits: d }).format(n); } catch (e) { return cur + ' ' + n.toFixed(d); } };
+U.eur = (v, o = {}) => { const n = Number(v) || 0, d = o.dec ?? 2, B = OS.cur ? OS.cur() : 'EUR', L = LC(); const pre = (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '');
+  if (B === 'EUR' && L === 'pt-PT') return pre + '€ ' + Math.abs(n).toLocaleString('pt-PT', { minimumFractionDigits: d, maximumFractionDigits: d });
+  return pre + curFmt(Math.abs(n), B, d); };
 // valor numa moeda qualquer (contas em reais, dólares…): símbolo + número como no resto da app
 U.SYM = { EUR: '€', BRL: 'R$', USD: 'US$', GBP: '£', CHF: 'CHF', JPY: '¥', CAD: 'C$', AUD: 'A$' };
-U.money = (v, cur = 'EUR', o = {}) => { if (!cur || cur === 'EUR') return U.eur(v, o); const n = Number(v) || 0; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + (U.SYM[cur] || cur) + ' ' + Math.abs(n).toLocaleString(cur === 'BRL' ? 'pt-BR' : 'pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); };
-U.eurK = v => { const a = Math.abs(v); if (a >= 1e6) return (v < 0 ? '−' : '') + '€' + U.r1(a / 1e6) + 'M'; if (a >= 1e4) return (v < 0 ? '−' : '') + '€' + Math.round(a / 1e3) + 'k'; return (v < 0 ? '−' : '') + '€' + Math.round(a); };
-U.pct = (v, d = 0) => (isFinite(v) ? (v * 100).toLocaleString('pt-PT', { maximumFractionDigits: d, minimumFractionDigits: d }) : '0') + '%';
+U.money = (v, cur = 'EUR', o = {}) => { const B = OS.cur ? OS.cur() : 'EUR'; if (!cur || cur === B) return U.eur(v, o); if (cur === 'EUR' && LC() === 'pt-PT') { const n = Number(v) || 0; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + '€ ' + Math.abs(n).toLocaleString('pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); } const n = Number(v) || 0; if (!/^pt/.test(LC())) return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + curFmt(Math.abs(n), cur, o.dec ?? 2); return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + (U.SYM[cur] || cur) + ' ' + Math.abs(n).toLocaleString(cur === 'BRL' ? 'pt-BR' : 'pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); };
+U.curSym = (cur = OS.cur ? OS.cur() : 'EUR') => { if (cur === 'EUR') return '€'; try { return (new Intl.NumberFormat(LC(), { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol' }).formatToParts(0).find(p => p.type === 'currency') || {}).value || cur; } catch (e) { return cur; } };
+U.eurK = v => { const a = Math.abs(v), s = U.curSym(); if (a >= 1e6) return (v < 0 ? '−' : '') + s + U.r1(a / 1e6) + 'M'; if (a >= 1e4) return (v < 0 ? '−' : '') + s + Math.round(a / 1e3) + 'k'; return (v < 0 ? '−' : '') + s + Math.round(a); };
+U.pct = (v, d = 0) => (isFinite(v) ? (v * 100).toLocaleString(LC(), { maximumFractionDigits: d, minimumFractionDigits: d }) : '0') + '%';
 U.mmss = sec => { sec = Math.round(sec || 0); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60; return (h ? h + ':' + U.pad(m) : m) + ':' + U.pad(s); };
 U.parseDur = str => { if (str == null || str === '') return 0; if (typeof str === 'number') return str; const p = String(str).trim().split(':').map(Number); if (p.some(isNaN)) return 0; return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p.length === 2 ? p[0] * 60 + p[1] : p[0] * 60; };
 U.hm = (d = new Date()) => U.pad(d.getHours()) + ':' + U.pad(d.getMinutes());

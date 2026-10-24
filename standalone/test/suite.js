@@ -15,7 +15,7 @@ let OFFLINE = false, GSFAIL = 0, SLOWIDX = 0, FAILP = '';
 // os mesmos cabeçalhos de segurança do Vercel (CSP incluída), para os testes apanharem o que ela bloquearia; o Apps Script simulado está em http://127.0.0.1
 const SECH = (() => { try { const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')), all = v.headers.find(h => h.source === '/(.*)'), o = {}; all.headers.forEach(h => { o[h.key] = h.key === 'Content-Security-Policy' ? h.value.replace("connect-src 'self'", `connect-src 'self' http://127.0.0.1:${PORT}`) : h.value; }); delete o['Strict-Transport-Security']; return o; } catch (e) { return {}; } })();
 // servidor das contas para os testes: pasta temporária em vez do Vercel Blob (apagada no fim)
-const ACCDIR = fs.mkdtempSync(path.join(require('os').tmpdir(), 'nautilo-contas-')); process.env.NAUTILO_STORE_DIR = ACCDIR; process.env.NAUTILO_ADMIN = 'ana@exemplo.pt'; process.env.NAUTILO_IA_LIVRE = 'http://localhost:' + PORT + '/iamock'; delete process.env.GEMINI_API_KEY; process.env.NAUTILO_CACHE_MS = '0'; process.env.NAUTILO_RSS_BASE = 'http://localhost:' + PORT + '/rssmock'; delete process.env.BLOB_READ_WRITE_TOKEN;
+const ACCDIR = fs.mkdtempSync(path.join(require('os').tmpdir(), 'nautilo-contas-')); process.env.NAUTILO_STORE_DIR = ACCDIR; process.env.NAUTILO_ADMIN = 'ana@exemplo.pt'; process.env.NAUTILO_IA_LIVRE = 'http://localhost:' + PORT + '/iamock'; process.env.NAUTILO_STRINGS = path.join(ROOT, 'i18n/strings.json'); delete process.env.GEMINI_API_KEY; process.env.NAUTILO_CACHE_MS = '0'; process.env.NAUTILO_RSS_BASE = 'http://localhost:' + PORT + '/rssmock'; delete process.env.BLOB_READ_WRITE_TOKEN;
 Object.assign(process.env, { GOOGLE_CLIENT_SECRET: 'teste-segredo', GOOGLE_REDIRECT: BASE + 'api/google', GOOGLE_AUTH_URL: 'http://localhost:' + PORT + '/gmock/auth', GOOGLE_TOKEN_URL: 'http://localhost:' + PORT + '/gmock/token', GOOGLE_REVOKE_URL: 'http://localhost:' + PORT + '/gmock/revoke', GOOGLE_API: 'http://localhost:' + PORT + '/gmock/api/' }); delete process.env.GOOGLE_CLIENT_ID;
 process.on('exit', () => { try { fs.rmSync(ACCDIR, { recursive: true, force: true }); } catch (e) { } });
 const ACCFN = {}; const ACCAPI = n => { if (!(n in ACCFN)) { try { ACCFN[n] = require(path.join(ROOT, 'api', n + '.js')); } catch (e) { ACCFN[n] = null; } } return ACCFN[n]; };
@@ -64,7 +64,9 @@ const srv = http.createServer((req, res) => {
       INBOX.push({ id: crypto.randomUUID(), t: new Date().toISOString(), v, d: q.d || '', c: q.c || '' }); out('✓ registado', 1); });
     return; }
   if (u.pathname === '/iamock') { let body = ''; req.on('data', c => body += c); req.on('end', () => { let j = {}; try { j = JSON.parse(body); } catch (e) { } IAMOCK.push(j); const json = j.response_format && j.response_format.type === 'json_object';
-      const tx = JSON.stringify(j.messages || ''), out = json && /disciplinas/.test(tx) ? '{"disciplinas":["Cálculo I","Contabilidade Geral","Microeconomia","Introdução ao Direito","Matemática Financeira"]}' : json && /mestre de jogo/.test(tx) ? '{"int":["Ler 6 livros de gestão este ano"],"for":["Juntar 1500 até ao verão"],"cor":["Fazer 10 elevações seguidas"],"inf":["Jantar com a família todos os domingos"],"esp":["Escrever 3 gratidões por dia durante 30 dias"]}' : json ? '{"ok":true,"resposta":"feito"}' : 'Olá! Aqui é a tua IA.';
+      const tx = JSON.stringify(j.messages || ''), trl = /You translate the user interface of/.test(tx) && (tx.match(/Target language: [^(]*\(([^)]+)\)/) || [])[1];
+      if (trl) { let inp = {}; try { inp = JSON.parse(j.messages[1].content); } catch (e) { } const o = {}; Object.entries(inp).forEach(([k, v]) => { o[k] = trl + ': ' + v; }); res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: JSON.stringify(o) } }] })); }
+      const out = json && /disciplinas/.test(tx) ? '{"disciplinas":["Cálculo I","Contabilidade Geral","Microeconomia","Introdução ao Direito","Matemática Financeira"]}' : json && /mestre de jogo/.test(tx) ? '{"int":["Ler 6 livros de gestão este ano"],"for":["Juntar 1500 até ao verão"],"cor":["Fazer 10 elevações seguidas"],"inf":["Jantar com a família todos os domingos"],"esp":["Escrever 3 gratidões por dia durante 30 dias"]}' : json ? '{"ok":true,"resposta":"feito"}' : 'Olá! Aqui é a tua IA.';
       res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: out } }] })); }); return; }
   // Google simulado (OAuth, Gmail e Calendar) para api/google
   if (u.pathname.startsWith('/gmock/')) { let body = ''; req.on('data', c => body += c); req.on('end', () => GM.handle(req, res, u, body)); return; }
@@ -72,7 +74,7 @@ const srv = http.createServer((req, res) => {
   // contas: as funções do servidor a sério (api/conta.js e api/dados.js), com uma pasta temporária no lugar do Vercel Blob
   if (u.pathname.startsWith('/rssmock/')) { const q = u.query.q || '', n = (k) => `<item><title>${k} - Jornal Teste</title><link>https://exemplo.pt/${encodeURIComponent(k)}</link><pubDate>${new Date().toUTCString()}</pubDate><source url="https://exemplo.pt">Jornal Teste</source><description></description></item>`;
     res.writeHead(200, { 'Content-Type': 'application/rss+xml' }); return res.end(`<?xml version="1.0"?><rss><channel>${[1, 2, 3].map(i => n((q ? 'Pesquisa ' : 'Notícia da conta ') + i)).join('')}</channel></rss>`); }
-  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias|ia|google)$/);
+  const am = u.pathname.match(/^\/Oceanum\/api\/(conta|dados|atalho|noticias|ia|google|lingua)$/);
   if (am) { const fn = ACCAPI(am[1]); if (!fn) { res.writeHead(404); return res.end(); } req.query = u.query;
     if (process.env.DEBUGAPI) { const t0 = Date.now(), id = Math.random().toString(36).slice(2, 7); let op = ''; const oe = req.emit; req.emit = function (ev, ch) { if (ev === 'data' && !op) op = String(ch).slice(0, 40); return oe.apply(this, arguments); };
       INFL.set(id, () => am[1] + ' ' + op + ' ' + (Date.now() - t0) + 'ms'); res.on('finish', () => { INFL.delete(id); if (Date.now() - t0 > 2500) console.log('    [api lenta]', am[1], op, Date.now() - t0, 'ms'); }); }
@@ -86,11 +88,11 @@ const srv = http.createServer((req, res) => {
 });
 
 const PROFILES = [
-  { id: 'iPhone', o: { viewport: { width: 393, height: 852 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' } },
-  { id: 'Android tel', o: { viewport: { width: 412, height: 915 }, deviceScaleFactor: 2.6, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Mobile Safari/537.36' } },
-  { id: 'Tablet horiz', o: { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-X210) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36' }, slow: 6 },
-  { id: 'Tablet vert', o: { viewport: { width: 800, height: 1280 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-X210) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36' } },
-  { id: 'Computador', o: { viewport: { width: 1440, height: 900 } } }];
+  { id: 'iPhone', o: { locale: 'pt-PT', viewport: { width: 393, height: 852 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' } },
+  { id: 'Android tel', o: { locale: 'pt-PT', viewport: { width: 412, height: 915 }, deviceScaleFactor: 2.6, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Mobile Safari/537.36' } },
+  { id: 'Tablet horiz', o: { locale: 'pt-PT', viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-X210) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36' }, slow: 6 },
+  { id: 'Tablet vert', o: { locale: 'pt-PT', viewport: { width: 800, height: 1280 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-X210) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36' } },
+  { id: 'Computador', o: { locale: 'pt-PT', viewport: { width: 1440, height: 900 } } }];
 
 const R = []; let cur = '';
 const ok = (name, pass, info = '') => { R.push({ p: cur, name, pass, info }); console.log(`${pass ? '  ✓' : '  ✗'} [${cur}] ${name}${info ? ' — ' + info : ''}`); };
@@ -2370,7 +2372,7 @@ async function onbTests(b) { cur = 'Boas-vindas'; console.log('\n=== Vamos conhe
   await C(p, '[data-oc=est][data-v=uni]'); await F(p, '[data-ok=inst]', 'UFMG'); await F(p, '[data-ok=curso]', 'Administração'); await C(p, '[data-oc=ano][data-v="1"]'); await C(p, '[data-act=onbSug]');
   await p.waitForFunction(() => /Cálculo I/.test((document.querySelector('#onb [data-ok=subs]') || {}).value || ''), null, { timeout: 10000 }).catch(() => { });
   ok('Estudos: "Sugerir as disciplinas com IA" preenche as disciplinas do curso', await E(p, () => (document.querySelector('#onb [data-ok=subs]').value.match(/\n/g) || []).length >= 4));
-  await next(p); ok('Sem a área Carreira, salta a pergunta do trabalho', await E(p, () => /O teu corpo/.test(document.querySelector('#onb h1').textContent)));
+  await next(p); ok('Sem a área Carreira, salta a pergunta do trabalho (e, por ser do Brasil, já em português do Brasil)', await E(p, () => OS.Lang.code() === 'pt-BR' && document.querySelector('#onb h1').textContent.includes(OS.Lang.t('O teu corpo')) && OS.Lang.t('O teu corpo') !== 'O teu corpo'), await E(p, () => OS.Lang.code() + ' ' + document.querySelector('#onb h1').textContent));
   await C(p, '[data-oc=obj][data-v=cut]'); await C(p, '[data-oc=dias][data-v="3"]'); await C(p, '[data-oc=onde][data-v=gym]'); await C(p, '[data-om=desp][data-v=corrida]'); await C(p, '[data-om=desp][data-v=voleibol]');
   await F(p, '[data-ok=peso]', '68'); await F(p, '[data-ok=altura]', '165'); await F(p, '[data-ok=idade]', '21'); await C(p, '[data-oc=sexo][data-v=F]'); await next(p);
   await C(p, '[data-om=dinh][data-v=reserva]'); await next(p);
@@ -2397,7 +2399,7 @@ async function onbTests(b) { cur = 'Boas-vindas'; console.log('\n=== Vamos conhe
   ok('Menu: sem Fé nem Carreira (escondidas), com o resto', !nav.includes('#fe') && !nav.includes('#carreira') && !nav.includes('#trabalho') && nav.includes('#universidade') && nav.includes('#treino'));
   // abas outra vez: Definições › Geral e Explorar
   await E(p, () => { location.hash = 'definicoes'; }); await sleep(500); await E(p, () => document.querySelector('#onbSet [data-act=onbAreas]').click()); await sleep(200);
-  ok('Definições › Geral: "O teu Prumo" abre só as abas do menu', await E(p, () => /O que queres no teu Prumo/.test(document.querySelector('#onb h1').textContent) && !!document.querySelector('#onb [data-onb=guardarAreas]')));
+  ok('Definições › Geral: "O teu Prumo" abre só as abas do menu', await E(p, () => document.querySelector('#onb h1').textContent.includes(OS.Lang.t('O que queres no teu Prumo?')) && !!document.querySelector('#onb [data-onb=guardarAreas]')));
   await C(p, '[data-oa=fe]'); await C(p, '[data-onb=guardarAreas]'); await sleep(400);
   ok('Pôr a Fé de volta no menu', await E(p, () => !!document.querySelector('#side a[href="#fe"]') && !OS.one('areas').hide.includes('fe')));
   await E(p, () => { location.hash = 'explorar'; }); await sleep(500); await E(p, () => { const b = document.querySelector('[data-act=areaOn][data-k=trabalho]'); b && b.click(); }); await sleep(400);
@@ -2421,6 +2423,114 @@ async function onbTests(b) { cur = 'Boas-vindas'; console.log('\n=== Vamos conhe
   ok('Perfil do Ryan (ps): sem questionário', await E(Cc.p, () => !document.querySelector('#onb:not([hidden]) .onb-body') && !(OS.Acc && OS.Acc.pub)));
   await Cc.ctx.close();
   ok('sem erros de JavaScript', !A.errs.concat(B.errs, Cc.errs).length, A.errs.concat(B.errs, Cc.errs).slice(0, 3).join(' | ')); }
+async function fundoTests(b) { cur = 'Fundo'; console.log('\n=== Ecrã de entrada: fundo à escolha, texto no sítio, avatar do Dominus ===');
+  const prof = PROFILES[0], ip = () => '10.' + [1, 2, 3].map(() => crypto.randomBytes(1)[0]).join('.');
+  const x = ip(), call = (body, tok) => fetch(BASE + 'api/conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json', origin: 'http://localhost:' + PORT, 'x-forwarded-for': x }, tok ? { authorization: 'Bearer ' + tok } : {}), body: JSON.stringify(body) }).then(r => r.json());
+  const email = 'f' + crypto.randomBytes(6).toString('hex') + '@teste.pt', r = await call({ op: 'registar', email, senha: 'segredo123', termos: TERMOS_V, saude: true, idade: true }), q = await call({ op: 'perfil', acao: 'criar', perfil: { nome: 'Rita', lk: HASH } }, r.token);
+  const init = { 'nau:s': JSON.stringify({ t: r.token, e: email, n: '', perfis: q.conta.perfis }), 'nau:p': JSON.stringify(q.perfil.id), 'nau:pd': JSON.stringify(q.perfil.id), 'nau:owner': JSON.stringify(email) };
+  // tablet deitado (como no Android do Ryan)
+  const T = Object.assign({}, prof, { o: { viewport: { width: 1000, height: 625 }, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36' } });
+  const k = await newPage(b, T, init); const p = k.p; await p.addInitScript(() => { window.__noOnb = 1; }); await p.goto(BASE);
+  await p.waitForSelector('#lkCode', { state: 'visible', timeout: 12000 }); await sleep(700);
+  const lay = await E(p, () => { const g = s => document.querySelector(s).getBoundingClientRect(); return { q: g('.lk-q'), f: g('#lkForm'), bg: g('#lkBg'), H: innerHeight, W: innerWidth }; });
+  ok('Tablet deitado: a frase fica no céu (acima do horizonte) e o código em baixo, sem se sobreporem', lay.q.bottom < lay.H * .6 && lay.f.top > lay.q.bottom + 40 && lay.f.bottom <= lay.H, JSON.stringify({ q: Math.round(lay.q.bottom), f: Math.round(lay.f.top), H: lay.H }));
+  ok('Botão "Fundo" pequeno no canto de cima', lay.bg.width < 140 && lay.bg.top < 40 && lay.bg.right > lay.W - 40, JSON.stringify(lay.bg));
+  await p.tap('#lkBg'); await p.waitForSelector('#fdSheet');
+  const sh = await E(p, () => ({ n: document.querySelectorAll('#fdSheet [data-fd]:not([data-fd=x])').length, gal: !!document.querySelector('#fdSheet .fd-gal input[type=file]'), on: (document.querySelector('#fdSheet .fd-t.on') || {}).dataset.fd, mv: !!(document.querySelector('#fdSheet [data-fdmv]') || {}).checked }));
+  ok('Escolher o fundo: 10 modelos (o Farol marcado), "Fundo animado" ligado e "Da galeria"', sh.n === 10 && sh.gal && sh.on === 'farol' && sh.mv, JSON.stringify(sh));
+  await p.tap('#fdSheet [data-fd=ondas]'); await sleep(250);
+  const mv = await E(p, () => { let n = 0; document.querySelectorAll('#splash .lk-scene *').forEach(e => { const cs = getComputedStyle(e); if (cs.animationName !== 'none' && cs.animationIterationCount === 'infinite') n++; }); return { n, anim: !!document.querySelector('#splash .lk-scene svg.fd-anim') }; });
+  await p.tap('#fdSheet .fd-mv .fd-sw'); await sleep(250);
+  const st = await E(p, () => ({ anim: !!document.querySelector('#splash .lk-scene svg.fd-anim'), k: OS.Fundo.anim() }));
+  ok('Fundo animado: as ondas mexem; ao desligar, ficam paradas', mv.anim && mv.n >= 4 && !st.anim && !st.k, JSON.stringify({ mv, st }));
+  await p.tap('#fdSheet .fd-mv .fd-sw'); await sleep(150);
+  await p.tap('#fdSheet [data-fd=cidade]'); await sleep(200); await p.tap('#fdSheet [data-fd=x]'); await sleep(200);
+  ok('Escolher "Cidade" muda o fundo na hora', await E(p, () => OS.Fundo.get() === 'cidade' && !document.getElementById('fdSheet') && document.querySelectorAll('.lk-scene svg rect').length > 40));
+  const png = 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGNk+M/AwMDAxMDAwMDAAAAhGQIBvZqP7QAAAABJRU5ErkJggg==';
+  await p.tap('#lkBg'); await p.waitForSelector('#fdSheet'); await p.setInputFiles('#fdSheet .fd-file', { name: 'praia.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') }); await sleep(1200);
+  ok('Foto da galeria vira o fundo', await E(p, () => OS.Fundo.get() === 'foto' && !!document.querySelector('.lk-scene .fd-photo')));
+  await p.keyboard.press('Escape'); await p.reload(); await p.waitForSelector('#lkCode', { state: 'visible', timeout: 12000 }); await sleep(1200);
+  ok('Depois de fechar e abrir, o fundo escolhido continua', await E(p, () => OS.Fundo.get() === 'foto' && !!document.querySelector('.lk-scene .fd-photo')));
+  // editar o perfil no ecrã da conta: "Personagem do Dominus" não abre a galeria de fotos; o formulário dá para subir
+  await p.tap('#lkSw'); await p.waitForSelector('#acc [data-ac=gerir]'); await p.tap('#acc [data-ac=gerir]'); await p.tap('#acc .ac-p[data-ac=editar]'); await p.waitForSelector('#acc [data-acx=dom]');
+  const hit = await E(p, () => { const d = document.querySelector('#acc [data-acx=dom]'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(), e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return e === d || d.contains(e); });
+  let chooser = false; p.on('filechooser', () => { chooser = true; }); await p.tap('#acc [data-acx=dom]'); await sleep(500);
+  ok('Editar perfil: "Personagem do Dominus" abre os personagens (e não a galeria de fotos)', hit && !chooser && await E(p, () => { const g = document.querySelector('#acc .ac-domg'); return !g.hidden && g.querySelectorAll('[data-acx=pick]').length > 8; }));
+  ok('Editar perfil: com a lista aberta dá para subir até ao topo do formulário', await E(p, () => { const a = document.getElementById('acc'); a.scrollTop = 0; const t = document.querySelector('#acc form h2').getBoundingClientRect().top; return a.scrollHeight > a.clientHeight && t >= 0; }));
+  ok('sem erros de JavaScript', !k.errs.length, k.errs.slice(0, 3).join(' | ')); await k.ctx.close(); }
+async function vivoTests(b) { cur = 'Movimento'; console.log('\n=== App mais vivo: animações e a voz da IA ===');
+  const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.addInitScript(() => { localStorage.setItem('os2anim', JSON.stringify('full')); }); await p.goto(BASE); await unlock(p);
+  await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close && OS.Spyke.close(); OS.add('accounts', { name: 'Conta viva', type: 'Conta à ordem', currency: 'EUR', opening: 4321.5, openDate: OS.U.today() }); location.hash = 'financas'; });
+  await sleep(120); const mid = await E(p, () => ({ pg: document.getElementById('view').classList.contains('pg-in'), cls: document.documentElement.className, v: [...document.querySelectorAll('#view .kpi-v')].map(e => e.textContent).join('|') }));
+  await sleep(1800); const end = await E(p, () => ({ pg: document.getElementById('view').classList.contains('pg-in'), v: [...document.querySelectorAll('#view .kpi-v')].map(e => e.textContent).join('|') }));
+  ok('Abrir uma página: os blocos entram com movimento (e a animação acaba)', mid.pg && /\bvv-full\b/.test(mid.cls) && !end.pg, JSON.stringify({ mid: mid.pg, end: end.pg }));
+  ok('Os números contam até ao valor certo', mid.v !== end.v && /4[\s\u00a0\u202f.]?321,50/.test(end.v), end.v.slice(0, 120));
+  const inf = await E(p, () => { let n = 0; document.querySelectorAll('*').forEach(e => { const cs = getComputedStyle(e); if (cs.animationName !== 'none' && cs.animationIterationCount === 'infinite') n++; }); return n; });
+  ok('Dentro do app nada fica a mexer para sempre (bateria)', inf === 0, String(inf));
+  await E(p, () => location.hash = 'definicoes'); await sleep(600); await E(p, () => { const b = document.querySelector('#animSet [data-act=vivoSet][data-v=off]'); b && b.click(); }); await sleep(200);
+  await E(p, () => location.hash = 'hoje'); await sleep(150);
+  ok('Animações desligadas em Definições: as páginas abrem sem movimento', await E(p, () => !document.getElementById('view').classList.contains('pg-in') && !document.documentElement.classList.contains('vv')));
+  // a voz da tua IA: as 30 vozes do Google para ouvir e escolher
+  await E(p, () => { OS.AI.gkey = () => 'k'; OS.Spyke.say = (t, o) => { window.__said = [t, o && o.eng, OS.one('spyke').voice]; }; location.hash = 'definicoes.spyke'; }); await sleep(800);
+  const vz = await E(p, () => ({ n: document.querySelectorAll('#spyVoz [data-act=spyVoz]').length, f: document.querySelectorAll('#spyVoz [data-act=spyVoz] .spy-vi').length }));
+  await E(p, () => { const b = document.querySelector('#spyVoz [data-act=spyVg][data-v=F]'); b && b.click(); }); await sleep(300);
+  const fem = await E(p, () => [...document.querySelectorAll('#spyVoz [data-act=spyVoz] .spy-vi')].every(x => x.textContent === '♀') && document.querySelectorAll('#spyVoz [data-act=spyVoz]').length === 14);
+  await E(p, () => { const b = document.querySelector('#spyVoz [data-act=spyVoz][data-v=Kore]'); b && b.click(); }); await sleep(300);
+  const ch = await E(p, () => ({ v: OS.one('spyke').voice, e: OS.one('spyke').eng, said: window.__said, on: !!document.querySelector('#spyVoz [data-v=Kore].on') }));
+  ok('A voz da IA: 30 vozes (filtro de femininas), tocar ouve e escolhe', vz.n === 30 && fem && ch.v === 'Kore' && ch.e === 'gemini' && ch.said && ch.said[2] === 'Kore' && ch.on, JSON.stringify({ vz, fem, ch }));
+  ok('sem erros de JavaScript', !errs.length, errs.slice(0, 3).join(' | ')); await ctx.close(); }
+async function linguasTests(b) { cur = 'Línguas'; console.log('\n=== Países e línguas: o Prumo para qualquer país do mundo ===');
+  const ip = () => '10.' + [1, 2, 3].map(() => crypto.randomBytes(1)[0]).join('.'), x = ip(), call = (body, tok) => fetch(BASE + 'api/conta', { method: 'POST', headers: Object.assign({ 'content-type': 'application/json', origin: 'http://localhost:' + PORT, 'x-forwarded-for': x }, tok ? { authorization: 'Bearer ' + tok } : {}), body: JSON.stringify(body) }).then(r => r.json());
+  const email = 'l' + crypto.randomBytes(6).toString('hex') + '@teste.pt', r = await call({ op: 'registar', email, senha: 'segredo123', termos: TERMOS_V, saude: true, idade: true }), q = await call({ op: 'perfil', acao: 'criar', perfil: { nome: 'Sam', lk: HASH } }, r.token);
+  const init = { 'nau:s': JSON.stringify({ t: r.token, e: email, n: '', perfis: q.conta.perfis }), 'nau:p': JSON.stringify(q.perfil.id), 'nau:pd': JSON.stringify(q.perfil.id), 'nau:owner': JSON.stringify(email) };
+  const k = await newPage(b, PROFILES[0], init), p = k.p; await p.addInitScript(() => { window.__noOnb = 1; window.__noAsk = 1; });
+  let ai = ''; await p.route('https://generativelanguage.googleapis.com/**', rt => { ai = rt.request().postData() || ''; rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: '{"ok":1}' }] } }] }) }); });
+  await p.route('https://date.nager.at/**', rt => rt.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ date: '2026-07-04', localName: 'Independence Day', name: 'Independence Day', global: true, types: ['Public'] }]) }));
+  await p.goto(BASE); await unlock(p);
+  if (!(await E(p, () => !!(window.OS && OS.Lang)))) { console.log('     (as línguas ainda não estão ligadas nesta versão)'); await k.ctx.close(); return; }
+  const EN = await E(p, async () => (await (await fetch('i18n/en.json')).json()).m || {});
+  ok('Dicionários das línguas principais vêm com o app (inglês com mais de 15 mil textos)', Object.keys(EN).length > 15000, String(Object.keys(EN).length));
+  await E(p, () => { OS.setOne('profile', { country: 'US' }); location.hash = 'financas'; }); await p.waitForFunction(() => OS.Lang.code() === 'en' && OS.Lang.ready, null, { timeout: 10000 }).catch(() => { }); await sleep(900);
+  const us = await E(p, () => ({ lang: OS.Lang.code(), h1: (document.querySelector('#view h1') || {}).textContent, cur: OS.cur(), eur: OS.U.eur(1234.5), date: OS.U.longDate('2026-10-24'), d: OS.U.fmtD('2026-10-24'), g: OS.Grade.label(), html: document.documentElement.lang }));
+  ok('Estados Unidos: o app passa a inglês (títulos traduzidos)', us.lang === 'en' && us.html === 'en' && us.h1 === EN['Finanças'] && us.h1 !== 'Finanças', JSON.stringify({ h1: us.h1, want: EN['Finanças'] }));
+  ok('Estados Unidos: dólares, datas e números à americana, notas de 0 a 100', us.cur === 'USD' && us.eur === '$1,234.50' && us.date === 'Saturday, October 24' && us.d === '10/24/2026' && us.g === '0–100', JSON.stringify(us));
+  // frases com valores, ícones, plurais e contagens; o que não é do app (um versículo, nomes escritos pela pessoa) fica como está
+  const tt = await E(p, () => { const t = OS.Lang.t, v = '“Dai, e será vos dado; medida boa, comprimida, sacudida e transbordante vos darão no vosso colo; pois com a mesma medida que medirdes vos medirão de volta.”';
+    return { plural: t('Fazer mais 4 treinos esta semana'), um: t('Fazer mais 1 treino esta semana'), icone: t('Animações'), conta: t('2 de 3'), par: t('Concluído (3)'), ponto: t('Experiência · 40%'), verso: t(v) === v, casa: t('Casa de praia'), prova: t('Prova de Matemática'), com: t('comprimida') }; });
+  ok('Traduz frases com números, plurais, ícones e contagens, sem mexer no que a pessoa escreveu', /4/.test(tt.plural) && !/treinos/.test(tt.plural) && !/treino/.test(tt.um) && tt.icone !== 'Animações' && !/[{}]/.test(tt.icone) && tt.conta === '2 of 3' && /\(3\)$/.test(tt.par) && !/Concluído/.test(tt.par) && /· 40%$/.test(tt.ponto) && !/Experiência/.test(tt.ponto) && tt.verso && tt.casa === 'Casa de praia' && tt.prova === 'Prova de Matemática' && tt.com === 'comprimida', JSON.stringify(tt));
+  ok('Saudação na língua da pessoa ("Good …, Sam")', await E(p, () => { location.hash = 'visao'; return new Promise(r => setTimeout(() => r((document.querySelector('#view h1') || {}).textContent || ''), 700)); }).then(h => /^Good (morning|afternoon|evening|night)|^Hello/i.test(h) || !/^(Bom dia|Boa tarde|Boa noite|Boa madrugada)/.test(h)));
+  await E(p, () => OS.Pais.holidays('US', 2026)); await sleep(500);
+  ok('Feriados de qualquer país (4 de julho nos EUA)', await E(p, () => OS.Att.holiday('2026-07-04')) === 'Independence Day');
+  // quanto do ecrã fica por traduzir nas páginas principais
+  const left = []; for (const h of ['visao', 'hoje', 'financas', 'habitos', 'tarefas', 'definicoes']) { await E(p, h => location.hash = h, h); await sleep(700);
+    const L = await E(p, () => { const out = [], it = document.createTreeWalker(document.getElementById('view'), NodeFilter.SHOW_TEXT); let n; while ((n = it.nextNode())) { const t = n.data.trim(); if (t.length > 3 && /[ãõçáéíóúâêô]|\b(de|para|com|não|uma|os|as|teu|tua)\b/i.test(t) && n.parentElement && !n.parentElement.closest('[data-notr],textarea,script,style') && n.parentElement.offsetParent !== null) out.push(t.slice(0, 60)); } return out; }); left.push(...L.map(t => h + ': ' + t)); }
+  console.log('     por traduzir (amostra):', left.slice(0, 12).join(' | '));
+  ok('Páginas principais em inglês quase sem português à vista', left.length <= 25, left.length + ' textos');
+  await E(p, () => fetch('https://generativelanguage.googleapis.com/v1beta/models/x:generateContent?key=k', { method: 'POST', body: JSON.stringify({ contents: [{ parts: [{ text: 'olá' }] }] }) })); await sleep(300);
+  ok('A IA responde na língua da pessoa', /IMPORTANT — LANGUAGE[\s\S]*English/.test(ai));
+  // Definições: mudar a língua à mão
+  await E(p, () => location.hash = 'definicoes'); await sleep(700);
+  const ES = await E(p, async () => (await (await fetch('i18n/es.json')).json()).m || {});
+  await E(p, () => { const s = document.querySelector('#paisSet [data-pset=lang]'); s.value = 'es'; s.dispatchEvent(new Event('change', { bubbles: true })); }); await p.waitForFunction(() => OS.Lang.code() === 'es', null, { timeout: 8000 }).catch(() => { }); await E(p, () => location.hash = 'financas'); await sleep(900);
+  ok('Definições › País, língua e moeda: escolher espanhol traduz tudo', await E(p, () => OS.Lang.code()) === 'es' && await E(p, () => (document.querySelector('#view h1') || {}).textContent) === ES['Finanças']);
+  // Brasil: português do Brasil e reais
+  await E(p, () => OS.setOne('profile', { country: 'BR', lang: '' })); await p.waitForFunction(() => OS.Lang.code() === 'pt-BR', null, { timeout: 8000 }).catch(() => { }); await sleep(600);
+  ok('Brasil: português do Brasil e reais', await E(p, () => OS.Lang.code() === 'pt-BR' && OS.cur() === 'BRL' && /^R\$\s1\.234,50$/.test(OS.U.eur(1234.5))), await E(p, () => OS.Lang.code() + ' ' + OS.U.eur(1234.5)));
+  // língua sem dicionário no app: o servidor prepara-a com a IA, aos poucos
+  const ja = await (await fetch(BASE + 'api/lingua?l=ja', { headers: { origin: 'http://localhost:' + PORT } })).json();
+  const pj = await (await fetch(BASE + 'api/lingua', { method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://localhost:' + PORT, authorization: 'Bearer ' + r.token }, body: JSON.stringify({ op: 'preparar', l: 'ja' }) })).json();
+  ok('Outra língua qualquer (japonês): a IA do servidor prepara o dicionário aos poucos', ja.ok && !ja.completo && pj.ok && pj.feito > 0 && pj.total === ja.total, JSON.stringify({ t: ja.total, f: pj.feito }));
+  ok('sem erros de JavaScript', !k.errs.length, k.errs.slice(0, 3).join(' | ')); await k.ctx.close();
+  // o perfil pessoal do Ryan fica sempre em português de Portugal e euros
+  const R = await newPage(b, PROFILES[0], await mkAcc()); await R.p.addInitScript(() => { Object.defineProperty(navigator, 'language', { get: () => 'en-US' }); }); await R.p.goto(BASE); await unlock(R.p); await sleep(800);
+  ok('Perfil do Ryan: português de Portugal e euros (mesmo num aparelho em inglês)', await E(R.p, () => OS.Lang.code() === 'pt-PT' && OS.cur() === 'EUR' && OS.U.eur(10) === '€ 10,00'));
+  await R.ctx.close();
+  // aparelho novo em inglês ou do Brasil: o ecrã de criar conta já abre nessa língua
+  for (const [loc, want] of [['en-US', 'en'], ['pt-BR', 'pt-BR']]) { const ctx = await b.newContext(Object.assign({}, PROFILES[0].o, { locale: loc })), q = await ctx.newPage(), er = []; q.on('pageerror', e => er.push(e.message));
+    await q.addInitScript(() => { window.__noAsk = 1; window.__noOnb = 1; }); await q.goto(BASE); await q.waitForSelector('#acc .ac-tabs', { timeout: 15000 }).catch(() => { }); await q.waitForFunction(w => window.OS && OS.Lang && OS.Lang.code() === w && OS.Lang.ready, want, { timeout: 8000 }).catch(() => { }); await sleep(400);
+    const g = await E(q, () => ({ code: OS.Lang.code(), tabs: [...document.querySelectorAll('#acc .ac-tabs button')].map(x => x.textContent) }));
+    ok(`Aparelho novo em ${loc}: o ecrã da conta abre em ${want === 'en' ? 'inglês' : 'português do Brasil'}`, g.code === want && (want !== 'en' || (g.tabs.length === 2 && g.tabs[1] === EN['Criar conta'] && g.tabs[1] !== 'Criar conta')) && !er.length, JSON.stringify(g) + er.slice(0, 2).join(' | '));
+    await ctx.close(); } }
 async function sonoTests(b) { cur = 'Sono'; console.log('\n=== Sono: app Saúde no Painel ===');
   const { ctx, p, errs } = await newPage(b, PROFILES[0]); await p.goto(BASE); await unlock(p); await E(p, () => { OS.Jarvis && OS.Jarvis.close(); OS.Spyke && OS.Spyke.close(); OS.all('sleep').splice(0); location.hash = 'visao'; }); await sleep(600);
   ok('Painel: cartão do Sono vazio convida a ligar o app Saúde ou registar à mão', await E(p, () => { const c = [...document.querySelectorAll('.dash .dc')].find(d => /^Sono/.test(d.querySelector('h3').textContent)); return !!c && /Ligar ao app Saúde/.test(c.innerText) && !!c.querySelector('[data-act=slAdd]'); }));
@@ -2734,7 +2844,7 @@ async function earTests() { cur = 'Ouvido'; console.log('\n=== Spyke: ouvido sil
   await new Promise(r => srv.listen(PORT, r));
   const b = await chromium.launch(); const t0 = Date.now();
   const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean), run = k => !ONLY.length || ONLY.includes(k);
-  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('google')) await googleTests(b); if (run('boasvindas')) await onbTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
+  try { if (run('perfis')) for (const prof of PROFILES) await profileTests(b, prof); if (run('geral')) await sharedTests(b); if (run('areas')) await areaTests(b); if (run('novidades')) await newFeatureTests(b); if (run('seguranca')) await securityTests(b); if (run('atualizacao')) await updateTests(b); if (run('ia')) await aiTests(b); if (run('novos')) await novosTests(b); if (run('extras')) { await extrasTests(b); await extras2Tests(b); } if (run('voz')) await voiceTests(b); if (run('ouvido')) await earTests(); if (run('agenda')) { await calTests(b); await calDupTests(b); } if (run('direcao')) await direcaoTests(b); if (run('reset')) await resetTests(b); if (run('faltas')) await attTests(b); if (run('dominus')) await domTests(b); if (run('mundo')) await muTests(b); if (run('contas')) await accTests(b); if (run('sono')) await sonoTests(b); if (run('google')) await googleTests(b); if (run('boasvindas')) await onbTests(b); if (run('fundo')) await fundoTests(b); if (run('movimento')) await vivoTests(b); if (run('linguas')) await linguasTests(b); if (run('arrumar')) await foldTests(b); if (run('oportunidades')) await oppVaultTests(b); if (run('unifo')) await uniFoTests(b); if (run('checkup')) for (const pf of [PROFILES[4], PROFILES[0], PROFILES[1], PROFILES[3], PROFILES[2]].filter(x => !process.env.CKP || process.env.CKP.split(',').includes(x.id))) await checkupTests(b, pf); if (run('aparelhos')) await deviceMatrix(b); if (!QUICK && run('stress')) await stress(b); }
   catch (e) { R.push({ p: cur, name: 'execução da bateria', pass: false, info: e.message.split('\n')[0] }); console.log('ERRO NA BATERIA:', e.message); try { for (const c of b.contexts()) for (const pg of c.pages()) { const d = await pg.evaluate(() => ({ u: location.hash, now: Date.now(), pend: window.__pend ? [...window.__pend.values()] : null, acc: ((document.getElementById('acc') || {}).innerText || '').slice(0, 80).replace(/\n/g, ' '), msg: (document.querySelector('#acc .ac-msg') || {}).textContent || '' })).catch(() => null); if (d && d.pend) console.log('    [pagina]', JSON.stringify(d)); } } catch (e2) { } }
   await b.close(); srv.close();
   const f = R.filter(x => !x.pass);

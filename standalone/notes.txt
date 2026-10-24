@@ -1,4 +1,5 @@
-Contas novas: na primeira vez, o Prumo faz-te umas perguntas rápidas (estudos, trabalho, corpo, dinheiro, rotina) e monta tudo à tua medida: disciplinas do teu curso, treino da semana, metas de calorias, hábitos, metas e marcos do Dominus. Podes saltar.
-Escolhes as abas que queres no menu. As outras ficam em Definições › Geral › O teu Prumo e em Explorar, para pores de volta quando quiseres.
-País da conta: feriados, moeda e voz da IA do Brasil ou de Portugal.
-Podes responder outra vez quando quiseres, em Definições › Geral, sem duplicar nada.
+O Prumo fala a tua língua: escolhe o país e a língua no questionário inicial ou em Definições › Tu › País, língua e moeda. Português do Brasil, inglês, espanhol, francês, italiano e alemão já vêm prontos; outras línguas são preparadas pela IA na primeira vez que as escolhes.
+Tudo se adapta ao teu país: moeda, feriados, formato das datas e dos números, escala das notas da escola ou da faculdade, notícias, índices da bolsa, relatórios e unidades do tempo. A IA e a voz respondem na tua língua.
+Escolhe a voz da tua IA: 30 vozes (masculinas e femininas) para ouvir e escolher em Definições › Spyke, e logo no questionário inicial. Sem configurar nada.
+Fundos animados no ecrã de entrada: ondas, chuva, estrelas a piscar, aurora, luzes da cidade, nuvens e os anéis do Prumo a rodar devagar. Duas cenas novas: Ondas e Chuva. Podes desligar o movimento no botão Fundo.
+O app ficou mais vivo: as páginas entram com movimento, os números contam até ao valor, as barras enchem e os botões respondem ao toque. Em Definições › Aplicação › Animações escolhes completas, suaves ou desligadas.

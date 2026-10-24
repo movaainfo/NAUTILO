@@ -101,7 +101,7 @@ const evs = () => { const T = today(), E = [], add = (d, a, x, t) => { d = Strin
   // Intelecto
   sf(() => OS.all('sessions').forEach(s => add(s.date, 'intelecto', Math.min(60, U.num(s.minutes) / 2), `Estudo ${U.num(s.minutes)} min` + ((OS.get('subjects', s.subject) || {}).name ? ' · ' + OS.get('subjects', s.subject).name : ''))), 'estudo');
   sf(() => OS.all('reviews').forEach(r => ['r1At', 'r2At', 'r3At'].forEach(k => add(r[k], 'intelecto', 10, 'Revisão: ' + (r.topic || '')))), 'revisões');
-  sf(() => OS.all('assessments').forEach(a => { if (a.grade === '' || a.grade == null) return; const g = U.num(a.grade); add(a.date, 'intelecto', 25 + (g >= 10 ? g * 2 : 0), `${a.type || 'Avaliação'}: ${a.title} (${g})`); }), 'avaliações');
+  sf(() => OS.all('assessments').forEach(a => { if (a.grade === '' || a.grade == null) return; const g = U.num(a.grade); add(a.date, 'intelecto', 25 + (OS.Grade ? (OS.Grade.ok(g) ? Math.round(OS.Grade.frac(g) * 40) : 0) : (g >= 10 ? g * 2 : 0)), `${a.type || 'Avaliação'}: ${a.title} (${g})`); }), 'avaliações');
   sf(() => OS.all('quizzes').forEach(q => add(q.date, 'intelecto', 15 + Math.min(20, U.num(q.score)), 'Simulado' + (q.title ? ': ' + q.title : ''))), 'simulados');
   sf(() => OS.all('books').forEach(b => { if (b.status === 'Lido') { add(b.end || b.start, 'intelecto', 60 + Math.min(60, U.num(b.pages) / 5), 'Livro lido: ' + b.title); add(b.end || b.start, 'mente', 15, 'Livro lido: ' + b.title); } }), 'livros');
   sf(() => OS.all('learn').forEach(l => { if (/Conclu/.test(l.status || '')) add(l.end || l.start, 'intelecto', 60, (l.kind || 'Curso') + ' concluído: ' + l.title); }), 'cursos');

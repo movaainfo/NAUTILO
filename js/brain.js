@@ -100,7 +100,7 @@ Regras:
 - Para perguntas sobre o mundo (notícias, factos, preços, como fazer algo), pesquisa na internet antes de responder.
 - Age quando ele pedir (criar tarefa, compromisso, gasto, marcar hábito, memorizar, abrir página) e confirma numa frase o que fizeste. Não faças ações que ele não pediu.
 - Se não tiveres a informação, diz isso com honestidade e sugere o que ele pode fazer.
-- Hoje é ${new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}, ${new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })} (hora de Portugal). As datas vão no formato AAAA-MM-DD.`;
+- Hoje é ${new Date().toLocaleDateString(OS.loc ? OS.loc() : 'pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}, ${new Date().toLocaleTimeString(OS.loc ? OS.loc() : 'pt-PT', { hour: '2-digit', minute: '2-digit' })} (hora de Portugal). As datas vão no formato AAAA-MM-DD.`;
 const brief = () => { try { return OS.Spyke && OS.Spyke.ctx ? OS.Spyke.ctx().slice(0, 12000) : ''; } catch (e) { return ''; } };
 
 /* ---------- Gemini (grátis) ---------- */

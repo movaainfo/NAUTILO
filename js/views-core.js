@@ -7,7 +7,7 @@ const A = OS.act = OS.act || {};
 const prioL = p => (L.PRIO.find(x => x[0] === String(p)) || [, ''])[1];
 const prioT = p => ({ 1: 'neg', 2: 'warn' }[p] || '');
 const subjN = id => (OS.get('subjects', id) || {}).name || '';
-const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const greet = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };   // já na língua da pessoa (vem colado ao nome)
 const dayQuote = () => OS.my(L.QUOTES[U.hash(U.today()) % L.QUOTES.length]);
 OS.srcColor = s => (Cal.src[s] || [, 'var(--mut)'])[1];
 

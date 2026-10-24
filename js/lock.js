@@ -84,16 +84,16 @@ function open() { const viaCode = !L.unlocked(); setUnlocked(true); setTimeout((
 const codeInput = () => { const sec = (() => { try { return CSS.supports('-webkit-text-security', 'disc'); } catch (e) { return false; } })();
   return `<input id="lkCode" class="${sec ? 'lk-sec' : ''}" type="${sec ? 'text' : 'password'}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Código de acesso" aria-label="Código de acesso">`; };
 // ecrã de entrada: o mar visto do forte, à hora real, com a tua frase do dia
-const hello = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const hello = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };
 const hm = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
 let lkTick = 0, lkRes = 0, lkRT = 0;
-const scene = () => OS.Scene ? `<div class="lk-scene">${OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { anim: 1, id: 'lks' })}<i class="lk-grain" style="background-image:url(${OS.Scene.grain()})"></i></div>` : '';
+const scene = () => OS.Scene ? `<div class="lk-scene${OS.Fundo && OS.Fundo.get() === 'foto' ? ' fd-isphoto' : ''}">${OS.Fundo ? OS.Fundo.html(Math.max(320, innerWidth), Math.max(480, innerHeight), { anim: 1, id: 'lks' }) : OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { anim: 1, id: 'lks' })}<i class="lk-grain" style="background-image:url(${OS.Scene.grain()})"></i></div>` : '';
 async function showLock() {
   const s = el(), bio = L.bioId(), can = bio && await L.bioAvailable();
   s.hidden = false; s.classList.add('lkx');
   let name = 'Ryan', q = ''; try { name = (OS.one('profile').short || OS.who()).split(' ')[0]; } catch (e) { } try { q = OS.Quotes ? OS.Quotes.push() : ''; } catch (e) { }
   const qs = q.length < 42 ? 'l' : q.length < 75 ? 'm' : 's';
-  s.innerHTML = `${scene()}<div class="lk-top"><div class="lk-time" id="lkTime">${hm()}</div><div class="lk-date">${OS.U ? OS.U.esc(OS.U.longDate(OS.U.today())) : ''}</div></div>
+  s.innerHTML = `${scene()}${OS.Fundo ? '<button type="button" class="lk-bgb" id="lkBg" aria-label="Mudar o fundo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>Fundo</button>' : ''}<div class="lk-top"><div class="lk-time" id="lkTime">${hm()}</div><div class="lk-date">${OS.U ? OS.U.esc(OS.U.longDate(OS.U.today())) : ''}</div></div>
     <div class="lk-mid"><p class="lk-hi">${hello()}, ${OS.U ? OS.U.esc(name) : 'Ryan'}.</p>${q ? `<p class="lk-q ${qs}">${OS.U.esc(q)}</p>` : ''}</div>
     <div class="sp-in lk-bot"><div class="lk-brand">${L.logo(26)}<span class="sp-name">Prumo</span></div>
     <form class="lk" id="lkForm" autocomplete="off">
@@ -104,7 +104,7 @@ async function showLock() {
   clearInterval(lkTick); lkTick = setInterval(() => { const t = document.getElementById('lkTime'); if (!t || s.hidden) { clearInterval(lkTick); return; } t.textContent = hm(); }, 15000);
   if (!lkRes) { lkRes = 1; addEventListener('resize', () => { clearTimeout(lkRT); lkRT = setTimeout(() => { const sc = s.querySelector('.lk-scene'); if (sc && !s.hidden) sc.outerHTML = scene(); }, 250); }); }
   document.getElementById('lkForm').onsubmit = e => { e.preventDefault(); tryCode(document.getElementById('lkCode').value); };
-  const sw = document.getElementById('lkSw'); if (sw) sw.onclick = () => OS.Acc.switchProfile();
+  const sw = document.getElementById('lkSw'); if (sw) sw.onclick = () => OS.Acc.switchProfile(); const bgb = document.getElementById('lkBg'); if (bgb) bgb.onclick = () => OS.Fundo.open();
   const bb = document.getElementById('lkBio');
   if (bb) { const go = async auto => { if (bb.disabled || !bb.isConnected || L.unlocked()) return; bb.disabled = true; try { if (await bioUnlock(auto)) open(); } finally { bb.disabled = false; } };
     bb.onclick = () => go(false);
