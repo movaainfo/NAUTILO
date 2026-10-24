@@ -64,6 +64,9 @@
   "functions": {
     "api/ia.js": {
       "maxDuration": 60
+    },
+    "api/lingua.js": {
+      "maxDuration": 60
     }
   },
   "cleanUrls": true
