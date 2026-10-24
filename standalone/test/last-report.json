@@ -1,397 +1,397 @@
 [
  {
-  "p": "Novidades",
-  "name": "Face ID: ao abrir a app o Face ID começa sozinho e entra",
+  "p": "IA",
+  "name": "IA: descobre sozinha os modelos que o Google tem hoje (sem voz, imagem nem embeddings)",
+  "pass": true,
+  "info": "gemini-3.5-flash, gemini-3.5-flash-lite, gemini-2.0-flash-lite, gemma-3-27b-it"
+ },
+ {
+  "p": "IA",
+  "name": "IA: cota de um modelo esgotada → passa logo ao seguinte, sem esperar",
+  "pass": true,
+  "info": "google · gemini-3.5-flash > gemini-3.5-flash-lite"
+ },
+ {
+  "p": "IA",
+  "name": "IA: modelo desligado pelo Google (como o gemini-2.0) fica de lado e usa outro",
+  "pass": true,
+  "info": "google · gemini-3.5-flash-lite > gemini-2.0-flash-lite > gemma-3-27b-it"
+ },
+ {
+  "p": "IA",
+  "name": "IA: com toda a cota do Google esgotada responde a IA grátis de reserva (sem esperar)",
+  "pass": true,
+  "info": "reserva"
+ },
+ {
+  "p": "IA",
+  "name": "IA: texto (resumos) também passa à reserva",
+  "pass": true,
+  "info": "Primeiro parágrafo do resumo da reserva.\n\nSegundo parágrafo "
+ },
+ {
+  "p": "IA",
+  "name": "IA: o Spyke continua a pensar e a agir com a reserva (criou a tarefa)",
+  "pass": true,
+  "info": "Criei a tarefa, chefe. | Tarefa: Tarefa criada pela reserva"
+ },
+ {
+  "p": "IA",
+  "name": "IA: notícia bloqueada e Google sem cota → o Spyke faz o resumo com o que os jornais publicaram (não mostra erro em inglês)",
+  "pass": true,
+  "info": "Estadão · agora Notícia bloqueada RESUMO FEITO PELO SPYKE COM O QUE 2 JORNAIS PUBLICARAM Primeiro parágrafo do resumo da reserva. Segundo parágrafo do resumo. Fontes consultadas: Estadão · O Globo Spy"
+ },
+ {
+  "p": "IA",
+  "name": "IA: se desligares a reserva, nada vai para fora do Google",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Face ID: não pergunta \"Ativar o Face ID?\" outra vez",
+  "p": "IA",
+  "name": "sem erros de JavaScript (IA)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Face ID: se cancelares fica o botão e uma mensagem calma (sem repetir sozinho)",
+  "p": "Contas",
+  "name": "Aparelho novo: abre o ecrã da conta (criar conta ou entrar) e não o código pessoal",
+  "pass": true,
+  "info": "{\"gate\":true,\"lock\":false,\"mode\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Criar conta sem aceitar os termos: não cria (as três caixas são obrigatórias)",
+  "pass": true,
+  "info": "{\"gate\":true,\"msg\":\" Please check this box if you want to proceed.\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Criar conta: mostra o código de recuperação (só uma vez)",
+  "pass": true,
+  "info": "AR6G-2S5J-2LB6-HXXP"
+ },
+ {
+  "p": "Contas",
+  "name": "Depois pede o primeiro perfil, já com o nome",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Face ID: não fica a pedir em ciclo",
+  "p": "Contas",
+  "name": "Códigos diferentes: avisa e não cria",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Face ID: tocar no botão entra",
+  "p": "Contas",
+  "name": "Perfis como na Netflix: \"Quem está a usar\", a bolinha do perfil e \"Adicionar perfil\"",
+  "pass": true,
+  "info": "{\"n\":1,\"name\":\"Ana\",\"av\":\"🌊\",\"add\":true,\"title\":\"Quem está a usar o Prumo?\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Escolher o perfil abre o mesmo ecrã de bloqueio, com o nome do perfil e \"Trocar de perfil\"",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (Face ID)",
+  "p": "Contas",
+  "name": "O código pessoal (do Ryan) não abre um perfil de uma conta",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: começa a ouvir sozinho ao entrar (ponto no microfone do topo)",
+  "p": "Contas",
+  "name": "Perfil novo começa limpo: nada do Ryan (sem disciplinas, candidaturas, contactos, metas), com o nome do perfil",
+  "pass": true,
+  "info": "{\"subj\":0,\"apps\":0,\"contacts\":0,\"goals\":0,\"short\":\"Ana\",\"uni\":\"\",\"hab\":6,\"acc\":2,\"bub\":true,\"mova\":\"O meu negócio\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "A bolinha do perfil aparece na barra de cima",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: sem dizer o nome dele não responde (só \"Spyke, …\")",
+  "p": "Contas",
+  "name": "O que registas vai para a conta, cifrado no servidor (sem texto legível)",
+  "pass": true,
+  "info": "16 ficheiros · flush true · {\"st\":\"sincronizada\",\"err\":\"\"} · accounts~0,exercises~0,habits~0,one~fin,one~fit,one~meta,one~profile,one~security,one~spyke,one~tax,snapshots~0,tasks~0,transactions~0"
+ },
+ {
+  "p": "Contas",
+  "name": "Senha errada: mensagem clara",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: com o nome responde logo",
-  "pass": true,
-  "info": "São 12:55."
- },
- {
-  "p": "Novidades",
-  "name": "Spyke: conversa seguida (depois de responder volta a ouvir sozinho)",
+  "p": "Contas",
+  "name": "Noutro aparelho (computador): entra com a mesma conta e vê os mesmos dados",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: \"Spike, bom dia\" dá o resumo do dia (escrito \"Spike\", como o iPhone ouve)",
-  "pass": true,
-  "info": "Boa tarde, Ryan. Hoje é sábado, 24 de outubro. A agenda está livre de compromiss"
- },
- {
-  "p": "Novidades",
-  "name": "Spyke: \"Bom dia, Spike\" (nome no fim) também dá o resumo",
+  "p": "Contas",
+  "name": "Sincroniza nos dois sentidos em segundos (computador → telemóvel)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: só \"Spike\" não fala nada (som e fica à espera do pedido)",
+  "p": "Contas",
+  "name": "Segundo perfil na mesma conta: dados separados (não vê as tarefas da Ana)",
+  "pass": true,
+  "info": "{\"t\":[],\"short\":\"Bruno\",\"p\":\"Bruno\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Definições › Conta e perfis: blocos fechados com seta; abertos mostram e-mail, perfis, sincronização, senha, sair e apagar a conta",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: o pedido logo a seguir ao nome (sem repetir o nome) é executado",
+  "p": "Contas",
+  "name": "Editar perfil: escolher um personagem do Dominus (heróis e monstros em pixel art) passa a ser a bolinha do perfil",
   "pass": true,
-  "info": "São 12:55."
+  "info": "{\"n\":24,\"ok\":true,\"img\":\"data:image/png;base64,\",\"bub\":true,\"modal\":false}"
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: com uma pausa depois do nome (\"Spike… que dia é hoje\") faz o pedido",
+  "p": "Contas",
+  "name": "Editar perfil: uma foto tua fica cortada em quadrado (160 px, leve) e guardada no perfil, em todos os aparelhos",
   "pass": true,
-  "info": "Hoje é sábado, 24 de outubro."
+  "info": "[{\"jpg\":true,\"len\":1991,\"prev\":true},{\"w\":160,\"h\":160,\"jpg\":true}]"
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: depois de responder, sem o nome volta a ignorar",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "Spyke: fora da conversa ignora o que não é para ele",
+  "p": "Contas",
+  "name": "Ecrã \"Quem está a usar\": o perfil aparece com a foto",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: \"Spyke, …\" funciona sempre",
+  "p": "Contas",
+  "name": "Gerir perfis › Editar: tirar a foto volta ao emoji",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: frase sem \"fim\" é apanhada pela pausa (iPhone)",
+  "p": "Contas",
+  "name": "Conta de administração: aparece o separador \"Admin\" no fim do menu (ou em \"Mais\", se não couber)",
+  "pass": true,
+  "info": "{\"adm\":true,\"nav\":\"Admin\",\"shown\":true,\"side\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Administração: lista as contas (e-mail, nome, perfis), último acesso, última entrada e minutos por dia, sem senhas",
+  "pass": true,
+  "info": "{\"r\":[\"ana teste ana@exemplo.pt ana bruno\"],\"contas\":true,\"ana\":true,\"hoje\":true,\"kpi\":7,\"senha\":false}"
+ },
+ {
+  "p": "Contas",
+  "name": "A resposta do servidor para a administração não traz senhas, códigos nem chaves",
+  "pass": true,
+  "info": "{\"ok\":true,\"contas\":[{\"email\":\"ana@exemplo.pt\",\"nome\":\"Ana Teste\",\"criado\":\"2026-10-24T13:07:10.864Z\",\"perfis\":[\"Ana\",\"Bruno\"],\"ultEntrada\":1792847234981,\"entra"
+ },
+ {
+  "p": "Contas",
+  "name": "Tempo de uso: os minutos com a app aberta contam por dia e o último acesso fica registado",
+  "pass": true,
+  "info": "{\"ult\":1792847247633,\"ent\":1,\"dias\":{\"2026-10-24\":49}}"
+ },
+ {
+  "p": "Contas",
+  "name": "Tocar numa conta mostra o detalhe: perfis, criada, última entrada, último acesso e o gráfico dos 30 dias",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: o eco da própria voz não conta como pedido",
+  "p": "Contas",
+  "name": "Modo pessoal (aparelho que já tinha o Prumo): igual a antes, sem ecrã de conta nem bolinha",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: o iPhone fecha o microfone e ele reabre sozinho",
+  "p": "Contas",
+  "name": "Sair da conta limpa este aparelho e volta ao ecrã de entrar",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: \"para de ouvir\" desliga e não reabre",
+  "p": "Contas",
+  "name": "Esqueci a senha: o código de recuperação muda a senha e dá um código novo",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: tocar no microfone volta a ouvir",
+  "p": "Contas",
+  "name": "Com a senha mudada, os outros aparelhos pedem para entrar outra vez",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: enquanto fala o microfone descansa (não ouve a própria voz nem corta o som)",
+  "p": "Contas",
+  "name": "Atalho de gastos do iPhone numa conta sem script: o link do perfil regista e o gasto entra nas finanças desse perfil",
+  "pass": true,
+  "info": "✓ 12,4 € registado no Prumo / 403"
+ },
+ {
+  "p": "Contas",
+  "name": "Definições › Atalhos do iPhone mostra o link do perfil (sem pedir o script Google)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: acabou de falar e volta a ouvir sozinho",
+  "p": "Contas",
+  "name": "Sono numa conta: o atalho do app Saúde envia para o link do perfil (tipo=sono) e a noite entra no Painel",
+  "pass": true,
+  "info": "{\"lk\":true,\"r1\":\"✓ Sono enviado para o Prumo\",\"sl\":[{\"d\":\"2026-10-24\",\"m\":450,\"src\":\"saude\"}]}"
+ },
+ {
+  "p": "Contas",
+  "name": "Jornal numa conta sem script: as notícias vêm do servidor do Prumo",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: com \"Interromper por voz\" ligado, dizer \"Spyke\" enquanto fala interrompe e ouve",
+  "p": "Contas",
+  "name": "Conta nova: pergunta o nome da IA uma vez, e a IA já está ligada sem chave nenhuma",
   "pass": true,
-  "info": "Sim?"
+  "info": "{\"ask\":true,\"key\":\"nautilo-servidor\",\"own\":\"\"}"
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: ao sair da app o microfone desliga e ao voltar liga sozinho",
+  "p": "Contas",
+  "name": "Nome da IA: \"Luna\" (é ela) — chama-se por voz pelo nome e o texto fica no feminino",
   "pass": true,
-  "info": ""
+  "info": "{\"n\":\"Luna\",\"f\":true,\"w1\":true,\"w2\":false,\"t\":\"Cérebro da Luna · fala com a Luna\"}"
  },
  {
-  "p": "Novidades",
-  "name": "palmas: duas palmas chamam o Spyke",
-  "pass": true,
-  "info": "{\"two\":1,\"one\":0,\"voice\":0,\"far\":0,\"soft9\":1,\"soft1\":0}"
- },
- {
-  "p": "Novidades",
-  "name": "palmas: uma palma sozinha não chama",
+  "p": "Contas",
+  "name": "Definições: o separador e os blocos usam o nome da IA (sem \"Spyke\")",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "palmas: voz ou música contínua não chamam",
+  "p": "Contas",
+  "name": "IA sem configurar (servidor do Prumo → IA grátis): responde, e o pedido leva o nome dela",
+  "pass": true,
+  "info": "Olá! Aqui é a tua IA. · {\"model\":\"openai\",\"messages\":[{\"role\":\"user\",\"content\":\"Diz olá à Luna\"}],\"temperature\":0.4,\"private\":true,\"referrer\":\"nautilo\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "IA sem configurar: pedidos em JSON (decisões, resumos, tutor) também funcionam",
+  "pass": true,
+  "info": "{\"ok\":true,\"resposta\":\"feito\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Fotos sem a chave Google: mensagem clara a explicar como ligar (sem ficar a carregar)",
+  "pass": true,
+  "info": "A IA não respondeu (Ler fotos, PDFs e voz precisa da IA do Google. Liga a tua chave grátis em Definições › Spyke › Cérebro.). Verifica a internet e tenta de novo."
+ },
+ {
+  "p": "Contas",
+  "name": "A IA do servidor só responde a quem tem sessão numa conta",
+  "pass": true,
+  "info": "401"
+ },
+ {
+  "p": "Contas",
+  "name": "Modo pessoal: Definições tem \"Conta Prumo\" para guardar o Prumo numa conta",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "palmas: palmas muito afastadas não contam",
+  "p": "Contas",
+  "name": "Ao guardar numa conta nova, o código de recuperação da senha aparece uma vez",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "palmas: a sensibilidade muda o que conta (máxima ouve palmas fracas, mínima não)",
+  "p": "Contas",
+  "name": "Guardar na conta: este aparelho passa a usar a conta com o mesmo código e os mesmos dados; o perfil continua o do Ryan (marcos e textos dele)",
+  "pass": true,
+  "info": "{\"on\":true,\"pub\":false,\"ps\":true,\"t\":true,\"g\":true,\"short\":\"Ryan\",\"leg\":100,\"who\":\"o Ryan (brasileiro)\",\"bub\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Conta sem administração: sem o separador \"Admin\" e o servidor recusa a lista de contas",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "Spyke: página explica o limite do iPhone com a app fechada e como não pedir o microfone",
+  "p": "Contas",
+  "name": "Noutro aparelho: entra na conta do Ryan e aparece tudo o que estava no Prumo pessoal",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (Spyke a ouvir)",
+  "p": "Contas",
+  "name": "Outro aparelho no modo pessoal: \"Entrar na conta neste aparelho\" leva ao ecrã de entrar, com o e-mail (os dados pessoais deste aparelho saem)",
+  "pass": true,
+  "info": "{\"has\":true,\"em\":\"ryan@exemplo.pt\",\"keys\":[],\"meta\":null,\"tasks\":0}"
+ },
+ {
+  "p": "Contas",
+  "name": "O servidor recusa criar conta sem a aceitação dos termos",
+  "pass": true,
+  "info": "{\"_st\":400,\"ok\":false,\"msg\":\"Para usar o Prumo tens de aceitar os Termos de Serviço e a Política de Privacidade e confirmar as outras duas caixas.\",\"code\":\"term"
+ },
+ {
+  "p": "Contas",
+  "name": "Ecrã de entrar: Termos, Privacidade, Cookies e Acessibilidade abrem por cima (LGPD e RGPD, ANPD e CNPD) e fecham com Esc",
+  "pass": true,
+  "info": "{\"open\":true,\"t\":\"Política de Privacidade\",\"lgpd\":true,\"tabs\":6}"
+ },
+ {
+  "p": "Contas",
+  "name": "Conta que ainda não aceitou esta versão: ao entrar, pede para aceitar os termos uma vez",
+  "pass": true,
+  "info": "{\"termos\":true,\"boxes\":3}"
+ },
+ {
+  "p": "Contas",
+  "name": "Aceitar fica guardado na conta (versão e data) e segue para os perfis",
+  "pass": true,
+  "info": "{\"still\":true,\"t\":\"2026-10-22\"}"
+ },
+ {
+  "p": "Contas",
+  "name": "Depois de aceitar não volta a pedir (nem ao recarregar)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "floresta: quando o iPhone apaga o 3D, ele refaz-se sozinho",
+  "p": "Contas",
+  "name": "Definições › Privacidade e termos: os 6 documentos, o que aceitaste e quando",
+  "pass": true,
+  "info": "{\"tab\":true,\"docs\":6,\"ac\":true}"
+ },
+ {
+  "p": "Contas",
+  "name": "Fazer um pedido LGPD/RGPD: recebe um número de protocolo",
+  "pass": true,
+  "info": "20261024130756-206353"
+ },
+ {
+  "p": "Contas",
+  "name": "Administração: o pedido aparece (tipo, e-mail, texto) para responder em 15 dias",
+  "pass": true,
+  "info": "{\"id\":\"20261024130756-206353\",\"uid\":\"80e33b10a9e6aad94dfc5676\",\"email\":\"lia@exemplo.pt\",\"nome\":\"Lia\",\"tipo\":\"acesso\",\"msg\":\"Quero saber que dados meus guardam.\""
+ },
+ {
+  "p": "Contas",
+  "name": "Administração: marcar o pedido como respondido; o que falta configurar (chave da IA) só para o administrador; o Gmail já não está pendente (chave do Google verificada)",
   "pass": true,
   "info": ""
  },
  {
-  "p": "Novidades",
-  "name": "floresta: se o 3D falhar mostra \"A abrir o 3D…\" (não fica preso no erro)",
+  "p": "Contas",
+  "name": "Contas públicas mostram as mesmas fotos dos alimentos",
   "pass": true,
-  "info": ""
+  "info": "{\"pub\":true,\"pin\":true}"
  },
  {
-  "p": "Novidades",
-  "name": "floresta: tenta outra vez sozinha e volta a mostrar a árvore 3D",
-  "pass": true,
-  "info": "{\"ok\":true,\"fail\":false,\"why\":\"\"}"
- },
- {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (Floresta)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "decisões: o Spyke analisa (prós, contras, riscos, perguntas, para onde apontam os dados)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "decisões: \"Preencher a matriz\" estima só o que está vazio",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "decisões: perguntas ao Spyke ficam guardadas na decisão",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "decisões: próximo passo vira tarefa",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "jornal: mostra os segundos enquanto espera",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "jornal: sem resposta desiste, explica e oferece \"Tentar outra vez\" (sem ficar em ciclo)",
-  "pass": true,
-  "info": "Visão geral\nJORNAL\n\nAs notícias mais importantes do mundo e de cada país, em tempo real. Atualiza sozinho ao longo do di"
- },
- {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (decisões e jornal)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "script antigo: o Jornal explica que o script é antigo e leva a Definições → Script Google",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "estado do Spyke: mostra o que falta (script, notícias, e-mail) e leva a Definições → Script Google (sem partes para copiar no Spyke)",
-  "pass": true,
-  "info": "{\"bad\":4,\"guide\":true,\"noCopy\":true}"
- },
- {
-  "p": "Novidades",
-  "name": "estado do Spyke: depois de atualizar o script fica tudo verde (IA, script, notícias)",
-  "pass": true,
-  "info": "{\"ok\":[\"Cérebro (IA)\",\"Script Google\",\"Notícias\"],\"guide\":false}"
- },
- {
-  "p": "Novidades",
-  "name": "script atualizado: o Jornal mostra as notícias",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (estado do Spyke)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "script v10: Definições → Script Google pede a Parte 3, num ficheiro novo (sem apagar as partes 1 e 2)",
-  "pass": true,
-  "info": "[\"p3\"]"
- },
- {
-  "p": "Novidades",
-  "name": "script v10: o botão copia a Parte 3 (com o doGet novo e sem repetir a chave)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (Parte 3)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "e-mail: abre o e-mail inteiro dentro da app (até ao fim, com anexos)",
-  "pass": true,
-  "info": "Proposta de estágio\nAna RH\nana@empresa.pt · 24/10, 12:56\npara ryan@x.pt\nOlá Ryan,\n\nSegue a proposta completa do estágio com todos os detalhes do contrato e a pa"
- },
- {
-  "p": "Novidades",
-  "name": "e-mail: nada abre fora da app",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "e-mail formatado: num quadro isolado, sem scripts (o código malicioso de um e-mail não corre)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "LinkedIn: nenhum botão leva ao Gmail",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "LinkedIn: \"Abrir\" abre o e-mail dentro da app (sem Responder nem Gmail)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "LinkedIn: tocar na própria notificação também abre o leitor",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "jornal: a notícia abre dentro da app com o texto completo do jornal",
-  "pass": true,
-  "info": "Jornal de Notícias · agora Notícia aberta pelo jornal TEXTO DE JORNAL DE NOTÍCIAS Primeiro parágrafo da notícia completa, com os factos principais do que aconteceu hoje em Aveiro e no resto do país. Segundo parágrafo com as declarações dos envolvidos e o contexto do que levou a esta situação inesper"
- },
- {
-  "p": "Novidades",
-  "name": "jornal: texto do jornal entra só como texto (sem código a correr)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "jornal: jornal que bloqueia → o Spyke escreve a notícia completa com as fontes, dentro da app",
-  "pass": true,
-  "info": "Público · há 1 min Notícia de jornal fechado NOTÍCIA COMPLETA ESCRITA PELO SPYKE A PARTIR DE PESQUISA NA INTERNET O Spyke escreveu o primeiro parágrafo. Segundo parágrafo escrito. Terceiro parágrafo escrito. Fontes consultadas: publico.pt · rtp.pt Spyke, lê-me Se mesmo assim quiseres, abrir no site "
- },
- {
-  "p": "Novidades",
-  "name": "agenda Google pelo script: os eventos aparecem no Calendário",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "agenda Google: o Spyke consegue marcar eventos na agenda Google",
-  "pass": true,
-  "info": "{\"k\":\"k\",\"op\":\"ce\",\"t\":\"Dentista\",\"d\":\"2026-10-29\",\"h\":\"10:00\"}"
- },
- {
-  "p": "Novidades",
-  "name": "sem erros de JavaScript (leitores)",
-  "pass": true,
-  "info": ""
- },
- {
-  "p": "Novidades",
-  "name": "nome da app: Prumo no ecrã principal, no título e no manifesto",
+  "p": "Contas",
+  "name": "sem erros de JavaScript",
   "pass": true,
   "info": ""
  }
