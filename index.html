@@ -3490,7 +3490,7 @@ html.vv #side a,html.vv .tn-links a{transition:background-color .25s,color .25s!
 
 </style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.42", "date": "24/10/2026", "notes": ["Escolhe a voz da tua IA: 30 vozes (masculinas e femininas) para ouvir e escolher em Definições › Spyke, e logo no questionário inicial. Sem configurar nada.", "Fundos animados no ecrã de entrada: ondas, chuva, estrelas a piscar, aurora, luzes da cidade, nuvens e os anéis do Prumo a rodar devagar. Duas cenas novas: Ondas e Chuva. Podes desligar o movimento no botão Fundo.", "O app ficou mais vivo: as páginas entram com movimento, os números contam até ao valor, as barras enchem e os botões respondem ao toque. Em Definições › Aplicação › Animações escolhes completas, suaves ou desligadas."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.43", "date": "24/10/2026", "notes": ["O Prumo fala a tua língua: escolhe o país e a língua no questionário inicial ou em Definições › Tu › País, língua e moeda. Português do Brasil, inglês, espanhol, francês, italiano e alemão já vêm prontos; outras línguas são preparadas pela IA na primeira vez que as escolhes.", "Tudo se adapta ao teu país: moeda, feriados, formato das datas e dos números, escala das notas da escola ou da faculdade, notícias, índices da bolsa, relatórios e unidades do tempo. A IA e a voz respondem na tua língua.", "Escolhe a voz da tua IA: 30 vozes (masculinas e femininas) para ouvir e escolher em Definições › Spyke, e logo no questionário inicial. Sem configurar nada.", "Fundos animados no ecrã de entrada: ondas, chuva, estrelas a piscar, aurora, luzes da cidade, nuvens e os anéis do Prumo a rodar devagar. Duas cenas novas: Ondas e Chuva. Podes desligar o movimento no botão Fundo.", "O app ficou mais vivo: as páginas entram com movimento, os números contam até ao valor, as barras enchem e os botões respondem ao toque. Em Definições › Aplicação › Animações escolhes completas, suaves ou desligadas."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -5434,6 +5434,328 @@ const settings = () => { const UI = OS.UI, p = cur() || {}, L = profiles(), ago 
 
 </script>
 <script>
+/* PRUMO — países: cada pessoa escolhe o país onde vive (qualquer país do mundo) e o app adapta-se:
+   moeda principal, língua da interface, formato de números e datas, escala de notas, feriados, notícias, bolsa e unidades.
+   O perfil pessoal do Ryan (ps) e o modo sem conta ficam como sempre: euros e português de Portugal. */
+(() => {
+'use strict';
+const U = OS.U;
+// código do país : moeda : língua principal (ISO 3166-1, ISO 4217, BCP 47)
+const RAW = 'AD:EUR:ca AE:AED:ar AF:AFN:fa AG:XCD:en AI:XCD:en AL:ALL:sq AM:AMD:hy AO:AOA:pt-PT AR:ARS:es AS:USD:en AT:EUR:de AU:AUD:en AW:AWG:nl AX:EUR:sv AZ:AZN:az '
+  + 'BA:BAM:bs BB:BBD:en BD:BDT:bn BE:EUR:fr BF:XOF:fr BG:EUR:bg BH:BHD:ar BI:BIF:fr BJ:XOF:fr BL:EUR:fr BM:BMD:en BN:BND:ms BO:BOB:es BQ:USD:nl BR:BRL:pt-BR BS:BSD:en BT:BTN:en BW:BWP:en BY:BYN:ru BZ:BZD:en '
+  + 'CA:CAD:en CC:AUD:en CD:CDF:fr CF:XAF:fr CG:XAF:fr CH:CHF:de CI:XOF:fr CK:NZD:en CL:CLP:es CM:XAF:fr CN:CNY:zh CO:COP:es CR:CRC:es CU:CUP:es CV:CVE:pt-PT CW:ANG:nl CX:AUD:en CY:EUR:el CZ:CZK:cs '
+  + 'DE:EUR:de DJ:DJF:fr DK:DKK:da DM:XCD:en DO:DOP:es DZ:DZD:ar EC:USD:es EE:EUR:et EG:EGP:ar EH:MAD:ar ER:ERN:en ES:EUR:es ET:ETB:am FI:EUR:fi FJ:FJD:en FK:FKP:en FM:USD:en FO:DKK:da FR:EUR:fr '
+  + 'GA:XAF:fr GB:GBP:en GD:XCD:en GE:GEL:ka GF:EUR:fr GG:GBP:en GH:GHS:en GI:GIP:en GL:DKK:da GM:GMD:en GN:GNF:fr GP:EUR:fr GQ:XAF:es GR:EUR:el GT:GTQ:es GU:USD:en GW:XOF:pt-PT GY:GYD:en '
+  + 'HK:HKD:zh-TW HN:HNL:es HR:EUR:hr HT:HTG:fr HU:HUF:hu ID:IDR:id IE:EUR:en IL:ILS:he IM:GBP:en IN:INR:en IQ:IQD:ar IR:IRR:fa IS:ISK:is IT:EUR:it JE:GBP:en JM:JMD:en JO:JOD:ar JP:JPY:ja '
+  + 'KE:KES:en KG:KGS:ru KH:KHR:km KI:AUD:en KM:KMF:fr KN:XCD:en KP:KPW:ko KR:KRW:ko KW:KWD:ar KY:KYD:en KZ:KZT:ru LA:LAK:lo LB:LBP:ar LC:XCD:en LI:CHF:de LK:LKR:en LR:LRD:en LS:LSL:en LT:EUR:lt LU:EUR:fr LV:EUR:lv LY:LYD:ar '
+  + 'MA:MAD:fr MC:EUR:fr MD:MDL:ro ME:EUR:sr MF:EUR:fr MG:MGA:fr MH:USD:en MK:MKD:mk ML:XOF:fr MM:MMK:my MN:MNT:mn MO:MOP:zh-TW MP:USD:en MQ:EUR:fr MR:MRU:ar MS:XCD:en MT:EUR:en MU:MUR:en MV:MVR:en MW:MWK:en MX:MXN:es MY:MYR:ms MZ:MZN:pt-PT '
+  + 'NA:NAD:en NC:XPF:fr NE:XOF:fr NF:AUD:en NG:NGN:en NI:NIO:es NL:EUR:nl NO:NOK:no NP:NPR:ne NR:AUD:en NU:NZD:en NZ:NZD:en OM:OMR:ar PA:USD:es PE:PEN:es PF:XPF:fr PG:PGK:en PH:PHP:en PK:PKR:en PL:PLN:pl PM:EUR:fr PN:NZD:en PR:USD:es PS:ILS:ar PT:EUR:pt-PT PW:USD:en PY:PYG:es '
+  + 'QA:QAR:ar RE:EUR:fr RO:RON:ro RS:RSD:sr RU:RUB:ru RW:RWF:en SA:SAR:ar SB:SBD:en SC:SCR:en SD:SDG:ar SE:SEK:sv SG:SGD:en SH:SHP:en SI:EUR:sl SK:EUR:sk SL:SLE:en SM:EUR:it SN:XOF:fr SO:SOS:so SR:SRD:nl SS:SSP:en ST:STN:pt-PT SV:USD:es SX:ANG:nl SY:SYP:ar SZ:SZL:en '
+  + 'TC:USD:en TD:XAF:fr TG:XOF:fr TH:THB:th TJ:TJS:ru TL:USD:pt-PT TM:TMT:ru TN:TND:fr TO:TOP:en TR:TRY:tr TT:TTD:en TV:AUD:en TW:TWD:zh-TW TZ:TZS:sw UA:UAH:uk UG:UGX:en US:USD:en UY:UYU:es UZ:UZS:uz '
+  + 'VA:EUR:it VC:XCD:en VE:VES:es VG:USD:en VI:USD:en VN:VND:vi VU:VUV:en WF:XPF:fr WS:WST:en XK:EUR:sq YE:YER:ar YT:EUR:fr ZA:ZAR:en ZM:ZMW:en ZW:USD:en';
+const C = {}; RAW.split(' ').forEach(x => { const [cc, cur, lang] = x.split(':'); C[cc] = { cc, cur, lang }; });
+// semana a começar ao domingo; unidades imperiais
+const SUN = new Set('US CA BR MX JP KR IL PH TW HK MO SA AE QA KW BH OM JO EG IN PK BD ZA ZW PE CO VE GT HN SV NI PA DO PR JM BS BZ BO PY TH KH LA MM ID'.split(' '));
+const IMP = new Set(['US', 'LR', 'MM']);
+/* escala de notas de cada país: min, max, aprovação, "boa", "muito boa", passo; inv = a nota mais baixa é a melhor (Alemanha, Áustria…) */
+const SC = {
+  p20: { min: 0, max: 20, pass: 9.5, good: 14, great: 17, step: .1 },
+  p20pe: { min: 0, max: 20, pass: 10.5, good: 14, great: 17, step: .1 },
+  p10br: { min: 0, max: 10, pass: 6, good: 8, great: 9, step: .1 },
+  p10es: { min: 0, max: 10, pass: 5, good: 7, great: 9, step: .1 },
+  p10mx: { min: 0, max: 10, pass: 6, good: 8, great: 9.5, step: .1 },
+  p10ar: { min: 1, max: 10, pass: 4, good: 7, great: 9, step: .1 },
+  p10nl: { min: 1, max: 10, pass: 5.5, good: 7, great: 8.5, step: .1 },
+  p30it: { min: 0, max: 30, pass: 18, good: 25, great: 28, step: 1 },
+  p7cl: { min: 1, max: 7, pass: 4, good: 5.5, great: 6.5, step: .1 },
+  p5co: { min: 0, max: 5, pass: 3, good: 4, great: 4.5, step: .1 },
+  p6ch: { min: 1, max: 6, pass: 4, good: 5, great: 5.5, step: .25 },
+  p5ru: { min: 2, max: 5, pass: 3, good: 4, great: 5, step: 1 },
+  inv5de: { min: 1, max: 5, pass: 4, good: 2.3, great: 1.5, step: .1, inv: 1 },
+  inv5cz: { min: 1, max: 5, pass: 4, good: 2, great: 1, step: 1, inv: 1 },
+  p100us: { min: 0, max: 100, pass: 60, good: 80, great: 90, step: 1 },
+  p100gb: { min: 0, max: 100, pass: 40, good: 60, great: 70, step: 1 },
+  p100: { min: 0, max: 100, pass: 50, good: 70, great: 85, step: 1 } };
+const GRADE = { p20: 'PT FR BE LU AO MZ CV GW ST TL TN MA DZ LB VE SN CI CM GA CG CD ML BF NE TG BJ MG HT', p20pe: 'PE', p10br: 'BR', p10es: 'ES GR RO DO CU', p10mx: 'MX EC SV GT HN NI PA CR BO PY UY', p10ar: 'AR', p10nl: 'NL',
+  p30it: 'IT SM VA', p7cl: 'CL', p5co: 'CO', p6ch: 'CH LI', p5ru: 'RU BY UA KZ PL BG', inv5de: 'DE AT', inv5cz: 'CZ SK', p100us: 'US CA PH JP CN KR TW', p100gb: 'GB IE IN NG GH KE' };
+const GBY = {}; Object.entries(GRADE).forEach(([k, l]) => l.split(' ').forEach(cc => GBY[cc] = k));
+
+const acc = () => OS.Acc || {};
+// pessoas com conta (perfis "pub") seguem o seu país; o perfil pessoal do Ryan e o modo local ficam em Portugal/euros, salvo escolha explícita
+const pub = () => !!(acc().on && acc().pub);
+const prof = () => (OS.one ? OS.one('profile') : {}) || {};
+const P = OS.Pais = {
+  data: C,
+  has: cc => !!C[cc],
+  codes: () => Object.keys(C),
+  code: () => { const c = prof().country; return C[c] ? c : 'PT'; },
+  name: (cc, lang) => { try { return new Intl.DisplayNames([lang || (OS.Lang ? OS.Lang.base() : 'pt'), 'pt'], { type: 'region' }).of(cc) || cc; } catch (e) { return cc; } },
+  // a lista para escolher, por ordem alfabética na língua de quem lê (Portugal e Brasil primeiro)
+  list: lang => { const L = Object.keys(C).filter(cc => cc !== 'PT' && cc !== 'BR').map(cc => [cc, P.name(cc, lang)]).sort((a, b) => a[1].localeCompare(b[1], lang || 'pt')); return [['PT', P.name('PT', lang)], ['BR', P.name('BR', lang)]].concat(L); },
+  flag: cc => /^[A-Z]{2}$/.test(cc || '') ? String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0))) : '',
+  curOf: cc => (C[cc] || {}).cur || 'EUR',
+  langOf: cc => (C[cc] || {}).lang || 'en',
+  sunday: cc => SUN.has(cc || P.code()),
+  imperial: cc => IMP.has(cc || P.code()),
+  scaleKey: cc => GBY[cc || P.code()] || 'p100',
+  pub };
+// moeda principal do perfil: a escolhida; senão a do país (só contas novas); senão euros
+OS.cur = () => { const p = prof(); if (p.cur && /^[A-Z]{3}$/.test(p.cur)) return p.cur; if (pub() && C[p.country]) return C[p.country].cur; return 'EUR'; };
+
+/* ---------- escala de notas ---------- */
+const G = OS.Grade = {
+  key: () => { const p = prof(); return SC[p.gradeScale] ? p.gradeScale : pub() || p.gradeScale ? P.scaleKey(P.code()) : 'p20'; },
+  s: () => SC[G.key()],
+  all: SC,
+  label: (s = G.s()) => s.inv ? `${U.nf(s.min, s.step < 1 ? 1 : 0)}–${U.nf(s.max, s.step < 1 ? 1 : 0)}` : `${U.nf(s.min)}–${U.nf(s.max)}`,
+  // 0 (pior) a 1 (melhor), qualquer escala
+  frac: g => { const s = G.s(), v = U.num(g); const f = (v - s.min) / (s.max - s.min); return Math.max(0, Math.min(1, s.inv ? 1 - f : f)); },
+  fromFrac: f => { const s = G.s(); return s.inv ? s.max - f * (s.max - s.min) : s.min + f * (s.max - s.min); },
+  better: (a, b) => G.s().inv ? U.num(a) <= U.num(b) : U.num(a) >= U.num(b),   // a é pelo menos tão boa como b
+  ok: g => G.better(g, G.s().pass),
+  pass: () => G.s().pass, good: () => G.s().good, great: () => G.s().great, max: () => G.s().max, min: () => G.s().min, inv: () => !!G.s().inv,
+  fmt: g => U.nf(U.num(g), G.s().step < 1 ? 1 : 0),
+  // converte uma nota guardada na escala de 0–20 (dados antigos e exemplos) para a escala atual
+  from20: v => G.fromFrac(U.num(v) / 20) };
+
+/* ---------- feriados de qualquer país (Nager.Date, grátis, sem chave); Portugal e Brasil continuam calculados no app ---------- */
+const HK = 'os2hol:';
+const HOLN = {}, busy = {};
+P.holidays = (cc, y) => { const k = cc + y; if (HOLN[k]) return HOLN[k]; const c = U.ls.get(HK + k, null); if (c && c.m) { HOLN[k] = c.m; return c.m; }
+  if (!busy[k] && navigator.onLine !== false) { busy[k] = 1; fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/${cc}`).then(r => r.ok ? r.json() : []).then(L => { const m = {};
+      const lg = OS.Lang ? OS.Lang.base() : 'pt'; (Array.isArray(L) ? L : []).filter(h => h.global !== false && (h.types || ['Public']).includes('Public')).forEach(h => { m[h.date] = lg === 'en' || lg === P.langOf(cc).slice(0, 2) ? (lg === 'en' ? h.name : h.localName) : h.localName || h.name; });
+      HOLN[k] = m; U.ls.set(HK + k, { at: Date.now(), m }); OS.request && OS.request(); }).catch(() => { setTimeout(() => { busy[k] = 0; }, 6e5); }); }
+  return {}; };
+
+/* ---------- Definições › Geral: país, língua, moeda, notas e unidades ---------- */
+const SCN = { p20: '0–20 (Portugal, França…)', p20pe: '0–20, passa com 11 (Peru)', p10br: '0–10, passa com 6 (Brasil)', p10es: '0–10, passa com 5 (Espanha…)', p10mx: '0–10, passa com 6 (México…)', p10ar: '1–10, passa com 4 (Argentina)', p10nl: '1–10, passa com 5,5 (Países Baixos)',
+  p30it: '18–30 (Itália, universidade)', p7cl: '1–7 (Chile)', p5co: '0–5 (Colômbia)', p6ch: '1–6, 6 é a melhor (Suíça)', p5ru: '2–5 (Rússia, Polónia…)', inv5de: '1–5, 1 é a melhor (Alemanha, Áustria)', inv5cz: '1–5, 1 é a melhor (Chéquia, Eslováquia)', p100us: '0–100 / letras A–F (EUA…)', p100gb: '0–100, passa com 40 (Reino Unido…)', p100: '0–100, passa com 50' };
+const curName = c => { try { return new Intl.DisplayNames([OS.Lang ? OS.Lang.base() : 'pt'], { type: 'currency' }).of(c); } catch (e) { return c; } };
+const opt = (v, l, sel) => `<option value="${U.esc(v)}"${v === sel ? ' selected' : ''}>${U.esc(l)}</option>`;
+const panel = () => { const p = prof(), cc = P.code(), curs = [...new Set([P.curOf(cc), 'EUR', 'USD', 'BRL', 'GBP', 'CHF'].concat([...new Set(Object.values(C).map(x => x.cur))].sort()))];
+  return `<div class="pn" id="paisSet"><div class="pn-h"><h3>${OS.UI.ic('globe')}País, língua e moeda</h3></div>
+  <p class="mut" style="margin:0 0 10px">O Prumo adapta-se ao sítio onde vives: feriados, moeda, formato das datas e dos números, escala das notas, notícias e a língua de tudo (também a da IA e da voz).</p>
+  <div class="g g2" style="gap:10px">
+    <label class="fld"><span>País onde vives</span><select class="field" data-pset="country">${P.list().map(([c, n]) => opt(c, P.flag(c) + ' ' + n, cc)).join('')}</select></label>
+    <label class="fld"><span>Língua do app</span><select class="field" data-pset="lang" data-notr>${opt('', 'Automática (do país) · ' + (OS.Lang ? OS.Lang.name(OS.Lang.code()) : ''), p.lang || '')}${(OS.Lang ? OS.Lang.list() : []).map(c => opt(c, OS.Lang.name(c), p.lang || '')).join('')}</select></label>
+    <label class="fld"><span>Moeda principal</span><select class="field" data-pset="cur">${opt('', 'Automática (' + OS.cur() + ')', p.cur || '')}${curs.map(c => opt(c, c + ' · ' + curName(c), p.cur || '')).join('')}</select></label>
+    <label class="fld"><span>Escala das notas</span><select class="field" data-pset="gradeScale">${opt('', 'Automática (' + (SCN[G.key()] || G.key()) + ')', p.gradeScale || '')}${Object.keys(SC).map(k => opt(k, SCN[k] || k, p.gradeScale || '')).join('')}</select></label>
+    <label class="fld"><span>Unidades</span><select class="field" data-pset="units">${opt('', 'Automáticas (' + (OS.Units.imp() ? 'libras e milhas' : 'kg e km') + ')', p.units || '')}${opt('met', 'Métricas (kg, km, °C)', p.units || '')}${opt('imp', 'Imperiais (lb, mi, °F)', p.units || '')}</select></label>
+  </div></div>`; };
+document.addEventListener('change', e => { const el = e.target.closest && e.target.closest('[data-pset]'); if (!el) return; const k = el.dataset.pset, v = el.value;
+  OS.setOne('profile', { [k]: v }); OS.U.ls.set('nau:lang', '');
+  if (k === 'country' || k === 'lang') { if (OS.Lang) OS.Lang.apply(); }
+  OS.UI && OS.UI.toast && OS.UI.toast('Guardado', 'pos'); OS.request && OS.request(); });
+OS.on('ready', () => { const o = OS.views.definicoes; if (!o || o._pais) return; OS.views.definicoes = sub => o(sub) + (String(sub || '') === '' ? panel() : ''); OS.views.definicoes._pais = 1; });
+
+/* ---------- unidades (sistema imperial nos EUA, Libéria e Myanmar) ---------- */
+OS.Units = {
+  imp: () => { const p = prof(); return p.units ? p.units === 'imp' : pub() && P.imperial(); },
+  kg: v => OS.Units.imp() ? U.nf(U.num(v) * 2.20462, 1) + ' lb' : U.nf(U.num(v), 1) + ' kg',
+  km: v => OS.Units.imp() ? U.nf(U.num(v) * .621371, 1) + ' mi' : U.nf(U.num(v), 1) + ' km',
+  temp: c => OS.Units.imp() ? Math.round(U.num(c) * 9 / 5 + 32) + '°F' : Math.round(U.num(c)) + '°C' };
+})();
+
+</script>
+<script>
+/* PRUMO — línguas. O app é escrito em português de Portugal; para quem lê outra língua, o ecrã é traduzido na hora:
+   cada texto que aparece (botões, títulos, avisos, listas…) é trocado pela tradução do dicionário dessa língua.
+   Os dicionários são feitos a partir dos textos do código (standalone/i18n): os principais vêm com o app (i18n/<língua>.json)
+   e os outros são preparados uma vez pela IA no servidor (api/lingua) e guardados para todos.
+   Só se traduzem textos do app que estão no dicionário: o que escreves (tarefas, notas, nomes…) nunca sai do aparelho por causa disto.
+   A IA e a voz passam a falar a língua da pessoa. */
+(() => {
+'use strict';
+const U = OS.U;
+const LANGS = ['pt-PT', 'pt-BR', 'en', 'es', 'fr', 'it', 'de', 'nl', 'ca', 'pl', 'ro', 'ru', 'uk', 'tr', 'el', 'cs', 'sk', 'sl', 'hr', 'sr', 'bs', 'mk', 'bg', 'hu', 'sv', 'no', 'da', 'fi', 'is', 'et', 'lv', 'lt', 'sq', 'hy', 'ka', 'az', 'uz',
+  'ar', 'he', 'fa', 'hi', 'bn', 'ne', 'zh', 'zh-TW', 'ja', 'ko', 'id', 'ms', 'th', 'vi', 'km', 'lo', 'my', 'mn', 'sw', 'am', 'so'];
+const SHIP = new Set(['pt-BR', 'en', 'es', 'fr', 'it', 'de']);   // dicionários que vêm com o app
+const RTL = new Set(['ar', 'he', 'fa']);
+const ok = c => LANGS.includes(c);
+const fromNav = n => { n = String(n || ''); if (/^pt-BR/i.test(n)) return 'pt-BR'; if (/^pt/i.test(n)) return 'pt-PT'; if (/^zh-(TW|HK|MO|Hant)/i.test(n)) return 'zh-TW'; let b = n.slice(0, 2).toLowerCase(); if (b === 'nb' || b === 'nn') b = 'no'; return ok(b) ? b : 'en'; };
+const acc = () => OS.Acc || {};
+const prof = () => { try { return OS.one('profile') || {}; } catch (e) { return {}; } };
+let isReady = false; const booted = () => isReady;
+const dev = () => { const s = U.ls.get('nau:lang', ''); if (ok(s)) return s; return fromNav((navigator.languages && navigator.languages[0]) || navigator.language); };
+// a língua de agora: a escolhida no perfil; senão a do país (contas novas); o perfil pessoal do Ryan e o modo local ficam em português de Portugal
+const want = () => { if (window.__lang && ok(window.__lang)) return window.__lang;
+  if (!booted()) return acc().on || acc().sess ? dev() : 'pt-PT';
+  const p = prof(); if (ok(p.lang)) return p.lang;
+  if (acc().on && acc().pub) return p.country && OS.Pais && OS.Pais.has(p.country) ? OS.Pais.langOf(p.country) : dev();
+  return 'pt-PT'; };
+let code = 'pt-PT';
+const L = OS.Lang = {
+  list: () => LANGS.slice(), ship: c => SHIP.has(c), ok,
+  code: () => code,
+  base: () => code.slice(0, 2),
+  on: () => code !== 'pt-PT',
+  name: (c = code, inLang) => { if (c === 'pt-PT') return 'Português (Portugal)'; if (c === 'pt-BR') return 'Português (Brasil)'; try { const n = new Intl.DisplayNames([inLang || c], { type: 'language' }).of(c); return n ? n.charAt(0).toUpperCase() + n.slice(1) : c; } catch (e) { return c; } },
+  // nome da língua em inglês (para a IA)
+  en: (c = code) => { if (c === 'pt-BR') return 'Brazilian Portuguese (pt-BR)'; if (c === 'pt-PT') return 'European Portuguese (pt-PT)'; try { return new Intl.DisplayNames(['en'], { type: 'language' }).of(c) + ' (' + c + ')'; } catch (e) { return c; } },
+  loc: () => { if (code === 'pt-PT' || code === 'pt-BR' || code === 'zh-TW') return code; const cc = OS.Pais ? OS.Pais.code() : 'PT', t = code + '-' + cc; try { return Intl.NumberFormat.supportedLocalesOf([t]).length ? t : code; } catch (e) { return code; } },
+  // voz: reconhecimento e leitura
+  speech: () => { if (code === 'pt-PT' || code === 'pt-BR') return code; const l = L.loc(); return /-/.test(l) ? l : ({ en: 'en-US', es: 'es-ES', fr: 'fr-FR', it: 'it-IT', de: 'de-DE', nl: 'nl-NL', ja: 'ja-JP', zh: 'zh-CN', ko: 'ko-KR', ru: 'ru-RU', ar: 'ar-SA', hi: 'hi-IN', sv: 'sv-SE', pl: 'pl-PL', tr: 'tr-TR' }[code] || code); },
+  ready: false };
+// formatos (números, datas, moeda) na língua e país da pessoa; em português de Portugal fica tudo igual
+OS.loc = () => L.loc();
+
+/* ---------- dicionário ---------- */
+let EX = null, PAT = [], IDX = new Map(), CACHE = new Map(), FB = null;
+const norm = s => s.replace(/\s+/g, ' ').trim();
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const words = s => (s.toLowerCase().match(/[a-zà-ÿ]{3,}/g) || []);
+const compile = (m, into) => { const ex = new Map(), pats = [], idx = new Map(), shorts = [];
+  for (const k in m) { const v = m[k]; if (typeof v !== 'string' || !v) continue;
+    if (!/\{\d+\}/.test(k)) { ex.set(k, v); continue; }
+    const parts = k.split(/(\{\d+\})/), ids = [], isP = x => /^\{\d+\}$/.test(x || ''); let re = '^';
+    // {n} pode ser vazio (um ícone, um plural) e os espaços à volta dele também
+    // (o espaço entre o texto e o {n} vai junto com ele: "com {0}" serve para "com 5" e "com", nunca para "comprimida")
+    parts.forEach((p, i) => { const mm = p.match(/^\{(\d+)\}$/); if (mm) { ids.push(+mm[1]); const pre = /\s$/.test(parts[i - 1] || ''), post = /^\s/.test(parts[i + 1] || '');
+        re += pre && post ? '(?:\\s+(.*?)\\s+|\\s+)' : pre ? '(?:\\s+(.*?))?' : post ? '(?:(.*?)\\s+)?' : '(.*?)'; return; }
+      let e = esc(p); if (isP(parts[i - 1])) e = e.replace(/^\s+/, ''); if (isP(parts[i + 1])) e = e.replace(/\s+$/, ''); re += e; });
+    re += '$'; let rx; try { rx = new RegExp(re, 's'); } catch (e) { continue; }
+    const lit = parts.filter(p => !isP(p)).join(' ');
+    // a palavra-chave para encontrar o modelo: a mais comprida que aparece inteira (não "treino" em "treino{1}", que no ecrã é "treinos")
+    const whole = parts.map((p, i) => isP(p) ? '' : p.replace(isP(parts[i - 1]) ? /^[A-Za-zÀ-ÿ]+/ : /^$/, '').replace(isP(parts[i + 1]) ? /[A-Za-zÀ-ÿ]+$/ : /^$/, '')).join(' ');
+    const ws = words(whole).length ? words(whole) : words(lit);
+    if (!ws.length) { if (/[A-Za-zÀ-ÿ]{2}/.test(lit)) shorts.push({ rx, ids, v, n: lit.length }); continue; }   // "{0} de {1}": sem palavra-chave, só para números
+    const anchor = ws.sort((a, b) => b.length - a.length)[0], pt = { rx, ids, v, n: lit.length };
+    pats.push(pt); if (!idx.has(anchor)) idx.set(anchor, []); idx.get(anchor).push(pt); }
+  idx.forEach(l => l.sort((a, b) => b.n - a.n));
+  return { ex, pats, idx, shorts }; };
+let D = null;
+const sym = () => { try { return OS.cur() === 'EUR' ? null : (new Intl.NumberFormat(L.loc(), { style: 'currency', currency: OS.cur(), currencyDisplay: 'narrowSymbol' }).formatToParts(0).find(p => p.type === 'currency') || {}).value; } catch (e) { return null; } };
+const lookup = (d, key, depth) => { const v = d.ex.get(key); if (v != null) return v;
+  // de todos os modelos que servem, fica o mais completo ("Meta: {0} dias por semana…" ganha a "Meta: {0}")
+  const seen = new Set(); let best = null, bm = null;
+  // e o texto fixo do modelo tem de ser boa parte da frase (um "{0} de volta" não serve para um versículo inteiro)
+  const fits = (p, m) => m.slice(1).reduce((t, c) => t + (c ? c.length : 0), 0) <= Math.max(48, 3 * p.n);
+  for (const w of words(key)) { const L2 = d.idx.get(w); if (!L2) continue; for (const p of L2) { if (seen.has(p) || (best && p.n <= best.n)) continue; seen.add(p); const m = p.rx.exec(key); if (m && fits(p, m)) { best = p; bm = m; } } }
+  // modelos curtos ("2 de 3", "há 5 dias") só com números no lugar dos {n}, para não mexer em nomes que as pessoas escrevem
+  if (!best && key.length <= 48) for (const p of d.shorts) { const m = p.rx.exec(key); if (m && m.slice(1).every(c => /^[\d\s.,:%/+\-−]*$/.test(c || ''))) { best = p; bm = m; break; } }
+  if (!best) return null;
+  let out = best.v; best.ids.forEach((id, i) => { const cap = bm[i + 1] || '', tr = cap && depth < 2 ? tx(cap, depth + 1) : null; out = out.split('{' + id + '}').join(tr != null ? cap.match(/^\s*/)[0] + tr + cap.match(/\s*$/)[0] : cap); });
+  return out.replace(/ {2,}/g, ' ').trim(); };
+// aspas, parênteses, símbolos e pontuação à volta: traduz o miolo e devolve-os ("“…”", "+ …", "…:")
+const EDGE = /^([^A-Za-zÀ-ÿ0-9]*)([\s\S]*?)([^A-Za-zÀ-ÿ0-9]*)$/;
+const core = (key, depth) => { let r = lookup(D, key, depth); if (r == null && FB) r = lookup(FB, key, depth);
+  if (r == null && depth < 2) { const m = key.match(EDGE); if (m && (m[1] || m[3]) && /[A-Za-zÀ-ÿ]{2}/.test(m[2])) { let c = lookup(D, m[2], depth); if (c == null && FB) c = lookup(FB, m[2], depth); if (c != null) r = m[1] + c + m[3]; } }
+  // uma contagem no fim: "Concluído (3)"
+  if (r == null && depth < 2) { const m = key.match(/^(.*?[A-Za-zÀ-ÿ].*?)(\s*\(\s*[\d.,%/]+\s*\))$/); if (m) { let c = lookup(D, m[1], depth); if (c == null && FB) c = lookup(FB, m[1], depth); if (c != null) r = c + m[2]; } }
+  return r; };
+const tx = (s, depth = 0) => { if (!D) return null; const key = norm(s); if (!key || !/[A-Za-zÀ-ÿ]/.test(key)) return null;
+  if (!depth && CACHE.has(key)) return CACHE.get(key);
+  let r = core(key, depth);
+  // partes separadas por " · " ou " — " (ex.: "Experiência · 40%"): cada uma à parte
+  if (r == null && depth < 2 && / [·—] /.test(key)) { let any = false; const out = key.split(/( [·—] )/).map((x, i) => { if (i % 2) return x; const t = /[A-Za-zÀ-ÿ]{2}/.test(x) ? core(x, depth + 1) : null; if (t != null) { any = true; return t; } return x; }); if (any) r = out.join(''); }
+  if (r != null && SYM && r.includes('€')) r = r.replace(/€/g, SYM);
+  if (!depth) { if (CACHE.size > 40000) CACHE.clear(); CACHE.set(key, r); }
+  return r; };
+let SYM = null;
+// traduz um texto (para a voz, avisos, títulos…); devolve o original se não houver tradução
+L.t = s => { if (!D || s == null) return s; const str = String(s), r = tx(str); if (r == null) return str; const lead = str.match(/^\s*/)[0], trail = str.match(/\s*$/)[0]; return lead + r + trail; };
+
+/* ---------- traduzir o ecrã ---------- */
+const SRC = new WeakMap();   // nó de texto → { s: original, o: traduzido }
+const ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
+const ASRC = new WeakMap();
+const skipEl = el => !el || el.closest('script,style,textarea,code,pre,noscript,[data-notr],[translate="no"],[contenteditable="true"],[contenteditable=""]');
+const doText = n => { const d = n.data; if (!d || d.length > 4000) return; const rec = SRC.get(n); if (rec && rec.o === d) return;
+  const r = tx(d); if (r == null) { if (rec) SRC.delete(n); return; }
+  const lead = d.match(/^\s*/)[0], trail = d.match(/\s*$/)[0], out = lead + r + trail; if (out === d) return;
+  SRC.set(n, { s: d, o: out }); n.data = out; };
+const doAttrs = el => { for (const a of ATTRS) { const v = el.getAttribute(a); if (!v) continue; const m = ASRC.get(el) || {}; if (m[a] && m[a].o === v) continue; const r = tx(v); if (r == null || r === v) continue; m[a] = { s: v, o: r }; ASRC.set(el, m); el.setAttribute(a, r); }
+  if (el.tagName === 'INPUT' && /^(submit|button)$/i.test(el.type) && el.value) { const r = tx(el.value); if (r != null) el.value = r; } };
+const walk = root => { if (!D || !root) return;
+  if (root.nodeType === 3) { if (!skipEl(root.parentElement)) doText(root); return; }
+  if (root.nodeType !== 1 && root.nodeType !== 9 && root.nodeType !== 11) return;
+  if (root.nodeType === 1 && skipEl(root)) return;
+  if (root.nodeType === 1) doAttrs(root);
+  const it = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: n => n.nodeType === 1 ? (/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE|NOSCRIPT)$/.test(n.tagName) || n.hasAttribute('data-notr') || n.getAttribute('translate') === 'no' || n.isContentEditable ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) : NodeFilter.FILTER_ACCEPT });
+  let n; while ((n = it.nextNode())) { if (n.nodeType === 3) doText(n); else { if (n.hasAttribute('placeholder') || n.hasAttribute('title') || n.hasAttribute('aria-label') || n.hasAttribute('alt') || n.tagName === 'INPUT') doAttrs(n); } } };
+// volta ao português (ao mudar de língua sem recarregar)
+const restore = () => { const it = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT); let n;
+  while ((n = it.nextNode())) { if (n.nodeType === 3) { const r = SRC.get(n); if (r && r.o === n.data) n.data = r.s; SRC.delete(n); } else { const m = ASRC.get(n); if (m) { Object.entries(m).forEach(([a, x]) => { if (n.getAttribute(a) === x.o) n.setAttribute(a, x.s); }); ASRC.delete(n); } } } };
+let MO = null;
+const observe = () => { if (MO) return; MO = new MutationObserver(recs => { if (!D) return; for (const r of recs) {
+    if (r.type === 'characterData') { const p = r.target.parentElement; if (!skipEl(p)) doText(r.target); }
+    else if (r.type === 'attributes') { if (!skipEl(r.target)) doAttrs(r.target); }
+    else r.addedNodes.forEach(walk); } });
+  MO.observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS }); };
+// alert/confirm/prompt do navegador também na língua
+['alert', 'confirm', 'prompt'].forEach(f => { const o = window[f]; if (typeof o !== 'function') return; window[f] = function (msg, ...a) { return o.call(window, D ? L.t(msg) : msg, ...a); }; });
+
+/* ---------- carregar o dicionário ---------- */
+const VER = () => (window.OCEANUM_VERSION && window.OCEANUM_VERSION.v) || '0';
+const CK = 'oceanum-lingua';
+const getPack = async c => {
+  if (SHIP.has(c)) { const r = await fetch('i18n/' + c + '.json?v=' + VER()); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }
+  // outras línguas: preparadas no servidor; guardadas também neste aparelho
+  const url = 'api/lingua?l=' + encodeURIComponent(c) + '&v=' + VER();
+  let cache = null; try { cache = window.caches ? await caches.open(CK) : null; } catch (e) { }
+  const hit = cache && await cache.match(url); if (hit) { const j = await hit.json(); if (j && j.completo) return j; }
+  const r = await fetch(url); const j = await r.json(); if (j && j.completo && cache) { try { await cache.put(url, new Response(JSON.stringify(j), { headers: { 'content-type': 'application/json' } })); } catch (e) { } }
+  return j; };
+let loading = null, prepT = 0;
+L.progress = null;   // { feito, total } enquanto a IA prepara uma língua nova
+const prepare = async c => { // pede ao servidor para traduzir o que falta (aos poucos), mostra o progresso e recarrega no fim
+  if (!(acc().on && acc().token && acc().token())) return; if (prepT) return; prepT = 1;
+  for (let i = 0; i < 400 && L.code() === c; i++) { let j; try { const r = await fetch('api/lingua', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + acc().token() }, body: JSON.stringify({ op: 'preparar', l: c }) }); j = await r.json(); } catch (e) { j = null; }
+    if (!j || !j.ok) { await new Promise(r => setTimeout(r, 15000)); continue; }
+    L.progress = { feito: j.feito, total: j.total }; OS.request && OS.request(); bar();
+    if (j.completo) break; await new Promise(r => setTimeout(r, 500)); }
+  prepT = 0; L.progress = null; bar(); if (L.code() === c) { delete PKS[c]; await use(c, true); } };
+const PKS = {};
+const use = async (c, force) => {
+  if (c === 'pt-PT') { const was = !!D; D = null; FB = null; CACHE.clear(); SYM = null; L.ready = true; if (was) restore(); dir(); return; }
+  let pk = null; try { if (!PKS[c] || force) { pk = await getPack(c); PKS[c] = compile(pk.m || {}); } } catch (e) { PKS[c] = PKS[c] || null; }
+  // fora do português, o que falta numa língua preparada aos poucos aparece em inglês
+  if (c !== 'en' && !c.startsWith('pt')) { try { if (!PKS.en) PKS.en = compile((await getPack('en')).m || {}); } catch (e) { } FB = PKS.en || null; } else FB = null;
+  if (L.code() !== c) return;
+  if (D) restore();   // vinha de outra língua: primeiro volta ao original, depois traduz para a nova
+  D = PKS[c] || FB; CACHE.clear(); SYM = sym(); L.ready = true; dir(); observe(); walk(document.documentElement);
+  if (!SHIP.has(c) && pk && !pk.completo) prepare(c); };
+const dir = () => { document.documentElement.lang = code === 'pt-PT' ? 'pt' : code; dates(); };
+// nomes dos meses e dos dias da semana na língua (os do português ficam guardados para voltar)
+const PTD = { MES: U.MES.slice(), MESL: U.MESL.slice(), WD: U.WD.slice(), WDS: U.WDS.slice() };
+const cap = x => x.charAt(0).toUpperCase() + x.slice(1);
+const dates = () => { const put = (k, a) => { if (Array.isArray(U[k]) && a.length === U[k].length) U[k].splice(0, U[k].length, ...a); };
+  if (/^pt/.test(code)) { Object.keys(PTD).forEach(k => put(k, PTD[k])); return; }
+  try { const lc = L.loc(), m = o => Array.from({ length: 12 }, (_, i) => new Intl.DateTimeFormat(lc, o).format(new Date(2026, i, 15))), w = o => Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(lc, o).format(new Date(2026, 1, 1 + i)));
+    put('MES', m({ month: 'short' }).map(x => x.replace(/\.$/, ''))); put('MESL', m({ month: 'long' })); put('WD', w({ weekday: 'long' }).map(cap)); put('WDS', w({ weekday: 'short' }).map(x => cap(x.replace(/\.$/, '')))); } catch (e) { } };
+// barra fina no topo enquanto a IA prepara uma língua nova
+const bar = () => { let b = document.getElementById('lgBar'); const p = L.progress;
+  if (!p) { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement('div'); b.id = 'lgBar'; b.setAttribute('data-notr', ''); b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;font:12px system-ui;background:#0B1830;color:#E9E3D8;padding:6px 12px;text-align:center'; document.body.appendChild(b); }
+  b.textContent = (L.name() + ' · ' + Math.round(100 * p.feito / Math.max(1, p.total)) + '%'); };
+L.set = async (c, save = true) => { if (!ok(c)) return; if (save) { U.ls.set('nau:lang', c); if (booted()) OS.setOne('profile', { lang: c }); } await L.apply(); };
+L.apply = async () => { const c = want(); if (booted()) U.ls.set('nau:lang', c);   // o ecrã da conta, da próxima vez, já abre nesta língua
+  if (c === code && (L.ready || c === 'pt-PT')) { L.ready = true; return; }
+  code = c; L.ready = false; loading = use(c); await loading; OS.emit && OS.emit('lang', c); OS.request && OS.request(); };
+L.wait = () => loading || Promise.resolve();
+L.apply();
+OS.on('ready', () => { isReady = true; L.apply(); });
+OS.on('unlock', () => L.apply());
+OS.on('one:profile', () => { if (want() !== code) L.apply(); });
+OS.on('remote', () => { if (want() !== code) L.apply(); });
+
+/* ---------- a IA responde na língua da pessoa ---------- */
+const NOTE = () => code === 'pt-BR' ? 'IMPORTANTE — IDIOMA: escreve tudo o que for para a pessoa ler em português do Brasil (pt-BR), com vocabulário e tratamento brasileiros (você, celular, tela, salvar…), mesmo que as instruções acima digam "português de Portugal". Não traduzas chaves de JSON nem valores que tenham de coincidir com uma lista de opções dada nas instruções.'
+  : `IMPORTANT — LANGUAGE: the person using this app reads ${L.en()}. Write every word meant for the person in ${L.en()}, even if the instructions above are written in Portuguese or ask for Portuguese. Do not translate JSON keys, IDs, or values that must match a list of allowed options given in the instructions (keep those exactly as written).${OS.Pais ? ' The person lives in ' + OS.Pais.name(OS.Pais.code(), 'en') + '.' : ''}`;
+const addNote = (url, body) => { let j; try { j = JSON.parse(body); } catch (e) { return body; }
+  if (/AUDIO/i.test(JSON.stringify((j.generationConfig || {}).responseModalities || ''))) return body;   // voz (TTS): sem instruções extra
+  if (/generativelanguage\.googleapis\.com|\/api\/ia\b/.test(url)) { const k = j.systemInstruction ? 'systemInstruction' : j.system_instruction ? 'system_instruction' : 'systemInstruction', si = j[k] || { parts: [] }; si.parts = (si.parts || []).concat([{ text: NOTE() }]); j[k] = si; }
+  else if (Array.isArray(j.messages) && /anthropic|claude/i.test(url + (j.model || ''))) { j.system = j.system ? (typeof j.system === 'string' ? j.system + '\n\n' + NOTE() : j.system.concat([{ type: 'text', text: NOTE() }])) : NOTE(); }
+  else if (Array.isArray(j.messages)) { j.messages = [{ role: 'system', content: NOTE() }].concat(j.messages); }
+  else return body;
+  return JSON.stringify(j); };
+const AIURL = /generativelanguage\.googleapis\.com\/[^?]*:(generateContent|streamGenerateContent)|\/api\/ia\?[^#]*:(generateContent|streamGenerateContent)|pollinations\.ai\/openai|api\.anthropic\.com\/v1\/messages|\/api\/brain/;
+const of = window.fetch;
+window.fetch = function (u, o) { try { if (code !== 'pt-PT' && o && typeof o.body === 'string') { const url = typeof u === 'string' ? u : (u && u.url) || String(u); if (AIURL.test(url)) o = Object.assign({}, o, { body: addNote(url, o.body) }); } } catch (e) { } return of.apply(this, [u, o]); };
+})();
+
+</script>
+<script>
 /* PRUMO — Termos de Serviço, Política de Privacidade, cookies, os teus direitos (LGPD e RGPD), acessibilidade e créditos.
    Numa conta, os termos aceitam-se uma vez (ao criar a conta, ou na primeira entrada depois de existirem); a aceitação fica guardada
    na conta com a versão e a data. Os textos abrem por cima de tudo (também no ecrã de entrar), em Definições › Privacidade e termos. */
@@ -5829,7 +6151,7 @@ const A = OS.act = OS.act || {};
 const prioL = p => (L.PRIO.find(x => x[0] === String(p)) || [, ''])[1];
 const prioT = p => ({ 1: 'neg', 2: 'warn' }[p] || '');
 const subjN = id => (OS.get('subjects', id) || {}).name || '';
-const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const greet = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };   // já na língua da pessoa (vem colado ao nome)
 const dayQuote = () => OS.my(L.QUOTES[U.hash(U.today()) % L.QUOTES.length]);
 OS.srcColor = s => (Cal.src[s] || [, 'var(--mut)'])[1];
 
@@ -8845,7 +9167,7 @@ A.feGo = b => { OS.setUI('bRef', b.dataset.r); OS.setUI('bSel', []); location.ha
 /* ---------- ecrã principal ---------- */
 const TABS = [['', 'Hoje com Deus'], ['biblia', 'Bíblia'], ['devocional', 'Meu devocional'], ['oracoes', 'Orações'], ['planos', 'Planos de leitura']];
 V.fe = sub => { bible(); const h = new Date().getHours(), nm = (OS.one('profile').short || OS.who());
-  return UI.head(`${h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'}, ${esc(nm)}`, 'Um tempo dedicado a Deus: a Palavra, a oração e o que Ele te diz hoje.', '', 'Fé & Devoção') + UI.tabs('fe', TABS, sub || '') + `<div class="fe">${(T[sub || ''] || T[''])()}</div>`; };
+  return UI.head(`${(g => OS.Lang ? OS.Lang.t(g) : g)(h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite')}, ${esc(nm)}`, 'Um tempo dedicado a Deus: a Palavra, a oração e o que Ele te diz hoje.', '', 'Fé & Devoção') + UI.tabs('fe', TABS, sub || '') + `<div class="fe">${(T[sub || ''] || T[''])()}</div>`; };
 const T = {};
 const verseCard = (R, title, extra = '') => { const vs = verses(R); return `<div class="fe-v"><div class="eyebrow">${title}</div><blockquote>${vs.map(([n, t]) => `<sup>${n}</sup>${esc(t)}`).join(' ') || '…'}</blockquote><div class="fe-vr"><b>${esc(label(R))}</b><span class="mut">${esc(VERS[ver()])}</span></div>
   <div class="row gap6" style="flex-wrap:wrap;margin-top:10px"><button class="btn xs" data-act="feGo" data-r="${R.b}.${R.c}">Ler o capítulo</button><button class="btn xs ghost" data-act="feCopy" data-ref="${R.b} ${R.c}:${R.v1 || 1}${R.v2 && R.v2 !== R.v1 ? '-' + R.v2 : ''}">Copiar</button><button class="btn xs ghost" data-act="feUse" data-ref="${R.b} ${R.c}:${R.v1 || 1}${R.v2 && R.v2 !== R.v1 ? '-' + R.v2 : ''}">Usar no devocional</button>${extra}</div></div>`; };
@@ -13139,6 +13461,8 @@ S.memAdd = memAdd;
 /* ================= rotinas ================= */
 // junta o que cada passo diria e fala tudo de uma vez no fim
 { const say0 = S.say; S.say = (t, o) => say0(OS.aiN(t), o); }
+// noutra língua, as frases feitas do Spyke (resumo do dia, confirmações) dizem-se nessa língua; as respostas da IA já vêm nela
+{ const say1 = S.say; S.say = (t, o) => say1(XLang() && typeof t === 'string' ? t.split(/(?<=[.!?…])\s+/).map(x => OS.Lang.t(x)).join(' ') : t, o); }
 /* ---------- o nome da tua IA ---------- */
 const NAMES = ['Spyke', 'Jarvis', 'Atlas', 'Nova', 'Luna', 'Aurora', 'Max', 'Íris'];
 S.namePanel = () => { const c = cfg(), n = c.nome || '';
@@ -13680,7 +14004,7 @@ const cfg = () => Object.assign({ jarvisStart: true }, OS.one('spyke'));
 let el = null, fab = null, raf = 0, dataAt = 0, newsX = 0, newsW = 0;
 const name = () => OS.one('profile').short || OS.who();
 const eur = v => U.eur(v);
-const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'; };
+const greet = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 19 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };
 
 /* ---------- dados ---------- */
 const D = () => { const t = U.today(), nowM = new Date().getHours() * 60 + new Date().getMinutes(), o = {};
@@ -16881,7 +17205,7 @@ const Fin = OS.Fin, Cal = OS.Cal;
 const safe = (f, d) => { try { return f(); } catch (e) { return d; } };
 // a janela do Painel: o mesmo mar do ecrã de entrada, parado, à hora real
 const sky = () => { if (!OS.Scene) return ''; const m = innerWidth < 860, w = m ? Math.max(320, innerWidth) : Math.min(1280, Math.max(700, innerWidth - 60)); return `<div class="dash-sc">${OS.Scene.svg(w, m ? 420 : 320, { id: 'dsh' })}</div>`; };
-const greet = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const greet = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };   // já na língua da pessoa (vem colado ao nome)
 const range = () => { const per = OS.ui.dashPer || 'mes', t = U.today(), ym = OS.ui.dashYM || U.ym(t);
   if (per === 'hoje') return { per, a: t, b: t, label: 'Hoje', ym };
   if (per === 'semana') { const w = U.monday(t); return { per, a: w, b: U.addDays(w, 6), label: `${U.fmtDS(w)} – ${U.fmtDS(U.addDays(w, 6))}`, ym }; }
@@ -20091,7 +20415,7 @@ function open() { const viaCode = !L.unlocked(); setUnlocked(true); setTimeout((
 const codeInput = () => { const sec = (() => { try { return CSS.supports('-webkit-text-security', 'disc'); } catch (e) { return false; } })();
   return `<input id="lkCode" class="${sec ? 'lk-sec' : ''}" type="${sec ? 'text' : 'password'}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Código de acesso" aria-label="Código de acesso">`; };
 // ecrã de entrada: o mar visto do forte, à hora real, com a tua frase do dia
-const hello = () => { const h = new Date().getHours(); return h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; };
+const hello = () => { const h = new Date().getHours(), g = h < 6 ? 'Boa madrugada' : h < 13 ? 'Bom dia' : h < 20 ? 'Boa tarde' : 'Boa noite'; return OS.Lang ? OS.Lang.t(g) : g; };
 const hm = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
 let lkTick = 0, lkRes = 0, lkRT = 0;
 const scene = () => OS.Scene ? `<div class="lk-scene${OS.Fundo && OS.Fundo.get() === 'foto' ? ' fd-isphoto' : ''}">${OS.Fundo ? OS.Fundo.html(Math.max(320, innerWidth), Math.max(480, innerHeight), { anim: 1, id: 'lks' }) : OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { anim: 1, id: 'lks' })}<i class="lk-grain" style="background-image:url(${OS.Scene.grain()})"></i></div>` : '';
