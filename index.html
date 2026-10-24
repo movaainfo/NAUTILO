@@ -3246,6 +3246,46 @@ body.onb-open{overflow:hidden}
 .fd-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .fd-msg{margin:10px 0 0;font:13px var(--sans);color:#F0A29D}
 .fd-msg:empty{display:none}
+/* fundos animados: só mexem enquanto o ecrã de entrada (ou o da conta) está à vista; leves (opacidade e deslocações) */
+:is(#splash:not([hidden]):not(.out),#acc) .sc-anim .sc-glint{animation:scGlint 4.5s ease-in-out infinite!important}:is(#splash:not([hidden]):not(.out),#acc) .sc-anim .sc-boat{animation:scBoat 5s ease-in-out infinite!important}:is(#splash:not([hidden]):not(.out),#acc) .sc-anim .sc-beam{animation:scBeam 9s linear infinite!important}:is(#splash:not([hidden]):not(.out),#acc) .sc-anim .sc-cloud{animation:scCloud 60s ease-in-out infinite alternate!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-tw{animation:fdTw 3.6s ease-in-out infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-drift{animation:fdDrift 50s ease-in-out infinite alternate!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-mist{animation:fdMist 26s ease-in-out infinite alternate!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-glow{animation:fdGlow 7s ease-in-out infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-shim{animation:fdShim 2.8s ease-in-out infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-spin{animation:fdSpin 140s linear infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-aur{transform-box:fill-box;animation:fdAur 14s ease-in-out infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-shoot{animation:fdShoot 11s ease-in infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-wave{transform-box:fill-box;animation:fdWave 16s linear infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-anim .fd-rain{transform-box:fill-box;animation:fdRain 1.3s linear infinite!important}
+:is(#splash:not([hidden]):not(.out),#acc) .fd-kb{animation:fdKb 34s ease-in-out infinite alternate!important}
+@keyframes fdTw{0%,100%{opacity:.18}50%{opacity:1}}
+@keyframes fdDrift{from{transform:translateX(-3%)}to{transform:translateX(4%)}}
+@keyframes fdMist{from{transform:translateX(-5%)}to{transform:translateX(5%)}}
+@keyframes fdGlow{0%,100%{opacity:.78}50%{opacity:1}}
+@keyframes fdShim{0%,100%{opacity:.12}50%{opacity:.45}}
+@keyframes fdSpin{to{transform:rotate(360deg)}}
+@keyframes fdAur{0%,100%{transform:translateX(-3%) skewX(-5deg);opacity:.35}50%{transform:translateX(3%) skewX(5deg);opacity:.8}}
+@keyframes fdShoot{0%,86%{opacity:0;transform:translate(0,0)}88%{opacity:1}100%{opacity:0;transform:translate(-22vw,14vh)}}
+@keyframes fdWave{to{transform:translateX(-50%)}}
+@keyframes fdRain{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+@keyframes fdKb{from{transform:scale(1)}to{transform:scale(1.08) translate(-1%,-1%)}}
+@media (prefers-reduced-motion:reduce){.fd-anim *,.fd-kb{animation:none!important}}
+.fd-mv{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:10px 12px;border:1px solid rgba(233,227,216,.12);border-radius:14px;cursor:pointer}
+.fd-mv input{position:absolute;opacity:0;width:1px;height:1px}
+.fd-mv small{display:block;color:#8A93A0;font-size:12px;margin-top:2px}
+.fd-sw{flex:none;width:42px;height:24px;border-radius:999px;background:rgba(233,227,216,.18);position:relative;transition:background .2s}
+.fd-sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#E9E3D8;transition:transform .2s}
+.fd-mv input:checked+.fd-sw{background:#F2C48D}.fd-mv input:checked+.fd-sw::after{transform:translateX(18px);background:#1A1208}
+.fd-mv input:focus-visible+.fd-sw{outline:2px solid #F2C48D;outline-offset:2px}
+/* a voz da tua IA: grelha de vozes para ouvir e escolher */
+.spy-vz{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.spy-vc{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px 10px 34px;border-radius:14px;border:1px solid var(--line2,rgba(233,227,216,.14));background:var(--pn2,rgba(255,255,255,.03));color:var(--tx);cursor:pointer;min-height:54px}
+.spy-vc b{font-size:14px}.spy-vc small{color:var(--mut);font-size:12px}
+.spy-vc .spy-vi{position:absolute;left:11px;top:11px;font-size:14px;opacity:.7}
+.spy-vc.on{border-color:#F2C48D;background:rgba(242,196,141,.10)}.spy-vc.on b{color:#F5E2C8}
+.spy-vc:focus-visible{outline:2px solid #F2C48D;outline-offset:2px}
+.spy-dv{margin-top:10px}.spy-dv summary{cursor:pointer;font-size:13px;margin-bottom:8px}
 
 </style>
 <style>
@@ -3416,8 +3456,41 @@ html.lite #splash{background:#04070D!important}
 html.lite .ceremony,html.lite .upd{background:#04101F!important}
 
 </style>
+<style>
+/* PRUMO — movimento (js/vivo.js). Curto, leve (opacidade e deslocações) e por cima do modo leve: também nos tablets Android. */
+@keyframes vvUp{from{opacity:0;translate:0 16px}to{opacity:1;translate:0 0}}
+@keyframes vvFade{from{opacity:0}to{opacity:1}}
+@keyframes vvScale{from{opacity:0;scale:.94}to{opacity:1;scale:1}}
+@keyframes vvBar{from{scale:0 1}to{scale:1 1}}
+@keyframes vvPop{0%{scale:1}35%{scale:.93}70%{scale:1.05}100%{scale:1}}
+@keyframes vvToast{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
+@keyframes vvModal{from{opacity:0;translate:0 18px;scale:.97}to{opacity:1;translate:0 0;scale:1}}
+/* entrada da página: os blocos de cima em cascata */
+html.vv #view.pg-in>*{animation:vvUp .5s cubic-bezier(.2,.8,.2,1) both!important}
+html.vv #view.pg-in>:nth-child(2){animation-delay:.05s!important}html.vv #view.pg-in>:nth-child(3){animation-delay:.1s!important}html.vv #view.pg-in>:nth-child(4){animation-delay:.15s!important}
+html.vv #view.pg-in>:nth-child(5){animation-delay:.2s!important}html.vv #view.pg-in>:nth-child(6){animation-delay:.24s!important}html.vv #view.pg-in>:nth-child(n+7){animation-delay:.28s!important}
+/* completas: também os cartões dentro das grelhas, os KPIs e as barras */
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid,.ac-grid)>*{animation:vvScale .45s cubic-bezier(.2,.8,.2,1) both!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(2){animation-delay:.06s!important}html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(3){animation-delay:.12s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(4){animation-delay:.18s!important}html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(5){animation-delay:.22s!important}
+html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(6){animation-delay:.26s!important}html.vv-full #view.pg-in :is(.g,.kpis,.dash,.dc-grid)>:nth-child(n+7){animation-delay:.3s!important}
+html.vv-full #view.pg-in :is(.pbar,.dc-bar,.dbar) i{transform-origin:left center;animation:vvBar .9s .2s cubic-bezier(.2,.8,.2,1) both!important}
+html.vv-full #view.pg-in .li{animation:vvFade .4s ease-out both!important}
+/* toque: afunda um pouco; o que mudou dá um salto */
+html.vv :is(button,.btn,.chip,.li.click,a.click,[data-act],[data-edit],[data-go]){transition:scale .14s ease,background-color .2s,border-color .2s,color .2s!important}
+html.vv .vv-press:not(:disabled){scale:.96}
+html.vv .vv-pop{animation:vvPop .48s cubic-bezier(.2,.8,.2,1)!important}
+/* avisos e janelas */
+html.vv .toast:not([hidden]){animation:vvToast .34s cubic-bezier(.2,.8,.2,1)!important}
+html.vv .vv-modal{animation:vvModal .3s cubic-bezier(.2,.8,.2,1)!important}
+html.vv #modal:not([hidden]) .drw-bg{animation:vvFade .25s ease-out!important}
+/* menu: o separador ativo acende devagar */
+html.vv #side a,html.vv .tn-links a{transition:background-color .25s,color .25s!important}
+@media (prefers-reduced-motion:reduce){html.vv *{animation:none!important;transition:none!important}}
+
+</style>
 <style>[hidden]{display:none!important}</style>
-<script>window.OCEANUM_VERSION={"v": "2.41", "date": "24/10/2026", "notes": ["Fundo à tua escolha no ecrã de entrada: toca em \"Fundo\" (canto de cima) e escolhe uma de 8 cenas — Farol, Serra, Cidade, Dunas, Pinhal, Céu estrelado, Prumo ou Liso — ou uma foto da tua galeria. Também em Definições › Geral.", "Ecrã de entrada no tablet deitado e no computador: a frase fica no céu e o código em baixo, sem tapar o desenho; tudo alinhado.", "Editar perfil: \"Personagem do Dominus\" já abre os personagens (antes abria a galeria de fotos) e o formulário dá para subir até ao topo."]};</script>
+<script>window.OCEANUM_VERSION={"v": "2.42", "date": "24/10/2026", "notes": ["Escolhe a voz da tua IA: 30 vozes (masculinas e femininas) para ouvir e escolher em Definições › Spyke, e logo no questionário inicial. Sem configurar nada.", "Fundos animados no ecrã de entrada: ondas, chuva, estrelas a piscar, aurora, luzes da cidade, nuvens e os anéis do Prumo a rodar devagar. Duas cenas novas: Ondas e Chuva. Podes desligar o movimento no botão Fundo.", "O app ficou mais vivo: as páginas entram com movimento, os números contam até ao valor, as barras enchem e os botões respondem ao toque. Em Definições › Aplicação › Animações escolhes completas, suaves ou desligadas."]};</script>
 <script>(function(){try{var n=navigator,ua=n.userAgent||"",low=(n.deviceMemory&&n.deviceMemory<=4)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||/Android/i.test(ua)||matchMedia("(prefers-reduced-motion: reduce)").matches;var f=localStorage.getItem("os2lite");if(f==="1"||(f!=="0"&&low))document.documentElement.classList.add("lite")}catch(e){}})();</script>
 <script src="config.js"></script>
 <script>
@@ -3601,7 +3674,7 @@ U.eur = (v, o = {}) => { const n = Number(v) || 0, d = o.dec ?? 2, B = OS.cur ? 
   return pre + curFmt(Math.abs(n), B, d); };
 // valor numa moeda qualquer (contas em reais, dólares…): símbolo + número como no resto da app
 U.SYM = { EUR: '€', BRL: 'R$', USD: 'US$', GBP: '£', CHF: 'CHF', JPY: '¥', CAD: 'C$', AUD: 'A$' };
-U.money = (v, cur = 'EUR', o = {}) => { const B = OS.cur ? OS.cur() : 'EUR'; if (!cur || cur === B) return U.eur(v, o); if (cur === 'EUR' && LC() === 'pt-PT') { const n = Number(v) || 0; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + '€ ' + Math.abs(n).toLocaleString('pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); } const n = Number(v) || 0; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + (U.SYM[cur] || cur) + ' ' + Math.abs(n).toLocaleString(/^pt/.test(LC()) ? (cur === 'BRL' ? 'pt-BR' : 'pt-PT') : LC(), { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); };
+U.money = (v, cur = 'EUR', o = {}) => { const B = OS.cur ? OS.cur() : 'EUR'; if (!cur || cur === B) return U.eur(v, o); if (cur === 'EUR' && LC() === 'pt-PT') { const n = Number(v) || 0; return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + '€ ' + Math.abs(n).toLocaleString('pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); } const n = Number(v) || 0; if (!/^pt/.test(LC())) return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + curFmt(Math.abs(n), cur, o.dec ?? 2); return (o.sign && n > 0 ? '+' : '') + (n < 0 ? '−' : '') + (U.SYM[cur] || cur) + ' ' + Math.abs(n).toLocaleString(cur === 'BRL' ? 'pt-BR' : 'pt-PT', { minimumFractionDigits: o.dec ?? 2, maximumFractionDigits: o.dec ?? 2 }); };
 U.curSym = (cur = OS.cur ? OS.cur() : 'EUR') => { if (cur === 'EUR') return '€'; try { return (new Intl.NumberFormat(LC(), { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol' }).formatToParts(0).find(p => p.type === 'currency') || {}).value || cur; } catch (e) { return cur; } };
 U.eurK = v => { const a = Math.abs(v), s = U.curSym(); if (a >= 1e6) return (v < 0 ? '−' : '') + s + U.r1(a / 1e6) + 'M'; if (a >= 1e4) return (v < 0 ? '−' : '') + s + Math.round(a / 1e3) + 'k'; return (v < 0 ? '−' : '') + s + Math.round(a); };
 U.pct = (v, d = 0) => (isFinite(v) ? (v * 100).toLocaleString(LC(), { maximumFractionDigits: d, minimumFractionDigits: d }) : '0') + '%';
@@ -5050,7 +5123,7 @@ const gone = () => { if (endedOnce) return; endedOnce = true; LS.del(K.p); wipeL
 
 /* ---------- ecrã da conta (por cima de tudo, com o mesmo mar do ecrã de entrada) ---------- */
 let G = null, gMode = 'entrar', gMsg = '', gEdit = null, gManage = false, gBusy = false, gRec = '';
-const scene = () => OS.Scene ? `<div class="lk-scene${OS.Fundo && OS.Fundo.get() === 'foto' ? ' fd-isphoto' : ''}">${OS.Fundo ? OS.Fundo.html(Math.max(320, innerWidth), Math.max(480, innerHeight), { id: 'acs' }) : OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { id: 'acs' })}</div>` : '';
+const scene = () => OS.Scene ? `<div class="lk-scene${OS.Fundo && OS.Fundo.get() === 'foto' ? ' fd-isphoto' : ''}">${OS.Fundo ? OS.Fundo.html(Math.max(320, innerWidth), Math.max(480, innerHeight), { id: 'acs', anim: 1 }) : OS.Scene.svg(Math.max(320, innerWidth), Math.max(480, innerHeight), { id: 'acs' })}</div>` : '';
 const okImg = s => typeof s === 'string' && s.length <= 60000 && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(s);
 const avatar = (p, big) => `<span class="ac-av${big ? ' big' : ''}${okImg(p.img) ? ' im' : ''}" style="--c:${esc(p.cor || PCOL[0])}">${okImg(p.img) ? `<img src="${p.img}" alt="">` : esc(p.av || first(p.nome).slice(0, 1).toUpperCase() || '?')}</span>`;
 const field = (n, label, type = 'text', extra = '') => `<label class="ac-f"><span>${label}</span><input name="${n}" type="${type}" ${extra}></label>`;
@@ -12695,6 +12768,11 @@ E.stt = async b64 => { const lang = OS.Lang && OS.Lang.on() && !/^pt/.test(OS.La
 'use strict';
 const U = OS.U, UI = OS.UI, V = OS.views, A = OS.act, esc = U.esc;
 const VOICES = [['Charon', 'Charon · informativo, grave'], ['Orus', 'Orus · firme'], ['Iapetus', 'Iapetus · claro'], ['Algenib', 'Algenib · rouco'], ['Alnilam', 'Alnilam · decidido'], ['Sadaltager', 'Sadaltager · sabedor'], ['Fenrir', 'Fenrir · enérgico'], ['Puck', 'Puck · animado'], ['Umbriel', 'Umbriel · descontraído']];
+// as 30 vozes da IA do Google: [nome, como soa, M/F]
+const VOZES = [['Charon', 'grave e informativa', 'M'], ['Orus', 'firme', 'M'], ['Iapetus', 'clara', 'M'], ['Algenib', 'rouca', 'M'], ['Alnilam', 'decidida', 'M'], ['Sadaltager', 'sabedora', 'M'], ['Fenrir', 'enérgica', 'M'], ['Puck', 'animada', 'M'],
+  ['Umbriel', 'descontraída', 'M'], ['Enceladus', 'sussurrada', 'M'], ['Algieba', 'suave', 'M'], ['Rasalgethi', 'de locutor', 'M'], ['Schedar', 'equilibrada', 'M'], ['Achird', 'simpática', 'M'], ['Zubenelgenubi', 'casual', 'M'], ['Sadachbia', 'viva', 'M'],
+  ['Kore', 'firme', 'F'], ['Aoede', 'leve', 'F'], ['Zephyr', 'luminosa', 'F'], ['Leda', 'jovem', 'F'], ['Callirrhoe', 'tranquila', 'F'], ['Autonoe', 'clara', 'F'], ['Despina', 'suave', 'F'], ['Erinome', 'nítida', 'F'],
+  ['Laomedeia', 'alegre', 'F'], ['Achernar', 'delicada', 'F'], ['Gacrux', 'madura', 'F'], ['Pulcherrima', 'confiante', 'F'], ['Vindemiatrix', 'gentil', 'F'], ['Sulafat', 'calorosa', 'F']];
 OS.ONE_DEF.spyke = { brain: 'gemini', anKey: '', anModel: 'claude-opus-5-5', always: true, convWin: -1, azKey: '', azRegion: 'westeurope', azVoice: 'pt-BR-AntonioNeural', cont: true, barge: false, alerts: true, newsBrief: true, jarvisStart: true, eng: 'auto', elKey: '', elVoice: '', elModel: 'eleven_multilingual_v2', voice: 'Charon', accent: 'BR', speed: 1, ai: true, wake: false, clap: false, sens: 5, morning: true, siri: true, siriAsk: false, ear: 'auto', pausa: 1.2, bargeS: true, alertVoz: false };
 // numa conta (versão pública) o Spyke começa calado: sem microfone sempre ligado nem modo Jarvis ao abrir (cada pessoa liga se quiser)
 if (OS.Acc && OS.Acc.pub) Object.assign(OS.ONE_DEF.spyke, { always: false, jarvisStart: false, morning: false, siri: false, fix3: 1, fix4: 1 });
@@ -12869,7 +12947,7 @@ const playClip = (clip, my) => new Promise(res => { if (my !== tok) return res('
   playing = { stop: () => { try { a.pause(); } catch (e) { } end('stop'); } }; orb();
   const p = a.play(); if (p && p.catch) p.catch(e => end(e && e.name === 'NotAllowedError' ? 'blocked' : 'erro')); });
 const MALE = /felipe|daniel|duarte|ricardo|thiago|tiago|joaquim|ant[oó]nio|jorge|paulo|eddy|reed|rocko|grandpa|male|mascul/i, GOOD = /premium|enhanced|melhorad|neural|natural|siri/i;
-const sysVoice = () => { try { const sl = SPL(), vs = speechSynthesis.getVoices().filter(v => v.lang.slice(0, 2).toLowerCase() === sl.slice(0, 2).toLowerCase()), pref = new RegExp(sl.replace('-', '[-_]'), 'i'), rank = v => (MALE.test(v.name) ? 4 : 0) + (GOOD.test(v.name) ? 2 : 0) + (pref.test(v.lang) ? 1 : 0); return vs.sort((a, b) => rank(b) - rank(a))[0] || null; } catch (e) { return null; } };
+const sysVoice = () => { try { const sl = SPL(), all = speechSynthesis.getVoices(), mine = cfg().devVoice && all.find(v => v.name === cfg().devVoice); if (mine) return mine; const vs = all.filter(v => v.lang.slice(0, 2).toLowerCase() === sl.slice(0, 2).toLowerCase()), pref = new RegExp(sl.replace('-', '[-_]'), 'i'), rank = v => (MALE.test(v.name) ? 4 : 0) + (GOOD.test(v.name) ? 2 : 0) + (pref.test(v.lang) ? 1 : 0); return vs.sort((a, b) => rank(b) - rank(a))[0] || null; } catch (e) { return null; } };
 const sysSay = (text, my) => new Promise(res => { try { if (!window.speechSynthesis || my !== tok) return res('none'); outSession(); const u = new SpeechSynthesisUtterance(text), v = sysVoice(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = SPL(); u.rate = (+cfg().speed || 1) * .98; u.pitch = v && MALE.test(v.name) ? 1 : .9;
   let started = false; const to = setTimeout(() => res(started ? 'ok' : 'blocked'), Math.max(5000, text.length * 95)); u.onstart = () => { started = true; engine = 'voz do aparelho' + (v ? ' · ' + v.name : ''); orb(); }; u.onboundary = () => { lvlBump = .9; }; u.onend = () => { clearTimeout(to); res('ok'); }; u.onerror = e => { clearTimeout(to); res(e && /not-allowed/.test(e.error || '') ? 'blocked' : 'erro'); }; speechSynthesis.speak(u); } catch (e) { res('erro'); } });
 // primeiro pedaço curto (a 1.ª frase, ou as duas primeiras se forem curtas) para a voz começar logo; o resto em pedaços grandes
@@ -13268,6 +13346,22 @@ OS.forms.spyAsk = f => { const q = f.elements.q.value.trim(); conv = false; if (
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && el && !el.hidden) close(); });
 
 /* ================= como o Spyke pensa: Gemini (grátis) ou Claude (pago, o mais inteligente) ================= */
+/* a voz da tua IA: cada pessoa escolhe a que mais gosta (ouve antes de escolher); sem chaves, nas contas */
+const gemOk = () => !!(OS.AI && OS.AI.gkey());
+const devVoices = () => { try { const sl = SPL().slice(0, 2).toLowerCase(); return speechSynthesis.getVoices().filter(v => v.lang.slice(0, 2).toLowerCase() === sl); } catch (e) { return []; } };
+const voicePick = c => { const g = OS.ui.spyVg || 'all', on = gemOk(), cur = c.voice || 'Charon', eng = c.eng || 'auto';
+  const L = VOZES.filter(v => g === 'all' || v[2] === g), dv = devVoices();
+  return `<div class="pn" id="spyVoz"><div class="pn-h"><h3>${UI.ic('play')}A voz da tua IA</h3><small class="mut">${on && eng !== 'device' && eng !== 'azure' && eng !== 'eleven' ? esc(cur) : eng === 'device' ? 'voz do aparelho' : ''}</small></div>
+    <p class="mut" style="margin:0 0 10px">Toca numa voz para a ouvir; a que tocares fica escolhida. ${on ? '' : 'As vozes da IA precisam da IA ligada; entretanto podes escolher uma voz do teu aparelho.'}</p>
+    ${on ? `<div class="seg" role="group" style="margin-bottom:10px">${[['all', 'Todas'], ['M', 'Masculinas'], ['F', 'Femininas']].map(([v, l]) => `<button class="${g === v ? 'on' : ''}" data-act="spyVg" data-v="${v}">${l}</button>`).join('')}</div>
+    <div class="spy-vz">${L.map(([n, d, x]) => `<button type="button" class="spy-vc${cur === n && eng !== 'device' ? ' on' : ''}" data-act="spyVoz" data-v="${n}" aria-pressed="${cur === n && eng !== 'device'}"><span class="spy-vi" aria-hidden="true">${x === 'F' ? '♀' : '♂'}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div>` : ''}
+    ${dv.length ? `<details class="spy-dv"${on ? '' : ' open'}><summary class="mut">Vozes do aparelho (sem internet)</summary><div class="spy-vz">${dv.slice(0, 24).map(v => `<button type="button" class="spy-vc${eng === 'device' && c.devVoice === v.name ? ' on' : ''}" data-act="spyDevVoz" data-v="${esc(v.name)}"><b>${esc(v.name.replace(/\s*\(.*\)\s*$/, '').slice(0, 26))}</b><small>${esc(v.lang)}</small></button>`).join('')}</div></details>` : ''}
+    <div class="ws-form" style="margin-top:10px"><label>Velocidade<select class="field" data-bind="spyke.speed">${[['0.9', 'Calma'], ['1', 'Normal'], ['1.1', 'Rápida']].map(([v, l]) => `<option value="${v}"${String(c.speed) === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div></div>`; };
+const sample = () => `Olá, ${name()}. Sou ${cfg().art === 'a' ? 'a' : 'o'} ${OS.aiName ? OS.aiName() : 'Spyke'}. É assim que eu falo. Quando precisares de mim, é só chamar.`;
+A.spyVg = b => OS.setUI('spyVg', b.dataset.v);
+A.spyVoz = b => { OS.setOne('spyke', { voice: b.dataset.v, eng: 'gemini' }); open(); S.say(sample(), { tap: true, eng: 'gemini' }); };
+A.spyDevVoz = b => { OS.setOne('spyke', { devVoice: b.dataset.v, eng: 'device' }); open(); S.say(sample(), { tap: true, eng: 'device' }); };
+S.voices = VOZES; S.sample = sample;
 const brainPanel = c => { const cl = c.brain === 'claude', M = OS.Brain ? OS.Brain.MODELS : [];
   return `<div class="pn" id="spyBrainSel"><div class="pn-h"><h3>Como o Spyke pensa</h3><small class="mut">${OS.Brain && OS.Brain.which() === 'claude' ? 'Claude' : 'Gemini'}</small></div>
     <p class="mut" style="margin:0 0 8px;font-size:13px">Em qualquer dos dois, o Spyke pensa sozinho: consulta os teus dados, pesquisa na internet sem sair da app e faz coisas por ti (tarefas, agenda, gastos, hábitos, rascunhos de e-mail).</p>
@@ -13305,6 +13399,7 @@ A.spyCheckAll = async () => { if (chkBusy) return; chkBusy = true; OS.request();
 V.spyke = sub => { const c = cfg(), ibc = ib(), link = op => ibc.url && ibc.key ? ibc.url.trim() + (ibc.url.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(ibc.key) + '&op=' + op : '';
   if (sub === 'bomdia') { try { history.replaceState(null, '', '#definicoes.spyke'); } catch (e) { } setTimeout(() => { open(); S.say(S.brief()); }, 300); }
   return UI.head('Spyke', 'O teu assistente de voz: fala contigo, resume o dia e faz coisas por ti.', `<button class="btn pri" data-act="spyBrief">${UI.ic('play')}Resumo do dia</button>`) + `<div class="spy-page">${statePanel()}${OS.AI && OS.AI.panel ? OS.AI.panel() : ''}${brainPanel(c)}
+  ${voicePick(c)}
   <div class="pn"><div class="pn-h"><h3>Voz do Spyke</h3><small class="mut">${esc(engine ? 'última: ' + engine : '')}</small></div>
     <div class="spy-eng">${[['auto', 'Automática', 'a melhor que estiver ligada'], ['azure', 'Microsoft', 'humana, grátis ~9 h/mês'], ['eleven', 'ElevenLabs', 'a mais humana, 10 min/mês'], ['gemini', 'IA Gemini', 'com a tua chave da IA'], ['device', 'Aparelho', 'sem internet, mais robótica']].map(([v, l, d]) => `<button type="button" class="spy-ec ${(c.eng || 'auto') === v ? 'on' : ''}" data-act="spyEng" data-v="${v}"><b>${l}</b><small>${d}</small></button>`).join('')}</div>
     ${voiceErr ? `<div class="ib-st bad" style="margin-top:8px">Na última vez: ${esc(voiceErr)}</div>` : ''}
@@ -15801,7 +15896,7 @@ const allEx = () => { const used = {}; OS.all('workouts').forEach(w => (Array.is
   const out = Ex.LIST.map(l => { const r = recByLib[l.id]; return { key: r ? r.id : 'lib:' + l.id, rec: r ? r.id : '', lib: l.id, name: l.name, muscle: l.muscle, equip: l.equip, pop: l.pop, used: r ? used[r.id] || 0 : 0 }; });
   OS.all('exercises').filter(r => !r.lib).forEach(r => out.push({ key: r.id, rec: r.id, lib: '', name: r.name, muscle: r.muscle, equip: r.equip || '', pop: 1, used: used[r.id] || 0, custom: 1 }));
   return out; };
-const filtered = () => { const q = norm(pickQ).split(/\s+/).filter(Boolean); return allEx().filter(x => (!pickM || x.muscle === pickM) && (!pickE || x.equip === pickE) && q.every(w => norm(x.name + ' ' + x.muscle + ' ' + x.equip).includes(w))).sort((a, b) => (b.used - a.used) || ((TOP[b.lib] || 0) - (TOP[a.lib] || 0)) || (b.pop - a.pop) || a.name.localeCompare(b.name, 'pt')); };
+const filtered = () => { const q = norm(pickQ).split(/\s+/).filter(Boolean); return allEx().filter(x => (!pickM || x.muscle === pickM) && (!pickE || x.equip === pickE) && q.every(w => norm((OS.Lang && OS.Lang.on() ? OS.Lang.t(x.name) + ' ' + OS.Lang.t(x.muscle) + ' ' : '') + x.name + ' ' + x.muscle + ' ' + x.equip).includes(w))).sort((a, b) => (b.used - a.used) || ((TOP[b.lib] || 0) - (TOP[a.lib] || 0)) || (b.pop - a.pop) || a.name.localeCompare(b.name, 'pt')); };
 const pickHost = () => { let h = document.getElementById('wkPick'); if (!h) { h = document.createElement('div'); h.id = 'wkPick'; h.hidden = true; document.body.appendChild(h);
   h.addEventListener('input', e => { if (e.target.dataset.pq != null) { pickQ = e.target.value; drawList(); } });
   h.addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; e.preventDefault(); const p = b.dataset.p;
@@ -16572,8 +16667,10 @@ Diet.img = (name, cat, cls = '', pic) => { if (!pic && FPN[norm(name)] && FPN[no
   const p = pic ? { u: pic } : Diet.pic(name, cat); return p.u ? `<span class="fdi ${cls}${p.c && !pic ? ' cut' : ''}${pic && /openfoodfacts/.test(pic) ? ' brand' : ''}"><img src="${esc(p.u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()"></span>` : `<span class="fdi ${cls} noimg" aria-hidden="true"></span>`; };
 /* ================= procurar ================= */
 const userFoods = () => OS.all('foods').map(f => ({ id: 'u' + f.id, name: f.name, kcal: n(f.kcal), p: n(f.p), c: n(f.c), f: n(f.f), fib: n(f.fib), cat: 'Os meus', por: [f.portion || '1 porção', 0], per: 'portion', nn: norm(f.name), uid: f.id }));
+// noutra língua também encontra pelo nome traduzido ("rice" encontra o arroz)
+const tl = x => { if (!(OS.Lang && OS.Lang.on())) return x.nn; const c = OS.Lang.code(); if (x._lc !== c) { x._lc = c; x._nt = x.nn + ' ' + norm(OS.Lang.t(x.name) + (x.vars ? ' ' + x.vars.map(v => OS.Lang.t(v.l)).join(' ') : '')); } return x._nt; };
 Diet.search = (q, lim = 40) => { const w = norm(q).split(/\s+/).filter(Boolean); if (!w.length) return [];
-  const score = x => { let s = 0; w.forEach(t => { const i = x.nn.indexOf(t); if (i < 0) s -= 1e3; else s += (i === 0 ? 30 : x.nn[i - 1] === ' ' || x.nn[i - 1] === ',' ? 15 : 3); }); if (x.uid) s += 25; s -= (x.vars ? norm(x.name).length : x.nn.length) / 20; if (x.vars) s -= (+x.id.slice(1)) * .004 + (x.cat === 'Pratos prontos' ? 4 : 0); if (!x.vars && /\bcru|crua\b/.test(x.nn) && !w.some(t => t.startsWith('cru'))) s -= 6; if (/coracao|figado|moela|lingua|bucho|orelha|rabo|toucinho|dobradinha|sarapatel/.test(x.nn) && !w.some(t => /coracao|figado|moela|lingua|bucho|orelha|rabo/.test(t))) s -= 12; return s; };
+  const score = x => { let s = 0; const nn = tl(x); w.forEach(t => { const i = nn.indexOf(t); if (i < 0) s -= 1e3; else s += (i === 0 ? 30 : nn[i - 1] === ' ' || nn[i - 1] === ',' ? 15 : 3); }); if (x.uid) s += 25; s -= (x.vars ? norm(x.name).length : x.nn.length) / 20; if (x.vars) s -= (+x.id.slice(1)) * .004 + (x.cat === 'Pratos prontos' ? 4 : 0); if (!x.vars && /\bcru|crua\b/.test(x.nn) && !w.some(t => t.startsWith('cru'))) s -= 6; if (/coracao|figado|moela|lingua|bucho|orelha|rabo|toucinho|dobradinha|sarapatel/.test(x.nn) && !w.some(t => /coracao|figado|moela|lingua|bucho|orelha|rabo/.test(t))) s -= 12; return s; };
   const seen = new Set(); return [...userFoods(), ...brHere(), ...ffHere(), ...GR, ...DB.filter(x => !x.g)].map(x => [score(x) + (x.vars ? 8 : 0), x]).filter(([s]) => s > -1e3 / 2).sort((a, b) => b[0] - a[0]).map(x => x[1]).filter(x => !seen.has(x.id) && seen.add(x.id)).slice(0, lim); };
 Diet.searchGroups = (q, lim = 80) => Diet.search(q, 200).filter(x => x.vars).slice(0, lim);
 const recents = () => { const seen = new Set(), out = []; U.sortBy(OS.all('meals'), m => m.date + (m.created || ''), -1).forEach(m => { const k = norm(m.food); if (!k || seen.has(k) || out.length >= 30) return; seen.add(k); out.push(m); }); return out; };
@@ -17001,6 +17098,8 @@ const CUR = new Proxy({}, { get: (o, cc) => OS.Pais ? OS.Pais.curOf(cc) : cc ===
 // moedas para escolher: a do país primeiro, depois as mais usadas e todas as outras
 const CURS = cc => { const all = OS.Pais ? [...new Set(Object.values(OS.Pais.data).map(x => x.cur))] : ['EUR', 'BRL', 'USD']; const top = [CUR[cc], 'EUR', 'USD', 'BRL', 'GBP', 'CHF']; return [...new Set(top.concat(all.sort()))]; };
 const curName = c => { try { return new Intl.DisplayNames([OS.Lang ? OS.Lang.base() : 'pt'], { type: 'currency' }).of(c); } catch (e) { return c; } };
+// vozes para escolher logo no início (as 30 estão em Definições › Spyke)
+const VOZ = [['Charon', '♂ Grave'], ['Puck', '♂ Animada'], ['Iapetus', '♂ Clara'], ['Kore', '♀ Firme'], ['Aoede', '♀ Leve'], ['Sulafat', '♀ Calorosa']];
 const NAMES = ['Spyke', 'Jarvis', 'Atlas', 'Nova', 'Luna', 'Aurora', 'Max', 'Íris'], FEM = /^(Nova|Luna|Aurora|Íris|Iris|Sofia|Ana|Maria|Alice|Eva|Lia|Mia|Clara)$/i;
 const SPORTS = [['corrida', 'Corrida'], ['futebol', 'Futebol'], ['futsal', 'Futsal'], ['basquetebol', 'Basquetebol'], ['voleibol', 'Voleibol'], ['natacao', 'Natação'], ['ciclismo', 'Ciclismo'], ['tenis', 'Ténis'], ['padel', 'Padel'], ['jiujitsu', 'Jiu-Jitsu'], ['boxe', 'Boxe'], ['muaythai', 'Muay Thai'], ['surf', 'Surf'], ['escalada', 'Escalada'], ['crossfit', 'CrossFit'], ['calistenia', 'Calistenia']];
 const HABITS = [['acordar', 'Acordar à hora, sem snooze', 'Manhã', 1], ['treino', 'Treino ou corrida', 'Dia', 1, 'workout'], ['estudo', '2 blocos de foco (100 min)', 'Dia', 1, 'study100'], ['ler', '20 páginas de leitura', 'Noite', 0],
@@ -17021,7 +17120,8 @@ const STEPS = [
   { id: 'tu', t: 'Vamos fazer o Prumo à tua medida', s: 'São dois minutos. Tudo fica editável depois, e podes saltar quando quiseres.',
     b: a => `${inp(a, 'short', 'Como te chamas?', { ph: 'O teu nome' })}<div class="onb-2">${`<label class="onb-f"><span>País onde vives</span><select class="field" data-ok="country">${(OS.Pais ? OS.Pais.list() : [['PT', 'Portugal'], ['BR', 'Brasil']]).map(c => `<option value="${c[0]}"${c[0] === a.country ? ' selected' : ''}>${OS.Pais ? OS.Pais.flag(c[0]) + ' ' : ''}${esc(c[1])}</option>`).join('')}</select></label>`}${inp(a, 'city', 'Cidade', { ph: 'ex.: Lisboa, São Paulo' })}</div>
       ${OS.Lang ? `<label class="onb-f"><span>Língua do app</span><select class="field" data-ok="lang" data-notr>${OS.Lang.list().map(c => `<option value="${c}"${c === a.lang ? ' selected' : ''}>${esc(OS.Lang.name(c))}</option>`).join('')}</select></label>` : ''}
-      <div class="onb-f"><span>Como queres chamar a tua IA? (é por este nome que a chamas por voz)</span>${chips(a, 'ia', NAMES.map(n => [n, n]))}<input class="field" data-ok="ia" value="${esc(NAMES.includes(a.ia) ? '' : a.ia)}" placeholder="Ou escreve outro nome"></div>` },
+      <div class="onb-f"><span>Como queres chamar a tua IA? (é por este nome que a chamas por voz)</span>${chips(a, 'ia', NAMES.map(n => [n, n]))}<input class="field" data-ok="ia" value="${esc(NAMES.includes(a.ia) ? '' : a.ia)}" placeholder="Ou escreve outro nome"></div>
+      <div class="onb-f"><span>E a voz? (toca para ouvir)</span>${chips(a, 'voz', VOZ)}</div>` },
   { id: 'areas', t: 'O que queres no teu Prumo?', s: 'Toca para escolher as abas que vais usar. As outras ficam escondidas do menu e podes ligá-las quando quiseres em Definições.',
     b: a => areaChips(new Set(a.hide), 'data-oa') },
   { id: 'estudos', show: a => on(a, 'universidade', 'cursos'), t: 'Estudas?', s: 'Com isto monto a tua Universidade: disciplinas, faltas, notas e o tutor.',
@@ -17124,7 +17224,7 @@ const apply = async a => { const t = U.today(), S = subsOf(a), done = [];
   OS.setOne('profile', prof);
   const ia = String(a.ia || 'Spyke').trim().slice(0, 24) || 'Spyke';
   const lg = prof.lang || (a.country === 'BR' ? 'pt-BR' : 'pt-PT');
-  OS.setOne('spyke', Object.assign({ nome: ia === 'Spyke' ? '' : ia, art: FEM.test(ia) ? 'a' : 'o', nomeAt: t }, lg === 'pt-BR' ? { accent: 'BR', azVoice: 'pt-BR-AntonioNeural' } : lg === 'pt-PT' ? { accent: 'PT', azVoice: 'pt-PT-DuarteNeural' } : { accent: lg, azVoice: '' }));
+  OS.setOne('spyke', Object.assign({ nome: ia === 'Spyke' ? '' : ia, art: FEM.test(ia) ? 'a' : 'o', nomeAt: t }, a.voz ? { voice: a.voz, eng: 'gemini' } : {}, lg === 'pt-BR' ? { accent: 'BR', azVoice: 'pt-BR-AntonioNeural' } : lg === 'pt-PT' ? { accent: 'PT', azVoice: 'pt-PT-DuarteNeural' } : { accent: lg, azVoice: '' }));
   try { OS.Spyke && OS.Spyke.setWakeName && OS.Spyke.setWakeName(); } catch (e) { }
   if (['PT', 'BR'].includes(a.country)) OS.setOne('news', { tabs: a.country === 'BR' ? ['BR', 'PT'] : ['PT', 'BR'] }); else if (OS.News && OS.News.has && OS.News.has(a.country)) OS.setOne('news', { tabs: [a.country] });
   OS.Areas.set(a.hide || []);
@@ -17208,7 +17308,9 @@ const onInput = e => { if (!W) return; const el = e.target, k = el.dataset.ok, m
     if (k === 'lang' && e.type === 'change') { W.langSet = 1; langNow(el.value); draw(); } }
   if (m3 != null) W.a.metas[+m3] = el.value; };
 const onClick = async e => { if (!W) return; const b = e.target.closest('button'); if (!b || b.disabled) return; const a = W.a, hide = new Set(a.hide);
-  if (b.dataset.oc) { a[b.dataset.oc] = isNaN(+b.dataset.v) || b.dataset.oc === 'poup' || b.dataset.oc === 'nivel' ? b.dataset.v : +b.dataset.v; if (b.dataset.oc === 'ia') { const f = document.querySelector('#onb [data-ok=ia]'); if (f) f.value = ''; } return draw(); }
+  if (b.dataset.oc) { a[b.dataset.oc] = isNaN(+b.dataset.v) || b.dataset.oc === 'poup' || b.dataset.oc === 'nivel' ? b.dataset.v : +b.dataset.v; if (b.dataset.oc === 'ia') { const f = document.querySelector('#onb [data-ok=ia]'); if (f) f.value = ''; }
+    if (b.dataset.oc === 'voz' && OS.Spyke && OS.Spyke.say) { const prev = OS.one('spyke').voice; OS.one('spyke').voice = b.dataset.v; try { OS.Spyke.say(`Olá${a.short ? ', ' + a.short.split(' ')[0] : ''}. É assim que eu falo.`, { bg: true, tap: true, eng: 'gemini' }); } catch (e) { } setTimeout(() => { if (!OS.one('onb').done) OS.one('spyke').voice = prev; }, 8000); }
+    return draw(); }
   if (b.dataset.om) { const L = new Set(a[b.dataset.om] || []); L.has(b.dataset.v) ? L.delete(b.dataset.v) : L.add(b.dataset.v); a[b.dataset.om] = [...L]; return draw(); }
   if (b.dataset.oa) { toggleArea(hide, b.dataset.oa); a.hide = [...hide]; return draw(); }
   if (b.dataset.oag) { toggleGroup(hide, b.dataset.oag); a.hide = [...hide]; return draw(); }
@@ -19769,15 +19871,17 @@ const hour = o => { const d = (o && o.date) || new Date(); return d.getHours() +
 // o que todas as cenas partilham: céu da hora, estrelas, sol ou lua, vinheta
 const base = (W, H, o, hz, P, extra = {}) => { const id = o.id || 'fd', h = hour(o), r = rng(7 + new Date().getDate() * 13), u = Math.min(W, H * 1.6) / 400;
   const t = P.day ? (h - 6.5) / 13.1 : ((h < 12 ? h + 24 : h) - 19.6) / 10.9, bx = W * (extra.sx != null ? extra.sx : .2 + .6 * t), by = hz - Math.sin(Math.PI * Math.max(0, Math.min(1, t))) * hz * .62 + hz * .1, br = (extra.big || 9) * u;
-  const n = extra.stars || 70, st = P.stars > .02 || extra.night ? Array.from({ length: n }, () => { const x = r() * W, y = r() * hz * .9, s = r(); return `<circle cx="${f(x)}" cy="${f(y)}" r="${f((s > .93 ? 1.5 : .75) * Math.max(.8, u * .9))}" fill="#E6EEF8" opacity="${f((extra.night ? 1 : P.stars) * (.3 + s * .6))}"/>`; }).join('') : '';
+  const n = extra.stars || 70, st = P.stars > .02 || extra.night ? Array.from({ length: n }, () => { const x = r() * W, y = r() * hz * .9, s = r(), tw = r() < .4; return `<circle${tw ? ` class="fd-tw" style="animation-delay:-${f(r() * 4)}s"` : ''} cx="${f(x)}" cy="${f(y)}" r="${f((s > .93 ? 1.5 : .75) * Math.max(.8, u * .9))}" fill="#E6EEF8" opacity="${f((extra.night ? 1 : P.stars) * (.3 + s * .6))}"/>`; }).join('') : '';
   return { id, u, r, bx, by, br,
     defs: `<linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.top}"/><stop offset="1" stop-color="${P.hz}"/></linearGradient>
       <radialGradient id="${id}g"><stop offset="0" stop-color="${P.glow}" stop-opacity=".55"/><stop offset="1" stop-color="${P.glow}" stop-opacity="0"/></radialGradient>
       <radialGradient id="${id}v" cx="50%" cy="45%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>`,
     sky: `<rect width="${f(W)}" height="${f(H)}" fill="url(#${id}s)"/>${st}`,
-    sun: `<circle cx="${f(bx)}" cy="${f(by)}" r="${f(br * 9)}" fill="url(#${id}g)"/><circle cx="${f(bx)}" cy="${f(by)}" r="${f(br)}" fill="${P.glow}" opacity=".92"/>${P.day ? '' : `<circle cx="${f(bx + br * .35)}" cy="${f(by - br * .2)}" r="${f(br * .85)}" fill="${P.top}" opacity=".35"/>`}`,
+    cloud: (cx, cy, w, k) => `<g class="fd-drift" style="animation-delay:-${f(r() * 40)}s"><ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(w)}" ry="${f(w * .07)}" fill="${mix(P.top, P.hz, .55)}" opacity="${k}"/><ellipse cx="${f(cx + w * .25)}" cy="${f(cy - w * .05)}" rx="${f(w * .55)}" ry="${f(w * .05)}" fill="${mix(P.top, P.hz, .7)}" opacity="${k}"/></g>`,
+    sun: `<circle class="fd-glow" cx="${f(bx)}" cy="${f(by)}" r="${f(br * 9)}" fill="url(#${id}g)"/><circle cx="${f(bx)}" cy="${f(by)}" r="${f(br)}" fill="${P.glow}" opacity=".92"/>${P.day ? '' : `<circle cx="${f(bx + br * .35)}" cy="${f(by - br * .2)}" r="${f(br * .85)}" fill="${P.top}" opacity=".35"/>`}`,
     vig: `<rect width="${f(W)}" height="${f(H)}" fill="url(#${id}v)"/>` }; };
-const wrap = (W, H, defs, body) => `<svg class="scene" viewBox="0 0 ${f(W)} ${f(H)}" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><defs>${defs}</defs>${body}</svg>`;
+let ANIM = false;   // o fundo que está a ser desenhado mexe? (nos ecrãs de entrada e da conta, se a pessoa quiser)
+const wrap = (W, H, defs, body) => `<svg class="scene${ANIM ? ' fd-anim' : ''}" viewBox="0 0 ${f(W)} ${f(H)}" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><defs>${defs}</defs>${body}</svg>`;
 // cumeada ondulada (montanhas, dunas, colinas)
 const ridge = (W, H, y0, amp, n, r, smooth) => { let d = `M0 ${f(H)} L0 ${f(y0)}`; const pts = Array.from({ length: n + 1 }, (_, i) => [W * i / n, y0 - amp * (.35 + r() * .65) * (i % 2 ? 1 : .55)]);
   pts.forEach((p, i) => { if (!i) { d += ` L0 ${f(p[1])}`; return; } const q = pts[i - 1]; d += smooth ? ` Q${f((q[0] + p[0]) / 2)} ${f(Math.min(q[1], p[1]) - amp * .25)} ${f(p[0])} ${f(p[1])}` : ` L${f(p[0])} ${f(p[1])}`; });
@@ -19789,8 +19893,8 @@ const MODELS = {
   // serra: camadas de montanhas a perder-se na neblina
   serra: (W, H, o) => { const P = S.pal(hour(o)), hz = H * .66, B = base(W, H, o, hz, P);
     const L = [0, 1, 2, 3].map(i => `<path d="${ridge(W, H, hz - H * .02 + i * H * .075, H * (.13 - i * .025), 7 + i * 2, B.r, i > 1)}" fill="${mix(mix(P.hz, P.top, .25), mix(P.land, '#000000', .2), .28 + i * .24)}"/>`).join('');
-    const mist = `<rect y="${f(hz - H * .03)}" width="${f(W)}" height="${f(H * .07)}" fill="${P.hz}" opacity=".18"/>`;
-    return wrap(W, H, B.defs, B.sky + B.sun + L + mist + B.vig); },
+    const mist = `<rect class="fd-mist" x="${f(-W * .1)}" y="${f(hz - H * .03)}" width="${f(W * 1.2)}" height="${f(H * .07)}" fill="${P.hz}" opacity=".18"/>`;
+    return wrap(W, H, B.defs, B.sky + B.sun + B.cloud(W * .25, hz * .35, 70 * B.u, .3) + B.cloud(W * .72, hz * .2, 90 * B.u, .22) + L + mist + B.vig); },
   // cidade: prédios à beira-rio, janelas acesas ao fim do dia
   cidade: (W, H, o) => { const P = S.pal(hour(o)), hz = H * .64, B = base(W, H, o, hz, P, { stars: 40 }), u = B.u, r = B.r, lit = !P.day || P.beam > .2;
     let x = -10 * u, b = '', win = '', refl = ''; const col = mix(P.land, P.hz, .12), col2 = mix(P.land, P.hz, .28);
@@ -19798,8 +19902,8 @@ const MODELS = {
       b += `<rect x="${f(x)}" y="${f(hz - hh)}" width="${f(w)}" height="${f(hh + 1)}" fill="${far ? col2 : col}"/>`;
       if (r() > .7) b += `<rect x="${f(x + w * .45)}" y="${f(hz - hh - 9 * u)}" width="${f(1.2 * u)}" height="${f(9 * u)}" fill="${col}"/>`;
       const cols = Math.max(1, Math.floor(w / (6 * u))), rows = Math.floor(hh / (8 * u));
-      for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) if (r() < (lit ? .3 : .08)) win += `<rect x="${f(x + 2 * u + j * 6 * u)}" y="${f(hz - hh + 4 * u + i * 8 * u)}" width="${f(2.4 * u)}" height="${f(3.4 * u)}" fill="${lit ? '#F2C48D' : mix(P.hz, '#FFFFFF', .2)}" opacity="${lit ? f(.5 + r() * .45) : .35}"/>`;
-      if (lit && r() > .55) refl += `<rect x="${f(x + w * .2)}" y="${f(hz + 6 * u + r() * (H - hz) * .5)}" width="${f(w * .5)}" height="${f(1.2 * u)}" fill="#F2C48D" opacity="${f(.12 + r() * .2)}"/>`;
+      for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) if (r() < (lit ? .3 : .08)) win += `<rect${lit && r() < .22 ? ` class="fd-tw" style="animation-delay:-${f(r() * 6)}s;animation-duration:${f(4 + r() * 6)}s"` : ''} x="${f(x + 2 * u + j * 6 * u)}" y="${f(hz - hh + 4 * u + i * 8 * u)}" width="${f(2.4 * u)}" height="${f(3.4 * u)}" fill="${lit ? '#F2C48D' : mix(P.hz, '#FFFFFF', .2)}" opacity="${lit ? f(.5 + r() * .45) : .35}"/>`;
+      if (lit && r() > .55) refl += `<rect class="fd-shim" style="animation-delay:-${f(r() * 3)}s" x="${f(x + w * .2)}" y="${f(hz + 6 * u + r() * (H - hz) * .5)}" width="${f(w * .5)}" height="${f(1.2 * u)}" fill="#F2C48D" opacity="${f(.12 + r() * .2)}"/>`;
       x += w + (r() > .8 ? 4 * u : 0); }
     const river = `<rect y="${f(hz)}" width="${f(W)}" height="${f(H - hz)}" fill="${mix(P.seaT, P.seaB, .5)}"/><rect y="${f(hz)}" width="${f(W)}" height="${f(Math.max(1, u))}" fill="${mix(P.hz, '#FFFFFF', .2)}" opacity=".35"/>`;
     const quay = `<rect y="${f(H * .9)}" width="${f(W)}" height="${f(H * .1 + 1)}" fill="${mix(P.land, '#000000', .3)}"/>`;
@@ -19807,18 +19911,18 @@ const MODELS = {
   // dunas: areia ondulada e um sol (ou lua) grande
   dunas: (W, H, o) => { const P = S.pal(hour(o)), hz = H * .6, B = base(W, H, o, hz, P, { big: 15, sx: .62 }), u = B.u, sand = P.day ? '#B98A5E' : '#3B3445';
     const L = [0, 1, 2].map(i => `<path d="${ridge(W, H, hz + i * H * .09, (26 + i * 10) * u, 3 + i, B.r, true)}" fill="${mix(mix(sand, P.land, .35 + i * .22), P.hz, i ? 0 : .25)}"/>`).join('');
-    return wrap(W, H, B.defs, B.sky + B.sun + L + B.vig); },
+    return wrap(W, H, B.defs, B.sky + B.sun + B.cloud(W * .3, hz * .3, 80 * u, .22) + L + B.vig); },
   // pinhal: pinheiros em camadas, com neblina entre elas
   pinhal: (W, H, o) => { const P = S.pal(hour(o)), hz = H * .66, B = base(W, H, o, hz, P), u = Math.min(W, H) / 400, r = B.r;
     const tree = (x, y, s, c) => `<path d="M${f(x)} ${f(y - 46 * s)} L${f(x + 9 * s)} ${f(y - 30 * s)} L${f(x + 5 * s)} ${f(y - 30 * s)} L${f(x + 13 * s)} ${f(y - 16 * s)} L${f(x + 7 * s)} ${f(y - 16 * s)} L${f(x + 16 * s)} ${f(y - 2 * s)} L${f(x + 1.5 * s)} ${f(y - 2 * s)} L${f(x + 1.5 * s)} ${f(y + 6 * s)} L${f(x - 1.5 * s)} ${f(y + 6 * s)} L${f(x - 1.5 * s)} ${f(y - 2 * s)} L${f(x - 16 * s)} ${f(y - 2 * s)} L${f(x - 7 * s)} ${f(y - 16 * s)} L${f(x - 13 * s)} ${f(y - 16 * s)} L${f(x - 5 * s)} ${f(y - 30 * s)} L${f(x - 9 * s)} ${f(y - 30 * s)}Z" fill="${c}"/>`;
     let g = ''; [0, 1, 2].forEach(i => { const y = hz + i * H * .09, s = (.5 + i * .32) * u, c = mix(mix(P.hz, P.top, .2), mix(P.land, '#000000', .25), .35 + i * .3);
       g += `<rect y="${f(y)}" width="${f(W)}" height="${f(H - y)}" fill="${c}"/>`; for (let x = -10; x < W + 20; x += (14 + r() * 16) * s) g += tree(x, y + r() * 4 * u, s * (.8 + r() * .5), c);
-      if (i < 2) g += `<rect y="${f(y + 2 * u)}" width="${f(W)}" height="${f(18 * u)}" fill="${P.hz}" opacity=".12"/>`; });
+      if (i < 2) g += `<rect class="fd-mist" style="animation-delay:-${f(i * 9)}s" x="${f(-W * .1)}" y="${f(y + 2 * u)}" width="${f(W * 1.2)}" height="${f(18 * u)}" fill="${P.hz}" opacity=".12"/>`; });
     return wrap(W, H, B.defs, B.sky + B.sun + g + B.vig); },
   // céu estrelado: noite sempre, com a Via Láctea e uma aurora suave
   estrelas: (W, H, o) => { const P = S.pal(23.2), hz = H * .74, B = base(W, H, o, hz, P, { stars: 220, night: 1 }), u = B.u, id = B.id;
     const mw = `<ellipse cx="${f(W * .55)}" cy="${f(hz * .45)}" rx="${f(Math.max(W, H) * .7)}" ry="${f(46 * u)}" fill="url(#${id}m)" transform="rotate(-28 ${f(W * .55)} ${f(hz * .45)})"/>`;
-    const aur = [0, 1].map(i => `<path d="M0 ${f(hz * (.55 + i * .08))} C${f(W * .3)} ${f(hz * (.35 + i * .1))} ${f(W * .6)} ${f(hz * (.75 - i * .05))} ${f(W)} ${f(hz * (.45 + i * .1))} L${f(W)} ${f(hz * (.62 + i * .1))} C${f(W * .6)} ${f(hz * (.88 - i * .05))} ${f(W * .3)} ${f(hz * (.5 + i * .1))} 0 ${f(hz * (.72 + i * .08))}Z" fill="url(#${id}a)" opacity="${i ? .35 : .5}"/>`).join('');
+    const aur = [0, 1].map(i => `<path d="M0 ${f(hz * (.55 + i * .08))} C${f(W * .3)} ${f(hz * (.35 + i * .1))} ${f(W * .6)} ${f(hz * (.75 - i * .05))} ${f(W)} ${f(hz * (.45 + i * .1))} L${f(W)} ${f(hz * (.62 + i * .1))} C${f(W * .6)} ${f(hz * (.88 - i * .05))} ${f(W * .3)} ${f(hz * (.5 + i * .1))} 0 ${f(hz * (.72 + i * .08))}Z" fill="url(#${id}a)" opacity="${i ? .35 : .5}" class="fd-aur" style="animation-delay:-${i * 5}s"/>`).join('') + `<line class="fd-shoot" x1="${f(W * .78)}" y1="${f(hz * .12)}" x2="${f(W * .86)}" y2="${f(hz * .08)}" stroke="#F4F7FF" stroke-width="${f(1.4 * u)}" stroke-linecap="round" opacity="0"/>`;
     const hills = `<path d="${ridge(W, H, hz, 26 * u, 5, B.r, true)}" fill="#03060B"/>`;
     const defs = B.defs + `<radialGradient id="${id}m"><stop offset="0" stop-color="#C9D6F0" stop-opacity=".16"/><stop offset="1" stop-color="#C9D6F0" stop-opacity="0"/></radialGradient>
       <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5EE0B0" stop-opacity="0"/><stop offset=".5" stop-color="#5EE0B0" stop-opacity=".22"/><stop offset="1" stop-color="#2A8FA8" stop-opacity="0"/></linearGradient>`;
@@ -19827,11 +19931,22 @@ const MODELS = {
   aneis: (W, H, o) => { const id = o.id || 'fd', cx = W * (W > H ? .74 : .62), cy = H * (W > H ? .38 : .3), R = Math.max(W, H) * .42;
     const rings = [1, .78, .57, .37].map((k, i) => `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R * k)}" fill="none" stroke="#E9E3D8" stroke-opacity="${[.05, .07, .09, .12][i]}" stroke-width="${f(Math.max(1.5, R * .028))}"/>`).join('');
     const defs = `<radialGradient id="${id}k" cx="70%" cy="30%" r="90%"><stop offset="0" stop-color="#1A2433"/><stop offset=".6" stop-color="#0C1119"/><stop offset="1" stop-color="#060709"/></radialGradient>`;
-    return wrap(W, H, defs, `<rect width="${f(W)}" height="${f(H)}" fill="url(#${id}k)"/>${rings}<line x1="${f(cx)}" y1="${f(cy - R * 1.05)}" x2="${f(cx)}" y2="${f(cy - R * .2)}" stroke="#E9E3D8" stroke-opacity=".1" stroke-width="${f(R * .03)}"/><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R * .085)}" fill="#E0431F" opacity=".85"/>`); },
+    return wrap(W, H, defs, `<rect width="${f(W)}" height="${f(H)}" fill="url(#${id}k)"/><g class="fd-spin" style="transform-origin:${f(cx)}px ${f(cy)}px">${rings}<line x1="${f(cx)}" y1="${f(cy - R * 1.05)}" x2="${f(cx)}" y2="${f(cy - R * .2)}" stroke="#E9E3D8" stroke-opacity=".1" stroke-width="${f(R * .03)}"/></g><circle class="fd-glow" cx="${f(cx)}" cy="${f(cy)}" r="${f(R * .085)}" fill="#E0431F" opacity=".85"/>`); },
   // liso: só a cor do céu desta hora
   liso: (W, H, o) => { const P = S.pal(hour(o)), id = o.id || 'fd';
-    return wrap(W, H, `<linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.top}"/><stop offset=".6" stop-color="${mix(P.hz, P.top, .45)}"/><stop offset="1" stop-color="${P.seaB}"/></linearGradient>`, `<rect width="${f(W)}" height="${f(H)}" fill="url(#${id}s)"/>`); } };
-const NAMES = [['farol', 'Farol'], ['serra', 'Serra'], ['cidade', 'Cidade'], ['dunas', 'Dunas'], ['pinhal', 'Pinhal'], ['estrelas', 'Céu estrelado'], ['aneis', 'Prumo'], ['liso', 'Liso']];
+    return wrap(W, H, `<linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.top}"/><stop offset=".6" stop-color="${mix(P.hz, P.top, .45)}"/><stop offset="1" stop-color="${P.seaB}"/></linearGradient><radialGradient id="${id}q"><stop offset="0" stop-color="${P.glow}" stop-opacity=".14"/><stop offset="1" stop-color="${P.glow}" stop-opacity="0"/></radialGradient>`, `<rect width="${f(W)}" height="${f(H)}" fill="url(#${id}s)"/><circle class="fd-glow" cx="${f(W * .7)}" cy="${f(H * .3)}" r="${f(Math.max(W, H) * .45)}" fill="url(#${id}q)"/>`); },
+  // ondas: o mar a mexer, em camadas
+  ondas: (W, H, o) => { const P = S.pal(hour(o)), hz = H * .58, B = base(W, H, o, hz, P), u = B.u;
+    const wave = (i) => { const y = hz + (H - hz) * (.05 + i * .24), A = (4 + i * 4) * u, k = 3 + (3 - i), L2 = W / k; let d = `M0 ${f(H)} L0 ${f(y)}`; for (let x = 0; x <= W * 2 + 1; x += L2 / 2) d += ` Q${f(x + L2 / 4)} ${f(y + ((x / (L2 / 2)) % 2 ? A : -A))} ${f(x + L2 / 2)} ${f(y)}`; return `<path class="fd-wave" style="animation-duration:${18 - i * 4}s" d="${d} L${f(W * 2 + L2)} ${f(H)}Z" fill="${mix(mix(P.seaT, P.seaB, .3 + i * .22), '#000000', i * .08)}"/>`; };
+    const glint = Array.from({ length: 10 }, (_, i) => `<rect class="fd-shim" style="animation-delay:-${f(B.r() * 3)}s" x="${f(B.bx - (14 - i) * u * 1.5)}" y="${f(hz + 3 * u + i * (H - hz) * .045)}" width="${f((28 - i * 2) * u)}" height="${f(Math.max(1, 1.2 * u))}" fill="${P.glow}" opacity=".3"/>`).join('');
+    return wrap(W, H, B.defs, B.sky + B.sun + B.cloud(W * .2, hz * .3, 70 * u, .3) + `<rect y="${f(hz)}" width="${f(W)}" height="${f(H - hz)}" fill="${P.seaT}"/>` + glint + [0, 1, 2, 3].map(wave).join('') + B.vig); },
+  // chuva: noite de chuva sobre a cidade
+  chuva: (W, H, o) => { const P = S.pal(Math.min(hour(o), 21.5) < 7 ? hour(o) : 21.5), hz = H * .66, B = base(W, H, o, hz, P, { stars: 1 }), u = B.u, r = B.r;
+    let b = '', x = -8 * u; const col = mix(P.land, P.hz, .1);
+    while (x < W) { const w = (18 + r() * 30) * u, hh = H * (.05 + Math.pow(r(), 1.7) * (W > H ? .18 : .25)); b += `<rect x="${f(x)}" y="${f(hz - hh)}" width="${f(w)}" height="${f(hh + 1)}" fill="${col}"/>`; for (let i = 0; i < 4; i++) if (r() < .5) b += `<rect x="${f(x + 3 * u + r() * (w - 8 * u))}" y="${f(hz - hh + 5 * u + r() * hh * .7)}" width="${f(2.4 * u)}" height="${f(3.4 * u)}" fill="#F2C48D" opacity="${f(.4 + r() * .4)}"/>`; x += w; }
+    const drops = Array.from({ length: 70 }, () => { const x0 = r() * W * 1.1, y0 = r() * H * 2, l = (14 + r() * 18) * u; return `<line x1="${f(x0)}" y1="${f(y0)}" x2="${f(x0 - l * .18)}" y2="${f(y0 + l)}"/>`; }).join('');
+    return wrap(W, H, B.defs, B.sky + `<rect y="${f(hz)}" width="${f(W)}" height="${f(H - hz)}" fill="${mix(P.seaT, P.seaB, .5)}"/>` + b + `<g class="fd-rain" stroke="#C9D6EA" stroke-width="${f(Math.max(.8, .9 * u))}" opacity=".28" stroke-linecap="round">${drops}</g>` + B.vig); } };
+const NAMES = [['farol', 'Farol'], ['ondas', 'Ondas'], ['serra', 'Serra'], ['cidade', 'Cidade'], ['chuva', 'Chuva'], ['dunas', 'Dunas'], ['pinhal', 'Pinhal'], ['estrelas', 'Céu estrelado'], ['aneis', 'Prumo'], ['liso', 'Liso']];
 
 /* ---------- a escolha (por perfil, neste aparelho) e a foto ---------- */
 const LS = OS.U.ls;
@@ -19850,16 +19965,19 @@ const shrink = file => new Promise((res, rej) => { const u = URL.createObjectURL
 
 const F = OS.Fundo = { list: NAMES, get,
   // o fundo escolhido, à medida do ecrã
-  html: (W, H, o = {}) => { const k = get(), p = pid();
-    if (k === 'foto') { if (PH[p]) return `<div class="fd-photo" style="background-image:url('${PH[p]}')"></div>`; if (PH[p] == null) loadPhoto(p).then(v => { if (v) F.refresh(); }); return S.svg(W, H, o); }
-    if (k === 'farol') return S.svg(W, H, o);
-    try { return MODELS[k](W, H, o); } catch (e) { return S.svg(W, H, o); } },
+  // fundo animado: ligado por omissão; cada aparelho pode desligar
+  anim: () => LS.get('nau:bganim', '1') !== '0',
+  setAnim: on => { LS.set('nau:bganim', on ? '1' : '0'); F.refresh(); },
+  html: (W, H, o = {}) => { const k = get(), p = pid(), mv = !!o.anim && F.anim(), oo = Object.assign({}, o, { anim: mv ? 1 : 0 });
+    if (k === 'foto') { if (PH[p]) return `<div class="fd-photo${mv ? ' fd-kb' : ''}" style="background-image:url('${PH[p]}')"></div>`; if (PH[p] == null) loadPhoto(p).then(v => { if (v) F.refresh(); }); return S.svg(W, H, oo); }
+    if (k === 'farol') return S.svg(W, H, oo);
+    ANIM = mv; try { return MODELS[k](W, H, oo); } catch (e) { return S.svg(W, H, oo); } finally { ANIM = false; } },
   model: (k, W, H, o = {}) => (MODELS[k] || MODELS.farol)(W, H, o),
   set: k => { if (k !== 'foto' && !MODELS[k]) return; LS.set(K(), k); LS.set('nau:bg', k); F.refresh(); OS.request && OS.request(); },
   setPhoto: async file => { const d = await shrink(file), p = pid(); await idb('readwrite', st => st.put(d, p)); PH[p] = d; F.set('foto'); },
   // troca o fundo que está à vista (ecrã de entrada e ecrã da conta), sem recarregar
   refresh: () => document.querySelectorAll('.lk-scene').forEach(sc => { const g = sc.querySelector('.lk-grain'), W = Math.max(320, innerWidth), H = Math.max(480, innerHeight), id = sc.closest('#acc') ? 'acs' : 'lks';
-    sc.innerHTML = F.html(W, H, { anim: id === 'lks' ? 1 : 0, id }) + (g ? g.outerHTML : ''); sc.classList.toggle('fd-isphoto', get() === 'foto'); }) };
+    sc.innerHTML = F.html(W, H, { anim: 1, id }) + (g ? g.outerHTML : ''); sc.classList.toggle('fd-isphoto', get() === 'foto'); }) };
 loadPhoto(pid());
 
 /* ---------- escolher: folha com os modelos e a galeria ---------- */
@@ -19869,12 +19987,14 @@ F.open = () => { close(); const portrait = innerHeight > innerWidth, tw = portra
   const ph = PH[p] ? `<button type="button" class="fd-t${cur === 'foto' ? ' on' : ''}" data-fd="foto" aria-pressed="${cur === 'foto'}"><span class="fd-th" style="background:url('${PH[p]}') center/cover"></span><b>A tua foto</b></button>` : '';
   const el = document.createElement('div'); el.id = 'fdSheet'; el.className = 'fd-sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Escolher o fundo');
   el.innerHTML = `<div class="fd-box"><div class="fd-h"><b>Fundo do ecrã de entrada</b><button type="button" class="fd-x" data-fd="x" aria-label="Fechar">Feito</button></div>
+    <label class="fd-mv"><input type="checkbox" data-fdmv ${F.anim() ? 'checked' : ''}><span class="fd-sw" aria-hidden="true"></span><span>Fundo animado <small>nuvens, água, estrelas e luzes a mexer devagar</small></span></label>
     <div class="fd-g" style="--tw:${tw}px;--ar:${tw}/${th}">${NAMES.map(([k, n]) => tile(k, n)).join('')}${ph}
       <label class="fd-t fd-gal"><input type="file" accept="image/*" class="fd-file"><span class="fd-th"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg></span><b>Da galeria</b></label></div>
     <p class="fd-msg" role="status"></p></div>`;
   document.body.appendChild(el);
   el.addEventListener('click', e => { if (e.target === el) return close(); const b = e.target.closest('[data-fd]'); if (!b) return; const k = b.dataset.fd; if (k === 'x') return close();
     F.set(k); el.querySelectorAll('[data-fd]').forEach(x => { if (x.dataset.fd === 'x') return; x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); });
+  el.querySelector('[data-fdmv]').addEventListener('change', e => F.setAnim(e.target.checked));
   el.querySelector('.fd-file').addEventListener('change', async e => { const file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return; const m = el.querySelector('.fd-msg'); m.textContent = 'A preparar a foto…';
     try { await F.setPhoto(file); m.textContent = ''; F.open(); } catch (err) { m.textContent = err.message || 'Não consegui guardar a foto.'; } });
   setTimeout(() => { const b = el.querySelector('.fd-t.on') || el.querySelector('.fd-t'); b && b.focus({ preventScroll: true }); }, 30); };
@@ -20011,6 +20131,75 @@ OS.act.bioRegister = () => L.register();
 OS.act.bioForget = () => L.forget();
 OS.forms = OS.forms || {};
 OS.forms.codeChange = async (f) => { const err = await L.setCode(f.elements.cur.value, f.elements.nw.value); OS.UI.toast(err || 'Código alterado em todos os dispositivos', err ? 'neg' : 'pos'); };
+})();
+
+</script>
+<script>
+/* PRUMO — movimento: o app mais vivo, sem pesar.
+   - ao abrir uma página, os blocos entram em cascata e as barras enchem;
+   - os números grandes (saldos, médias, totais) contam até ao valor;
+   - ao tocar num botão ele afunda um pouco, e o que mudou dá um pequeno salto quando a página se redesenha;
+   - avisos e janelas entram a deslizar.
+   Só animações curtas (nada que fique a mexer para sempre dentro do app) e só com opacidade e deslocações, para o iPhone e os tablets.
+   Definições › Aplicação › Animações: completas, suaves (só as entradas) ou desligadas. Respeita "reduzir movimento" do aparelho. */
+(() => {
+'use strict';
+const U = OS.U, UI = OS.UI, A = OS.act;
+const K = 'os2anim';
+const reduce = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+// (nos testes automáticos fica desligado, salvo se o teste o ligar, para os números não estarem a meio da contagem)
+const mode = () => { const v = U.ls.get(K, null); if (v === 'off' || v === 'soft' || v === 'full') return v; return reduce() || navigator.webdriver ? 'off' : 'full'; };
+const apply = () => { const R = document.documentElement, m = mode(); R.classList.toggle('vv', m !== 'off'); R.classList.toggle('vv-full', m === 'full'); if (m === 'off') { const v = document.getElementById('view'); if (v) v.classList.remove('pg-in'); } };
+apply();
+const V = OS.Vivo = { mode, set: v => { U.ls.set(K, v); apply(); OS.request && OS.request(); } };
+
+/* ---------- entrada de página ---------- */
+const view = () => document.getElementById('view');
+let lastR = null, tIn = 0;
+const enter = () => { const v = view(); if (!v) return; if (mode() === 'off') { v.classList.remove('pg-in'); return; }
+  v.classList.remove('pg-in'); void v.offsetWidth; v.classList.add('pg-in');
+  clearTimeout(tIn); tIn = setTimeout(() => v.classList.remove('pg-in'), 1300);
+  if (mode() === 'full') requestAnimationFrame(() => countUp(v)); };
+
+/* ---------- números a contar ---------- */
+const dec = () => { try { return (1.5).toLocaleString(OS.loc ? OS.loc() : 'pt-PT').charAt(1); } catch (e) { return ','; } };
+const ease = t => 1 - Math.pow(1 - t, 3);
+const countUp = root => { const D = dec(), loc = OS.loc ? OS.loc() : 'pt-PT'; let n = 0;
+  root.querySelectorAll('.kpi-v, .big-num, .dc-big, .fin-big, .vv-n').forEach(el => {
+    if (n >= 18 || el.children.length > 1 || el.closest('[data-novv]')) return;
+    const txt = el.firstChild && el.firstChild.nodeType === 3 && el.childNodes.length === 1 ? el.firstChild : null; if (!txt) return;
+    const t = txt.data, m = t.match(/[−-]?\d[\d   .,']*\d|[−-]?\d/); if (!m) return;
+    const raw = m[0], neg = /^[−-]/.test(raw), body = raw.replace(/^[−-]/, ''), li = body.lastIndexOf(D), hasDec = li >= 0 && /^\d{1,2}$/.test(body.slice(li + 1));
+    const digits = body.replace(/[^\d]/g, ''), d = hasDec ? body.length - li - 1 : 0, v = (neg ? -1 : 1) * (+digits) / Math.pow(10, d);
+    if (!isFinite(v) || Math.abs(v) < 3 || digits.length > 12 || /\d{4}-\d{2}|:\d{2}|\d\/\d/.test(t)) return;   // datas e horas não
+    if (!hasDec && v >= 1900 && v <= 2100 && !/[\u00a0\u202f .,']/.test(body)) return;   // anos (2026) também não
+    const grouped = /[   .,']/.test(hasDec ? body.slice(0, li) : body), pre = t.slice(0, m.index), post = t.slice(m.index + raw.length);
+    const fmt = x => { let s = Math.abs(x).toLocaleString(loc, { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: grouped }); return (x < 0 || neg ? (raw[0] === '−' ? '−' : '-') : '') + s; };
+    n++; const t0 = performance.now(), dur = 650 + Math.min(500, Math.log10(Math.abs(v) + 1) * 120);
+    const step = now => { if (!txt.isConnected || (txt._vv && txt._vv !== t0)) return; const k = Math.min(1, (now - t0) / dur);
+      if (k >= 1) { txt.data = t; return; } txt.data = pre + fmt(v * ease(k)) + post; requestAnimationFrame(step); };
+    txt._vv = t0; txt.data = pre + fmt(0) + post; requestAnimationFrame(step); }); };
+
+/* ---------- toque e o que acabou de mudar ---------- */
+let hit = null;
+const keyOf = b => { for (const a of ['data-act', 'data-edit', 'data-go', 'data-oc', 'data-om', 'data-oa']) if (b.hasAttribute(a)) { let s = `[${a}="${CSS.escape(b.getAttribute(a))}"]`;
+    for (const x of ['data-id', 'data-v', 'data-k', 'data-d', 'data-i', 'data-h']) if (b.hasAttribute(x)) s += `[${x}="${CSS.escape(b.getAttribute(x))}"]`; return s; } return null; };
+document.addEventListener('pointerdown', e => { if (mode() === 'off') return; const b = e.target.closest && e.target.closest('button,.btn,.chip,[data-act],[data-edit],[data-go],a.click,.li.click'); if (!b) return; b.classList.add('vv-press'); setTimeout(() => b.classList.remove('vv-press'), 220); }, { passive: true, capture: true });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-act],[data-edit],[data-go],[data-oc],[data-om],[data-oa]'); if (!b) return; const k = keyOf(b); if (k) hit = { k, at: Date.now() }; }, true);
+const popAfter = root => { if (!hit || Date.now() - hit.at > 1000 || mode() === 'off') return; const el = root.querySelector(hit.k); hit = null; if (!el) return; el.classList.add('vv-pop'); setTimeout(() => el.classList.remove('vv-pop'), 520); };
+
+/* ---------- vigiar o ecrã ---------- */
+const start = () => { const v = view(); if (!v) return setTimeout(start, 300);
+  new MutationObserver(() => { const r = location.hash.split('?')[0]; if (r !== lastR) { lastR = r; enter(); } else popAfter(v); }).observe(v, { childList: true });
+  const m = document.getElementById('modal'); if (m) new MutationObserver(() => { if (!m.hidden && mode() !== 'off') { const d = m.querySelector('.modal'); if (d && !d._vv) { d._vv = 1; d.classList.add('vv-modal'); } } }).observe(m, { childList: true, attributes: true, attributeFilter: ['hidden'] }); };
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+OS.on && OS.on('unlock', () => { lastR = null; });
+
+/* ---------- Definições › Aplicação ---------- */
+A.vivoSet = b => { V.set(b.dataset.v); UI.toast(b.dataset.v === 'off' ? 'Animações desligadas' : 'Animações ' + (b.dataset.v === 'full' ? 'completas' : 'suaves'), 'pos'); };
+OS.on && OS.on('ready', () => { const o = OS.views.definicoes; if (!o || o._vv) return; OS.views.definicoes = sub => o(sub) + (String(sub || '') === '' ? `<div class="pn" id="animSet"><div class="pn-h"><h3>${UI.ic('sun')}Animações</h3><span class="mut" style="font-size:12px">${{ full: 'completas', soft: 'suaves', off: 'desligadas' }[mode()]}</span></div>
+  <p class="mut" style="margin:0 0 10px">Páginas que entram com movimento, números que contam até ao valor, barras que enchem e botões que respondem ao toque. Leves: não gastam bateria.${reduce() ? ' O teu aparelho pede menos movimento, por isso começam desligadas.' : ''}</p>
+  <div class="seg" role="group">${[['full', 'Completas'], ['soft', 'Suaves'], ['off', 'Desligadas']].map(([v, l]) => `<button class="${mode() === v ? 'on' : ''}" data-act="vivoSet" data-v="${v}">${l}</button>`).join('')}</div></div>` : ''); OS.views.definicoes._vv = 1; });
 })();
 
 </script>
