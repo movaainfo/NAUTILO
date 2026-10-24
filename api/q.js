@@ -1,8 +1,8 @@
-// NÁUTILO · cotações de reserva (função do Vercel). Quando o script Google não consegue buscar as cotações
+// PRUMO · cotações de reserva (função do Vercel). Quando o script Google não consegue buscar as cotações
 // (o Yahoo às vezes bloqueia os servidores do Google), a app pede-as aqui: dados públicos do Yahoo Finance.
 // Só símbolos válidos, no máximo 30 por pedido, guardados 30 s; só responde à própria app.
 const CACHE = new Map(), HITS = new Map();
-const OK = /^https:\/\/(oceanum|nautilo)(-[a-z0-9-]+)?\.vercel\.app$/;
+const OK = /^https:\/\/(oceanum|nautilo|prumo)(-[a-z0-9-]+)?\.vercel\.app$/;
 module.exports = async (req, res) => {
   const origin = req.headers.origin || '', ref = req.headers.referer || '', site = req.headers['sec-fetch-site'] || '';
   // só a própria app: pedido do mesmo site (o navegador marca-o) ou com origem/referência da app; o resto é recusado

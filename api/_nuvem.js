@@ -1,4 +1,4 @@
-// NÁUTILO · base comum das contas (não é uma rota: o "_" no nome diz ao Vercel para não a publicar).
+// PRUMO · base comum das contas (não é uma rota: o "_" no nome diz ao Vercel para não a publicar).
 // Guarda tudo num Vercel Blob PRIVADO (só o servidor lê, com a chave do projeto) e, além disso, cifrado:
 //   a/<hash do e-mail>          a conta (e-mail, senha em scrypt, perfis, código de recuperação em hash)
 //   d/<conta>/<perfil>/<doc>     os dados de cada perfil, um documento por fragmento do motor de dados (AES-256-GCM)
@@ -107,7 +107,7 @@ const readToken = async req => { const m = String(req.headers.authorization || '
   return t; };
 
 /* ---------- pedidos HTTP ---------- */
-const OK_ORIGIN = /^https:\/\/(oceanum|nautilo)(-[a-z0-9-]+)?\.vercel\.app$/;
+const OK_ORIGIN = /^https:\/\/(oceanum|nautilo|prumo)(-[a-z0-9-]+)?\.vercel\.app$/;
 const extraOrigins = () => String(process.env.NAUTILO_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
 const allowed = req => { const o = req.headers.origin || '', site = req.headers['sec-fetch-site'] || '', ref = ((req.headers.referer || '').match(/^https?:\/\/[^/]+/) || [''])[0];
   const good = x => OK_ORIGIN.test(x) || extraOrigins().includes(x) || (process.env.NAUTILO_STORE_DIR && /^http:\/\/localhost(:\d+)?$/.test(x));
